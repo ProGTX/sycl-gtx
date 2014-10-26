@@ -1,2 +1,5 @@
 sycl-gtx/Debug/
 Debug/
+*.sdf
+*.suo
+*.pdf
