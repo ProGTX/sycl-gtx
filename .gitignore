@@ -3,3 +3,5 @@ Debug/
 *.sdf
 *.suo
 *.pdf
+sycl-gtx/empty.cl
+*.opensdf

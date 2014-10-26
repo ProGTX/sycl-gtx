@@ -1,5 +1,5 @@
-#include "Debug.h"
-
+#include <debug.h>
+#include <sycl.hpp>
 #include <Windows.h>
 
 

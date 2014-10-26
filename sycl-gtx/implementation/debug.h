@@ -46,8 +46,7 @@ public:
 	debug() = default;
 #if MSVC_LOW
 	debug(debug&& move)
-		: stream(std::move(move.stream)), before(std::move(move.before))
-	{}
+		: stream(std::move(move.stream)), before(std::move(move.before)) {}
 #elif
 	debug(debug&& move) = default;
 #endif
