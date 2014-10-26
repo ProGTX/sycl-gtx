@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\debug.h" />
+    <ClInclude Include="implementation\specification\ranges.h" />
     <ClInclude Include="implementation\sycl.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
