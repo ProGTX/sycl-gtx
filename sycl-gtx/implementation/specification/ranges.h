@@ -1,11 +1,11 @@
 #pragma once
 
+// 3.4.1 Ranges and identifiers
+
 #include <array>
 
 namespace cl {
 namespace sycl {
-
-// 3.4.1 Ranges and identifiers
 
 namespace helper {
 

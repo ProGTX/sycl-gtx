@@ -149,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\debug.h" />
+    <ClInclude Include="implementation\specification\buffer.h" />
     <ClInclude Include="implementation\specification\ranges.h" />
     <ClInclude Include="implementation\sycl.hpp" />
     <ClInclude Include="tests\tests.h" />

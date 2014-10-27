@@ -38,5 +38,8 @@
     <ClInclude Include="tests\tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
