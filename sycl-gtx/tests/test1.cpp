@@ -3,6 +3,7 @@
 #include <vector>
 
 // Example from http://www.codeplay.com/portal/sycl-tutorial-1-the-vector-addition
+// (slightly modified)
 
 #define TOL (0.001)   // tolerance used in floating point comparisons
 #define LENGTH (1024) // Length of vectors a, b and c
@@ -17,16 +18,16 @@ bool test1() {
 	// Fill vectors a and b with random float values
 	int count = LENGTH;
 	for(int i = 0; i < count; i++) {
-		h_a[i] = rand() / (float)RAND_MAX;
-		h_b[i] = rand() / (float)RAND_MAX;
-		h_c[i] = rand() / (float)RAND_MAX;
+		h_a[i] = (int) (rand() / (float)RAND_MAX);
+		h_b[i] = (int)(rand() / (float)RAND_MAX);
+		h_c[i] = (int)(rand() / (float)RAND_MAX);
 	}
 	{
 		// Device buffers
-		buffer d_a(h_a);
-		buffer d_b(h_b);
-		buffer d_c(h_c);
-		buffer d_r(h_d);
+		buffer<int> d_a(h_a);
+		buffer<int> d_b(h_b);
+		buffer<int> d_c(h_c);
+		buffer<int> d_r(h_d);
 		queue myQueue;
 		command_group(myQueue, [&]() {
 			// Data accessors
