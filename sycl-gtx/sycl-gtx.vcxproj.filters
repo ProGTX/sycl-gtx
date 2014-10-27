@@ -24,6 +24,9 @@
     <ClCompile Include="tests\test1.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="tests\test2.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">
@@ -39,6 +42,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\device_selector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\command_group.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\accessors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\invoking.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

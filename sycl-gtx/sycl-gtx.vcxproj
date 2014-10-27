@@ -146,10 +146,18 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tests\test1.cpp" />
+    <ClCompile Include="tests\test2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\debug.h" />
+    <ClInclude Include="implementation\specification\accessors.h" />
     <ClInclude Include="implementation\specification\buffer.h" />
+    <ClInclude Include="implementation\specification\command_group.h" />
+    <ClInclude Include="implementation\specification\context.h" />
+    <ClInclude Include="implementation\specification\device.h" />
+    <ClInclude Include="implementation\specification\device_selector.h" />
+    <ClInclude Include="implementation\specification\invoking.h" />
+    <ClInclude Include="implementation\specification\queue.h" />
     <ClInclude Include="implementation\specification\ranges.h" />
     <ClInclude Include="implementation\sycl.hpp" />
     <ClInclude Include="tests\tests.h" />
