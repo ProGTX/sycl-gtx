@@ -27,7 +27,7 @@ bool test1() {
 		buffer<int> d_a(h_a);
 		buffer<int> d_b(h_b);
 		buffer<int> d_c(h_c);
-		buffer<int> d_r(h_d);
+		buffer<int> d_r(h_r);
 		queue myQueue;
 		command_group(myQueue, [&]() {
 			// Data accessors
