@@ -13,10 +13,16 @@
       <UniqueIdentifier>{D011BB44-1BF7-4113-997B-A081035B40D8}</UniqueIdentifier>
       <Extensions>cl</Extensions>
     </Filter>
+    <Filter Include="Source Files\tests">
+      <UniqueIdentifier>{0b288f8f-268e-49ec-aa3b-61f8d4e186e3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\test1.cpp">
+      <Filter>Source Files\tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -27,6 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\ranges.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
