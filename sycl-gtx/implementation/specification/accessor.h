@@ -16,11 +16,15 @@ class __atomic_ref {};
 template <typename dataType, int dimensions, access::mode mode, access::target target>
 class accessor {
 public:
-	accessor(buffer<dataType, dimensions>& target) {}
+	accessor(buffer<dataType, dimensions>& target) {
+		DSELF() << "not implemented";
+	}
 
 	// Reference to target element.
 	// Only if mode contains write access
-	dataType& operator[](id<dimensions>) {}
+	dataType& operator[](id<dimensions>) {
+		DSELF() << "not implemented";
+	}
 
 	/*
 	// Read element from target data.

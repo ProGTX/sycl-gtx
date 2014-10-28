@@ -2,23 +2,31 @@
 
 // 3.2.6 Command group class
 
+#include "../debug.h"
 #include "queue.h"
 
 namespace cl {
 namespace sycl {
 
-struct event {};
+struct event {
+	event() {
+		DSELF() << "not implemented";
+	}
+};
 
 namespace helper {
 
 struct command_group_interface {
 	virtual event kernel_event() {
+		debug::warning(__func__) << "Should not be called.";
 		return event();
 	}
 	virtual event start_event() {
+		debug::warning(__func__) << "Should not be called.";
 		return event();
 	}
 	virtual event complete_event() {
+		debug::warning(__func__) << "Should not be called.";
 		return event();
 	}
 };
@@ -28,14 +36,19 @@ struct command_group_interface {
 template <typename functorT>
 class command_group : public command_group_interface {
 public:
-	command_group(queue q, functorT functor) {}
+	command_group(queue q, functorT functor) {
+		DSELF() << "not implemented";
+	}
 	virtual event kernel_event() override {
+		DSELF() << "not implemented";
 		return event();
 	}
 	virtual event start_event() override {
+		DSELF() << "not implemented";
 		return event();
 	}
 	virtual event complete_event() override {
+		DSELF() << "not implemented";
 		return event();
 	}
 };
@@ -52,8 +65,7 @@ public:
 	// typename functorT: kernel functor or lambda function
 	template <typename functorT>
 	command_group(queue q, functorT functor)
-		: group(helper::command_group<functorT>(q, functor))
-	{}
+		: group(helper::command_group<functorT>(q, functor)) {}
 	event kernel_event() {
 		group.kernel_event();
 	}

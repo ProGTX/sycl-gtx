@@ -77,9 +77,9 @@ public:
 			std::cout << before.str() << stream.str() << std::endl;
 		}
 	}
-};
 
-template<typename T>
-static debug Warning(T message) {
-	return debug("Warning: ", message);
-}
+	template<typename T>
+	static debug warning(T message) {
+		return debug("SYCL warning: ", message);
+	}
+};

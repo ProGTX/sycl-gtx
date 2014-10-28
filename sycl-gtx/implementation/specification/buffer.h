@@ -3,6 +3,7 @@
 // 3.3.1 Buffers
 
 #include "../common.h"
+#include "../debug.h"
 #include "access.h"
 #include "ranges.h"
 #include <vector>
@@ -18,15 +19,21 @@ namespace helper {
 
 template <typename T, int dimensions>
 struct buffer {
-	buffer(T* host_data, range<dimensions> range) {}
-	buffer(T* host_data, int range) {}
+	buffer(T* host_data, range<dimensions> range) {
+		DSELF() << "not implemented";
+	}
+	buffer(T* host_data, int range) {
+		DSELF() << "not implemented";
+	}
 
 	range<dimensions> get_range();
 	size_t get_count();
 	size_t get_size();
 
 	template<access::mode mode, access::target target = access::global_buffer>
-	accessor<T, dimensions, mode, target> get_access() {}
+	accessor<T, dimensions, mode, target> get_access() {
+		DSELF() << "not implemented";
+	}
 };
 
 } // namespace helper
@@ -46,16 +53,18 @@ struct buffer : helper::buffer<T, dimensions> {
 };
 
 template <typename T>
-struct buffer<T, 1> : helper::buffer < T, 1 >{
+struct buffer<T, 1> : helper::buffer<T, 1> {
 #if MSVC_LOW
 	buffer(T* host_data, range<1> range)
-	: helper::buffer<T, 1>(host_data, range) {}
+		: helper::buffer<T, 1>(host_data, range) {}
 	buffer(T* host_data, int range)
 		: helper::buffer<T, 1>(host_data, range) {}
 #else
 	using helper::buffer<T, 1>::buffer;
 #endif
-	buffer(std::vector<T> host_data) : helper::buffer<T, 1>(host_data.data(), host_data.size()) {}
+	buffer(std::vector<T> host_data) : helper::buffer<T, 1>(host_data.data(), host_data.size()) {
+		DSELF() << "not implemented";
+	}
 };
 
 } // namespace sycl

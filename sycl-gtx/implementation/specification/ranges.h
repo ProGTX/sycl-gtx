@@ -2,25 +2,42 @@
 
 // 3.4.1 Ranges and identifiers
 
+#include "../debug.h"
 
 namespace cl {
 namespace sycl {
 
 template <int dimensions>
-class range {};
+class range {
+public:
+	range() {
+		DSELF() << "not implemented";
+	}
+};
 
 template <int dimensions>
-class nd_range {};
+class nd_range {
+public:
+	nd_range() {
+		DSELF() << "not implemented";
+	}
+};
 
 template <int dimensions = 1>
 class id {
 public:
-	id(range<dimensions> global_size, range<dimensions> local_size) {}
+	id(range<dimensions> global_size, range<dimensions> local_size) {
+		DSELF() << "not implemented";
+	}
 	
 	// TODO: Not in specification
-	id(int size) {}
+	id(int size) {
+		DSELF() << "not implemented";
+	}
 
-	int get(int dimension) {}
+	int get(int dimension) {
+		DSELF() << "not implemented";
+	}
 };
 
 

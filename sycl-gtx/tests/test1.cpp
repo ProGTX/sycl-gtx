@@ -54,8 +54,7 @@ bool test1() {
 			correct++;
 		}
 		else {
-			printf(" tmp %f h_a %f h_b %f h_c %f h_r %f \n", tmp, h_a[i], h_b[i],
-				h_c[i], h_r[i]);
+			//printf(" tmp %f h_a %f h_b %f h_c %f h_r %f \n", tmp, h_a[i], h_b[i], h_c[i], h_r[i]);
 		}
 	}
 	// summarize results

@@ -3,21 +3,36 @@
 // 3.2.5 Queue class
 
 #include <CL/cl.h>
+#include "../debug.h"
 #include "context.h"
-#include "device_selector.h"
+#include "device.h"
 
 namespace cl {
 namespace sycl {
 
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
+private:
+	context contex;
 public:
-	queue() {}
-	queue(cl_command_queue cmd_queue) {}
-	queue(device_selector &selector) {}
-	queue(context, device_selector &selector, cl_command_queue_properties = 0) {}
-	queue(device queue_device) {}
-	queue(queue &cmd_queue) {}
+	queue() {
+		DSELF() << "not implemented";
+	}
+	queue(cl_command_queue cmd_queue) {
+		DSELF() << "not implemented";
+	}
+	queue(device_selector &selector) {
+		DSELF() << "not implemented";
+	}
+	queue(context, device_selector &selector, cl_command_queue_properties = 0) {
+		DSELF() << "not implemented";
+	}
+	queue(device queue_device) {
+		DSELF() << "not implemented";
+	}
+	queue(queue &cmd_queue) {
+		DSELF() << "not implemented";
+	}
 
 	// Optional parameters :
 	//queue(..., error_handler &sync_handler);

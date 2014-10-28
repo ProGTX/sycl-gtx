@@ -4,6 +4,7 @@
 // 3.4.1 is not included here, but rather in ranges.h
 
 #include "../common.h"
+#include "../debug.h"
 #include "program.h"
 
 namespace cl {
@@ -14,8 +15,12 @@ namespace sycl {
 // typename T: kernel functor type
 template <typename T>
 class kernel {
-	kernel<typename T>(context target_cont, device target_dev) {}
-	kernel(context target_cont, device target_dev, STRING_CLASS string_kernel, STRING_CLASS string_name) {}
+	kernel<typename T>(context target_cont, device target_dev) {
+		DSELF() << "not implemented";
+	}
+	kernel(context target_cont, device target_dev, STRING_CLASS string_kernel, STRING_CLASS string_name) {
+		DSELF() << "not implemented";
+	}
 
 	cl_kernel get();
 	context get_context();
@@ -31,23 +36,30 @@ class kernel {
 // 3.4.3 Invoking kernels
 
 template <typename functorT>
-void single_task(functorT f) {}
+void single_task(functorT f) {
+	DSELF() << "not implemented";
+}
 
 template <typename functorT>
-void parallel_for(int total_number_of_work_items, functorT f) {}
+void parallel_for(int total_number_of_work_items, functorT f) {
+	DSELF() << "not implemented";
+}
 
 template <typename functorT>
 functorT kernel_lambda(STRING_CLASS name, functorT f) {
+	DSELF() << "not implemented";
 	return f;
 }
 
 template <typename functorT>
 functorT kernel_functor(STRING_CLASS name, functorT f) {
+	DSELF() << "not implemented";
 	return f;
 }
 
 template <typename functorT>
 functorT kernel_functor(functorT f) {
+	DSELF() << "not implemented";
 	return f;
 }
 
