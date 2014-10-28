@@ -7,7 +7,7 @@ bool test2() {
 
 	int result; // this is where we will write our result
 
-	{ // by sticking all the SYCL work in a {} block, we ensure
+	{	// by sticking all the SYCL work in a {} block, we ensure
 		// all SYCL tasks must complete before exiting the block
 
 		// create a queue to work on
@@ -16,7 +16,7 @@ bool test2() {
 		// wrap our result variable in a buffer
 		buffer<int> resultBuf(&result, 1);
 
-		// create some c o m m a n d s for our q u e u e
+		// create some commands for our queue
 		command_group(myQueue, [&]() {
 			// request access to our buffer
 			auto writeResult = resultBuf.get_access<access::write>();
