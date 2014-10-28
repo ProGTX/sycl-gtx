@@ -6,14 +6,10 @@
 #include "specification\accessor.h"
 #include "specification\buffer.h"
 #include "specification\command_group.h"
+#include "specification\context.h"
+#include "specification\device.h"
 #include "specification\kernel.h"
+#include "specification\platform.h"
 #include "specification\program.h"
-#include "specification\ranges.h"
 #include "specification\queue.h"
-
-namespace cl {
-namespace sycl {
-
-
-} // namespace sycl
-} // namespace cl
+#include "specification\ranges.h"

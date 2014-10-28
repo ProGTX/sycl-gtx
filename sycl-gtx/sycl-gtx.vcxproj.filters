@@ -74,5 +74,8 @@
     <ClInclude Include="implementation\specification\program.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
