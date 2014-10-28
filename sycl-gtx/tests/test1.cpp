@@ -37,8 +37,8 @@ bool test1() {
 			auto r = d_r.get_access<access::write>();
 			// Kernel
 			parallel_for(count, kernel_functor([=](id<> item) {
-				int i = item.get_global(0);
-				r[i] = a[i] + b[i] + c[i];
+				//int i = item.get_global(0);
+				//r[i] = a[i] + b[i] + c[i];
 			}));
 		});
 	}

@@ -12,9 +12,15 @@ struct event {};
 namespace helper {
 
 struct command_group_interface {
-	virtual event kernel_event();
-	virtual event start_event();
-	virtual event complete_event();
+	virtual event kernel_event() {
+		return event();
+	}
+	virtual event start_event() {
+		return event();
+	}
+	virtual event complete_event() {
+		return event();
+	}
 };
 
 // This class is the actual implementation of the command_group
