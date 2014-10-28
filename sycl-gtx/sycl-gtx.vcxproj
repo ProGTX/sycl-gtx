@@ -149,6 +149,7 @@
     <ClCompile Include="tests\test2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="implementation\common.h" />
     <ClInclude Include="implementation\debug.h" />
     <ClInclude Include="implementation\specification\accessors.h" />
     <ClInclude Include="implementation\specification\buffer.h" />
