@@ -2,20 +2,27 @@
 
 // 3.4.1 Ranges and identifiers
 
-#include <array>
 
 namespace cl {
 namespace sycl {
 
-namespace helper {
+template <int dimensions>
+class range {};
 
-} // namespace helper
+template <int dimensions>
+class nd_range {};
 
-template <int dims>
-class range;
+template <int dimensions = 1>
+class id {
+public:
+	id(range<dimensions> global_size, range<dimensions> local_size) {}
+	
+	// TODO: Not in specification
+	id(int size) {}
 
-template <int dims>
-class nd_range;
+	int get(int dimension) {}
+};
+
 
 } // namespace sycl
 } // namespace cl

@@ -59,16 +59,19 @@
     <ClInclude Include="implementation\specification\command_group.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\accessors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implementation\specification\invoking.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="implementation\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\kernel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\accessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\access.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\program.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

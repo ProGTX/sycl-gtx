@@ -3,12 +3,16 @@
 // 3.3.1 Buffers
 
 #include "../common.h"
-#include "accessors.h"
+#include "access.h"
 #include "ranges.h"
 #include <vector>
 
 namespace cl {
 namespace sycl {
+
+// Forward declaration.
+template <typename dataType, int dimensions, access::mode mode, access::target target>
+class accessor;
 
 namespace helper {
 
@@ -16,6 +20,10 @@ template <typename T, int dimensions>
 struct buffer {
 	buffer(T* host_data, range<dimensions> range) {}
 	buffer(T* host_data, int range) {}
+
+	range<dimensions> get_range();
+	size_t get_count();
+	size_t get_size();
 
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<T, dimensions, mode, target> get_access() {}
@@ -47,7 +55,7 @@ struct buffer<T, 1> : helper::buffer < T, 1 >{
 #else
 	using helper::buffer<T, 1>::buffer;
 #endif
-	buffer(std::vector<T> host_data) {}
+	buffer(std::vector<T> host_data) : helper::buffer<T, 1>(host_data.data(), host_data.size()) {}
 };
 
 } // namespace sycl

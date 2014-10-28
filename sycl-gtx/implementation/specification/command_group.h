@@ -21,10 +21,17 @@ struct command_group_interface {
 // Three classes are needed as a workaround to the inability to deduce templated class constructor arguments
 template <typename functorT>
 class command_group : public command_group_interface {
+public:
 	command_group(queue q, functorT functor) {}
-	virtual event kernel_event() override {}
-	virtual event start_event() override {}
-	virtual event complete_event() override {}
+	virtual event kernel_event() override {
+		return event();
+	}
+	virtual event start_event() override {
+		return event();
+	}
+	virtual event complete_event() override {
+		return event();
+	}
 };
 
 } // namespace helper
@@ -39,7 +46,7 @@ public:
 	// typename functorT: kernel functor or lambda function
 	template <typename functorT>
 	command_group(queue q, functorT functor)
-		: group(q, functor)
+		: group(helper::command_group<functorT>(q, functor))
 	{}
 	event kernel_event() {
 		group.kernel_event();

@@ -151,14 +151,15 @@
   <ItemGroup>
     <ClInclude Include="implementation\common.h" />
     <ClInclude Include="implementation\debug.h" />
-    <ClInclude Include="implementation\specification\accessors.h" />
+    <ClInclude Include="implementation\specification\accessor.h" />
+    <ClInclude Include="implementation\specification\access.h" />
     <ClInclude Include="implementation\specification\buffer.h" />
     <ClInclude Include="implementation\specification\command_group.h" />
     <ClInclude Include="implementation\specification\context.h" />
     <ClInclude Include="implementation\specification\device.h" />
     <ClInclude Include="implementation\specification\device_selector.h" />
-    <ClInclude Include="implementation\specification\invoking.h" />
     <ClInclude Include="implementation\specification\kernel.h" />
+    <ClInclude Include="implementation\specification\program.h" />
     <ClInclude Include="implementation\specification\queue.h" />
     <ClInclude Include="implementation\specification\ranges.h" />
     <ClInclude Include="implementation\sycl.hpp" />
