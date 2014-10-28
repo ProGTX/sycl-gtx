@@ -157,7 +157,6 @@
     <ClInclude Include="implementation\specification\command_group.h" />
     <ClInclude Include="implementation\specification\context.h" />
     <ClInclude Include="implementation\specification\device.h" />
-    <ClInclude Include="implementation\specification\device_selector.h" />
     <ClInclude Include="implementation\specification\kernel.h" />
     <ClInclude Include="implementation\specification\program.h" />
     <ClInclude Include="implementation\specification\queue.h" />
