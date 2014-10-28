@@ -1,10 +1,7 @@
 #pragma once
 
-// 3.3.4 Accessors
-
 namespace cl {
 namespace sycl {
-
 namespace access {
 
 // 3.3.4.1 Access modes
@@ -20,7 +17,7 @@ enum mode {
 enum target {
 	global_buffer,		// access buffer via __global memory
 	constant_buffer,	// access buffer via __constant memory
-	local,				// access work - group - local memory
+	local,				// access work-group - local memory
 	image,				// access an image
 	host_buffer,		// access buffer immediately on the host
 	host_image,			// access image immediately on the host
@@ -30,10 +27,5 @@ enum target {
 };
 
 } // namespace access
-
-// 3.3.4.4 Buffer accessors
-template <typename dataType, int dimensions, access::mode mode, access::target target>
-class accessor {};
-
 } // namespace sycl
 } // namespace cl
