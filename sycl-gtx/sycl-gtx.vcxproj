@@ -158,6 +158,7 @@
     <ClInclude Include="implementation\specification\device.h" />
     <ClInclude Include="implementation\specification\device_selector.h" />
     <ClInclude Include="implementation\specification\invoking.h" />
+    <ClInclude Include="implementation\specification\kernel.h" />
     <ClInclude Include="implementation\specification\queue.h" />
     <ClInclude Include="implementation\specification\ranges.h" />
     <ClInclude Include="implementation\sycl.hpp" />
