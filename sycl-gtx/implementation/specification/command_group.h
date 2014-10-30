@@ -2,6 +2,7 @@
 
 // 3.2.6 Command group class
 
+#include "../common.h"
 #include "../debug.h"
 #include "queue.h"
 

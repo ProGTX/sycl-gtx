@@ -8,7 +8,7 @@
 
 int main() {
 	debug() << "SYCL Provisional Specification.";
-
+	
 	std::map<std::string, bool(*)()> tests{
 		//{ "test1", test1 },
 		//{ "test2", test2 },

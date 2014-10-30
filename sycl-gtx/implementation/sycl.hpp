@@ -13,3 +13,6 @@
 #include "specification\program.h"
 #include "specification\queue.h"
 #include "specification\ranges.h"
+
+#undef VECTOR_CLASS
+#undef STRING_CLASS
