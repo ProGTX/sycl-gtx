@@ -3,6 +3,7 @@
 // Device classes
 
 #include "../debug.h"
+#include <CL/cl.h>
 
 namespace cl {
 namespace sycl {
@@ -11,7 +12,7 @@ namespace sycl {
 // Encapsulates a cl_device_id and a cl_platform_id
 class device {
 public:
-	device() {
+	device(cl_device_id device_id = nullptr) {
 		DSELF() << "not implemented";
 	}
 };
