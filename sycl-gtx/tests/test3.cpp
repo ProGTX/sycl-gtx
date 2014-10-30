@@ -1,3 +1,5 @@
+// http://www.fixstars.com/en/opencl/book/OpenCLProgrammingBook/first-opencl-program/
+
 #include "tests.h"
 
 #include <stdio.h>
