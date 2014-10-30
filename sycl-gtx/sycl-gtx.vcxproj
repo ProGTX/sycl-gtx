@@ -165,6 +165,7 @@
     <ClInclude Include="implementation\specification\program.h" />
     <ClInclude Include="implementation\specification\queue.h" />
     <ClInclude Include="implementation\specification\ranges.h" />
+    <ClInclude Include="implementation\specification\refc.h" />
     <ClInclude Include="implementation\sycl.hpp" />
     <ClInclude Include="tests\tests.h" />
   </ItemGroup>
