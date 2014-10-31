@@ -50,5 +50,5 @@ bool platform::is_host() {
 }
 
 bool platform::has_extension(const STRING_CLASS extension_name) {
-	return helper::has_extension(this, extension_name);
+	return helper::has_extension<CL_PLATFORM_EXTENSIONS>(this, extension_name);
 }

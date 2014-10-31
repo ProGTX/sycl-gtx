@@ -47,5 +47,5 @@ VECTOR_CLASS<device> device::get_devices(cl_device_type device_type) {
 }
 
 bool device::has_extension(const STRING_CLASS extension_name) {
-	return helper::has_extension(this, extension_name);
+	return helper::has_extension<CL_DEVICE_EXTENSIONS>(this, extension_name);
 }
