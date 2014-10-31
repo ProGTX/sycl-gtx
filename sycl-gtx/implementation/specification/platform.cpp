@@ -43,10 +43,6 @@ VECTOR_CLASS<device> platform::get_devices(cl_device_type device_type) {
 	return helper::get_devices(device_type, platform_id, handler);
 }
 
-// TODO
-//template<cl_int name>
-//typename param_traits<cl_platform_info, name>::param_type get_info() {}
-
 // TODO: How to check for this?
 bool platform::is_host() {
 	DSELF() << "not implemented";

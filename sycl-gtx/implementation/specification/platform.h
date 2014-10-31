@@ -5,6 +5,7 @@
 #include "refc.h"
 #include "../common.h"
 #include "../error_handler.h"
+#include "../param_traits.h"
 
 namespace cl {
 namespace sycl {
@@ -45,10 +46,18 @@ public:
 	// Returns a vector of corresponding devices.
 	VECTOR_CLASS<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
 
-	// TODO: Not yet sure what to do with param_types, it's not described in the specification
 	// Direct equivalent of the OpenCL C API.
-	//template<cl_int name>
-	//typename param_traits<cl_platform_info, name>::param_type get_info();
+	template<cl_int name>
+	typename param_traits<cl_platform_info, name>::param_type get_info() {
+		static const int MAX_BUFFER = 8192;
+		auto pid = platform_id.get();
+		size_t param_value_size;
+		char buffer[MAX_BUFFER];
+		size_t param_value_size_ret;
+		auto error_code = clGetPlatformInfo(pid, name, param_value_size, buffer, &param_value_size_ret);
+		handler.handle(error_code);
+		return buffer;
+	}
 
 	bool is_host();
 	bool has_extension(const STRING_CLASS extension_name);
