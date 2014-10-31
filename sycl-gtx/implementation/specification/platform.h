@@ -49,12 +49,10 @@ public:
 	// Direct equivalent of the OpenCL C API.
 	template<cl_int name>
 	typename param_traits<cl_platform_info, name>::param_type get_info() {
-		static const int MAX_BUFFER = 8192;
+		static const int BUFFER_SIZE = 8192;
+		char buffer[BUFFER_SIZE];
 		auto pid = platform_id.get();
-		size_t param_value_size;
-		char buffer[MAX_BUFFER];
-		size_t param_value_size_ret;
-		auto error_code = clGetPlatformInfo(pid, name, param_value_size, buffer, &param_value_size_ret);
+		auto error_code = clGetPlatformInfo(pid, name, BUFFER_SIZE, buffer, nullptr);
 		handler.handle(error_code);
 		return buffer;
 	}
