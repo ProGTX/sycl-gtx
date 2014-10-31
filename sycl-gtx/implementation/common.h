@@ -31,14 +31,19 @@ namespace cl {
 namespace sycl {
 namespace helper {
 
-template<class Container, class Inner, size_t ArraySize>
-VECTOR_CLASS<Container> to_vector(Inner(&array)[ArraySize], cl_uint size) {
+template<class Container, class Inner>
+VECTOR_CLASS<Container> to_vector(Inner* array, cl_uint new_size, bool) {
 	VECTOR_CLASS<Container> vector;
-	vector.reserve(size);
-	for(auto&& ptr : array) {
-		vector.emplace_back(ptr);
+	vector.reserve(new_size);
+	for(cl_uint i = 0; i < new_size; ++i) {
+		vector.emplace_back(array[i]);
 	}
 	return vector;
+}
+
+template<class Container, class Inner, size_t ArraySize>
+VECTOR_CLASS<Container> to_vector(Inner(&array)[ArraySize], cl_uint size) {
+	return to_vector<Container>(array, size, true);
 }
 
 template<cl_uint extension_macro, class T>

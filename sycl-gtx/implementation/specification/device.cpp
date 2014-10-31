@@ -49,3 +49,16 @@ VECTOR_CLASS<device> device::get_devices(cl_device_type device_type) {
 bool device::has_extension(const STRING_CLASS extension_name) {
 	return helper::has_extension<CL_DEVICE_EXTENSIONS>(this, extension_name);
 }
+
+VECTOR_CLASS<device> device::create_sub_devices(
+	const cl_device_partition_property* properties,
+	int devices,
+	unsigned int* num_devices
+) {
+	auto did = device_id.get();
+	cl_device_id* device_ids = new cl_device_id[devices];
+	auto error_code = clCreateSubDevices(did, properties, devices, device_ids, num_devices);
+	auto device_vector = helper::to_vector<device>(device_ids, *num_devices, true);
+	delete[] device_ids;
+	return device_vector;
+}

@@ -45,6 +45,8 @@ public:
 	bool is_host();
 	bool is_cpu();
 	bool is_gpu();
+
+	// Partition device
 	VECTOR_CLASS<device> create_sub_devices(
 		const cl_device_partition_property* properties,
 		int devices,
