@@ -16,6 +16,12 @@
     <Filter Include="Source Files\tests">
       <UniqueIdentifier>{0b288f8f-268e-49ec-aa3b-61f8d4e186e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\specification">
+      <UniqueIdentifier>{1c9d35e7-f8ac-4442-a910-2dd30f82f9f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\specification">
+      <UniqueIdentifier>{76112fff-eaac-4239-8355-76ce97a5d1e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -40,10 +46,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="implementation\specification\device.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\specification</Filter>
     </ClCompile>
     <ClCompile Include="implementation\specification\platform.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\specification</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -53,49 +59,49 @@
     <ClInclude Include="implementation\debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\ranges.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="tests\tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implementation\specification\queue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implementation\specification\device.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implementation\specification\context.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implementation\specification\command_group.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implementation\common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implementation\specification\kernel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implementation\specification\accessor.h">
+    <ClInclude Include="implementation\error_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\access.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\program.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="implementation\specification\accessor.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\buffer.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\command_group.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\context.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\device.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\kernel.h">
+      <Filter>Header Files\specification</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\platform.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\program.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\queue.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\ranges.h">
+      <Filter>Header Files\specification</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\refc.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\error_handler.h">
+    <ClInclude Include="implementation\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
