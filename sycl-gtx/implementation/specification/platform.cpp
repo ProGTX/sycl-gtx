@@ -50,13 +50,5 @@ bool platform::is_host() {
 }
 
 bool platform::has_extension(const STRING_CLASS extension_name) {
-	// TODO: Maybe add caching
-	static const int BUFFER_SIZE = 8192;
-	char extensions[BUFFER_SIZE];
-	auto pid = platform_id.get();
-	auto error_code = clGetPlatformInfo(pid, CL_PLATFORM_EXTENSIONS, BUFFER_SIZE, extensions, NULL);
-	handler.handle(error_code);
-
-	STRING_CLASS ext_str(extensions);
-	return ext_str.find(extension_name) != STRING_CLASS::npos;
+	return helper::has_extension(this, extension_name);
 }

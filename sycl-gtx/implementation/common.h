@@ -41,6 +41,14 @@ VECTOR_CLASS<Container> to_vector(Inner(&array)[ArraySize], cl_uint size) {
 	return vector;
 }
 
+template<class T>
+bool has_extension(T* sycl_class, const STRING_CLASS extension_name) {
+	// TODO: Maybe add caching
+	auto extensions = sycl_class->get_info<CL_DEVICE_EXTENSIONS>();
+	STRING_CLASS ext_str(extensions);
+	return ext_str.find(extension_name) != STRING_CLASS::npos;
+}
+
 } // namespace helper
 } // namespace sycl
 } // namespace cl

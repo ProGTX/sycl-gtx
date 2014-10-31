@@ -45,3 +45,7 @@ platform device::get_platforms() {
 VECTOR_CLASS<device> device::get_devices(cl_device_type device_type) {
 	return helper::get_devices(device_type, platform_id, handler);
 }
+
+bool device::has_extension(const STRING_CLASS extension_name) {
+	return helper::has_extension(this, extension_name);
+}
