@@ -2,19 +2,58 @@
 
 // Device classes
 
+#include "refc.h"
 #include "../debug.h"
+#include "../common.h"
+#include "../error_handler.h"
 #include <CL/cl.h>
 
 namespace cl {
 namespace sycl {
 
+// Forward declaration
+class platform;
+
 // 3.2.2 Device class
-// Encapsulates a cl_device_id and a cl_platform_id
+// Encapsulates a cl_device_id and a cl_device_id
 class device {
+private:
+	refc::ptr<cl_platform_id> platform_id;
+	refc::ptr<cl_device_id> device_id;
+	helper::err_handler handler;
+
 public:
-	device(cl_device_id device_id = nullptr) {
-		DSELF() << "not implemented";
-	}
+	device(cl_device_id device_id = nullptr);
+	device(cl_device_id device_id, int& error_handler);
+	device(const device&) = default;
+	device& operator=(const device&) = default;
+
+#if MSVC_LOW
+	// Visual Studio [2013] does not support defaulted move constructors or move-assignment operators as the C++11 standard mandates.
+	// http://msdn.microsoft.com/en-us/library/dn457344.aspx
+	device(device&& move);
+	device& operator=(device&& move);
+#else
+	device(device&&) = default;
+	device& operator=(device&&) = default;
+#endif
+
+	cl_device_id get();
+	platform get_platforms();
+	VECTOR_CLASS<device> get_devices(cl_device_type device_type);
+	
+	//template<cl_int name>
+	//typename param_traits<cl_device_info, name>::param_type get_info();
+	
+	bool has_extension(const STRING_CLASS extension_name);
+	bool is_host();
+	bool is_cpu();
+	bool is_gpu();
+	VECTOR_CLASS<device> create_sub_devices(
+		const cl_device_partition_property* properties,
+		int devices,
+		unsigned int* num_devices
+	);
 };
 
 
