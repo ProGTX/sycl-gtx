@@ -23,6 +23,7 @@ private:
 	helper::err_handler handler;
 
 public:
+	// TODO: In the case of constructing a device instance from an existing cl_device_id the system triggers a clRetainDevice.
 	device(cl_device_id device_id = nullptr);
 	device(cl_device_id device_id, int& error_handler);
 	device(const device&) = default;
@@ -37,6 +38,9 @@ public:
 	device(device&&) = default;
 	device& operator=(device&&) = default;
 #endif
+
+	// TODO: On destruction a call to clReleaseDevice is triggered.
+	~device() {}
 
 	cl_device_id get() const;
 	platform get_platforms();

@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="implementation\error_handler.cpp" />
+    <ClCompile Include="implementation\specification\context.cpp" />
     <ClCompile Include="implementation\specification\device.cpp" />
     <ClCompile Include="implementation\specification\platform.cpp" />
     <ClCompile Include="main.cpp" />
