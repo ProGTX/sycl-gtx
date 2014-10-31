@@ -6,6 +6,7 @@
 #include "../debug.h"
 #include "../common.h"
 #include "../error_handler.h"
+#include "../param_traits.h"
 
 namespace cl {
 namespace sycl {
@@ -41,8 +42,10 @@ public:
 	platform get_platforms();
 	VECTOR_CLASS<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
 	
-	//template<cl_int name>
-	//typename param_traits<cl_device_info, name>::param_type get_info();
+	template<cl_int name>
+	typename param_traits<cl_device_info, name>::param_type get_info() {
+		return param_traits<cl_device_info, name>::param_type();
+	}
 	
 	bool has_extension(const STRING_CLASS extension_name);
 	bool is_host();
