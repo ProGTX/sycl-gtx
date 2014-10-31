@@ -6,7 +6,6 @@
 #include "../debug.h"
 #include "../common.h"
 #include "../error_handler.h"
-#include <CL/cl.h>
 
 namespace cl {
 namespace sycl {
@@ -15,7 +14,7 @@ namespace sycl {
 class platform;
 
 // 3.2.2 Device class
-// Encapsulates a cl_device_id and a cl_device_id
+// Encapsulates a cl_device_id and a cl_platform_id
 class device {
 private:
 	refc::ptr<cl_platform_id> platform_id;
@@ -38,9 +37,9 @@ public:
 	device& operator=(device&&) = default;
 #endif
 
-	cl_device_id get();
+	cl_device_id get() const;
 	platform get_platforms();
-	VECTOR_CLASS<device> get_devices(cl_device_type device_type);
+	VECTOR_CLASS<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
 	
 	//template<cl_int name>
 	//typename param_traits<cl_device_info, name>::param_type get_info();
@@ -55,6 +54,17 @@ public:
 		unsigned int* num_devices
 	);
 };
+
+
+namespace helper {
+
+VECTOR_CLASS<device> get_devices(
+	cl_device_type device_type,
+	refc::ptr<cl_platform_id> platform_id,
+	err_handler handler
+);
+
+} // namespace helper
 
 
 // 3.2.4 Device selection class
