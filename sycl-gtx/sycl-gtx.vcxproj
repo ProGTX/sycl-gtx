@@ -144,6 +144,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="implementation\error_handler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tests\test1.cpp" />
     <ClCompile Include="tests\test2.cpp" />
@@ -154,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="implementation\common.h" />
     <ClInclude Include="implementation\debug.h" />
+    <ClInclude Include="implementation\error_handler.h" />
     <ClInclude Include="implementation\specification\accessor.h" />
     <ClInclude Include="implementation\specification\access.h" />
     <ClInclude Include="implementation\specification\buffer.h" />

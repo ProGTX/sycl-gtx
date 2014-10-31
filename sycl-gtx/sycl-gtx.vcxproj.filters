@@ -36,6 +36,9 @@
     <ClCompile Include="tests\test5.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\error_handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\refc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\error_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
