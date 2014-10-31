@@ -158,6 +158,7 @@
     <ClInclude Include="implementation\common.h" />
     <ClInclude Include="implementation\debug.h" />
     <ClInclude Include="implementation\error_handler.h" />
+    <ClInclude Include="implementation\param_traits.h" />
     <ClInclude Include="implementation\specification\accessor.h" />
     <ClInclude Include="implementation\specification\access.h" />
     <ClInclude Include="implementation\specification\buffer.h" />

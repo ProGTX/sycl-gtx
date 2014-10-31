@@ -104,5 +104,8 @@
     <ClInclude Include="implementation\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\param_traits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
