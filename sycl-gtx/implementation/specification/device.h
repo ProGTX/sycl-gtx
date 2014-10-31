@@ -41,12 +41,6 @@ public:
 	cl_device_id get() const;
 	platform get_platforms();
 	VECTOR_CLASS<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
-	
-	template<cl_int name>
-	typename param_traits<cl_device_info, name>::param_type get_info() {
-		return param_traits<cl_device_info, name>::param_type();
-	}
-	
 	bool has_extension(const STRING_CLASS extension_name);
 	bool is_host();
 	bool is_cpu();
@@ -56,6 +50,24 @@ public:
 		int devices,
 		unsigned int* num_devices
 	);
+
+private:
+	template<class return_type, cl_int name>
+	struct hidden {
+		static return_type get_info(device* dev) {
+			auto did = dev->device_id.get();
+			return_type result;
+			auto error_code = clGetDeviceInfo(did, name, sizeof(return_type), &result, nullptr);
+			dev->handler.handle(error_code);
+			return result;
+		}
+	};
+	
+public:
+	template<cl_int name>
+	typename param_traits<cl_device_info, name>::param_type get_info() {
+		return hidden<typename param_traits<cl_device_info, name>::param_type, name>::get_info(this);
+	}
 };
 
 
