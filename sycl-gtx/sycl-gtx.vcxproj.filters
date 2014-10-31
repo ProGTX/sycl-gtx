@@ -42,6 +42,9 @@
     <ClCompile Include="implementation\specification\device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\specification\platform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">
