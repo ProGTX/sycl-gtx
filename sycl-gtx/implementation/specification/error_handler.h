@@ -38,14 +38,14 @@ public:
 	exception(queue* thrower, cl_int error_code, bool is_sycl_specific)
 		: thrower(thrower), error_code(error_code), is_sycl_specific(is_sycl_specific), thrower_type(thrower_t::queue) {}
 
-	// TODO: Handling of buffer template parameters
-	//template <>
-	//exception(buffer* thrower, cl_int error_code, bool is_sycl_specific)
-	//	: thrower(thrower), error_code(error_code), is_sycl_specific(is_sycl_specific), thrower_type(thrower_t::buffer) {}
-
 	template <>
 	exception(image* thrower, cl_int error_code, bool is_sycl_specific)
 		: thrower(thrower), error_code(error_code), is_sycl_specific(is_sycl_specific), thrower_type(thrower_t::image) {}
+
+	// TODO: Compiles, but linker error
+	template<int dimensions>
+	exception(buffer<class T, dimensions>* thrower, cl_int error_code, bool is_sycl_specific)
+		: thrower(thrower), error_code(error_code), is_sycl_specific(is_sycl_specific), thrower_type(thrower_t::buffer) {}
 
 	// Returns the OpenCL error code.
 	// Returns 0 if not an OpenCL error
@@ -65,9 +65,12 @@ public:
 		return get<queue, thrower_t::queue>();
 	}
 
+	// TODO: A bit trickier than the constructor since we are forcing the type instead of deducing it
 	// Returns the buffer that caused the error.
 	// Returns 0 if not a buffer error
-	//buffer* get_buffer();
+	//buffer<class T>* get_buffer() {
+	//	return get<buffer<class T>, thrower_t::buffer>();
+	//}
 
 	// Returns the image that caused the error.
 	// Returns 0 if not a image error
