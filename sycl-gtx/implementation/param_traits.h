@@ -98,6 +98,11 @@ SYCL_ADD_TRAIT(cl_device_info, cl_platform_id,				(name == CL_DEVICE_PLATFORM));
 SYCL_ADD_TRAIT(cl_device_info, cl_command_queue_properties,	(name == CL_DEVICE_QUEUE_PROPERTIES));
 SYCL_ADD_TRAIT(cl_device_info, cl_device_type,				(name == CL_DEVICE_TYPE));
 
+// https://www.khronos.org/registry/cl/sdk/1.0/docs/man/xhtml/clGetContextInfo.html
+SYCL_ADD_TRAIT(cl_context_info, cl_uint,					(name == CL_CONTEXT_REFERENCE_COUNT));
+SYCL_ADD_TRAIT(cl_context_info, cl_device_id[],				(name == CL_CONTEXT_DEVICES));
+SYCL_ADD_TRAIT(cl_context_info, cl_context_properties[],	(name == CL_CONTEXT_PROPERTIES));
+
 } // namespace sycl
 } // namespace cl
 

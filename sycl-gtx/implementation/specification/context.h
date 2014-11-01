@@ -3,6 +3,8 @@
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
+#include "../error_handler.h"
+#include "../param_traits.h"
 
 namespace cl {
 namespace sycl {
@@ -15,6 +17,7 @@ class program;
 class context {
 private:
 	refc::ptr<cl_context> ctx;
+	helper::err_handler handler;
 
 public:
 	// TODO: The constructor creates a context and in the case of copying it calls a clRetainContext
@@ -32,15 +35,22 @@ public:
 
 	cl_context get();
 
-	//template<cl_int name>
-	//typename param_traits<cl_context_info, name>::param_type get_info();
+	// TODO: Deal with array types
+	template<cl_int name>
+	typename param_traits<cl_context_info, name>::param_type get_info() {
+		auto c = ctx.get();
+		param_traits<cl_context_info, name>::param_type param_value;
+		size_t param_value_size = sizeof(decltype(param_value));
+		auto error_code = clGetContextInfo(c, name, param_value_size, &param_value, nullptr);
+		handler.handle(error_code);
+		return param_value;
+	}
 };
 
 // Used as the notification function for contexts.
 class context_notify {
 public:
-	context_notify();
-	~context_notify();
+	virtual ~context_notify() {}
 	virtual void operator()(const STRING_CLASS errinfo, const void* private_info, size_t cb) = 0;
 	virtual void operator()(program t_program) = 0;
 };

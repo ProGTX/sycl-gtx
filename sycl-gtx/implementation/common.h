@@ -31,6 +31,7 @@ namespace cl {
 namespace sycl {
 namespace helper {
 
+// Meant for transforming arrays of pointers to OpenCL structs into a vector
 template<class Container, class Inner>
 VECTOR_CLASS<Container> to_vector(Inner* array, cl_uint new_size, bool) {
 	VECTOR_CLASS<Container> vector;
@@ -40,7 +41,6 @@ VECTOR_CLASS<Container> to_vector(Inner* array, cl_uint new_size, bool) {
 	}
 	return vector;
 }
-
 template<class Container, class Inner, size_t ArraySize>
 VECTOR_CLASS<Container> to_vector(Inner(&array)[ArraySize], cl_uint size) {
 	return to_vector<Container>(array, size, true);
