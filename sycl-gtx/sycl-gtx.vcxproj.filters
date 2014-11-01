@@ -42,9 +42,6 @@
     <ClCompile Include="tests\test5.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\error_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="implementation\specification\device.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
@@ -52,6 +49,9 @@
       <Filter>Source Files\specification</Filter>
     </ClCompile>
     <ClCompile Include="implementation\specification\context.cpp">
+      <Filter>Source Files\specification</Filter>
+    </ClCompile>
+    <ClCompile Include="implementation\specification\error_handler.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
   </ItemGroup>
@@ -63,9 +63,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="tests\tests.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implementation\error_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\access.h">
@@ -109,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="implementation\param_traits.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\error_handler.h">
+      <Filter>Header Files\specification</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

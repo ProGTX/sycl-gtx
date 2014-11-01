@@ -144,9 +144,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="implementation\error_handler.cpp" />
     <ClCompile Include="implementation\specification\context.cpp" />
     <ClCompile Include="implementation\specification\device.cpp" />
+    <ClCompile Include="implementation\specification\error_handler.cpp" />
     <ClCompile Include="implementation\specification\platform.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tests\test1.cpp" />
@@ -158,7 +158,6 @@
   <ItemGroup>
     <ClInclude Include="implementation\common.h" />
     <ClInclude Include="implementation\debug.h" />
-    <ClInclude Include="implementation\error_handler.h" />
     <ClInclude Include="implementation\param_traits.h" />
     <ClInclude Include="implementation\specification\accessor.h" />
     <ClInclude Include="implementation\specification\access.h" />
@@ -166,6 +165,7 @@
     <ClInclude Include="implementation\specification\command_group.h" />
     <ClInclude Include="implementation\specification\context.h" />
     <ClInclude Include="implementation\specification\device.h" />
+    <ClInclude Include="implementation\specification\error_handler.h" />
     <ClInclude Include="implementation\specification\kernel.h" />
     <ClInclude Include="implementation\specification\platform.h" />
     <ClInclude Include="implementation\specification\program.h" />

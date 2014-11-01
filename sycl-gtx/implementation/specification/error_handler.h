@@ -1,7 +1,6 @@
 #pragma once
 
-#include "common.h"
-#include <CL/cl.h>
+#include "../common.h"
 
 namespace cl {
 namespace sycl {

@@ -3,8 +3,8 @@
 // 3.2.1 Platform class
 
 #include "refc.h"
+#include "error_handler.h"
 #include "../common.h"
-#include "../error_handler.h"
 #include "../param_traits.h"
 
 namespace cl {

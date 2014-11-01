@@ -1,9 +1,9 @@
 #pragma once
 
 #include "refc.h"
+#include "error_handler.h"
 #include "../common.h"
 #include "../debug.h"
-#include "../error_handler.h"
 #include "../param_traits.h"
 
 namespace cl {
