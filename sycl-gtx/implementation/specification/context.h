@@ -17,7 +17,6 @@ class program;
 class context {
 private:
 	refc::ptr<cl_context> ctx;
-	helper::err_handler handler;
 
 public:
 	// TODO: The constructor creates a context and in the case of copying it calls a clRetainContext

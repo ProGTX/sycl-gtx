@@ -20,24 +20,10 @@ class device {
 private:
 	refc::ptr<cl_platform_id> platform_id;
 	refc::ptr<cl_device_id> device_id;
-	helper::err_handler handler;
 
 public:
 	// TODO: In the case of constructing a device instance from an existing cl_device_id the system triggers a clRetainDevice.
 	device(cl_device_id device_id = nullptr);
-	device(cl_device_id device_id, int& error_handler);
-	device(const device&) = default;
-	device& operator=(const device&) = default;
-
-#if MSVC_LOW
-	// Visual Studio [2013] does not support defaulted move constructors or move-assignment operators as the C++11 standard mandates.
-	// http://msdn.microsoft.com/en-us/library/dn457344.aspx
-	device(device&& move);
-	device& operator=(device&& move);
-#else
-	device(device&&) = default;
-	device& operator=(device&&) = default;
-#endif
 
 	// TODO: On destruction a call to clReleaseDevice is triggered.
 	~device() {}
@@ -64,7 +50,7 @@ private:
 			auto did = dev->device_id.get();
 			return_type result;
 			auto error_code = clGetDeviceInfo(did, name, sizeof(return_type), &result, nullptr);
-			dev->handler.handle(error_code);
+			//dev->handler.handle(error_code);
 			return result;
 		}
 	};
@@ -81,8 +67,7 @@ namespace helper {
 
 VECTOR_CLASS<device> get_devices(
 	cl_device_type device_type,
-	refc::ptr<cl_platform_id> platform_id,
-	err_handler handler
+	refc::ptr<cl_platform_id> platform_id
 );
 
 } // namespace helper

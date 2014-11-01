@@ -16,30 +16,15 @@ class device;
 class platform {
 private:
 	refc::ptr<cl_platform_id> platform_id;
-	helper::err_handler handler;
 
 public:
-	platform(cl_platform_id platform_id, int& error_handler);
 	platform(cl_platform_id platform_id = nullptr);
-	platform(const platform&) = default;
-	platform& operator=(const platform&) = default;
-
-#if MSVC_LOW
-	// Visual Studio [2013] does not support defaulted move constructors or move-assignment operators as the C++11 standard mandates.
-	// http://msdn.microsoft.com/en-us/library/dn457344.aspx
-	platform(platform&& move);
-	platform& operator=(platform&& move);
-#else
-	platform(platform&&) = default;
-	platform& operator=(platform&&) = default;
-#endif
 
 	cl_platform_id get() const;
 
 	// Returns a vector of platforms.
 	// Errors can be returned via C++ exceptions or via a reference to an error_code.
 	static VECTOR_CLASS<platform> get_platforms();
-	static VECTOR_CLASS<platform> get_platforms(helper::err_handler::type& error_handler);
 	
 	// TODO: There's probably an error in the specification - get_devices cannot be overloaded on "static" alone.
 
@@ -53,7 +38,6 @@ public:
 		char buffer[BUFFER_SIZE];
 		auto pid = platform_id.get();
 		auto error_code = clGetPlatformInfo(pid, name, BUFFER_SIZE, buffer, nullptr);
-		handler.handle(error_code);
 		return buffer;
 	}
 
