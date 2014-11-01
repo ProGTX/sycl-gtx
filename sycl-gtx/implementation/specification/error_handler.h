@@ -23,7 +23,7 @@ private:
 
 	void* thrower;
 	enum class thrower_t {
-		otherm, queue, buffer, image
+		other, queue, buffer, image
 	};
 	thrower_t thrower_type;
 
@@ -115,7 +115,7 @@ public:
 class handler {
 private:
 	const std::unique_ptr<code_handler> code_hndlr;
-	const error_handler& actual_hndlr;
+	error_handler& actual_hndlr;
 
 public:
 	static throw_handler default;
@@ -131,9 +131,9 @@ public:
 	handler(const handler& copy)
 		: actual_hndlr(copy.actual_hndlr) {}
 
-	template <class... Args>
-	void report(Args... params) {
-		exception e(Args... params);
+	template <class T>
+	void report(T* thrower, cl_int error_code, bool is_sycl_specific = false) {
+		exception e(thrower, error_code, is_sycl_specific);
 		actual_hndlr.report_error(e);
 	}
 };
