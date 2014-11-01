@@ -154,6 +154,7 @@
     <ClCompile Include="tests\test3.cpp" />
     <ClCompile Include="tests\test4.cpp" />
     <ClCompile Include="tests\test5.cpp" />
+    <ClCompile Include="tests\test6.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\common.h" />
