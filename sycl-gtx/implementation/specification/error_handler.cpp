@@ -2,4 +2,4 @@
 
 using namespace cl::sycl::helper::error;
 
-const throw_handler handler::throw_hndlr;
+throw_handler handler::default;

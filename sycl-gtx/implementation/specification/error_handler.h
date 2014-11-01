@@ -115,13 +115,17 @@ public:
 class handler {
 private:
 	const std::unique_ptr<code_handler> code_hndlr;
-	static const throw_handler throw_hndlr;
 	const error_handler& actual_hndlr;
+
 public:
+	static throw_handler default;
+
 	handler()
-		: actual_hndlr(throw_hndlr) {}
+		: actual_hndlr(default) {}
 	handler(cl_int& error_code)
 		: code_hndlr(new code_handler(error_code)), actual_hndlr(*code_hndlr) {}
+	handler(error_handler& hndlr)
+		: actual_hndlr(hndlr) {}
 
 	// By default it is deleted which causes some problems
 	handler(const handler& copy)
