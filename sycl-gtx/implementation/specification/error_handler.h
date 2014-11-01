@@ -91,13 +91,27 @@ public:
 };
 
 namespace helper {
+namespace error {
 
-struct error_handler {
+class throw_handler : public error_handler {
 public:
-	static void handle(error_handler& handler);
-	static void handle(int& error_code);
+	virtual void report_error(exception& error) override {
+		throw error;
+	}
 };
 
+class code_handler : public error_handler {
+private:
+	cl_int& error_code;
+public:
+	code_handler(cl_int& error_code)
+		: error_code(error_code) {}
+	virtual void report_error(exception& error) override {
+		error_code = error.get_cl_code();
+	}
+};
+
+} // namespace error
 } // namespace helper
 
 } // namespace sycl

@@ -51,9 +51,6 @@
     <ClCompile Include="implementation\specification\context.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\error_handler.cpp">
-      <Filter>Source Files\specification</Filter>
-    </ClCompile>
     <ClCompile Include="tests\test6.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
