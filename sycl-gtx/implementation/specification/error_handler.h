@@ -5,6 +5,7 @@
 
 #include "../common.h"
 #include "../debug.h"
+#include <memory>
 
 namespace cl {
 namespace sycl {
@@ -108,6 +109,28 @@ public:
 		: error_code(error_code) {}
 	virtual void report_error(exception& error) override {
 		error_code = error.get_cl_code();
+	}
+};
+
+class handler {
+private:
+	const std::unique_ptr<code_handler> code_hndlr;
+	static const throw_handler throw_hndlr;
+	const error_handler& actual_hndlr;
+public:
+	handler()
+		: actual_hndlr(throw_hndlr) {}
+	handler(cl_int& error_code)
+		: code_hndlr(new code_handler(error_code)), actual_hndlr(*code_hndlr) {}
+
+	// By default it is deleted which causes some problems
+	handler(const handler& copy)
+		: actual_hndlr(copy.actual_hndlr) {}
+
+	template <class... Args>
+	void report(Args... params) {
+		exception e(Args... params);
+		actual_hndlr.report_error(e);
 	}
 };
 
