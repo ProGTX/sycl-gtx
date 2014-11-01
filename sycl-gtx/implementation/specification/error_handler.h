@@ -1,5 +1,6 @@
 #pragma once
 
+// 2.5.7 Error handling
 // 3.5 Error handling
 
 #include "../common.h"
@@ -21,7 +22,7 @@ private:
 
 	void* thrower;
 	enum class thrower_t {
-		queue, buffer, image
+		otherm, queue, buffer, image
 	};
 	thrower_t thrower_type;
 
@@ -30,22 +31,26 @@ private:
 		return (thrower_type == required_type ? reinterpret_cast<T*>(thrower) : nullptr);
 	}
 
+	exception(void* thrower, cl_int error_code, bool is_sycl_specific, thrower_t thrower_type)
+		: thrower(thrower), error_code(error_code), is_sycl_specific(is_sycl_specific), thrower_type(thrower_type) {}
+
 public:
 	template <class T>
-	exception(T* thrower, cl_int error_code, bool is_sycl_specific = false);
+	exception(T* thrower, cl_int error_code, bool is_sycl_specific = false)
+		: exception(thrower, error_code, is_sycl_specific, thrower_t::other) {}
 
 	template <>
 	exception(queue* thrower, cl_int error_code, bool is_sycl_specific)
-		: thrower(thrower), error_code(error_code), is_sycl_specific(is_sycl_specific), thrower_type(thrower_t::queue) {}
+		: exception(thrower, error_code, is_sycl_specific, thrower_t::queue) {}
 
 	template <>
 	exception(image* thrower, cl_int error_code, bool is_sycl_specific)
-		: thrower(thrower), error_code(error_code), is_sycl_specific(is_sycl_specific), thrower_type(thrower_t::image) {}
+		: exception(thrower, error_code, is_sycl_specific, thrower_t::image) {}
 
 	// TODO: Compiles, but linker error
 	template<int dimensions>
 	exception(buffer<class T, dimensions>* thrower, cl_int error_code, bool is_sycl_specific)
-		: thrower(thrower), error_code(error_code), is_sycl_specific(is_sycl_specific), thrower_type(thrower_t::buffer) {}
+		: exception(thrower, error_code, is_sycl_specific, thrower_t::bufer) {}
 
 	// Returns the OpenCL error code.
 	// Returns 0 if not an OpenCL error
