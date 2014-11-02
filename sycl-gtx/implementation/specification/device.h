@@ -24,10 +24,9 @@ private:
 
 public:
 	// TODO: In the case of constructing a device instance from an existing cl_device_id the system triggers a clRetainDevice.
-	device(cl_device_id device_id = nullptr);
+	device(cl_device_id device_id = nullptr, error_handler& handler = helper::error::handler::default);
 	device(error_handler& handler);
 	device(int& error_code);
-	device(cl_device_id device_id, error_handler& handler);
 	device(cl_device_id device_id, int& error_code);
 
 	// TODO: On destruction a call to clReleaseDevice is triggered.

@@ -19,18 +19,16 @@ private:
 	helper::error::handler handler;
 
 public:
-	platform(cl_platform_id platform_id = nullptr);
+	platform(cl_platform_id platform_id = nullptr, error_handler& handler = helper::error::handler::default);
 	platform(error_handler& handler);
 	platform(int& error_code);
-	platform(cl_platform_id platform_id, error_handler& handler);
 	platform(cl_platform_id platform_id, int& error_code);
 
 	cl_platform_id get() const;
 
 	// Returns a vector of platforms.
 	// Errors can be returned via C++ exceptions or via a reference to an error_code.
-	static VECTOR_CLASS<platform> get_platforms();
-	static VECTOR_CLASS<platform> get_platforms(error_handler& handler);
+	static VECTOR_CLASS<platform> get_platforms(error_handler& handler = helper::error::handler::default);
 	static VECTOR_CLASS<platform> get_platforms(int& error_code);
 private:
 	static VECTOR_CLASS<platform> get_platforms(helper::error::handler& handler);
