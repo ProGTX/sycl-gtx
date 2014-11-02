@@ -97,7 +97,9 @@ namespace error {
 class throw_handler : public error_handler {
 public:
 	virtual void report_error(exception& error) override {
-		throw error;
+		if(error.get_cl_code() != CL_SUCCESS) {
+			throw error;
+		}
 	}
 };
 
