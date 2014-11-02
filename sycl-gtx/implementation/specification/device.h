@@ -16,21 +16,20 @@ class platform;
 
 // 3.2.2 Device class
 // Encapsulates a cl_device_id and a cl_platform_id
+// In the case of constructing a device instance from an existing cl_device_id the system triggers a clRetainDevice.
+// On destruction a call to clReleaseDevice is triggered.
 class device {
 private:
 	refc::ptr<cl_platform_id> platform_id;
 	refc::ptr<cl_device_id> device_id;
 	helper::error::handler handler;
 
+	device(cl_device_id device_id, helper::error::handler handler);
 public:
-	// TODO: In the case of constructing a device instance from an existing cl_device_id the system triggers a clRetainDevice.
 	device(cl_device_id device_id = nullptr, error_handler& handler = helper::error::handler::default);
 	device(error_handler& handler);
 	device(int& error_code);
 	device(cl_device_id device_id, int& error_code);
-
-	// TODO: On destruction a call to clReleaseDevice is triggered.
-	~device() {}
 
 	cl_device_id get() const;
 	platform get_platforms();

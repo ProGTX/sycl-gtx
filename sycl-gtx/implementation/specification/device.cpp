@@ -3,8 +3,16 @@
 
 using namespace cl::sycl;
 
+device::device(cl_device_id device_id, helper::error::handler handler)
+	: device_id(refc::allocate(device_id, clReleaseDevice)), handler(handler) {
+	if(device_id != nullptr) {
+		auto error_code = clRetainDevice(device_id);
+		handler.report(this, error_code);
+	}
+}
+
 device::device(cl_device_id device_id, error_handler& handler)
-	: device_id(refc::allocate(device_id)), handler(handler) {}
+	: device(device_id, helper::error::handler(handler)) {}
 
 device::device(error_handler& handler)
 	: device(nullptr, handler) {}
@@ -13,7 +21,7 @@ device::device(int& error_code)
 	: device(nullptr, error_code) {}
 
 device::device(cl_device_id device_id, int& error_code)
-	: device_id(refc::allocate(device_id)), handler(error_code) {}
+	: device(device_id, helper::error::handler(error_code)) {}
 
 cl_device_id device::get() const {
 	return device_id.get();
