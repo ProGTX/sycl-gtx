@@ -45,7 +45,7 @@ VECTOR_CLASS<platform> platform::get_platforms(helper::error::handler& handler) 
 }
 
 VECTOR_CLASS<device> platform::get_devices(cl_device_type device_type) {
-	return helper::get_devices(device_type, platform_id);
+	return helper::get_devices(device_type, platform_id, handler);
 }
 
 // TODO: How to check for this?

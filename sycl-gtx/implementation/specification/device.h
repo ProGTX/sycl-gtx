@@ -20,10 +20,15 @@ class device {
 private:
 	refc::ptr<cl_platform_id> platform_id;
 	refc::ptr<cl_device_id> device_id;
+	helper::error::handler handler;
 
 public:
 	// TODO: In the case of constructing a device instance from an existing cl_device_id the system triggers a clRetainDevice.
 	device(cl_device_id device_id = nullptr);
+	device(error_handler& handler);
+	device(int& error_code);
+	device(cl_device_id device_id, error_handler& handler);
+	device(cl_device_id device_id, int& error_code);
 
 	// TODO: On destruction a call to clReleaseDevice is triggered.
 	~device() {}
@@ -50,7 +55,7 @@ private:
 			auto did = dev->device_id.get();
 			return_type result;
 			auto error_code = clGetDeviceInfo(did, name, sizeof(return_type), &result, nullptr);
-			//dev->handler.handle(error_code);
+			dev->handler.report(dev, error_code);
 			return result;
 		}
 	};
@@ -66,8 +71,7 @@ public:
 namespace helper {
 
 VECTOR_CLASS<device> get_devices(
-	cl_device_type device_type,
-	refc::ptr<cl_platform_id> platform_id
+	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler handler
 );
 
 } // namespace helper
