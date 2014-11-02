@@ -21,12 +21,22 @@ public:
 	virtual void operator()(program t_program) = 0;
 };
 
+// 2.3.1, point 2
+// Any OpenCL resource that is acquired by the user is attached to a context.
+// A context contains a collection of devices that the host can use
+// and manages memory objects that can be shared between the devices.
+// Data movement between devices within a context may be efficient and hidden by the underlying runtime
+// while data movement between contexts must involve the host.
+// A given context can only wrap devices owned by a single platform.
 class context {
 private:
 	refc::ptr<cl_context> ctx;
 	helper::error::handler handler;
 	static error_handler& default_error;
 
+	static refc::ptr<cl_context> reserve(cl_context c);
+
+	context(cl_context c, const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, error_handler& handler);
 public:
 	// TODO: The constructor creates a context and in the case of copying it calls a clRetainContext
 
@@ -45,8 +55,7 @@ public:
 	context(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, context_notify& handler);
 	context(const cl_context_properties* properties, device target_device, context_notify& handler);
 
-	~context() {}
-
+public:
 	cl_context get();
 
 	// TODO: Deal with array types
