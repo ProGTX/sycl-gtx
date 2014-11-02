@@ -32,7 +32,10 @@ public:
 	device(cl_device_id device_id, int& error_code);
 
 	cl_device_id get() const;
-	platform get_platforms();
+
+	// I believe there is an error in the specification and that this functions should be here instead of "platform get_platforms()"
+	cl_platform_id get_platform() const;
+
 	VECTOR_CLASS<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
 	bool has_extension(const STRING_CLASS extension_name);
 	bool is_host();

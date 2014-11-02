@@ -9,6 +9,12 @@ device::device(cl_device_id device_id, helper::error::handler handler)
 		auto error_code = clRetainDevice(device_id);
 		handler.report(this, error_code);
 	}
+	else {
+		// TODO: The “default” device constructed corresponds to the host.
+		// This is also the device that the system will “fall-back” to,
+		// if there are no existing or valid OpenCL devices associated with the system.
+		debug::warning(__func__) << "does not support a default device yet";
+	}
 }
 
 device::device(cl_device_id device_id, error_handler& handler)
@@ -27,9 +33,8 @@ cl_device_id device::get() const {
 	return device_id.get();
 }
 
-// TODO: Plural name, but only returns one platform?
-platform device::get_platforms() {
-	return platform(platform_id.get());
+cl_platform_id device::get_platform() const {
+	return platform_id.get();
 }
 
 VECTOR_CLASS<device> device::get_devices(cl_device_type device_type) {
