@@ -9,9 +9,8 @@ refc::ptr<cl_context> context::reserve(cl_context c) {
 	return refc::allocate(c, clReleaseContext);
 }
 
-// Error handling via error_handler&
-context::context(cl_context c, const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, error_handler& handler)
-	: ctx(reserve(c)), handler(handler) {
+void context::construct(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices) {
+	auto c = ctx.get();
 	if(c == nullptr) {
 		cl_uint num_devices = target_devices.size();
 
@@ -40,15 +39,24 @@ context::context(cl_context c, const cl_context_properties* properties, VECTOR_C
 	}
 }
 
+// Error handling via error_handler&
+context::context(cl_context c, const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, error_handler& handler)
+	: ctx(reserve(c)), handler(handler) {
+	construct(properties, target_devices);
+}
+
 // TODO: Auto load devices
 context::context(cl_context c, error_handler& handler)
 	: context(c, nullptr, {}, handler) {}
 
-// TODO: Device selector
 context::context(device_selector& dev_sel, error_handler& handler)
 	: context(nullptr, dev_sel, handler) {}
 context::context(const cl_context_properties* properties, device_selector& dev_sel, error_handler& handler)
-	: context(nullptr, properties, {}, handler) {}
+	: ctx(reserve()), handler(handler) {
+	// TODO: Selects best device
+	device d;
+	construct(properties, {d});
+}
 
 context::context(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, error_handler& handler)
 	: context(nullptr, properties, target_devices, handler) {}

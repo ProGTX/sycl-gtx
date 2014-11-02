@@ -11,7 +11,7 @@ namespace sycl {
 
 // Forward declarations
 class device;
-class device_selector;
+struct device_selector;
 class program;
 
 // Used as the notification function for contexts.
@@ -34,8 +34,9 @@ private:
 	helper::error::handler handler;
 	static error_handler& default_error;
 
-	static refc::ptr<cl_context> reserve(cl_context c);
+	static refc::ptr<cl_context> reserve(cl_context c = nullptr);
 
+	void construct(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices);
 	context(cl_context c, const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, error_handler& handler);
 public:
 	// TODO: The constructor creates a context and in the case of copying it calls a clRetainContext

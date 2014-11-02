@@ -70,3 +70,10 @@ VECTOR_CLASS<device> helper::get_devices(
 	handler.report(device_ids, error_code);
 	return to_vector<device>(device_ids, num_devices);
 }
+
+std::unique_ptr<device_selector> device_selector::default = std::unique_ptr<device_selector>(new host_selector());
+
+int host_selector::operator()(device dev) {
+	DSELF() << "not implemented";
+	return 0;
+}

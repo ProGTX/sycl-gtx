@@ -7,6 +7,7 @@
 #include "../debug.h"
 #include "../common.h"
 #include "../param_traits.h"
+#include <memory>
 
 namespace cl {
 namespace sycl {
@@ -96,18 +97,21 @@ VECTOR_CLASS<device> get_devices(
 // 3.2.4 Device selection class
 // The class device_selector is an abstract class which enables the SYCL runtime to choose the best device based
 // on heuristics specified by the user, or by one of the built-in device selectors
-class device_selector {
-public:
-	device_selector() {
-		DSELF() << "not implemented";
-	}
+struct device_selector {
+	static std::unique_ptr<device_selector> default;
 	virtual int operator()(device dev) = 0;
 };
 
-// Built-in device selectors:
-// Class name: gpu_selector
-// Class name: cpu_selector
-// Class name: host_selector
+// TODO: Built-in device selectors
+struct gpu_selector : device_selector {
+	virtual int operator()(device dev) override;
+};
+struct cpu_selector : device_selector {
+	virtual int operator()(device dev) override;
+};
+struct host_selector : device_selector {
+	virtual int operator()(device dev) override;
+};
 
 } // namespace sycl
 } // namespace cl
