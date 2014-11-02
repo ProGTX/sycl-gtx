@@ -16,6 +16,12 @@ class program;
 
 // Used as the notification function for contexts.
 class context_notify {
+private:
+	friend class context;
+	using pfn_notify_t = void (CL_CALLBACK*)(const char*, const void*, size_t, void*);
+	void CL_CALLBACK pfn_notify(const char* errinfo, const void* private_info, size_t cb, void* user_data) {
+		operator()(errinfo, private_info, cb);
+	}
 public:
 	virtual void operator()(const STRING_CLASS errinfo, const void* private_info, size_t cb) = 0;
 	virtual void operator()(program t_program) = 0;
@@ -35,13 +41,17 @@ private:
 	static error_handler& default_error;
 
 	static refc::ptr<cl_context> reserve(cl_context c = nullptr);
+	static device select_best_device(device_selector& dev_sel);
 
-	void construct(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices);
-	context(cl_context c, const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, error_handler& handler);
+	context(
+		cl_context c,
+		const cl_context_properties* properties,
+		VECTOR_CLASS<device> target_devices,
+		error_handler& handler,
+		context_notify::pfn_notify_t pfn_notify = nullptr
+	);
 public:
-	// TODO: The constructor creates a context and in the case of copying it calls a clRetainContext
-
-	// TODO: Error handling via error_handler&
+	// Error handling via error_handler&
 	context(cl_context c = nullptr, error_handler& handler = default_error);
 	context(device_selector& dev_sel, error_handler& handler = default_error);
 	context(const cl_context_properties* properties, device_selector& dev_sel, error_handler& handler = default_error);
