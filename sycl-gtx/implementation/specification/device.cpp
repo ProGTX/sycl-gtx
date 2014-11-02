@@ -60,7 +60,7 @@ VECTOR_CLASS<device> device::create_sub_devices(
 }
 
 VECTOR_CLASS<device> helper::get_devices(
-	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler handler
+	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler& handler
 ) {
 	static const int MAX_DEVICES = 1024;
 	auto pid = platform_id.get();

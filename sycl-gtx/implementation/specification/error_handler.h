@@ -116,7 +116,7 @@ public:
 
 class handler {
 private:
-	const std::unique_ptr<code_handler> code_hndlr;
+	std::shared_ptr<code_handler> code_hndlr; 
 	error_handler& actual_hndlr;
 
 public:
@@ -129,9 +129,22 @@ public:
 	handler(error_handler& hndlr)
 		: actual_hndlr(hndlr) {}
 
-	// By default it is deleted which causes some problems
-	handler(const handler& copy)
-		: actual_hndlr(copy.actual_hndlr) {}
+	handler(const handler&) = default;
+	handler& operator=(const handler&) = default;
+
+#if MSVC_LOW
+private:
+	void swap(handler& first, handler& second) {
+		SYCL_MOVE(code_hndlr);
+		SYCL_COPY(actual_hndlr);
+	}
+public:
+	handler(handler&& move) : actual_hndlr(move.actual_hndlr) { swap(*this, move); }
+	handler operator=(handler&& move) { swap(*this, move); return *this; }
+#else
+	handler(handler&&) = default;
+	handler operator=(handler&&) = default;
+#endif
 
 	template <class T>
 	void report(T* thrower, cl_int error_code, bool is_sycl_specific = false) {

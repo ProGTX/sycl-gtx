@@ -20,6 +20,7 @@ class platform;
 // On destruction a call to clReleaseDevice is triggered.
 class device {
 private:
+	// TODO: platform_id isn't set anywhere
 	refc::ptr<cl_platform_id> platform_id;
 	refc::ptr<cl_device_id> device_id;
 	helper::error::handler handler;
@@ -30,6 +31,20 @@ public:
 	device(error_handler& handler);
 	device(int& error_code);
 	device(cl_device_id device_id, int& error_code);
+
+	device(const device&) = default;
+	device& operator=(const device&) = default;
+
+#if MSVC_LOW
+	SYCL_MOVE_OPS(device, {
+		SYCL_MOVE(platform_id);
+		SYCL_MOVE(device_id);
+		SYCL_MOVE(handler);
+	})
+#else
+	device(device&&) = default;
+	device operator=(device&&) = default;
+#endif
 
 	cl_device_id get() const;
 
@@ -72,7 +87,7 @@ public:
 namespace helper {
 
 VECTOR_CLASS<device> get_devices(
-	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler handler
+	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler& handler
 );
 
 } // namespace helper
