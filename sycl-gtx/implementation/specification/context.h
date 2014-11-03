@@ -57,7 +57,7 @@ public:
 	context(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, error_handler& handler = default_error);
 	context(const cl_context_properties* properties, device target_device, error_handler& handler = default_error);
 
-	// TODO: Error handling via context_notify&
+	// Error handling via context_notify&
 	context(context_notify& handler);
 	context(cl_context c, context_notify& handler);
 	context(device_selector& dev_sel, context_notify& handler);
