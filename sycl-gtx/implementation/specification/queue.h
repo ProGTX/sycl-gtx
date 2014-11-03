@@ -19,10 +19,12 @@ private:
 	refc::ptr<cl_command_queue> command_q;
 	context ctx;
 	helper::error::handler handler;
+	bool exceptions_enabled = true;
 
 	static device select_best_device(device_selector& selector);
 
 public:
+	// TODO: There is a mess in the specification regarding these constructors
 	queue(cl_command_queue cmd_queue = nullptr, error_handler& sync_handler = helper::error::handler::default) {}
 	queue(device_selector& selector, error_handler& sync_handler = helper::error::handler::default);
 	queue(context ctx, device_selector& selector, cl_command_queue_properties properties = 0, error_handler& sync_handler = helper::error::handler::default);

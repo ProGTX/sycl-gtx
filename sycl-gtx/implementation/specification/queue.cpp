@@ -14,3 +14,8 @@ context queue::get_context() {
 device queue::get_device() {
 	return device();
 }
+
+
+void queue::disable_exceptions() {
+	exceptions_enabled = false;
+}
