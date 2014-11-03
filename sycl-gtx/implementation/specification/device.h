@@ -3,6 +3,7 @@
 // Device classes
 
 #include "refc.h"
+#include "device_selector.h"
 #include "error_handler.h"
 #include "param_traits.h"
 #include "../debug.h"
@@ -85,34 +86,15 @@ public:
 	}
 };
 
-
 namespace helper {
 
 VECTOR_CLASS<device> get_devices(
 	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler& handler
 );
 
+unsigned int select_best_device(device_selector& selector, VECTOR_CLASS<device>& devices);
+
 } // namespace helper
-
-
-// 3.2.4 Device selection class
-// The class device_selector is an abstract class which enables the SYCL runtime to choose the best device based
-// on heuristics specified by the user, or by one of the built-in device selectors
-struct device_selector {
-	static std::unique_ptr<device_selector> default;
-	virtual int operator()(device dev) = 0;
-};
-
-// TODO: Built-in device selectors
-struct gpu_selector : device_selector {
-	virtual int operator()(device dev) override;
-};
-struct cpu_selector : device_selector {
-	virtual int operator()(device dev) override;
-};
-struct host_selector : device_selector {
-	virtual int operator()(device dev) override;
-};
 
 } // namespace sycl
 } // namespace cl

@@ -61,7 +61,7 @@ VECTOR_CLASS<device> device::create_sub_devices(
 
 VECTOR_CLASS<device> helper::get_devices(
 	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler& handler
-) {
+	) {
 	static const int MAX_DEVICES = 1024;
 	auto pid = platform_id.get();
 	cl_device_id device_ids[MAX_DEVICES];
@@ -71,9 +71,19 @@ VECTOR_CLASS<device> helper::get_devices(
 	return to_vector<device>(device_ids, num_devices);
 }
 
-std::unique_ptr<device_selector> device_selector::default = std::unique_ptr<device_selector>(new host_selector());
+unsigned int helper::select_best_device(device_selector& selector, VECTOR_CLASS<device>& devices) {
+	unsigned int best_id = -1;
+	int best_score = -1;
+	int i = 0;
 
-int host_selector::operator()(device dev) {
-	DSELF() << "not implemented";
-	return 0;
+	for(auto&& dev : devices) {
+		int score = selector(dev);
+		if(score > best_score) {
+			best_id = i;
+		}
+		++i;
+	}
+
+	// Devices with a negative score will never be chosen.
+	return (best_score >= 0 ? best_id : -1);
 }

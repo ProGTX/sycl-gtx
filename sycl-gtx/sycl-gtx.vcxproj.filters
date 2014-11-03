@@ -60,6 +60,9 @@
     <ClCompile Include="implementation\specification\queue.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\specification\device_selector.cpp">
+      <Filter>Source Files\specification</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">
@@ -114,6 +117,9 @@
       <Filter>Header Files\specification</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\param_traits.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\device_selector.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
   </ItemGroup>

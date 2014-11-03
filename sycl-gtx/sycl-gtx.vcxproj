@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClCompile Include="implementation\specification\context.cpp" />
     <ClCompile Include="implementation\specification\device.cpp" />
+    <ClCompile Include="implementation\specification\device_selector.cpp" />
     <ClCompile Include="implementation\specification\error_handler.cpp" />
     <ClCompile Include="implementation\specification\platform.cpp" />
     <ClCompile Include="implementation\specification\queue.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="implementation\specification\command_group.h" />
     <ClInclude Include="implementation\specification\context.h" />
     <ClInclude Include="implementation\specification\device.h" />
+    <ClInclude Include="implementation\specification\device_selector.h" />
     <ClInclude Include="implementation\specification\error_handler.h" />
     <ClInclude Include="implementation\specification\kernel.h" />
     <ClInclude Include="implementation\specification\param_traits.h" />
