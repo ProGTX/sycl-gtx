@@ -18,9 +18,8 @@ class program;
 class context_notify {
 private:
 	friend class context;
-	using pfn_notify_t = void (CL_CALLBACK*)(const char*, const void*, size_t, void*);
-	void CL_CALLBACK pfn_notify(const char* errinfo, const void* private_info, size_t cb, void* user_data) {
-		operator()(errinfo, private_info, cb);
+	static void CL_CALLBACK forward(const char* errinfo, const void* private_info, size_t cb, void* caller) {
+		static_cast<context_notify*>(caller)->operator()(errinfo, private_info, cb);
 	}
 public:
 	virtual void operator()(const STRING_CLASS errinfo, const void* private_info, size_t cb) = 0;
@@ -48,7 +47,7 @@ private:
 		const cl_context_properties* properties,
 		VECTOR_CLASS<device> target_devices,
 		error_handler& handler,
-		context_notify::pfn_notify_t pfn_notify = nullptr
+		context_notify* ctx_notify = nullptr
 	);
 public:
 	// Error handling via error_handler&

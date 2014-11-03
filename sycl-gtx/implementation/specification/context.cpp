@@ -15,16 +15,19 @@ device context::select_best_device(device_selector& dev_sel) {
 }
 
 // Master constructor
-// TODO: Auto load devices
 context::context(
 	cl_context c,
 	const cl_context_properties* properties,
 	VECTOR_CLASS<device> target_devices,
 	error_handler& handler,
-	context_notify::pfn_notify_t pfn_notify
+	context_notify* ctx_notify
 ) : ctx(reserve(c)), handler(handler) {
 	if(c == nullptr) {
 		cl_uint num_devices = target_devices.size();
+
+		if(num_devices == 0) {
+			// TODO: Auto load devices
+		}
 
 		VECTOR_CLASS<cl_device_id> devices;
 		devices.reserve(num_devices);
@@ -32,8 +35,9 @@ context::context(
 			devices.push_back(device_ptr.get());
 		}
 
+		auto pfn_notify = (ctx_notify == nullptr ? nullptr : &context_notify::forward);
 		cl_int error_code;
-		c = clCreateContext(properties, num_devices, devices.data(), pfn_notify, nullptr, &error_code);
+		c = clCreateContext(properties, num_devices, devices.data(), pfn_notify, ctx_notify, &error_code);
 		if(pfn_notify == nullptr) {
 			this->handler.report(this, error_code);
 		}
@@ -57,14 +61,19 @@ context::context(const cl_context_properties* properties, VECTOR_CLASS<device> t
 context::context(const cl_context_properties* properties, device target_device, error_handler& handler)
 	: context(nullptr, properties, { target_device }, handler) {}
 
-// TODO: Error handling via context_notify&
-context::context(context_notify& handler) {}
-//	: context(nullptr, nullptr, {}, helper::error::handler::default, &handler.pfn_notify) {}
-context::context(cl_context c, context_notify& handler) {}
-context::context(device_selector& dev_sel, context_notify& handler) {}
-context::context(const cl_context_properties* properties, device_selector& dev_sel, context_notify& handler) {}
-context::context(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, context_notify& handler) {}
-context::context(const cl_context_properties* properties, device target_device, context_notify& handler) {}
+// Error handling via context_notify&
+context::context(context_notify& handler)
+	: context(nullptr, nullptr, {}, helper::error::handler::default, &handler) {}
+context::context(cl_context c, context_notify& handler)
+	: context(c, nullptr, {}, helper::error::handler::default, &handler) {}
+context::context(device_selector& dev_sel, context_notify& handler)
+	: context(nullptr, dev_sel, handler) {}
+context::context(const cl_context_properties* properties, device_selector& dev_sel, context_notify& handler)
+	: context(nullptr, properties, { select_best_device(dev_sel) }, helper::error::handler::default, &handler) {}
+context::context(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, context_notify& handler)
+	: context(nullptr, properties, target_devices, helper::error::handler::default, &handler) {}
+context::context(const cl_context_properties* properties, device target_device, context_notify& handler)
+	: context(nullptr, properties, { target_device }, helper::error::handler::default, &handler) {}
 
 cl_context context::get() {
 	return ctx.get();
