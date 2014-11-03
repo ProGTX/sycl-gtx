@@ -18,6 +18,7 @@ class queue {
 private:
 	refc::ptr<cl_command_queue> command_q;
 	context ctx;
+	helper::error::handler handler;
 
 	static device select_best_device(device_selector& selector);
 
@@ -38,7 +39,14 @@ public:
 	cl_int get_error();
 	
 	template<cl_int name>
-	typename param_traits<cl_command_queue_info, name>::param_type get_info();
+	typename param_traits<cl_command_queue_info, name>::param_type get_info() {
+		using type = param_traits<cl_command_queue_info, name>::param_type;
+		type param_value;
+		auto q = command_q.get();
+		auto error_code = clGetCommandQueueInfo(q, name, sizeof(type), &param_value, nullptr);
+		handler.report(this, error_code);
+		return param_value;
+	}
 
 	void disable_exceptions();
 	void throw_asynchronous();

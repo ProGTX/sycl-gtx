@@ -133,6 +133,13 @@ name == CL_CONTEXT_D3D11_PREFER_SHARED_RESOURCES_KHR
 ));
 */
 
+
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetCommandQueueInfo.html
+SYCL_ADD_TRAIT(cl_command_queue_info, cl_context,					(name == CL_QUEUE_CONTEXT));
+SYCL_ADD_TRAIT(cl_command_queue_info, cl_device_id,					(name == CL_QUEUE_DEVICE));
+SYCL_ADD_TRAIT(cl_command_queue_info, cl_uint,						(name == CL_QUEUE_REFERENCE_COUNT));
+SYCL_ADD_TRAIT(cl_command_queue_info, cl_command_queue_properties,	(name == CL_QUEUE_PROPERTIES));
+
 } // namespace sycl
 } // namespace cl
 

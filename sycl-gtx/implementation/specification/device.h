@@ -80,6 +80,7 @@ private:
 public:
 	template<cl_int name>
 	typename param_traits<cl_device_info, name>::param_type get_info() {
+		// Separate class implementation allows for partial template specialization
 		return hidden<typename param_traits<cl_device_info, name>::param_type, name>::get_info(this);
 	}
 };
