@@ -4,9 +4,9 @@
 
 #include "refc.h"
 #include "error_handler.h"
+#include "param_traits.h"
 #include "../debug.h"
 #include "../common.h"
-#include "../param_traits.h"
 #include <memory>
 
 namespace cl {

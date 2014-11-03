@@ -4,8 +4,8 @@
 
 #include "refc.h"
 #include "error_handler.h"
+#include "param_traits.h"
 #include "../common.h"
-#include "../param_traits.h"
 
 namespace cl {
 namespace sycl {

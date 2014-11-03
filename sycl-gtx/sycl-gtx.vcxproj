@@ -160,7 +160,6 @@
   <ItemGroup>
     <ClInclude Include="implementation\common.h" />
     <ClInclude Include="implementation\debug.h" />
-    <ClInclude Include="implementation\param_traits.h" />
     <ClInclude Include="implementation\specification\accessor.h" />
     <ClInclude Include="implementation\specification\access.h" />
     <ClInclude Include="implementation\specification\buffer.h" />
@@ -169,6 +168,7 @@
     <ClInclude Include="implementation\specification\device.h" />
     <ClInclude Include="implementation\specification\error_handler.h" />
     <ClInclude Include="implementation\specification\kernel.h" />
+    <ClInclude Include="implementation\specification\param_traits.h" />
     <ClInclude Include="implementation\specification\platform.h" />
     <ClInclude Include="implementation\specification\program.h" />
     <ClInclude Include="implementation\specification\queue.h" />

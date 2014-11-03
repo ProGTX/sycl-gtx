@@ -110,10 +110,10 @@
     <ClInclude Include="implementation\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\param_traits.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="implementation\specification\error_handler.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\param_traits.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
   </ItemGroup>

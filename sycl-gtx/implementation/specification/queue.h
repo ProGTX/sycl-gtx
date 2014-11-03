@@ -2,12 +2,13 @@
 
 // 3.2.5 Queue class
 
-#include "../common.h"
-#include "../debug.h"
 #include "context.h"
 #include "device.h"
 #include "error_handler.h"
+#include "param_traits.h"
 #include "refc.h"
+#include "../common.h"
+#include "../debug.h"
 
 namespace cl {
 namespace sycl {
@@ -35,8 +36,10 @@ public:
 	context get_context();
 	device get_device();
 	cl_int get_error();
+	
 	template<cl_int name>
 	typename param_traits<cl_command_queue_info, name>::param_type get_info();
+
 	void disable_exceptions();
 	void throw_asynchronous();
 	void wait();
