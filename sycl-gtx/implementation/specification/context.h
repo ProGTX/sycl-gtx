@@ -1,6 +1,7 @@
 #pragma once
 
 #include "refc.h"
+#include "device_selector.h"
 #include "error_handler.h"
 #include "param_traits.h"
 #include "../common.h"
@@ -11,7 +12,6 @@ namespace sycl {
 
 // Forward declarations
 class device;
-struct device_selector;
 class program;
 
 // Used as the notification function for contexts.
@@ -38,16 +38,20 @@ private:
 	refc::ptr<cl_context> ctx;
 	helper::error::handler handler;
 	static error_handler& default_error;
+	VECTOR_CLASS<device> target_devices;
+	unsigned int best_device_id = 0;
 
 	static refc::ptr<cl_context> reserve(cl_context c = nullptr);
-	static device select_best_device(device_selector& dev_sel);
+	static VECTOR_CLASS<device> load_devices();
 
+	// Master constructor
 	context(
 		cl_context c,
 		const cl_context_properties* properties,
 		VECTOR_CLASS<device> target_devices,
 		error_handler& handler,
-		context_notify* ctx_notify = nullptr
+		context_notify* ctx_notify = nullptr,
+		device_selector& dev_sel = *(device_selector::default)
 	);
 public:
 	// Error handling via error_handler&
