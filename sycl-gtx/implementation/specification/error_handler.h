@@ -6,6 +6,7 @@
 #include "../common.h"
 #include "../debug.h"
 #include <memory>
+#include <functional>
 
 namespace cl {
 namespace sycl {
@@ -16,7 +17,7 @@ template <typename T, int dimensions>
 struct buffer;
 class image;
 
-class exception {
+class exception : public std::exception {
 private:
 	cl_int error_code;
 	bool is_sycl_specific;
@@ -114,10 +115,34 @@ public:
 	}
 };
 
+class async_handler : public error_handler {
+private:
+	// Specification isn't clear enough on this
+	using function_t = std::function<void(VECTOR_CLASS<std::exception>&)>;
+
+	friend class handler;
+	function_t async_func;
+	VECTOR_CLASS<std::exception> list;
+public:
+	async_handler(function_t async_func)
+		: async_func(async_func) {}
+	virtual void report_error(exception& error) override {
+		return report_error((std::exception&)error);
+	}
+	void report_error(std::exception& error) {
+		list.push_back(error);
+	}
+	void apply() {
+		async_func(list);
+		list.clear();
+	}
+};
+
 class handler {
 private:
-	std::shared_ptr<code_handler> code_hndlr; 
+	std::shared_ptr<error_handler> hidden_hndlr;
 	error_handler& actual_hndlr;
+	bool is_async = false;
 
 public:
 	static throw_handler default;
@@ -125,7 +150,9 @@ public:
 	handler()
 		: actual_hndlr(default) {}
 	handler(cl_int& error_code)
-		: code_hndlr(new code_handler(error_code)), actual_hndlr(*code_hndlr) {}
+		: hidden_hndlr(new code_handler(error_code)), actual_hndlr(*hidden_hndlr) {}
+	handler(async_handler::function_t& hndlr)
+		: hidden_hndlr(new async_handler(hndlr)), actual_hndlr(*hidden_hndlr), is_async(true) {}
 	handler(error_handler& hndlr)
 		: actual_hndlr(hndlr) {}
 
@@ -135,8 +162,9 @@ public:
 #if MSVC_LOW
 private:
 	void swap(handler& first, handler& second) {
-		SYCL_MOVE(code_hndlr);
+		SYCL_MOVE(hidden_hndlr);
 		SYCL_COPY(actual_hndlr);
+		SYCL_COPY(is_async);
 	}
 public:
 	handler(handler&& move) : actual_hndlr(move.actual_hndlr) { swap(*this, move); }
@@ -150,6 +178,12 @@ public:
 	void report(T* thrower, cl_int error_code, bool is_sycl_specific = false) {
 		exception e(thrower, error_code, is_sycl_specific);
 		actual_hndlr.report_error(e);
+	}
+
+	void apply() {
+		if(is_async) {
+			((async_handler&)actual_hndlr).apply();
+		}
 	}
 };
 
