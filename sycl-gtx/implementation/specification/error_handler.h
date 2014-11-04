@@ -116,10 +116,10 @@ public:
 };
 
 class async_handler : public error_handler {
-private:
+public:
 	// Specification isn't clear enough on this
 	using function_t = std::function<void(VECTOR_CLASS<std::exception>&)>;
-
+private:
 	friend class handler;
 	function_t async_func;
 	VECTOR_CLASS<std::exception> list;

@@ -12,7 +12,7 @@ private:																	\
 void swap(class_name& first, class_name& second) action						\
 public:																		\
 	class_name(class_name&& move) { swap(*this, move); }					\
-	class_name operator=(class_name&& move) { swap(*this, move); return *this; }
+	class_name& operator=(class_name&& move) { swap(*this, move); return *this; }
 #define SYCL_COPY(member) first.member = second.member
 #define SYCL_MOVE(member) first.member = std::move(second.member)
 #endif
@@ -42,7 +42,7 @@ namespace cl {
 namespace sycl {
 namespace helper {
 
-// Meant for transforming arrays of pointers to OpenCL structs into a vector
+// Meant for transforming arrays of pointers to OpenCL structs into a vector of pointers to OpenCL structs
 template<class Container, class Inner>
 VECTOR_CLASS<Container> to_vector(Inner* array, cl_uint new_size, bool) {
 	VECTOR_CLASS<Container> vector;
