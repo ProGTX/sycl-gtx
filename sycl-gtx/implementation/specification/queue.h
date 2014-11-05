@@ -28,6 +28,7 @@ private:
 	bool exceptions_enabled = true;
 
 	static device select_best_device(device_selector& selector, context& ctx);
+	static context create_context(queue* q, device_selector& selector, error_handler& sync_handler = default_error);
 
 	// Master constructor
 	queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback);

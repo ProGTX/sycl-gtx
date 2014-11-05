@@ -11,6 +11,11 @@ device queue::select_best_device(device_selector& selector, context& ctx) {
 	return devices[index];
 }
 
+context queue::create_context(queue* q, device_selector& selector, error_handler& sync_handler) {
+	q->ctx = context(selector, sync_handler);
+	return std::move(q->ctx);
+}
+
 // Master constructor
 queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback) {}
 
@@ -25,11 +30,8 @@ queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
 
 queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler)
 	: queue(ctx, dev, properties, sync_handler, false) {}
-
-// TODO
-queue::queue(device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler) {}
-//	: queue(nullptr, select_best_device(selector, ctx), properties, sync_handler, false) {}
-
+queue::queue(device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler)
+	: queue(create_context(this, selector, sync_handler), select_best_device(selector, ctx), properties, sync_handler, false) {}
 queue::queue(context ctx, device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler)
 	: queue(ctx, select_best_device(selector, ctx), properties, sync_handler, true) {}
 queue::queue(device dev, cl_command_queue_properties properties, error_handler& sync_handler)
