@@ -3,7 +3,7 @@
 
 using namespace cl::sycl;
 
-error_handler& context::default_error = default_error;
+error_handler& context::default_error = helper::error::handler::default;
 
 refc::ptr<cl_context> context::reserve(cl_context c) {
 	return refc::allocate(c, clReleaseContext);

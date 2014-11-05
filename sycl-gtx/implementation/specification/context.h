@@ -36,10 +36,11 @@ public:
 class context {
 private:
 	refc::ptr<cl_context> ctx;
-	helper::error::handler handler;
-	static error_handler& default_error;
 	VECTOR_CLASS<device> target_devices;
 	unsigned int best_device_id = 0;
+
+	helper::error::handler handler;
+	static error_handler& default_error;
 
 	static refc::ptr<cl_context> reserve(cl_context c = nullptr);
 	static VECTOR_CLASS<device> load_devices();
@@ -69,18 +70,55 @@ public:
 	context(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, context_notify& handler);
 	context(const cl_context_properties* properties, device target_device, context_notify& handler);
 
+	context(const context&) = default;
+	context& operator=(const context&) = default;
+
+#if MSVC_LOW
+	SYCL_MOVE_OPS(context, {
+		SYCL_MOVE(ctx);
+		SYCL_MOVE(target_devices);
+		SYCL_COPY(best_device_id);
+		SYCL_MOVE(handler);
+	})
+#else
+	context(context&&) = default;
+	context& operator=(context&& copy) = default;
+#endif
+
 public:
 	cl_context get();
 
-	// TODO: Deal with array types
+private:
+	template<class return_type, cl_int name>
+	struct hidden {
+		using real_return = return_type;
+		static real_return get_info(context* contex) {
+			auto c = contex->ctx.get();
+			real_return param_value;
+			auto error_code = clGetContextInfo(c, name, sizeof(real_return), &param_value, nullptr);
+			contex->handler.report(contex, error_code);
+			return param_value;
+		}
+	};
+	template<class return_type, cl_int name>
+	struct hidden<return_type[], name> {
+		using real_return = VECTOR_CLASS<return_type>;
+		static real_return get_info(context* contex) {
+			auto c = contex->ctx.get();
+			static const int BUFFER_SIZE = 1024;
+			return_type param_value[BUFFER_SIZE];
+			std::size_t actual_size;
+			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE, &param_value, &actual_size);
+			contex->handler.report(contex, error_code);
+			return helper::to_vector<return_type>(param_value, actual_size);
+		}
+	};
+public:
 	template<cl_int name>
-	typename param_traits<cl_context_info, name>::param_type get_info() {
-		auto c = ctx.get();
-		param_traits<cl_context_info, name>::param_type param_value;
-		size_t param_value_size = sizeof(decltype(param_value));
-		auto error_code = clGetContextInfo(c, name, param_value_size, &param_value, nullptr);
-		handler.handle(error_code);
-		return param_value;
+	using param = typename param_traits<cl_context_info, name>::param_type;
+	template<cl_int name>
+	typename hidden<param<name>, name>::real_return get_info() {
+		return hidden<param<name>, name>::get_info(this);
 	}
 };
 
