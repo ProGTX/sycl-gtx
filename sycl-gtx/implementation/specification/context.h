@@ -110,7 +110,7 @@ private:
 			std::size_t actual_size;
 			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE, &param_value, &actual_size);
 			contex->handler.report(contex, error_code);
-			return helper::to_vector<return_type>(param_value, actual_size);
+			return real_return(param_value, param_value + actual_size);
 		}
 	};
 public:

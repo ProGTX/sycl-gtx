@@ -54,7 +54,7 @@ VECTOR_CLASS<device> device::create_sub_devices(
 	cl_device_id* device_ids = new cl_device_id[devices];
 	auto error_code = clCreateSubDevices(did, properties, devices, device_ids, num_devices);
 	handler.report(this, error_code);
-	auto device_vector = helper::to_vector<device>(device_ids, *num_devices, true);
+	auto device_vector = VECTOR_CLASS<device>(device_ids, device_ids + *num_devices);
 	delete[] device_ids;
 	return device_vector;
 }
@@ -68,7 +68,7 @@ VECTOR_CLASS<device> helper::get_devices(
 	cl_uint num_devices;
 	auto error_code = clGetDeviceIDs(pid, device_type, MAX_DEVICES, device_ids, &num_devices);
 	handler.report(device_ids, error_code);
-	return to_vector<device>(device_ids, num_devices);
+	return VECTOR_CLASS<device>(device_ids, device_ids + num_devices);
 }
 
 unsigned int helper::select_best_device(device_selector& selector, VECTOR_CLASS<device>& devices) {
