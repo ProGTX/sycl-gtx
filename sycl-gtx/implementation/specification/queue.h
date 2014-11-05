@@ -15,25 +15,43 @@ namespace sycl {
 
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
+public:
+	using async_handler_t = helper::error::async_handler::function_t;
+
 private:
 	refc::ptr<cl_command_queue> command_q;
 	context ctx;
+	device dev;
+
 	helper::error::handler handler;
+	static error_handler& default_error;
 	bool exceptions_enabled = true;
 
-	static device select_best_device(device_selector& selector);
+	static device select_best_device(device_selector& selector, context& ctx);
 
-	// TODO: There is a mess in the specification regarding these constructors
-	queue(cl_command_queue cmd_queue) {}
-	queue(device_selector& selector);
-	queue(context ctx, device_selector& selector, cl_command_queue_properties properties);
-	queue(device queue_device);
-
+	// Master constructor
+	queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback);
 public:
-	queue(cl_command_queue cmd_queue = nullptr, error_handler& sync_handler = helper::error::handler::default) {}
-	queue(device_selector& selector, error_handler& sync_handler = helper::error::handler::default);
-	queue(context ctx, device_selector& selector, cl_command_queue_properties properties = 0, error_handler& sync_handler = helper::error::handler::default);
-	queue(device queue_device, error_handler& sync_handler = helper::error::handler::default);
+	// Create commmand queue from existing one
+	queue(cl_command_queue cmd_queue, error_handler& sync_handler = default_error);
+
+	// Creates a command queue using clCreateCommandQueue from a context and a device.
+	// Returns errors via C++ exceptions.
+	queue(context ctx, device dev, cl_command_queue_properties properties = 0, error_handler& sync_handler = default_error);
+
+	// This chooses a device to run the command_groups on based on the provided selector.
+	// If no device is selected, runs on the host.
+	// If no selector is provided, the method for choosing the "best" device is undefined.
+	// This constructor cannot report an error, as any error during queue creation enforces queue creation on the host.
+	queue(device_selector& selector = *device_selector::default, cl_command_queue_properties properties = 0, error_handler& sync_handler = default_error);
+
+	// This chooses a device to run the command_groups based on the provided selector, but must be within the provided context.
+	// If no device is selected, an error is reported via a C++ exception.
+	queue(context ctx, device_selector& selector, cl_command_queue_properties properties = 0, error_handler& sync_handler = default_error);
+
+	// This creates a queue on the given device.
+	// Any error is reported via C++ exceptions.
+	queue(device dev, cl_command_queue_properties properties = 0, error_handler& sync_handler = default_error);
 
 	//TODO: queue(..., std::function &async_handler);
 

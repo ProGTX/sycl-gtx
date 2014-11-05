@@ -2,6 +2,39 @@
 
 using namespace cl::sycl;
 
+error_handler& queue::default_error = helper::error::handler::default;
+
+device queue::select_best_device(device_selector& selector, context& ctx) {
+	auto device_pointers = ctx.get_info<CL_CONTEXT_DEVICES>();
+	auto devices = helper::transform_vector<device>(device_pointers);
+	auto index = helper::select_best_device(selector, devices);
+	return devices[index];
+}
+
+// Master constructor
+queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback) {}
+
+queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
+	:	command_q(refc::allocate<cl_command_queue>(cmd_queue, clReleaseCommandQueue)),
+		dev(get_info<CL_QUEUE_DEVICE>(), sync_handler),
+		ctx(get_info<CL_QUEUE_CONTEXT>(), sync_handler),
+		handler(sync_handler) {
+	auto error_code = clRetainCommandQueue(cmd_queue);
+	handler.report(this, error_code);
+}
+
+queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler)
+	: queue(ctx, dev, properties, sync_handler, false) {}
+
+// TODO
+queue::queue(device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler) {}
+//	: queue(nullptr, select_best_device(selector, ctx), properties, sync_handler, false) {}
+
+queue::queue(context ctx, device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler)
+	: queue(ctx, select_best_device(selector, ctx), properties, sync_handler, true) {}
+queue::queue(device dev, cl_command_queue_properties properties, error_handler& sync_handler)
+	: queue(context(nullptr, dev, sync_handler), dev, properties, sync_handler, false) {}
+
 queue::~queue() {
 	throw_asynchronous();
 
@@ -16,9 +49,8 @@ context queue::get_context() {
 	return ctx;
 }
 
-// TODO: Which device?
 device queue::get_device() {
-	return device();
+	return dev;
 }
 
 // TODO: Which error?
