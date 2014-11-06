@@ -10,10 +10,6 @@ namespace helper {
 template<bool>
 struct select_type;
 
-// TODO: One cannot safely return char[] from a function
-//using char_array = char[];
-using char_array = STRING_CLASS;
-
 template<typename cl_type, cl_int name, typename = select_type<true>>
 struct param_traits;
 
@@ -28,7 +24,7 @@ struct param_traits<										\
 }
 
 // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetPlatformInfo.html
-SYCL_ADD_TRAIT(cl_platform_info, char_array, (name >= CL_PLATFORM_PROFILE && name <= CL_PLATFORM_EXTENSIONS));
+SYCL_ADD_TRAIT(cl_platform_info, char[],	(name >= CL_PLATFORM_PROFILE && name <= CL_PLATFORM_EXTENSIONS));
 
 
 // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetDeviceInfo.html
@@ -70,7 +66,7 @@ SYCL_ADD_TRAIT(cl_device_info, cl_device_fp_config, (
 	name == CL_DEVICE_SINGLE_FP_CONFIG
 ));
 
-SYCL_ADD_TRAIT(cl_device_info, char_array, (
+SYCL_ADD_TRAIT(cl_device_info, char[], (
 	name == CL_DEVICE_BUILT_IN_KERNELS	||
 	name == CL_DEVICE_EXTENSIONS		||
 	name == CL_DEVICE_NAME				||

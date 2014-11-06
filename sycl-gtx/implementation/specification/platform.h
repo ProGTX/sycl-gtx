@@ -40,14 +40,15 @@ public:
 	VECTOR_CLASS<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
 
 	// Direct equivalent of the OpenCL C API.
+	// All parameters are char arrays, so the function is simplified
 	template<cl_int name>
-	typename param_traits<cl_platform_info, name>::param_type get_info() {
+	typename STRING_CLASS get_info() {
 		static const int BUFFER_SIZE = 8192;
 		char buffer[BUFFER_SIZE];
 		auto pid = platform_id.get();
 		auto error_code = clGetPlatformInfo(pid, name, BUFFER_SIZE, buffer, nullptr);
 		handler.report(this, error_code);
-		return buffer;
+		return STRING_CLASS(buffer);
 	}
 
 	bool is_host();

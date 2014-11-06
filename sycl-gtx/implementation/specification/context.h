@@ -109,14 +109,14 @@ private:
 			static const int BUFFER_SIZE = 1024;
 			return_type param_value[BUFFER_SIZE];
 			std::size_t actual_size;
-			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE, &param_value, &actual_size);
+			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE * sizeof(return_type), &param_value, &actual_size);
 			contex->handler.report(contex, error_code);
 			return real_return(param_value, param_value + actual_size);
 		}
 	};
-public:
 	template<cl_int name>
 	using param = typename param_traits<cl_context_info, name>::param_type;
+public:
 	template<cl_int name>
 	typename hidden<param<name>, name>::real_return get_info() {
 		return hidden<param<name>, name>::get_info(this);

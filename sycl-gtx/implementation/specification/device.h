@@ -22,7 +22,7 @@ class platform;
 // On destruction a call to clReleaseDevice is triggered.
 class device {
 private:
-	// TODO: platform_id isn't set anywhere
+	// TODO: platform_id isn't set anywhere, first we need to select a platform
 	refc::ptr<cl_platform_id> platform_id;
 	refc::ptr<cl_device_id> device_id;
 	helper::error::handler handler;
@@ -56,6 +56,8 @@ public:
 
 	VECTOR_CLASS<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
 	bool has_extension(const STRING_CLASS extension_name);
+
+	// TODO
 	bool is_host();
 	bool is_cpu();
 	bool is_gpu();
@@ -70,20 +72,54 @@ public:
 private:
 	template<class return_type, cl_int name>
 	struct hidden {
-		static return_type get_info(device* dev) {
+		using real_return = return_type;
+		static real_return get_info(device* dev) {
 			auto did = dev->device_id.get();
-			return_type result;
-			auto error_code = clGetDeviceInfo(did, name, sizeof(return_type), &result, nullptr);
+			real_return param_value;
+			auto error_code = clGetDeviceInfo(did, name, sizeof(real_return), &param_value, nullptr);
 			dev->handler.report(dev, error_code);
-			return result;
+			return param_value;
 		}
 	};
-	
+	template<class return_type, cl_int name>
+	struct hidden<return_type[], name> {
+		using real_return = VECTOR_CLASS<return_type>;
+		static real_return get_info(device* dev) {
+			auto did = dev->device_id.get();
+			static const int BUFFER_SIZE = 1024;
+			return_type param_value[BUFFER_SIZE];
+			std::size_t actual_size;
+			auto error_code = clGetDeviceInfo(did, name, BUFFER_SIZE * sizeof(return_type), param_value, &actual_size);
+			dev->handler.report(dev, error_code);
+			return real_return(param_value, param_value + actual_size);
+		}
+	};
+	template<cl_int name>
+	struct hidden<char[], name> {
+		using real_return = STRING_CLASS;
+		static real_return get_info(device* dev) {
+			auto did = dev->device_id.get();
+			static const int BUFFER_SIZE = 8192;
+			char param_value[BUFFER_SIZE];
+			auto error_code = clGetDeviceInfo(did, name, BUFFER_SIZE * sizeof(char), param_value, nullptr);
+			dev->handler.report(dev, error_code);
+			return real_return(param_value);
+		}
+	};
+	template<cl_int name>
+	using param = typename param_traits<cl_device_info, name>::param_type;
 public:
 	template<cl_int name>
-	typename param_traits<cl_device_info, name>::param_type get_info() {
-		// Separate class implementation allows for partial template specialization
-		return hidden<typename param_traits<cl_device_info, name>::param_type, name>::get_info(this);
+	typename hidden<param<name>, name>::real_return get_info() {
+		return hidden<param<name>, name>::get_info(this);
+	}
+
+	void a() {
+		auto b1 = get_info<CL_DEVICE_ADDRESS_BITS>();
+		auto b2 = get_info<CL_DEVICE_AVAILABLE>();
+		auto b3 = get_info<CL_DEVICE_DOUBLE_FP_CONFIG>();
+		auto b4 = get_info<CL_DEVICE_PARTITION_TYPE>();
+		auto b5 = get_info<CL_DEVICE_NAME>();
 	}
 };
 
