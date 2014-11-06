@@ -58,8 +58,22 @@ public:
 
 	~queue();
 
-	queue(const queue& cmd_queue) = default;
-	queue& operator=(const queue& cmd_queue) = default;
+	// Copy and move semantics
+	queue(const queue&) = default;
+#if MSVC_LOW
+	queue(queue&& move)
+		: SYCL_MOVE_INIT(command_q), SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(dev), SYCL_MOVE_INIT(handler), exceptions_enabled(move.exceptions_enabled) {}
+	friend void swap(queue& first, queue& second) {
+		using std::swap;
+		SYCL_SWAP(command_q);
+		SYCL_SWAP(ctx);
+		SYCL_SWAP(dev);
+		SYCL_SWAP(handler);
+		SYCL_SWAP(exceptions_enabled);
+	}
+#else
+	queue(queue&&) = default;
+#endif
 
 	cl_command_queue get();
 	context get_context();

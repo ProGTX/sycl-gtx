@@ -34,18 +34,19 @@ public:
 	device(int& error_code);
 	device(cl_device_id device_id, int& error_code);
 
+	// Copy and move semantics
 	device(const device&) = default;
-	device& operator=(const device&) = default;
-
 #if MSVC_LOW
-	SYCL_MOVE_OPS(device, {
-		SYCL_MOVE(platform_id);
-		SYCL_MOVE(device_id);
-		SYCL_MOVE(handler);
-	})
+	device(device&& move)
+		: SYCL_MOVE_INIT(platform_id), SYCL_MOVE_INIT(device_id), SYCL_MOVE_INIT(handler) {}
+	friend void swap(device& first, device& second) {
+		using std::swap;
+		SYCL_SWAP(platform_id);
+		SYCL_SWAP(device_id);
+		SYCL_SWAP(handler);
+	}
 #else
 	device(device&&) = default;
-	device operator=(device&&) = default;
 #endif
 
 	cl_device_id get() const;

@@ -14,11 +14,11 @@
 #include "specification\queue.h"
 #include "specification\ranges.h"
 
+// Can collide with cl.hpp
 #undef VECTOR_CLASS
 #undef STRING_CLASS
 
 #if MSVC_LOW
-#undef SYCL_MOVE_OPS
-#undef SYCL_COPY
-#undef SYCL_MOVE
+#undef SYCL_SWAP
+#undef SYCL_MOVE_INIT
 #endif

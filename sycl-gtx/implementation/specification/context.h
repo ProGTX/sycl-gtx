@@ -70,19 +70,20 @@ public:
 	context(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, context_notify& handler);
 	context(const cl_context_properties* properties, device target_device, context_notify& handler);
 
+	// Copy and move semantics
 	context(const context&) = default;
-	context& operator=(const context&) = default;
-
 #if MSVC_LOW
-	SYCL_MOVE_OPS(context, {
-		SYCL_MOVE(ctx);
-		SYCL_MOVE(target_devices);
-		SYCL_COPY(best_device_id);
-		SYCL_MOVE(handler);
-	})
+	context(context&& move)
+		: SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(target_devices), SYCL_MOVE_INIT(handler), best_device_id(move.best_device_id) {}
+	friend void swap(context& first, context& second) {
+		using std::swap;
+		SYCL_SWAP(ctx);
+		SYCL_SWAP(target_devices);
+		SYCL_SWAP(handler);
+		SYCL_SWAP(best_device_id);
+	}
 #else
 	context(context&&) = default;
-	context& operator=(context&& copy) = default;
 #endif
 
 public:

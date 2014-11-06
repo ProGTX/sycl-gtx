@@ -7,14 +7,8 @@
 #endif
 
 #if MSVC_LOW
-#define SYCL_MOVE_OPS(class_name, action)									\
-private:																	\
-void swap(class_name& first, class_name& second) action						\
-public:																		\
-	class_name(class_name&& move) { swap(*this, move); }					\
-	class_name& operator=(class_name&& move) { swap(*this, move); return *this; }
-#define SYCL_COPY(member) first.member = second.member
-#define SYCL_MOVE(member) first.member = std::move(second.member)
+#define SYCL_SWAP(member) swap(first.member, second.member)
+#define SYCL_MOVE_INIT(member) member(std::move(move.member))
 #endif
 
 // 3.2.0 VECTOR_CLASS and STRING_CLASS

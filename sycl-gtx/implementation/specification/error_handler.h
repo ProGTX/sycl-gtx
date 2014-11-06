@@ -141,48 +141,46 @@ public:
 class handler {
 private:
 	std::shared_ptr<error_handler> hidden_hndlr;
-	error_handler& actual_hndlr;
+	error_handler* actual_hndlr;
 	bool is_async = false;
 
 public:
 	static throw_handler default;
 
 	handler()
-		: actual_hndlr(default) {}
+		: actual_hndlr(&default) {}
 	handler(cl_int& error_code)
-		: hidden_hndlr(new code_handler(error_code)), actual_hndlr(*hidden_hndlr) {}
+		: hidden_hndlr(new code_handler(error_code)), actual_hndlr(hidden_hndlr.get()) {}
 	handler(async_handler::function_t& hndlr)
-		: hidden_hndlr(new async_handler(hndlr)), actual_hndlr(*hidden_hndlr), is_async(true) {}
+		: hidden_hndlr(new async_handler(hndlr)), actual_hndlr(hidden_hndlr.get()), is_async(true) {}
 	handler(error_handler& hndlr)
-		: actual_hndlr(hndlr) {}
+		: actual_hndlr(&hndlr) {}
 
+	// Copy and move semantics
 	handler(const handler&) = default;
-	handler& operator=(const handler&) = default;
-
 #if MSVC_LOW
-private:
-	void swap(handler& first, handler& second) {
-		SYCL_MOVE(hidden_hndlr);
-		SYCL_COPY(actual_hndlr);
-		SYCL_COPY(is_async);
+	handler(handler&& move)
+		: SYCL_MOVE_INIT(hidden_hndlr), SYCL_MOVE_INIT(actual_hndlr), is_async(move.is_async)
+	{}
+	friend void swap(handler& first, handler& second) {
+		using std::swap;
+		SYCL_SWAP(hidden_hndlr);
+		SYCL_SWAP(actual_hndlr);
+		SYCL_SWAP(is_async);
 	}
-public:
-	handler(handler&& move) : actual_hndlr(move.actual_hndlr) { swap(*this, move); }
-	handler operator=(handler&& move) { swap(*this, move); return *this; }
 #else
 	handler(handler&&) = default;
-	handler operator=(handler&&) = default;
 #endif
 
 	template <class T>
 	void report(T* thrower, cl_int error_code, bool is_sycl_specific = false) {
 		exception e(thrower, error_code, is_sycl_specific);
-		actual_hndlr.report_error(e);
+		actual_hndlr->report_error(e);
 	}
 
 	void apply() {
 		if(is_async) {
-			((async_handler&)actual_hndlr).apply();
+			((async_handler*)actual_hndlr)->apply();
 		}
 	}
 };
