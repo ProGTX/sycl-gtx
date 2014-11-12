@@ -122,5 +122,8 @@
     <ClInclude Include="implementation\specification\device_selector.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\event.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

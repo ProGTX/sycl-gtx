@@ -2,18 +2,13 @@
 
 // 3.2.6 Command group class
 
+#include "event.h"
+#include "queue.h"
 #include "../common.h"
 #include "../debug.h"
-#include "queue.h"
 
 namespace cl {
 namespace sycl {
-
-struct event {
-	event() {
-		DSELF() << "not implemented";
-	}
-};
 
 namespace detail {
 

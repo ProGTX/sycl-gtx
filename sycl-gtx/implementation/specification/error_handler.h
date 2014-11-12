@@ -117,6 +117,7 @@ public:
 class code_handler : public error_handler {
 private:
 	cl_int& error_code;
+	friend class handler;
 public:
 	code_handler(cl_int& error_code)
 		: error_code(error_code) {}
@@ -186,6 +187,11 @@ public:
 #else
 	handler(handler&&) = default;
 #endif
+	void report(bool is_sycl_specific = false) {
+		// TODO: Prevent other types of handlers from calling this
+		exception e(thrower, ((code_handler*)actual_hndlr)->error_code, is_sycl_specific, thrower_type);
+		actual_hndlr->report_error(e);
+	}
 	void report(cl_int error_code, bool is_sycl_specific = false) {
 		exception e(thrower, error_code, is_sycl_specific, thrower_type);
 		actual_hndlr->report_error(e);
