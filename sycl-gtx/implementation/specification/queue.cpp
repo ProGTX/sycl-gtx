@@ -16,16 +16,19 @@ context queue::create_context(queue* q, device_selector& selector, error_handler
 	return std::move(q->ctx);
 }
 
-// Master constructor
-queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback) {}
+// TODO: Master constructor
+queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback) {
+	handler.set_thrower(this);
+}
 
+// Create queue from existing one
 queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
 	:	command_q(refc::allocate<cl_command_queue>(cmd_queue, clReleaseCommandQueue)),
 		dev(get_info<CL_QUEUE_DEVICE>(), sync_handler),
 		ctx(get_info<CL_QUEUE_CONTEXT>(), sync_handler),
 		handler(sync_handler) {
-	auto error_code = clRetainCommandQueue(cmd_queue);
 	handler.set_thrower(this);
+	auto error_code = clRetainCommandQueue(cmd_queue);
 	handler.report(error_code);
 }
 
@@ -71,7 +74,7 @@ void queue::throw_asynchronous() {
 	handler.apply();
 }
 
-// TODO: This a blocking wait for all enqueued tasks in the queue to complete.
+// TODO: This is a blocking wait for all enqueued tasks in the queue to complete.
 void queue::wait() {
 }
 

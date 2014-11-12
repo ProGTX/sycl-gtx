@@ -161,7 +161,7 @@ private:
 public:
 	static throw_handler default;
 
-	// TODO: Add thrower to constructor
+	// TODO: Add thrower to constructors
 	handler()
 		: actual_hndlr(&default) {}
 	handler(cl_int& error_code)
