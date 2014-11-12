@@ -34,7 +34,7 @@
 
 namespace cl {
 namespace sycl {
-namespace helper {
+namespace detail {
 
 template<class To, class From>
 VECTOR_CLASS<To> transform_vector(VECTOR_CLASS<From> array) {
@@ -49,6 +49,6 @@ bool has_extension(T* sycl_class, const STRING_CLASS extension_name) {
 	return ext_str.find(extension_name) != STRING_CLASS::npos;
 }
 
-} // namespace helper
+} // namespace detail
 } // namespace sycl
 } // namespace cl

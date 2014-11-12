@@ -3,7 +3,7 @@
 
 using namespace cl::sycl;
 
-device::device(cl_device_id device_id, helper::error::handler handler)
+device::device(cl_device_id device_id, detail::error::handler handler)
 	: device_id(refc::allocate(device_id, clReleaseDevice)), handler(handler) {
 	if(device_id != nullptr) {
 		auto error_code = clRetainDevice(device_id);
@@ -18,7 +18,7 @@ device::device(cl_device_id device_id, helper::error::handler handler)
 }
 
 device::device(cl_device_id device_id, error_handler& handler)
-	: device(device_id, helper::error::handler(handler)) {}
+	: device(device_id, detail::error::handler(handler)) {}
 
 device::device(error_handler& handler)
 	: device(nullptr, handler) {}
@@ -27,7 +27,7 @@ device::device(int& error_code)
 	: device(nullptr, error_code) {}
 
 device::device(cl_device_id device_id, int& error_code)
-	: device(device_id, helper::error::handler(error_code)) {}
+	: device(device_id, detail::error::handler(error_code)) {}
 
 cl_device_id device::get() const {
 	return device_id.get();
@@ -38,11 +38,11 @@ cl_platform_id device::get_platform() const {
 }
 
 VECTOR_CLASS<device> device::get_devices(cl_device_type device_type) {
-	return helper::get_devices(device_type, platform_id, handler);
+	return detail::get_devices(device_type, platform_id, handler);
 }
 
 bool device::has_extension(const STRING_CLASS extension_name) {
-	return helper::has_extension<CL_DEVICE_EXTENSIONS>(this, extension_name);
+	return detail::has_extension<CL_DEVICE_EXTENSIONS>(this, extension_name);
 }
 
 VECTOR_CLASS<device> device::create_sub_devices(
@@ -59,7 +59,7 @@ VECTOR_CLASS<device> device::create_sub_devices(
 	return device_vector;
 }
 
-VECTOR_CLASS<device> helper::get_devices(
+VECTOR_CLASS<device> detail::get_devices(
 	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler& handler
 ) {
 	static const int MAX_DEVICES = 1024;
@@ -71,7 +71,7 @@ VECTOR_CLASS<device> helper::get_devices(
 	return VECTOR_CLASS<device>(device_ids, device_ids + num_devices);
 }
 
-unsigned int helper::select_best_device(device_selector& selector, VECTOR_CLASS<device>& devices) {
+unsigned int detail::select_best_device(device_selector& selector, VECTOR_CLASS<device>& devices) {
 	unsigned int best_id = -1;
 	int best_score = -1;
 	int i = 0;

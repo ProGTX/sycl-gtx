@@ -3,7 +3,7 @@
 
 using namespace cl::sycl;
 
-error_handler& context::default_error = helper::error::handler::default;
+error_handler& context::default_error = detail::error::handler::default;
 
 refc::ptr<cl_context> context::reserve(cl_context c) {
 	return refc::allocate(c, clReleaseContext);
@@ -29,7 +29,7 @@ context::context(
 		if(num_devices == 0) {
 			target_devices = load_devices();
 		}
-		best_device_id = helper::select_best_device(dev_sel, target_devices);
+		best_device_id = detail::select_best_device(dev_sel, target_devices);
 		if(best_device_id < 0) {
 			// TODO: Maybe an exception?
 		}

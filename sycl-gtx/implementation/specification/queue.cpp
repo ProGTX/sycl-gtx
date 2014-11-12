@@ -2,12 +2,12 @@
 
 using namespace cl::sycl;
 
-error_handler& queue::default_error = helper::error::handler::default;
+error_handler& queue::default_error = detail::error::handler::default;
 
 device queue::select_best_device(device_selector& selector, context& ctx) {
 	auto device_pointers = ctx.get_info<CL_CONTEXT_DEVICES>();
-	auto devices = helper::transform_vector<device>(device_pointers);
-	auto index = helper::select_best_device(selector, devices);
+	auto devices = detail::transform_vector<device>(device_pointers);
+	auto index = detail::select_best_device(selector, devices);
 	return devices[index];
 }
 

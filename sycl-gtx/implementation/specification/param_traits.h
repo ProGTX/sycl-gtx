@@ -5,7 +5,7 @@
 namespace cl {
 namespace sycl {
 
-namespace helper {
+namespace detail {
 
 template<bool>
 struct select_type;
@@ -134,11 +134,11 @@ SYCL_ADD_TRAIT(cl_command_queue_info, cl_device_id,					(name == CL_QUEUE_DEVICE
 SYCL_ADD_TRAIT(cl_command_queue_info, cl_uint,						(name == CL_QUEUE_REFERENCE_COUNT));
 SYCL_ADD_TRAIT(cl_command_queue_info, cl_command_queue_properties,	(name == CL_QUEUE_PROPERTIES));
 
-} // namespace helper
+} // namespace detail
 
 
 template<typename cl_type, cl_int name>
-struct param_traits : public helper::param_traits<cl_type, name> {};
+struct param_traits : public detail::param_traits<cl_type, name> {};
 
 } // namespace sycl
 } // namespace cl

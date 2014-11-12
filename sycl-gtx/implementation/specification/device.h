@@ -25,11 +25,11 @@ private:
 	// TODO: platform_id isn't set anywhere, first we need to select a platform
 	refc::ptr<cl_platform_id> platform_id;
 	refc::ptr<cl_device_id> device_id;
-	helper::error::handler handler;
+	detail::error::handler handler;
 
-	device(cl_device_id device_id, helper::error::handler handler);
+	device(cl_device_id device_id, detail::error::handler handler);
 public:
-	device(cl_device_id device_id = nullptr, error_handler& handler = helper::error::handler::default);
+	device(cl_device_id device_id = nullptr, error_handler& handler = detail::error::handler::default);
 	device(error_handler& handler);
 	device(int& error_code);
 	device(cl_device_id device_id, int& error_code);
@@ -123,7 +123,7 @@ public:
 	}
 };
 
-namespace helper {
+namespace detail {
 
 VECTOR_CLASS<device> get_devices(
 	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler& handler
@@ -131,7 +131,7 @@ VECTOR_CLASS<device> get_devices(
 
 unsigned int select_best_device(device_selector& selector, VECTOR_CLASS<device>& devices);
 
-} // namespace helper
+} // namespace detail
 
 } // namespace sycl
 } // namespace cl

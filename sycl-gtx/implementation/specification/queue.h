@@ -16,14 +16,14 @@ namespace sycl {
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
 public:
-	using async_handler_t = helper::error::async_handler::function_t;
+	using async_handler_t = detail::error::async_handler::function_t;
 
 private:
 	refc::ptr<cl_command_queue> command_q;
 	context ctx;
 	device dev;
 
-	helper::error::handler handler;
+	detail::error::handler handler;
 	static error_handler& default_error;
 	bool exceptions_enabled = true;
 

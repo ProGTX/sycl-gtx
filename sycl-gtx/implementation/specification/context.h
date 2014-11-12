@@ -39,7 +39,7 @@ private:
 	VECTOR_CLASS<device> target_devices;
 	unsigned int best_device_id = 0;
 
-	helper::error::handler handler;
+	detail::error::handler handler;
 	static error_handler& default_error;
 
 	static refc::ptr<cl_context> reserve(cl_context c = nullptr);

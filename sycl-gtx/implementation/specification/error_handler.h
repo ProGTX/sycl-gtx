@@ -92,7 +92,7 @@ public:
 	virtual void report_error(exception& error) = 0;
 };
 
-namespace helper {
+namespace detail {
 namespace error {
 
 class throw_handler : public error_handler {
@@ -186,7 +186,7 @@ public:
 };
 
 } // namespace error
-} // namespace helper
+} // namespace detail
 
 } // namespace sycl
 } // namespace cl

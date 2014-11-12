@@ -15,7 +15,7 @@ struct event {
 	}
 };
 
-namespace helper {
+namespace detail {
 
 struct command_group_interface {
 	virtual event kernel_event() {
@@ -54,19 +54,19 @@ public:
 	}
 };
 
-} // namespace helper
+} // namespace detail
 
 
 // A command group in SYCL as it is defined in 2.3.1 includes a kernel to be enqueued along with all the commands
 // for queued data transfers that it needs in order for its execution to be successful.
 class command_group {
 private:
-	helper::command_group_interface group;
+	detail::command_group_interface group;
 public:
 	// typename functorT: kernel functor or lambda function
 	template <typename functorT>
 	command_group(queue q, functorT functor)
-		: group(helper::command_group<functorT>(q, functor)) {}
+		: group(detail::command_group<functorT>(q, functor)) {}
 	event kernel_event() {
 		group.kernel_event();
 	}

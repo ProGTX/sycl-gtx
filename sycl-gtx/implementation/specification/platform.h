@@ -16,10 +16,10 @@ class device;
 class platform {
 private:
 	refc::ptr<cl_platform_id> platform_id;
-	helper::error::handler handler;
+	detail::error::handler handler;
 
 public:
-	platform(cl_platform_id platform_id = nullptr, error_handler& handler = helper::error::handler::default);
+	platform(cl_platform_id platform_id = nullptr, error_handler& handler = detail::error::handler::default);
 	platform(error_handler& handler);
 	platform(int& error_code);
 	platform(cl_platform_id platform_id, int& error_code);
@@ -28,10 +28,10 @@ public:
 
 	// Returns a vector of platforms.
 	// Errors can be returned via C++ exceptions or via a reference to an error_code.
-	static VECTOR_CLASS<platform> get_platforms(error_handler& handler = helper::error::handler::default);
+	static VECTOR_CLASS<platform> get_platforms(error_handler& handler = detail::error::handler::default);
 	static VECTOR_CLASS<platform> get_platforms(int& error_code);
 private:
-	static VECTOR_CLASS<platform> get_platforms(helper::error::handler& handler);
+	static VECTOR_CLASS<platform> get_platforms(detail::error::handler& handler);
 
 public:
 	// TODO: There's probably an error in the specification - get_devices cannot be overloaded on "static" alone.

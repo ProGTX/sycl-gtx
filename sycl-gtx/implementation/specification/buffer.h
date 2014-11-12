@@ -15,7 +15,7 @@ namespace sycl {
 template <typename dataType, int dimensions, access::mode mode, access::target target>
 class accessor;
 
-namespace helper {
+namespace detail {
 
 template <typename T, int dimensions>
 struct buffer {
@@ -36,33 +36,33 @@ struct buffer {
 	}
 };
 
-} // namespace helper
+} // namespace detail
 
 // typename T: The type of the elements of the buffer
 // int dimensions: number of dimensions of the buffer : 1, 2, or 3
 template <typename T, int dimensions = 1>
-struct buffer : helper::buffer<T, dimensions> {
+struct buffer : detail::buffer<T, dimensions> {
 #if MSVC_LOW
 	buffer(T* host_data, range<dimensions> range)
-		: helper::buffer<T, dimensions>(host_data, range) {}
+		: detail::buffer<T, dimensions>(host_data, range) {}
 	buffer(T* host_data, int range)
-		: helper::buffer<T, dimensions>(host_data, range) {}
+		: detail::buffer<T, dimensions>(host_data, range) {}
 #else
-	using helper::buffer<T, dimensions>::buffer;
+	using detail::buffer<T, dimensions>::buffer;
 #endif
 };
 
 template <typename T>
-struct buffer<T, 1> : helper::buffer<T, 1> {
+struct buffer<T, 1> : detail::buffer<T, 1> {
 #if MSVC_LOW
 	buffer(T* host_data, range<1> range)
-		: helper::buffer<T, 1>(host_data, range) {}
+		: detail::buffer<T, 1>(host_data, range) {}
 	buffer(T* host_data, int range)
-		: helper::buffer<T, 1>(host_data, range) {}
+		: detail::buffer<T, 1>(host_data, range) {}
 #else
-	using helper::buffer<T, 1>::buffer;
+	using detail::buffer<T, 1>::buffer;
 #endif
-	buffer(std::vector<T> host_data) : helper::buffer<T, 1>(host_data.data(), host_data.size()) {
+	buffer(std::vector<T> host_data) : detail::buffer<T, 1>(host_data.data(), host_data.size()) {
 		DSELF() << "not implemented";
 	}
 };
