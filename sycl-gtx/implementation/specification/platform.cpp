@@ -35,7 +35,7 @@ VECTOR_CLASS<platform> platform::get_platforms(detail::error::handler& handler) 
 	cl_platform_id platform_ids[MAX_PLATFORMS];
 	cl_uint num_platforms;
 	auto error_code = clGetPlatformIDs(MAX_PLATFORMS, platform_ids, &num_platforms);
-	handler.report(platform_ids, error_code);
+	handler.report(error_code);
 	return VECTOR_CLASS<platform>(platform_ids, platform_ids + num_platforms);
 }
 

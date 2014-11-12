@@ -110,7 +110,7 @@ private:
 			return_type param_value[BUFFER_SIZE];
 			std::size_t actual_size;
 			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE * sizeof(return_type), &param_value, &actual_size);
-			contex->handler.report(contex, error_code);
+			contex->handler.report(error_code);
 			return real_return(param_value, param_value + actual_size);
 		}
 	};

@@ -25,7 +25,8 @@ queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
 		ctx(get_info<CL_QUEUE_CONTEXT>(), sync_handler),
 		handler(sync_handler) {
 	auto error_code = clRetainCommandQueue(cmd_queue);
-	handler.report(this, error_code);
+	handler.set_thrower(this);
+	handler.report(error_code);
 }
 
 queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler)

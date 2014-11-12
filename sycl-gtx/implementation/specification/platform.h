@@ -47,7 +47,7 @@ public:
 		char buffer[BUFFER_SIZE];
 		auto pid = platform_id.get();
 		auto error_code = clGetPlatformInfo(pid, name, BUFFER_SIZE, buffer, nullptr);
-		handler.report(this, error_code);
+		handler.report(error_code);
 		return STRING_CLASS(buffer);
 	}
 

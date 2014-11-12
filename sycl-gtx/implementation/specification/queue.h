@@ -86,7 +86,7 @@ public:
 		type param_value;
 		auto q = command_q.get();
 		auto error_code = clGetCommandQueueInfo(q, name, sizeof(type), &param_value, nullptr);
-		handler.report(this, error_code);
+		handler.report(error_code);
 		return param_value;
 	}
 

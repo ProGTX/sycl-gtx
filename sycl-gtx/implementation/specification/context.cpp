@@ -44,13 +44,13 @@ context::context(
 		cl_int error_code;
 		c = clCreateContext(properties, num_devices, devices.data(), pfn_notify, ctx_notify, &error_code);
 		if(pfn_notify == nullptr) {
-			this->handler.report(this, error_code);
+			this->handler.report(error_code);
 		}
 		ctx = reserve(c);
 	}
 	else {
 		auto error_code = clRetainContext(c);
-		this->handler.report(this, error_code);
+		this->handler.report(error_code);
 	}
 }
 

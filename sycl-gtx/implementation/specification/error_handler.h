@@ -17,16 +17,24 @@ template <typename T, int dimensions>
 struct buffer;
 class image;
 
+namespace detail {
+namespace error {
+class handler;
+}
+}
+
 class exception : public std::exception {
 private:
-	cl_int error_code;
-	bool is_sycl_specific;
+	friend class detail::error::handler;
 
-	void* thrower;
+	cl_int error_code = 0;
+	bool is_sycl_specific = false;
+
+	void* thrower = nullptr;
 	enum class thrower_t {
 		other, queue, buffer, image
 	};
-	thrower_t thrower_type;
+	thrower_t thrower_type = thrower_t::other;
 
 	template<class T, thrower_t required_type>
 	T* get() {
@@ -36,7 +44,6 @@ private:
 	exception(void* thrower, cl_int error_code, bool is_sycl_specific, thrower_t thrower_type)
 		: thrower(thrower), error_code(error_code), is_sycl_specific(is_sycl_specific), thrower_type(thrower_type) {}
 
-public:
 	template <class T>
 	exception(T* thrower, cl_int error_code, bool is_sycl_specific = false)
 		: exception(thrower, error_code, is_sycl_specific, thrower_t::other) {}
@@ -53,6 +60,9 @@ public:
 	template<int dimensions>
 	exception(buffer<class T, dimensions>* thrower, cl_int error_code, bool is_sycl_specific)
 		: exception(thrower, error_code, is_sycl_specific, thrower_t::bufer) {}
+
+public:
+	exception() {}
 
 	// Returns the OpenCL error code.
 	// Returns 0 if not an OpenCL error
@@ -80,7 +90,7 @@ public:
 	//}
 
 	// Returns the image that caused the error.
-	// Returns 0 if not a image error
+	// Returns 0 if not an image error
 	image* get_image() {
 		return get<image, thrower_t::image>();
 	}
@@ -144,9 +154,14 @@ private:
 	error_handler* actual_hndlr;
 	bool is_async = false;
 
+	void* thrower = this;
+	using thrower_t = exception::thrower_t;
+	thrower_t thrower_type = thrower_t::other;
+
 public:
 	static throw_handler default;
 
+	// TODO: Add thrower to constructor
 	handler()
 		: actual_hndlr(&default) {}
 	handler(cl_int& error_code)
@@ -171,11 +186,18 @@ public:
 #else
 	handler(handler&&) = default;
 #endif
+	void report(cl_int error_code, bool is_sycl_specific = false) {
+		exception e(thrower, error_code, is_sycl_specific, thrower_type);
+		actual_hndlr->report_error(e);
+	}
 
 	template <class T>
-	void report(T* thrower, cl_int error_code, bool is_sycl_specific = false) {
-		exception e(thrower, error_code, is_sycl_specific);
-		actual_hndlr->report_error(e);
+	void set_thrower(T* thrower);
+
+	template <>
+	void set_thrower(queue* thrower) {
+		this->thrower = thrower;
+		thrower_type = thrower_t::queue;
 	}
 
 	void apply() {

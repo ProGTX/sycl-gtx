@@ -7,7 +7,7 @@ device::device(cl_device_id device_id, detail::error::handler handler)
 	: device_id(refc::allocate(device_id, clReleaseDevice)), handler(handler) {
 	if(device_id != nullptr) {
 		auto error_code = clRetainDevice(device_id);
-		handler.report(this, error_code);
+		handler.report(error_code);
 	}
 	else {
 		// TODO: The “default” device constructed corresponds to the host.
@@ -53,7 +53,7 @@ VECTOR_CLASS<device> device::create_sub_devices(
 	auto did = device_id.get();
 	cl_device_id* device_ids = new cl_device_id[devices];
 	auto error_code = clCreateSubDevices(did, properties, devices, device_ids, num_devices);
-	handler.report(this, error_code);
+	handler.report(error_code);
 	auto device_vector = VECTOR_CLASS<device>(device_ids, device_ids + *num_devices);
 	delete[] device_ids;
 	return device_vector;
@@ -67,7 +67,7 @@ VECTOR_CLASS<device> detail::get_devices(
 	cl_device_id device_ids[MAX_DEVICES];
 	cl_uint num_devices;
 	auto error_code = clGetDeviceIDs(pid, device_type, MAX_DEVICES, device_ids, &num_devices);
-	handler.report(device_ids, error_code);
+	handler.report(error_code);
 	return VECTOR_CLASS<device>(device_ids, device_ids + num_devices);
 }
 

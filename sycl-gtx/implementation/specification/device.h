@@ -77,7 +77,7 @@ private:
 			auto did = dev->device_id.get();
 			real_return param_value;
 			auto error_code = clGetDeviceInfo(did, name, sizeof(real_return), &param_value, nullptr);
-			dev->handler.report(dev, error_code);
+			dev->handler.report(error_code);
 			return param_value;
 		}
 	};
@@ -90,7 +90,7 @@ private:
 			return_type param_value[BUFFER_SIZE];
 			std::size_t actual_size;
 			auto error_code = clGetDeviceInfo(did, name, BUFFER_SIZE * sizeof(return_type), param_value, &actual_size);
-			dev->handler.report(dev, error_code);
+			dev->handler.report(error_code);
 			return real_return(param_value, param_value + actual_size);
 		}
 	};
@@ -102,7 +102,7 @@ private:
 			static const int BUFFER_SIZE = 8192;
 			char param_value[BUFFER_SIZE];
 			auto error_code = clGetDeviceInfo(did, name, BUFFER_SIZE * sizeof(char), param_value, nullptr);
-			dev->handler.report(dev, error_code);
+			dev->handler.report(error_code);
 			return real_return(param_value);
 		}
 	};
