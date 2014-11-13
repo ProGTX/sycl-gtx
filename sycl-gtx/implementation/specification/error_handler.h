@@ -211,6 +211,10 @@ public:
 			((async_handler*)actual_hndlr)->apply();
 		}
 	}
+
+	operator error_handler&() {
+		return *actual_hndlr;
+	}
 };
 
 } // namespace error

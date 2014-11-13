@@ -1,5 +1,6 @@
 #include "context.h"
 #include "device.h"
+#include "platform.h"
 
 using namespace cl::sycl;
 
@@ -9,9 +10,10 @@ refc::ptr<cl_context> context::reserve(cl_context c) {
 	return refc::allocate(c, clReleaseContext);
 }
 
-// TODO: Auto load devices
 VECTOR_CLASS<device> context::load_devices() {
-	return {};
+	auto platforms = platform::get_platforms();
+	// TODO: For now just select the first platform
+	return platforms[0].get_devices();
 }
 
 // Master constructor

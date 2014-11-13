@@ -16,14 +16,28 @@ context queue::create_context(queue* q, device_selector& selector, error_handler
 	return std::move(q->ctx);
 }
 
-// TODO: Master constructor
-queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback) {
+// Master constructor
+queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback)
+	: ctx(ctx), dev(dev), handler(sync_handler) {
 	handler.set_thrower(this);
+	try {
+		cl_int error_code;
+		command_q = refc::allocate(clCreateCommandQueue(ctx.get(), dev.get(), properties, &error_code), clReleaseCommandQueue);
+		handler.report(error_code);
+	}
+	catch(std::exception& e) {
+		if(host_fallback) {
+			// TODO: Any error during queue creation enforces queue creation on the host.
+		}
+		else {
+			throw e;
+		}
+	}
 }
 
 // Create queue from existing one
 queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
-	:	command_q(refc::allocate<cl_command_queue>(cmd_queue, clReleaseCommandQueue)),
+	:	command_q(refc::allocate(cmd_queue, clReleaseCommandQueue)),
 		dev(get_info<CL_QUEUE_DEVICE>(), sync_handler),
 		ctx(get_info<CL_QUEUE_CONTEXT>(), sync_handler),
 		handler(sync_handler) {
