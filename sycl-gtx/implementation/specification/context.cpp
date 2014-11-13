@@ -30,6 +30,7 @@ context::context(
 
 		if(num_devices == 0) {
 			target_devices = load_devices();
+			num_devices = target_devices.size();
 		}
 		best_device_id = detail::select_best_device(dev_sel, target_devices);
 		if(best_device_id < 0) {

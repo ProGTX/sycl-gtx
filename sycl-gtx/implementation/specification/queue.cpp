@@ -17,8 +17,7 @@ context queue::create_context(queue* q, device_selector& selector, error_handler
 }
 
 // Master constructor
-queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback)
-	: ctx(ctx), dev(dev), handler(sync_handler) {
+void queue::construct(cl_command_queue_properties properties, bool host_fallback) {
 	handler.set_thrower(this);
 	try {
 		cl_int error_code;
@@ -35,6 +34,11 @@ queue::queue(context ctx, device dev, cl_command_queue_properties properties, er
 	}
 }
 
+queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback)
+	: ctx(ctx), dev(dev), handler(sync_handler) {
+	construct(properties, host_fallback);
+}
+
 // Create queue from existing one
 queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
 	:	command_q(refc::allocate(cmd_queue, clReleaseCommandQueue)),
@@ -49,7 +53,10 @@ queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
 queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler)
 	: queue(ctx, dev, properties, sync_handler, false) {}
 queue::queue(device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler)
-	: queue(create_context(this, selector, sync_handler), select_best_device(selector, ctx), properties, sync_handler, false) {}
+	: ctx(selector, sync_handler), handler(sync_handler) {
+	dev = select_best_device(selector, ctx);
+	construct(properties, false);
+}
 queue::queue(context ctx, device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler)
 	: queue(ctx, select_best_device(selector, ctx), properties, sync_handler, true) {}
 queue::queue(device dev, cl_command_queue_properties properties, error_handler& sync_handler)

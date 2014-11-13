@@ -1,5 +1,6 @@
 #include "device_selector.h"
 #include "device.h"
+#include "../debug.h"
 
 using namespace cl::sycl;
 

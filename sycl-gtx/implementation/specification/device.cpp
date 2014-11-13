@@ -80,6 +80,7 @@ unsigned int detail::select_best_device(device_selector& selector, VECTOR_CLASS<
 		int score = selector(dev);
 		if(score > best_score) {
 			best_id = i;
+			best_score = score;
 		}
 		++i;
 	}

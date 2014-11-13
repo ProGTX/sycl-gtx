@@ -31,6 +31,7 @@ private:
 	static context create_context(queue* q, device_selector& selector, error_handler& sync_handler = default_error);
 
 	// Master constructor
+	void construct(cl_command_queue_properties properties, bool host_fallback);
 	queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback);
 public:
 	// Create commmand queue from existing one
