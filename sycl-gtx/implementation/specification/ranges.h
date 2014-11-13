@@ -21,7 +21,7 @@ public:
 	range() {
 		DSELF() << "not implemented";
 	}
-	range(int) {
+	range(size_t) {
 		DSELF() << "not implemented";
 	}
 };
