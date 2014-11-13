@@ -5,6 +5,7 @@
 
 #include "../common.h"
 #include "../debug.h"
+#include "../error_code.h"
 #include <memory>
 #include <functional>
 
@@ -37,7 +38,7 @@ private:
 	thrower_t thrower_type = thrower_t::other;
 
 	template<class T, thrower_t required_type>
-	T* get() {
+	T* get() const {
 		return (thrower_type == required_type ? reinterpret_cast<T*>(thrower) : nullptr);
 	}
 
@@ -66,33 +67,41 @@ public:
 
 	// Returns the OpenCL error code.
 	// Returns 0 if not an OpenCL error
-	cl_int get_cl_code() {
+	cl_int get_cl_code() const {
 		return (is_sycl_specific ? 0 : error_code);
 	}
 
 	// Returns the SYCL-specific error code.
 	// Returns 0 if not a SYCL-specific error
-	cl_int get_sycl_code() {
+	cl_int get_sycl_code() const {
 		return (is_sycl_specific ? error_code : 0);
 	}
 
 	// Returns the queue that caused the error.
 	// Returns 0 if not a queue error
-	queue* get_queue() {
+	queue* get_queue() const {
 		return get<queue, thrower_t::queue>();
 	}
 
 	// TODO: A bit trickier than the constructor since we are forcing the type instead of deducing it
 	// Returns the buffer that caused the error.
 	// Returns 0 if not a buffer error
-	//buffer<class T>* get_buffer() {
+	//buffer<class T>* get_buffer() const {
 	//	return get<buffer<class T>, thrower_t::buffer>();
 	//}
 
 	// Returns the image that caused the error.
 	// Returns 0 if not an image error
-	image* get_image() {
+	image* get_image() const {
 		return get<image, thrower_t::image>();
+	}
+
+#if MSVC_LOW
+	virtual const char* what() const override {
+#else
+	virtual const char* what() const noexcept override {
+#endif
+		return detail::error_string(get_cl_code());
 	}
 };
 
@@ -109,6 +118,7 @@ class throw_handler : public error_handler {
 public:
 	virtual void report_error(exception& error) override {
 		if(error.get_cl_code() != CL_SUCCESS) {
+			debug(error_string(error.get_cl_code()));
 			throw error;
 		}
 	}
@@ -212,7 +222,7 @@ public:
 		}
 	}
 
-	operator error_handler&() {
+	error_handler& get() {
 		return *actual_hndlr;
 	}
 };

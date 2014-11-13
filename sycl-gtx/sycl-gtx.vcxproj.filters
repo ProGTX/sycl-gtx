@@ -125,5 +125,8 @@
     <ClInclude Include="implementation\specification\event.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\error_code.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
