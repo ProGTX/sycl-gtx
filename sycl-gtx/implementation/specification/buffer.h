@@ -25,6 +25,7 @@ class buffer {
 private:
 	range<dimensions> rang;
 	refc::ptr<cl_mem> data;
+	bool is_blocking = true;
 
 public:
 
@@ -47,7 +48,9 @@ public:
 	// Instead, the SYCL system frees any storage required for the buffer asynchronously when it is no longer in use in queues.
 	// The initial contents of the buffer are undefined.
 	buffer(range<dimensions> range)
-		: buffer(nullptr, range) {}
+		: buffer(nullptr, range), is_blocking(false) {
+		DSELF() << "not implemented";
+	}
 
 	// Associated storage object.
 	// The storage object must not be destroyed by the user until after the buffer has been destroyed.
@@ -95,7 +98,7 @@ struct buffer<DataType, 1> : public detail::buffer<DataType, 1> {
 		: detail::buffer<DataType, 1>(range) {}
 	buffer(DataType* host_data, range<1> range)
 		: detail::buffer<DataType, 1>(host_data, range) {}
-	//buffer(storage<DataType> &store, range<1>);
+	//buffer(storage<DataType>& store, range<1>);
 	//buffer(buffer, index<dimensions> base_index, range<dimensions> sub_range);
 	buffer(cl_mem mem_object, queue from_queue, event available_event)
 		: detail::buffer<DataType, 1>(mem_object, from_queue, available_event) {}
@@ -122,7 +125,7 @@ struct buffer<DataType, 2> : public detail::buffer<DataType, 2>{
 		: detail::buffer<DataType, 2>(range) {}
 	buffer(DataType* host_data, range<2> range)
 		: detail::buffer<DataType, 2>(host_data, range) {}
-	//buffer(storage<DataType> &store, range<2>);
+	//buffer(storage<DataType>& store, range<2>);
 	//buffer(buffer, index<2> base_index, range<2> sub_range);
 	buffer(cl_mem mem_object, queue from_queue, event available_event)
 		: detail::buffer<DataType, 2>(mem_object, from_queue, available_event) {}
@@ -142,7 +145,7 @@ struct buffer<DataType, 3> : public detail::buffer<DataType, 3>{
 		: detail::buffer<DataType, 3>(range) {}
 	buffer(DataType* host_data, range<3> range)
 		: detail::buffer<DataType, 3>(host_data, range) {}
-	//buffer(storage<DataType> &store, range<3>);
+	//buffer(storage<DataType>& store, range<3>);
 	//buffer(buffer, index<3> base_index, range<3> sub_range);
 	buffer(cl_mem mem_object, queue from_queue, event available_event)
 		: detail::buffer<DataType, 3>(mem_object, from_queue, available_event) {}
