@@ -45,7 +45,8 @@ public:
 	// The initial contents of the buffer will be the contents of the host memory at the time of construction.
 	// When the buffer is destroyed, the destructor will block until all work in queues on the buffer has completed,
 	// then copy the contents of the buffer back to the host memory (if required) and then return.
-	buffer(DataType* host_data, range<dimensions> range) {
+	buffer(DataType* host_data, range<dimensions> range)
+		: rang(range) {
 		DSELF() << "not implemented";
 	}
 

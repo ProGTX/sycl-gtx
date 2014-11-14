@@ -27,8 +27,8 @@ struct command_group_interface {
 	}
 };
 
-// This class is the actual implementation of the command_group
-// Three classes are needed as a workaround to the inability to deduce templated class constructor arguments
+// This is the actual implementation of the command_group
+// Three classes are needed as a workaround to the inability to deduce arguments of a templated class at time of construction
 template <typename functorT>
 class command_group : public command_group_interface {
 public:
