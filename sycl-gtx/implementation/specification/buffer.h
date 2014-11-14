@@ -3,6 +3,7 @@
 // 3.3.1 Buffers
 
 #include "access.h"
+#include "accessor.h"
 #include "event.h"
 #include "ranges.h"
 #include "refc.h"
@@ -13,10 +14,6 @@
 
 namespace cl {
 namespace sycl {
-
-// Forward declaration.
-template <typename dataType, int dimensions, access::mode mode, access::target target>
-class accessor;
 
 namespace detail {
 
@@ -82,6 +79,7 @@ public:
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
 		DSELF() << "not implemented";
+		return accessor<DataType, dimensions, mode, target>(*this);
 	}
 };
 

@@ -14,7 +14,7 @@ namespace sycl {
 
 // Forward declarations
 class queue;
-template <typename T, int dimensions>
+template <typename DataType, int dimensions>
 struct buffer;
 class image;
 
