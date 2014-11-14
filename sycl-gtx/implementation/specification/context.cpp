@@ -83,6 +83,6 @@ context::context(const cl_context_properties* properties, VECTOR_CLASS<device> t
 context::context(const cl_context_properties* properties, device target_device, context_notify& handler)
 	: context(nullptr, properties, { target_device }, default_error, &handler) {}
 
-cl_context context::get() {
+cl_context context::get() const {
 	return ctx.get();
 }

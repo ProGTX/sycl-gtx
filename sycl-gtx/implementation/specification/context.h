@@ -87,7 +87,7 @@ public:
 #endif
 
 public:
-	cl_context get();
+	cl_context get() const;
 
 private:
 	template<class return_type, cl_int name>

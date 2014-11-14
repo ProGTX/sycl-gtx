@@ -5,20 +5,20 @@
 // Example from http://www.codeplay.com/portal/sycl-tutorial-1-the-vector-addition
 // (slightly modified)
 
-#define TOL (0.001)   // tolerance used in floating point comparisons
-#define LENGTH (1024) // Length of vectors a, b and c
+#define TOL (0.001)		// tolerance used in floating point comparisons
+#define LENGTH (1024)	// Length of vectors a, b and c
 
 bool test1() {
 	using namespace cl::sycl;
 
-	std::vector<int> h_a(LENGTH);             // a vector
-	std::vector<int> h_b(LENGTH);             // b vector
-	std::vector<int> h_c(LENGTH);             // c vector
-	std::vector<int> h_r(LENGTH, 0xdeadbeef); // d vector (result)
+	std::vector<int> h_a(LENGTH);				// a vector
+	std::vector<int> h_b(LENGTH);				// b vector
+	std::vector<int> h_c(LENGTH);				// c vector
+	std::vector<int> h_r(LENGTH, 0xdeadbeef);	// d vector (result)
 	// Fill vectors a and b with random float values
 	int count = LENGTH;
 	for(int i = 0; i < count; i++) {
-		h_a[i] = (int) (rand() / (float)RAND_MAX);
+		h_a[i] = (int)(rand() / (float)RAND_MAX);
 		h_b[i] = (int)(rand() / (float)RAND_MAX);
 		h_c[i] = (int)(rand() / (float)RAND_MAX);
 	}
@@ -46,10 +46,9 @@ bool test1() {
 	int correct = 0;
 	float tmp;
 	for(int i = 0; i < count; i++) {
-		tmp = h_a[i] + h_b[i] + h_c[i]; // assign element i of a+b+c to tmp
-		tmp -= h_r[i]; // compute deviation of expected and output result
-		if(tmp * tmp < TOL * TOL) // correct if square deviation is less than
-			// tolerance squared
+		tmp = h_a[i] + h_b[i] + h_c[i];	// assign element i of a+b+c to tmp
+		tmp -= h_r[i];					// compute deviation of expected and output result
+		if(tmp * tmp < TOL * TOL)		// correct if square deviation is less than tolerance squared
 		{
 			correct++;
 		}
