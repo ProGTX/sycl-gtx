@@ -63,6 +63,9 @@
     <ClCompile Include="implementation\specification\device_selector.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\specification\command_group.cpp">
+      <Filter>Source Files\specification</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">

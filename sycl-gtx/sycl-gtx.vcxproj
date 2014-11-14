@@ -144,6 +144,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="implementation\specification\command_group.cpp" />
     <ClCompile Include="implementation\specification\context.cpp" />
     <ClCompile Include="implementation\specification\device.cpp" />
     <ClCompile Include="implementation\specification\device_selector.cpp" />
