@@ -22,7 +22,6 @@ struct range_ {
 #else
 		: dims{ first, second, third } {
 #endif
-		DSELF() << "not implemented";
 	}
 
 	range_(const range_&) = default;

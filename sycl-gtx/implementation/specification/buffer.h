@@ -27,15 +27,6 @@ private:
 	refc::ptr<cl_mem> data;
 
 public:
-	// TODO: As a convenience for the user, any constructor that takes a range argument
-	// can instead be passed range values as 1, 2 or 3 arguments of type size_t.
-
-	// No associated storage.
-	// The storage for this type of buffer is entirely handled by the SYCL system.
-	// The destructor for this type of buffer never blocks, even if work on the buffer has not completed.
-	// Instead, the SYCL system frees any storage required for the buffer asynchronously when it is no longer in use in queues.
-	// The initial contents of the buffer are undefined.
-	buffer(range<dimensions> range);
 
 	// Associated host memory.
 	// The buffer will use this host memory for its full lifetime,
@@ -49,6 +40,14 @@ public:
 		: rang(range) {
 		DSELF() << "not implemented";
 	}
+
+	// No associated storage.
+	// The storage for this type of buffer is entirely handled by the SYCL system.
+	// The destructor for this type of buffer never blocks, even if work on the buffer has not completed.
+	// Instead, the SYCL system frees any storage required for the buffer asynchronously when it is no longer in use in queues.
+	// The initial contents of the buffer are undefined.
+	buffer(range<dimensions> range)
+		: buffer(nullptr, range) {}
 
 	// Associated storage object.
 	// The storage object must not be destroyed by the user until after the buffer has been destroyed.
@@ -87,20 +86,7 @@ public:
 
 // Defines a shared array that can be used by kernels in queues and has to be accessed using accessor classes.
 template <typename DataType, int dimensions = 1>
-struct buffer : public detail::buffer<DataType, dimensions> {
-#if MSVC_LOW
-	buffer(range<dimensions> range)
-		: detail::buffer<DataType, dimensions>(range) {}
-	buffer(DataType* host_data, range<dimensions> range)
-		: detail::buffer<DataType, dimensions>(host_data, range) {}
-	//buffer(storage<DataType> &store, range<dimensions>);
-	//buffer(buffer, index<dimensions> base_index, range<dimensions> sub_range);
-	buffer(cl_mem mem_object, queue from_queue, event available_event)
-		: detail::buffer<DataType, dimensions>(mem_object, from_queue, available_event) {}
-#else
-	using detail::buffer<DataType, dimensions>::buffer;
-#endif
-};
+struct buffer;
 
 template <typename DataType>
 struct buffer<DataType, 1> : public detail::buffer<DataType, 1> {
@@ -127,6 +113,46 @@ struct buffer<DataType, 1> : public detail::buffer<DataType, 1> {
 		: detail::buffer<DataType, 1>(host_data.data(), host_data.size()) {
 		DSELF() << "not implemented";
 	}
+};
+
+template <typename DataType>
+struct buffer<DataType, 2> : public detail::buffer<DataType, 2>{
+#if MSVC_LOW
+	buffer(range<2> range)
+		: detail::buffer<DataType, 2>(range) {}
+	buffer(DataType* host_data, range<2> range)
+		: detail::buffer<DataType, 2>(host_data, range) {}
+	//buffer(storage<DataType> &store, range<2>);
+	//buffer(buffer, index<2> base_index, range<2> sub_range);
+	buffer(cl_mem mem_object, queue from_queue, event available_event)
+		: detail::buffer<DataType, 2>(mem_object, from_queue, available_event) {}
+#else
+	using detail::buffer<DataType, 2>::buffer;
+#endif
+	buffer(size_t sizeX, size_t sizeY)
+		: buffer({ sizeX, sizeY }) {}
+	buffer(DataType* host_data, size_t sizeX, size_t sizeY)
+		: buffer(host_data, { sizeX, sizeY }) {}
+};
+
+template <typename DataType>
+struct buffer<DataType, 3> : public detail::buffer<DataType, 3>{
+#if MSVC_LOW
+	buffer(range<3> range)
+		: detail::buffer<DataType, 3>(range) {}
+	buffer(DataType* host_data, range<3> range)
+		: detail::buffer<DataType, 3>(host_data, range) {}
+	//buffer(storage<DataType> &store, range<3>);
+	//buffer(buffer, index<3> base_index, range<3> sub_range);
+	buffer(cl_mem mem_object, queue from_queue, event available_event)
+		: detail::buffer<DataType, 3>(mem_object, from_queue, available_event) {}
+#else
+	using detail::buffer<DataType, 3>::buffer;
+#endif
+	buffer(size_t sizeX, size_t sizeY, size_t sizeZ)
+		: buffer({ sizeX, sizeY, sizeZ }) {}
+	buffer(DataType* host_data, size_t sizeX, size_t sizeY, size_t sizeZ)
+		: buffer(host_data, { sizeX, sizeY, sizeZ }) {}
 };
 
 } // namespace sycl
