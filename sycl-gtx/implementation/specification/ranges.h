@@ -16,6 +16,7 @@ class buffer;
 
 template <int dimensions>
 struct range_ {
+protected:
 	int dims[3];
 
 	range_(size_t first, size_t second, size_t third)
@@ -30,6 +31,11 @@ struct range_ {
 	}
 
 	range_(const range_&) = default;
+
+public:
+	int operator[](size_t n) {
+		return dims[n];
+	}
 };
 
 } // namespace detail
@@ -38,19 +44,21 @@ template <int dimensions = 1>
 class range;
 
 template <>
-struct range<1> : protected detail::range_<1> {
+struct range<1> : detail::range_<1> {
 	range(size_t size)
 		: detail::range_<1>(size, 1, 1) {}
+	range(size_t size[1])
+		: range(size[0]) {}
 };
 template <>
-struct range<2> : protected detail::range_<2>{
+struct range<2> : detail::range_<2>{
 	range(size_t sizeX, size_t sizeY)
 		: detail::range_<2>(sizeX, sizeY, 1) {}
 	range(size_t size[2])
 		: range(size[0], size[1]) {}
 };
 template <>
-struct range<3> : protected detail::range_<3>{
+struct range<3> : detail::range_<3>{
 	range(size_t sizeX, size_t sizeY, size_t sizeZ)
 		: detail::range_<3>(sizeX, sizeY, sizeZ) {}
 	range(size_t size[3])
@@ -67,6 +75,12 @@ public:
 		range<dimensions> global_size = range<dimensions>(VECTOR_CLASS<size_t>(dimensions, 0).data()),
 		range<dimensions> local_size = range<dimensions>(VECTOR_CLASS<size_t>(dimensions, 0).data())
 	)	: global_size(global_size), local_size(local_size) {}
+	id(int n)
+		: id() {
+		// TODO: Not sure if this is correct
+		global_size[0] = n;
+		local_size[0] = n;
+	}
 	int get(int dimension);
 };
 
@@ -75,6 +89,8 @@ class nd_range {
 private:
 	range<dimensions> global_size;
 	range<dimensions> local_size;
+
+	// TODO
 	id<dimensions> offset;
 
 public:
