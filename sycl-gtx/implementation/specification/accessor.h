@@ -8,17 +8,28 @@
 namespace cl {
 namespace sycl {
 
-// Forward declaration
+// Forward declarations
 template <typename DataType, int dimensions>
 struct buffer;
 
+// Data reference wrappers
+template <typename DataType>
+class __atomic_ref;
+template <typename DataType>
+class __read_ref;
+
+template <typename DataType>
+class __write_ref {
+public:
+	__write_ref& operator=(int n) {
+		return *this;
+	}
+};
+
 namespace detail {
 
-template<bool>
-struct select_target;
-
 // 3.3.4.3 Core accessors class
-template <typename DataType, int dimensions, access::mode mode, access::target target, typename = select_target<true>>
+template <typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_core {
 public:
 	int get_size();
@@ -26,13 +37,17 @@ public:
 	cl_event get_cl_event_object();
 };
 
+template<bool>
+struct select_target;
 
-template <typename DataType, int dimensions, access::mode mode, access::target target>
+// This does not compile with enums (at least in MSVC 2013), use ints instead
+template <typename DataType, int dimensions, int mode, int target, typename = select_target<true>>
 class accessor_;
 
-#define SYCL_ACCESSOR_CLASS(condition)																	\
-	template <typename DataType, int dimensions, access::mode mode, access::target target>								\
-	class accessor_ : public detail::accessor_core<DataType, dimensions, mode, target, detail::select_target<(condition)>>
+#define SYCL_ACCESSOR_CLASS(condition)															\
+template <typename DataType, int dimensions, int mode, int target>								\
+class accessor_<DataType, dimensions, mode, target, select_target<(condition)>>					\
+	: public accessor_core<DataType, dimensions, (access::mode)mode, (access::target)target>
 
 // 3.3.4.4 Buffer accessors
 SYCL_ACCESSOR_CLASS(target == access::global_buffer || target == access::constant_buffer || target == access::host_buffer) {
@@ -40,9 +55,6 @@ public:
 	accessor_(cl::sycl::buffer<DataType, dimensions>& targette) {
 		DSELF() << "not implemented";
 	}
-	// Atomic reference to element from target data.
-	// Only if mode is atomic.
-	//__atomic_ref<DataType> operator[](id<dimensions>) {}
 };
 
 } // namespace detail
@@ -51,32 +63,50 @@ public:
 template <typename DataType, int dimensions, access::mode mode, access::target target = access::global_buffer>
 class accessor;
 
-#define SYCL_ACCESSOR_BUFFER(mode)																					\
-	template <typename DataType, int dimensions, access::target target>												\
-	class accessor<DataType, dimensions, mode, target> : public detail::accessor_<DataType, dimensions, mode, target>
+#define SYCL_ADD_ACCESSOR(mode)												\
+	template <typename DataType, int dimensions, access::target target>		\
+	class accessor<DataType, dimensions, mode, target>						\
+		: public detail::accessor_<DataType, dimensions, mode, target>
 
-SYCL_ACCESSOR_BUFFER(access::read) {
+
+// 3.3.4.4 Buffer accessors
+
+SYCL_ADD_ACCESSOR(access::read) {
 public:
+#if MSVC_LOW
 	accessor(buffer<DataType, dimensions>& targette)
 		: detail::accessor_<DataType, dimensions, access::read, target>(targette) {}
+#else
+	using detail::accessor_<DataType, dimensions, access::read, target>::accessor_;
+#endif
 	// Read element from target data.
-	const DataType& operator[](id<dimensions>) {
+	__read_ref<DataType> operator[](id<dimensions>) {
 		DSELF() << "not implemented";
+		return __read_ref<DataType>();
 	}
 };
 
-SYCL_ACCESSOR_BUFFER(access::write) {
+SYCL_ADD_ACCESSOR(access::write) {
 public:
 	accessor(buffer<DataType, dimensions>& targette)
 		: detail::accessor_<DataType, dimensions, access::write, target>(targette) {}
 	// Reference to target element.
-	DataType& operator[](id<dimensions>) {
+	__write_ref<DataType> operator[](id<dimensions> index) {
 		DSELF() << "not implemented";
+		return __write_ref<DataType>();
 	}
+};
+
+SYCL_ADD_ACCESSOR(access::atomic) {
+public:
+	accessor(buffer<DataType, dimensions>& targette)
+		: detail::accessor_<DataType, dimensions, access::atomic, target>(targette) {}
+	// Atomic reference to element from target data.
+	__atomic_ref<DataType> operator[](id<dimensions>);
 };
 
 } // namespace sycl
 } // namespace cl
 
 #undef SYCL_ACCESSOR_CLASS
-#undef SYCL_ACCESSOR_BUFFER
+#undef SYCL_ADD_ACCESSOR
