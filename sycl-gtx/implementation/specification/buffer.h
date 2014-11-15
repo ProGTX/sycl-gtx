@@ -3,7 +3,6 @@
 // 3.3.1 Buffers
 
 #include "access.h"
-#include "accessor.h"
 #include "event.h"
 #include "ranges.h"
 #include "refc.h"
@@ -15,17 +14,22 @@
 namespace cl {
 namespace sycl {
 
+// Forward declarations
+template <typename DataType, int dimensions = 1>
+struct buffer;
+template <typename DataType, int dimensions, access::mode mode, access::target target>
+class accessor;
+
 namespace detail {
 
 template <typename DataType, int dimensions>
-class buffer {
+class buffer_ {
 private:
 	range<dimensions> rang;
 	refc::ptr<cl_mem> data;
 	bool is_blocking = true;
 
 public:
-
 	// Associated host memory.
 	// The buffer will use this host memory for its full lifetime,
 	// but the contents of this host memory are undefined for the lifetime of the buffer.
@@ -34,7 +38,7 @@ public:
 	// The initial contents of the buffer will be the contents of the host memory at the time of construction.
 	// When the buffer is destroyed, the destructor will block until all work in queues on the buffer has completed,
 	// then copy the contents of the buffer back to the host memory (if required) and then return.
-	buffer(DataType* host_data, range<dimensions> range)
+	buffer_(DataType* host_data, range<dimensions> range)
 		: rang(range) {
 		DSELF() << "not implemented";
 	}
@@ -44,8 +48,8 @@ public:
 	// The destructor for this type of buffer never blocks, even if work on the buffer has not completed.
 	// Instead, the SYCL system frees any storage required for the buffer asynchronously when it is no longer in use in queues.
 	// The initial contents of the buffer are undefined.
-	buffer(range<dimensions> range)
-		: buffer(nullptr, range), is_blocking(false) {
+	buffer_(range<dimensions> range)
+		: buffer_(nullptr, range), is_blocking(false) {
 		DSELF() << "not implemented";
 	}
 
@@ -57,14 +61,14 @@ public:
 	// Creates a sub-buffer object, which is a sub-range reference to a base buffer.
 	// This sub-buffer can be used to create accessors to the base buffer,
 	// but which only have access to the range specified at time of construction of the sub-buffer.
-	//buffer(buffer, index<dimensions> base_index, range<dimensions> sub_range);
+	//buffer_(buffer_, index<dimensions> base_index, range<dimensions> sub_range);
 
 	// Creates and initializes buffer from the OpenCL memory object.
 	// The SYCL system may copy the data to another device and/or context,
 	// but must copy it back (if modified) at the point of destruction of the buffer.
 	// The memory object is assumed to only be available to the SYCL scheduler after the event has signaled
 	// and is assumed to be currently resident on the context and device signified by the queue.
-	buffer(cl_mem mem_object, queue from_queue, event available_event);
+	buffer_(cl_mem mem_object, queue from_queue, event available_event);
 
 	range<dimensions> get_range() {
 		return rang;
@@ -78,30 +82,27 @@ public:
 
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
-		DSELF() << "not implemented";
-		return accessor<DataType, dimensions, mode, target>(*this);
+		return accessor<DataType, dimensions, mode, target>(*reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this));
 	}
 };
 
 } // namespace detail
 
 // Defines a shared array that can be used by kernels in queues and has to be accessed using accessor classes.
-template <typename DataType, int dimensions = 1>
-struct buffer;
 
 template <typename DataType>
-struct buffer<DataType, 1> : public detail::buffer<DataType, 1> {
+struct buffer<DataType, 1> : public detail::buffer_<DataType, 1> {
 #if MSVC_LOW
 	buffer(range<1> range)
-		: detail::buffer<DataType, 1>(range) {}
+		: detail::buffer_<DataType, 1>(range) {}
 	buffer(DataType* host_data, range<1> range)
-		: detail::buffer<DataType, 1>(host_data, range) {}
+		: detail::buffer_<DataType, 1>(host_data, range) {}
 	//buffer(storage<DataType>& store, range<1>);
 	//buffer(buffer, index<dimensions> base_index, range<dimensions> sub_range);
 	buffer(cl_mem mem_object, queue from_queue, event available_event)
-		: detail::buffer<DataType, 1>(mem_object, from_queue, available_event) {}
+		: detail::buffer_<DataType, 1>(mem_object, from_queue, available_event) {}
 #else
-	using detail::buffer<DataType, 1>::buffer;
+	using detail::buffer_<DataType, 1>::buffer;
 #endif
 	// Construction via copy constructor from any structure that has contiguous storage.
 	// The original structure or class does not get updated by the buffer after the processing.
@@ -111,24 +112,24 @@ struct buffer<DataType, 1> : public detail::buffer<DataType, 1> {
 
 	// TODO: Used by the Codeplay SYCL example
 	buffer(VECTOR_CLASS<DataType> host_data)
-		: detail::buffer<DataType, 1>(host_data.data(), host_data.size()) {
+		: detail::buffer_<DataType, 1>(host_data.data(), host_data.size()) {
 		DSELF() << "not implemented";
 	}
 };
 
 template <typename DataType>
-struct buffer<DataType, 2> : public detail::buffer<DataType, 2>{
+struct buffer<DataType, 2> : public detail::buffer_<DataType, 2>{
 #if MSVC_LOW
 	buffer(range<2> range)
-		: detail::buffer<DataType, 2>(range) {}
+		: detail::buffer_<DataType, 2>(range) {}
 	buffer(DataType* host_data, range<2> range)
-		: detail::buffer<DataType, 2>(host_data, range) {}
+		: detail::buffer_<DataType, 2>(host_data, range) {}
 	//buffer(storage<DataType>& store, range<2>);
 	//buffer(buffer, index<2> base_index, range<2> sub_range);
 	buffer(cl_mem mem_object, queue from_queue, event available_event)
-		: detail::buffer<DataType, 2>(mem_object, from_queue, available_event) {}
+		: detail::buffer_<DataType, 2>(mem_object, from_queue, available_event) {}
 #else
-	using detail::buffer<DataType, 2>::buffer;
+	using detail::buffer_<DataType, 2>::buffer;
 #endif
 	buffer(size_t sizeX, size_t sizeY)
 		: buffer({ sizeX, sizeY }) {}
@@ -137,18 +138,18 @@ struct buffer<DataType, 2> : public detail::buffer<DataType, 2>{
 };
 
 template <typename DataType>
-struct buffer<DataType, 3> : public detail::buffer<DataType, 3>{
+struct buffer<DataType, 3> : public detail::buffer_<DataType, 3>{
 #if MSVC_LOW
 	buffer(range<3> range)
-		: detail::buffer<DataType, 3>(range) {}
+		: detail::buffer_<DataType, 3>(range) {}
 	buffer(DataType* host_data, range<3> range)
-		: detail::buffer<DataType, 3>(host_data, range) {}
+		: detail::buffer_<DataType, 3>(host_data, range) {}
 	//buffer(storage<DataType>& store, range<3>);
 	//buffer(buffer, index<3> base_index, range<3> sub_range);
 	buffer(cl_mem mem_object, queue from_queue, event available_event)
-		: detail::buffer<DataType, 3>(mem_object, from_queue, available_event) {}
+		: detail::buffer_<DataType, 3>(mem_object, from_queue, available_event) {}
 #else
-	using detail::buffer<DataType, 3>::buffer;
+	using detail::buffer_<DataType, 3>::buffer;
 #endif
 	buffer(size_t sizeX, size_t sizeY, size_t sizeZ)
 		: buffer({ sizeX, sizeY, sizeZ }) {}
