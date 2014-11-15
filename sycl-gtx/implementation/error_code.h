@@ -1,5 +1,8 @@
 #pragma once
 
+#include "common.h"
+#include <unordered_map>
+
 namespace cl {
 namespace sycl {
 namespace detail {
@@ -88,6 +91,27 @@ static const char* error_string(int error_code) {
 	return errors[-error_code];
 }
 
+namespace error {
+
+struct code {
+	enum value_t : int {
+		GENERAL_FAILURE = 1,
+		NOT_IN_COMMAND_GROUP_SCOPE,
+	};
+};
+
+#define SYCL_ADD_ERROR(value)	\
+	{ value, #value }
+
+static const std::unordered_map<code::value_t, STRING_CLASS> codes = {
+	SYCL_ADD_ERROR(code::GENERAL_FAILURE),
+	SYCL_ADD_ERROR(code::NOT_IN_COMMAND_GROUP_SCOPE),
+};
+
+} // namespace error
+
 } // namespace detail
 } // namespace sycl
 } // namespace cl
+
+#undef SYCL_ADD_ERROR

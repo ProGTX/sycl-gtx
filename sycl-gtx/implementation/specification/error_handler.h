@@ -29,7 +29,7 @@ private:
 	friend class detail::error::handler;
 
 	cl_int error_code = 0;
-	bool is_sycl_specific = false;
+	bool is_sycl_specific_ = false;
 
 	void* thrower = nullptr;
 	enum class thrower_t {
@@ -43,7 +43,7 @@ private:
 	}
 
 	exception(void* thrower, cl_int error_code, bool is_sycl_specific, thrower_t thrower_type)
-		: thrower(thrower), error_code(error_code), is_sycl_specific(is_sycl_specific), thrower_type(thrower_type) {}
+		: thrower(thrower), error_code(error_code), is_sycl_specific_(is_sycl_specific), thrower_type(thrower_type) {}
 
 	template <class T>
 	exception(T* thrower, cl_int error_code, bool is_sycl_specific = false)
@@ -62,19 +62,23 @@ private:
 	exception(buffer<class T, dimensions>* thrower, cl_int error_code, bool is_sycl_specific)
 		: exception(thrower, error_code, is_sycl_specific, thrower_t::bufer) {}
 
-public:
 	exception() {}
+public:
+
+	bool is_sycl_specific() const {
+		return is_sycl_specific_;
+	}
 
 	// Returns the OpenCL error code.
 	// Returns 0 if not an OpenCL error
 	cl_int get_cl_code() const {
-		return (is_sycl_specific ? 0 : error_code);
+		return (is_sycl_specific_ ? 0 : error_code);
 	}
 
 	// Returns the SYCL-specific error code.
 	// Returns 0 if not a SYCL-specific error
 	cl_int get_sycl_code() const {
-		return (is_sycl_specific ? error_code : 0);
+		return (is_sycl_specific_ ? error_code : 0);
 	}
 
 	// Returns the queue that caused the error.
@@ -101,7 +105,11 @@ public:
 #else
 	virtual const char* what() const noexcept override {
 #endif
-		return detail::error_string(get_cl_code());
+		return (
+			is_sycl_specific_ ?
+			detail::error::codes.find((detail::error::code::value_t)error_code)->second.data() :
+			detail::error_string(error_code)
+		);
 	}
 };
 
@@ -117,8 +125,9 @@ namespace error {
 class throw_handler : public error_handler {
 public:
 	virtual void report_error(exception& error) override {
-		if(error.get_cl_code() != CL_SUCCESS) {
-			debug(error_string(error.get_cl_code()));
+		auto code = (error.is_sycl_specific() ? error.get_sycl_code() : error.get_cl_code());
+		if(code != CL_SUCCESS) {
+			debug("SYCL_ERROR::", error.what());
 			throw error;
 		}
 	}
@@ -197,14 +206,32 @@ public:
 #else
 	handler(handler&&) = default;
 #endif
-	void report(bool is_sycl_specific = false) {
-		// TODO: Prevent other types of handlers from calling this
-		exception e(thrower, ((code_handler*)actual_hndlr)->error_code, is_sycl_specific, thrower_type);
-		actual_hndlr->report_error(e);
-	}
-	void report(cl_int error_code, bool is_sycl_specific = false) {
+
+private:
+	void report(cl_int error_code, bool is_sycl_specific) {
 		exception e(thrower, error_code, is_sycl_specific, thrower_type);
 		actual_hndlr->report_error(e);
+	}
+public:
+	void report(cl_int error_code) {
+		report(error_code, false);
+	}
+	void report(detail::error::code::value_t error_code) {
+		report(error_code, true);
+	}
+	void report() {
+		exception e;
+		bool right_type = true;
+		try {
+			e = exception(thrower, ((code_handler*)actual_hndlr)->error_code, false, thrower_type);
+		}
+		catch(std::bad_cast&) {
+			right_type = false;
+			// TODO: Do something else?
+		}
+		if(right_type) {
+			actual_hndlr->report_error(e);
+		}
 	}
 
 	template <class T>
