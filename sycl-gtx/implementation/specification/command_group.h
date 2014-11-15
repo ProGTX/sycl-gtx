@@ -2,11 +2,11 @@
 
 // 3.2.6 Command group class
 
+#include "buffer.h"
 #include "event.h"
 #include "queue.h"
 #include "../common.h"
 #include "../debug.h"
-#include <functional>
 
 namespace cl {
 namespace sycl {
@@ -17,6 +17,10 @@ class command_group {
 private:
 	// TODO: Should be thread_local
 	static command_group* last;
+
+	// A list of friends
+	template <typename DataType, int dimensions>
+	friend class detail::buffer_;
 public:
 	// typename functorT: kernel functor or lambda function
 	template <typename functorT>

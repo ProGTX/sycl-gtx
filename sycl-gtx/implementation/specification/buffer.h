@@ -3,6 +3,7 @@
 // 3.3.1 Buffers
 
 #include "access.h"
+#include "error_handler.h"
 #include "event.h"
 #include "ranges.h"
 #include "refc.h"
@@ -19,6 +20,7 @@ template <typename DataType, int dimensions = 1>
 struct buffer;
 template <typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor;
+class command_group;
 
 namespace detail {
 
@@ -28,6 +30,9 @@ private:
 	range<dimensions> rang;
 	refc::ptr<cl_mem> data;
 	bool is_blocking = true;
+	bool is_initialized = false;
+	bool is_read_only = false;
+	detail::error::handler handler;
 
 public:
 	// Associated host memory.
@@ -40,6 +45,13 @@ public:
 	// then copy the contents of the buffer back to the host memory (if required) and then return.
 	buffer_(DataType* host_data, range<dimensions> range)
 		: rang(range) {
+		DSELF() << "not implemented";
+	}
+
+	// Associated constant host memory creates read-only buffer.
+	// Only read accessors are allowed on the buffer and no copy-back to host memory is performed.
+	buffer_(const DataType* host_data, range<dimensions> range)
+		: rang(range), is_read_only(true) {
 		DSELF() << "not implemented";
 	}
 
@@ -80,8 +92,17 @@ public:
 	// Total number of bytes in the buffer
 	size_t get_size();
 
+private:
+	void lazy_init() {
+		// TODO: Lazy initialization
+	}
+
+public:
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
+		if(command_group::last == nullptr) {
+			handler.report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
+		}
 		return accessor<DataType, dimensions, mode, target>(*reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this));
 	}
 };
@@ -96,6 +117,8 @@ struct buffer<DataType, 1> : public detail::buffer_<DataType, 1> {
 	buffer(range<1> range)
 		: detail::buffer_<DataType, 1>(range) {}
 	buffer(DataType* host_data, range<1> range)
+		: detail::buffer_<DataType, 1>(host_data, range) {}
+	buffer(const DataType* host_data, range<1> range)
 		: detail::buffer_<DataType, 1>(host_data, range) {}
 	//buffer(storage<DataType>& store, range<1>);
 	//buffer(buffer, index<dimensions> base_index, range<dimensions> sub_range);
@@ -124,6 +147,8 @@ struct buffer<DataType, 2> : public detail::buffer_<DataType, 2>{
 		: detail::buffer_<DataType, 2>(range) {}
 	buffer(DataType* host_data, range<2> range)
 		: detail::buffer_<DataType, 2>(host_data, range) {}
+	buffer(const DataType* host_data, range<2> range)
+		: detail::buffer_<DataType, 2>(host_data, range) {}
 	//buffer(storage<DataType>& store, range<2>);
 	//buffer(buffer, index<2> base_index, range<2> sub_range);
 	buffer(cl_mem mem_object, queue from_queue, event available_event)
@@ -143,6 +168,8 @@ struct buffer<DataType, 3> : public detail::buffer_<DataType, 3>{
 	buffer(range<3> range)
 		: detail::buffer_<DataType, 3>(range) {}
 	buffer(DataType* host_data, range<3> range)
+		: detail::buffer_<DataType, 3>(host_data, range) {}
+	buffer(const DataType* host_data, range<3> range)
 		: detail::buffer_<DataType, 3>(host_data, range) {}
 	//buffer(storage<DataType>& store, range<3>);
 	//buffer(buffer, index<3> base_index, range<3> sub_range);
