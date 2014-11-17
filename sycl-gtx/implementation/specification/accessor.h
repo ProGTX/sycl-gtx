@@ -32,9 +32,9 @@ namespace detail {
 template <typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_core {
 public:
-	int get_size();
-	cl_mem get_cl_mem_object();
-	cl_event get_cl_event_object();
+	int get_size() const;
+	cl_mem get_cl_mem_object() const;
+	cl_event get_cl_event_object() const;
 };
 
 template<bool>
@@ -80,7 +80,7 @@ public:
 	using detail::accessor_<DataType, dimensions, access::read, target>::accessor_;
 #endif
 	// Read element from target data.
-	__read_ref<DataType> operator[](id<dimensions>) {
+	__read_ref<DataType> operator[](id<dimensions>) const {
 		DSELF() << "not implemented";
 		return __read_ref<DataType>();
 	}
@@ -91,7 +91,7 @@ public:
 	accessor(buffer<DataType, dimensions>& targette)
 		: detail::accessor_<DataType, dimensions, access::write, target>(targette) {}
 	// Reference to target element.
-	__write_ref<DataType> operator[](id<dimensions> index) {
+	__write_ref<DataType> operator[](id<dimensions> index) const {
 		DSELF() << "not implemented";
 		return __write_ref<DataType>();
 	}
@@ -102,7 +102,7 @@ public:
 	accessor(buffer<DataType, dimensions>& targette)
 		: detail::accessor_<DataType, dimensions, access::atomic, target>(targette) {}
 	// Atomic reference to element from target data.
-	__atomic_ref<DataType> operator[](id<dimensions>);
+	__atomic_ref<DataType> operator[](id<dimensions>) const;
 };
 
 } // namespace sycl

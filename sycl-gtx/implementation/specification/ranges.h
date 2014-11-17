@@ -33,7 +33,10 @@ protected:
 	range_(const range_&) = default;
 
 public:
-	int operator[](size_t n) {
+	int& operator[](size_t n) {
+		return dims[n];
+	}
+	int operator[](size_t n) const {
 		return dims[n];
 	}
 };
