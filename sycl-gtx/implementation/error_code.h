@@ -103,7 +103,7 @@ struct code {
 #define SYCL_ADD_ERROR(value)	\
 	{ value, #value }
 
-static const std::unordered_map<code::value_t, STRING_CLASS> codes = {
+static const std::unordered_map<code::value_t, string_class> codes = {
 	SYCL_ADD_ERROR(code::GENERAL_FAILURE),
 	SYCL_ADD_ERROR(code::NOT_IN_COMMAND_GROUP_SCOPE),
 };

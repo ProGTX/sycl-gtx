@@ -75,8 +75,8 @@ private:
 	range<dimensions> local_size;
 public:
 	id(
-		range<dimensions> global_size = range<dimensions>(VECTOR_CLASS<size_t>(dimensions, 0).data()),
-		range<dimensions> local_size = range<dimensions>(VECTOR_CLASS<size_t>(dimensions, 0).data())
+		range<dimensions> global_size = range<dimensions>(vector_class<size_t>(dimensions, 0).data()),
+		range<dimensions> local_size = range<dimensions>(vector_class<size_t>(dimensions, 0).data())
 	)	: global_size(global_size), local_size(local_size) {}
 	id(int n)
 		: id() {

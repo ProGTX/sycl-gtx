@@ -22,7 +22,7 @@ private:
 		static_cast<context_notify*>(caller)->operator()(errinfo, private_info, cb);
 	}
 public:
-	virtual void operator()(const STRING_CLASS errinfo, const void* private_info, size_t cb) = 0;
+	virtual void operator()(const string_class errinfo, const void* private_info, size_t cb) = 0;
 	virtual void operator()(program t_program) = 0;
 };
 
@@ -36,20 +36,20 @@ public:
 class context {
 private:
 	refc::ptr<cl_context> ctx;
-	VECTOR_CLASS<device> target_devices;
+	vector_class<device> target_devices;
 	unsigned int best_device_id = 0;
 
 	detail::error::handler handler;
 	static error_handler& default_error;
 
 	static refc::ptr<cl_context> reserve(cl_context c = nullptr);
-	static VECTOR_CLASS<device> load_devices();
+	static vector_class<device> load_devices();
 
 	// Master constructor
 	context(
 		cl_context c,
 		const cl_context_properties* properties,
-		VECTOR_CLASS<device> target_devices,
+		vector_class<device> target_devices,
 		error_handler& handler,
 		context_notify* ctx_notify = nullptr,
 		device_selector& dev_sel = *(device_selector::default)
@@ -59,7 +59,7 @@ public:
 	context(cl_context c = nullptr, error_handler& handler = default_error);
 	context(device_selector& dev_sel, error_handler& handler = default_error);
 	context(const cl_context_properties* properties, device_selector& dev_sel, error_handler& handler = default_error);
-	context(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, error_handler& handler = default_error);
+	context(const cl_context_properties* properties, vector_class<device> target_devices, error_handler& handler = default_error);
 	context(const cl_context_properties* properties, device target_device, error_handler& handler = default_error);
 
 	// Error handling via context_notify&
@@ -67,7 +67,7 @@ public:
 	context(cl_context c, context_notify& handler);
 	context(device_selector& dev_sel, context_notify& handler);
 	context(const cl_context_properties* properties, device_selector& dev_sel, context_notify& handler);
-	context(const cl_context_properties* properties, VECTOR_CLASS<device> target_devices, context_notify& handler);
+	context(const cl_context_properties* properties, vector_class<device> target_devices, context_notify& handler);
 	context(const cl_context_properties* properties, device target_device, context_notify& handler);
 
 	// Copy and move semantics
@@ -103,7 +103,7 @@ private:
 	};
 	template<class return_type, cl_int name>
 	struct hidden<return_type[], name> {
-		using real_return = VECTOR_CLASS<return_type>;
+		using real_return = vector_class<return_type>;
 		static real_return get_info(context* contex) {
 			auto c = contex->ctx.get();
 			static const int BUFFER_SIZE = 1024;

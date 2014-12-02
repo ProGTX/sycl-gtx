@@ -15,7 +15,7 @@ class program {
 	template <typename T>
 	program(context dev_context, device target_dev);
 
-	program(context dev_context, device target_dev, STRING_CLASS kernel_string);
+	program(context dev_context, device target_dev, string_class kernel_string);
 };
 
 } // namespace sycl

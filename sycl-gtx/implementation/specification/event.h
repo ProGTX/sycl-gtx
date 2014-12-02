@@ -25,8 +25,8 @@ public:
 	}
 
 	cl_event get(cl_context context);
-	static void wait(VECTOR_CLASS<event> event_list);
-	VECTOR_CLASS<event> get_wait_list();
+	static void wait(vector_class<event> event_list);
+	vector_class<event> get_wait_list();
 };
 
 } // namespace sycl

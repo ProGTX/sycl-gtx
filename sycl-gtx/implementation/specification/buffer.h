@@ -134,7 +134,7 @@ struct buffer<DataType, 1> : public detail::buffer_<DataType, 1> {
 	buffer(DataType* startIterator, DataType* endIterator);
 
 	// TODO: Used by the Codeplay SYCL example
-	buffer(VECTOR_CLASS<DataType> host_data)
+	buffer(vector_class<DataType> host_data)
 		: detail::buffer_<DataType, 1>(host_data.data(), host_data.size()) {
 		DSELF() << "not implemented";
 	}

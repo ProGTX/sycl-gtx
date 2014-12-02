@@ -23,23 +23,23 @@ cl_platform_id platform::get() const {
 	return platform_id.get();
 }
 
-VECTOR_CLASS<platform> platform::get_platforms(int& error_code) {
+vector_class<platform> platform::get_platforms(int& error_code) {
 	return get_platforms(detail::error::handler(error_code));
 }
-VECTOR_CLASS<platform> platform::get_platforms(error_handler& handler) {
+vector_class<platform> platform::get_platforms(error_handler& handler) {
 	return get_platforms(detail::error::handler(handler));
 }
 
-VECTOR_CLASS<platform> platform::get_platforms(detail::error::handler& handler) {
+vector_class<platform> platform::get_platforms(detail::error::handler& handler) {
 	static const int MAX_PLATFORMS = 1024;
 	cl_platform_id platform_ids[MAX_PLATFORMS];
 	cl_uint num_platforms;
 	auto error_code = clGetPlatformIDs(MAX_PLATFORMS, platform_ids, &num_platforms);
 	handler.report(error_code);
-	return VECTOR_CLASS<platform>(platform_ids, platform_ids + num_platforms);
+	return vector_class<platform>(platform_ids, platform_ids + num_platforms);
 }
 
-VECTOR_CLASS<device> platform::get_devices(cl_device_type device_type) {
+vector_class<device> platform::get_devices(cl_device_type device_type) {
 	return detail::get_devices(device_type, platform_id, handler);
 }
 
@@ -49,6 +49,6 @@ bool platform::is_host() {
 	return true;
 }
 
-bool platform::has_extension(const STRING_CLASS extension_name) {
+bool platform::has_extension(const string_class extension_name) {
 	return detail::has_extension<CL_PLATFORM_EXTENSIONS>(this, extension_name);
 }

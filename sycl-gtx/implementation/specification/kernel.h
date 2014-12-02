@@ -18,15 +18,15 @@ class kernel {
 	kernel<typename T>(context target_cont, device target_dev) {
 		DSELF() << "not implemented";
 	}
-	kernel(context target_cont, device target_dev, STRING_CLASS string_kernel, STRING_CLASS string_name) {
+	kernel(context target_cont, device target_dev, string_class string_kernel, string_class string_name) {
 		DSELF() << "not implemented";
 	}
 
 	cl_kernel get();
 	context get_context();
 	program get_program();
-	STRING_CLASS get_kernel_attributes();
-	STRING_CLASS get_function_name();
+	string_class get_kernel_attributes();
+	string_class get_function_name();
 	void set_arg(int arg_index, accessor acc_obj);
 
 	template<typename T>
@@ -46,13 +46,13 @@ void parallel_for(int total_number_of_work_items, functorT f) {
 }
 
 template <typename functorT>
-functorT kernel_lambda(STRING_CLASS name, functorT f) {
+functorT kernel_lambda(string_class name, functorT f) {
 	DSELF() << "not implemented";
 	return f;
 }
 
 template <typename functorT>
-functorT kernel_functor(STRING_CLASS name, functorT f) {
+functorT kernel_functor(string_class name, functorT f) {
 	DSELF() << "not implemented";
 	return f;
 }

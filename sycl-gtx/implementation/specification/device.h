@@ -54,8 +54,8 @@ public:
 	// I believe there is an error in the specification and that this functions should be here instead of "platform get_platforms()"
 	cl_platform_id get_platform() const;
 
-	VECTOR_CLASS<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
-	bool has_extension(const STRING_CLASS extension_name);
+	vector_class<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
+	bool has_extension(const string_class extension_name);
 
 	// TODO
 	bool is_host();
@@ -63,7 +63,7 @@ public:
 	bool is_gpu();
 
 	// Partition device
-	VECTOR_CLASS<device> create_sub_devices(
+	vector_class<device> create_sub_devices(
 		const cl_device_partition_property* properties,
 		int devices,
 		unsigned int* num_devices
@@ -83,7 +83,7 @@ private:
 	};
 	template<class return_type, cl_int name>
 	struct hidden<return_type[], name> {
-		using real_return = VECTOR_CLASS<return_type>;
+		using real_return = vector_class<return_type>;
 		static real_return get_info(device* dev) {
 			auto did = dev->device_id.get();
 			static const int BUFFER_SIZE = 1024;
@@ -97,7 +97,7 @@ private:
 	};
 	template<cl_int name>
 	struct hidden<char[], name> {
-		using real_return = STRING_CLASS;
+		using real_return = string_class;
 		static real_return get_info(device* dev) {
 			auto did = dev->device_id.get();
 			static const int BUFFER_SIZE = 8192;
@@ -126,11 +126,11 @@ public:
 
 namespace detail {
 
-VECTOR_CLASS<device> get_devices(
+vector_class<device> get_devices(
 	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler& handler
 );
 
-unsigned int select_best_device(device_selector& selector, VECTOR_CLASS<device>& devices);
+unsigned int select_best_device(device_selector& selector, vector_class<device>& devices);
 
 } // namespace detail
 
