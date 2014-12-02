@@ -18,7 +18,7 @@ context queue::create_context(queue* q, device_selector& selector, error_handler
 
 // Master constructor
 void queue::construct(cl_command_queue_properties properties, bool host_fallback) {
-	handler.set_thrower(this);
+	handler.set_thrower(&ctx);
 	try {
 		cl_int error_code;
 		command_q = refc::allocate(clCreateCommandQueue(ctx.get(), dev.get(), properties, &error_code), clReleaseCommandQueue);
@@ -45,7 +45,7 @@ queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
 		dev(get_info<CL_QUEUE_DEVICE>(), sync_handler),
 		ctx(get_info<CL_QUEUE_CONTEXT>(), sync_handler),
 		handler(sync_handler) {
-	handler.set_thrower(this);
+	handler.set_thrower(&ctx);
 	auto error_code = clRetainCommandQueue(cmd_queue);
 	handler.report(error_code);
 }

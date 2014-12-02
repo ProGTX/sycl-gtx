@@ -1,7 +1,7 @@
 #pragma once
 
-// 2.5.7 Error handling
-// 3.5 Error handling
+// 2.5.6 Error handling
+// 3.2 Error handling
 
 #include "../common.h"
 #include "../debug.h"
@@ -13,105 +13,78 @@ namespace cl {
 namespace sycl {
 
 // Forward declarations
-class queue;
-template <typename DataType, int dimensions>
-struct buffer;
-class image;
+class context;
 
 namespace detail {
 namespace error {
-class handler;
-}
-}
+	class handler;
+}} // namespace detail::error
 
-class exception : public std::exception {
-private:
+
+struct exception {
+protected:
 	friend class detail::error::handler;
+	context* thrower;
 
-	cl_int error_code = 0;
-	bool is_sycl_specific_ = false;
-
-	void* thrower = nullptr;
-	enum class thrower_t {
-		other, queue, buffer, image
-	};
-	thrower_t thrower_type = thrower_t::other;
-
-	template<class T, thrower_t required_type>
-	T* get() const {
-		return (thrower_type == required_type ? reinterpret_cast<T*>(thrower) : nullptr);
-	}
-
-	exception(void* thrower, cl_int error_code, bool is_sycl_specific, thrower_t thrower_type)
-		: thrower(thrower), error_code(error_code), is_sycl_specific_(is_sycl_specific), thrower_type(thrower_type) {}
-
-	template <class T>
-	exception(T* thrower, cl_int error_code, bool is_sycl_specific = false)
-		: exception(thrower, error_code, is_sycl_specific, thrower_t::other) {}
-
-	template <>
-	exception(queue* thrower, cl_int error_code, bool is_sycl_specific)
-		: exception(thrower, error_code, is_sycl_specific, thrower_t::queue) {}
-
-	template <>
-	exception(image* thrower, cl_int error_code, bool is_sycl_specific)
-		: exception(thrower, error_code, is_sycl_specific, thrower_t::image) {}
-
-	// TODO: Compiles, but linker error
-	template<int dimensions>
-	exception(buffer<class T, dimensions>* thrower, cl_int error_code, bool is_sycl_specific)
-		: exception(thrower, error_code, is_sycl_specific, thrower_t::bufer) {}
-
-	exception() {}
+	exception(context* thrower = nullptr)
+		: thrower(thrower) {}
 public:
-
-	bool is_sycl_specific() const {
-		return is_sycl_specific_;
+	// Returns a descriptive string for the error, if available.
+	string_class get_description() {
+		return "Undefined SYCL error";
 	}
 
-	// Returns the OpenCL error code.
-	// Returns 0 if not an OpenCL error
-	cl_int get_cl_code() const {
-		return (is_sycl_specific_ ? 0 : error_code);
-	}
-
-	// Returns the SYCL-specific error code.
-	// Returns 0 if not a SYCL-specific error
-	cl_int get_sycl_code() const {
-		return (is_sycl_specific_ ? error_code : 0);
-	}
-
-	// Returns the queue that caused the error.
-	// Returns 0 if not a queue error
-	queue* get_queue() const {
-		return get<queue, thrower_t::queue>();
-	}
-
-	// TODO: A bit trickier than the constructor since we are forcing the type instead of deducing it
-	// Returns the buffer that caused the error.
-	// Returns 0 if not a buffer error
-	//buffer<class T>* get_buffer() const {
-	//	return get<buffer<class T>, thrower_t::buffer>();
-	//}
-
-	// Returns the image that caused the error.
-	// Returns 0 if not an image error
-	image* get_image() const {
-		return get<image, thrower_t::image>();
-	}
-
-#if MSVC_LOW
-	virtual const char* what() const override {
-#else
-	virtual const char* what() const noexcept override {
-#endif
-		return (
-			is_sycl_specific_ ?
-			detail::error::codes.find((detail::error::code::value_t)error_code)->second.data() :
-			detail::error_string(error_code)
-		);
+	// Returns the context that caused the error.
+	// Returns null if not a buffer error.
+	// The pointer is to an object that is only valid as long as the exception object is valid
+	context* get_context() {
+		return thrower;
 	}
 };
+
+struct cl_exception : exception {
+private:
+	friend class detail::error::handler;
+	cl_int error_code;
+
+	cl_exception(context* thrower, cl_int error_code)
+		: exception(thrower), error_code(error_code) {}
+
+	cl_exception(cl_int error_code)
+		: cl_exception(nullptr, error_code) {}
+public:
+	cl_exception()
+		: cl_exception(CL_SUCCESS) {}
+
+	// Thrown as a result of an OpenCL API error code
+	cl_int get_cl_code() const {
+		return error_code;
+	}
+};
+
+struct async_exception : exception {
+	// stored in an exception_list for asynchronous errors
+};
+
+// TODO: The exception_ptr class is used to store cl::sycl::exception objects
+// and allows exception objects to be transferred between threads.
+// It is equivalent to the std::exception_ptr class.
+typedef exception* exception_ptr;
+
+class exception_list : public exception {
+	// Used as a container for a list of asynchronous exceptions
+public:
+	typedef exception_ptr value_type;
+	typedef const value_type& reference;
+	typedef const value_type& const_reference;
+	typedef size_t size_type;
+	//typedef /*unspecified* iterator;
+	//typedef /*unspecified* const_iterator;
+	size_t size() const;
+	//iterator begin() const; // first asynchronous exception
+	//iterator end() const; // lasst asynchronous exception
+};
+
 
 class error_handler {
 public:
@@ -125,9 +98,12 @@ namespace error {
 class throw_handler : public error_handler {
 public:
 	virtual void report_error(exception& error) override {
-		auto code = (error.is_sycl_specific() ? error.get_sycl_code() : error.get_cl_code());
+		throw error;
+	}
+	void report_error(cl_exception& error) {
+		auto code = error.get_cl_code();
 		if(code != CL_SUCCESS) {
-			debug("SYCL_ERROR::", error.what());
+			debug("SYCL_ERROR::", error.get_description());
 			throw error;
 		}
 	}
@@ -141,7 +117,7 @@ public:
 	code_handler(cl_int& error_code)
 		: error_code(error_code) {}
 	virtual void report_error(exception& error) override {
-		error_code = error.get_cl_code();
+		error_code = ((cl_exception&)error).get_cl_code();
 	}
 };
 
@@ -173,10 +149,7 @@ private:
 	std::shared_ptr<error_handler> hidden_hndlr;
 	error_handler* actual_hndlr;
 	bool is_async = false;
-
-	void* thrower = this;
-	using thrower_t = exception::thrower_t;
-	thrower_t thrower_type = thrower_t::other;
+	context* thrower = nullptr;
 
 public:
 	static throw_handler default;
@@ -209,7 +182,7 @@ public:
 
 private:
 	void report(cl_int error_code, bool is_sycl_specific) {
-		exception e(thrower, error_code, is_sycl_specific, thrower_type);
+		cl_exception e(thrower, error_code);
 		actual_hndlr->report_error(e);
 	}
 public:
@@ -220,10 +193,10 @@ public:
 		report(error_code, true);
 	}
 	void report() {
-		exception e;
+		cl_exception e;
 		bool right_type = true;
 		try {
-			e = exception(thrower, ((code_handler*)actual_hndlr)->error_code, false, thrower_type);
+			e = cl_exception(thrower, ((code_handler*)actual_hndlr)->error_code);
 		}
 		catch(std::bad_cast&) {
 			right_type = false;
@@ -234,13 +207,8 @@ public:
 		}
 	}
 
-	template <class T>
-	void set_thrower(T* thrower);
-
-	template <>
-	void set_thrower(queue* thrower) {
+	void set_thrower(context* thrower) {
 		this->thrower = thrower;
-		thrower_type = thrower_t::queue;
 	}
 
 	void apply() {
