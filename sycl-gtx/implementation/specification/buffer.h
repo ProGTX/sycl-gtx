@@ -100,7 +100,7 @@ private:
 public:
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
-		if(command_group::last == nullptr) {
+		if(command_group_::last == nullptr) {
 			handler.report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
 		}
 		return accessor<DataType, dimensions, mode, target>(*reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this));

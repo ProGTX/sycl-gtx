@@ -2,4 +2,4 @@
 
 using namespace cl::sycl;
 
-command_group* command_group::last = nullptr;
+command_group* detail::command_group_::last = nullptr;
