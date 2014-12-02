@@ -66,6 +66,9 @@
     <ClCompile Include="implementation\specification\command_group.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
+    <ClCompile Include="tests\test7.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">

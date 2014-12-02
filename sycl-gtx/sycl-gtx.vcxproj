@@ -158,6 +158,7 @@
     <ClCompile Include="tests\test4.cpp" />
     <ClCompile Include="tests\test5.cpp" />
     <ClCompile Include="tests\test6.cpp" />
+    <ClCompile Include="tests\test7.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\common.h" />
