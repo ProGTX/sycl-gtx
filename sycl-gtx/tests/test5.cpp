@@ -6,7 +6,7 @@ debug(#trait ":\t") << object.get_info<trait>();
 class handler : public cl::sycl::error_handler {
 public:
 	virtual void report_error(cl::sycl::exception& error) override {
-		debug("OpenCL error:\t") << error.get_cl_code();
+		debug("OpenCL error:\t") << ((cl::sycl::cl_exception&)error).get_cl_code();
 	}
 };
 
@@ -69,8 +69,8 @@ bool test5() {
 	try {
 		devices.push_back(dd.get_devices(CL_DEVICE_TYPE_ALL));
 	}
-	catch(std::exception& e) {
-		debug("exception:\t") << e.what();
+	catch(cl_exception& e) {
+		debug("exception:\t") << e.get_description();
 	}
 
 	return true;
