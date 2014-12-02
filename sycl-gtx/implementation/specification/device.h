@@ -127,7 +127,7 @@ public:
 namespace detail {
 
 vector_class<device> get_devices(
-	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, error::handler& handler
+	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, const error::handler& handler
 );
 
 unsigned int select_best_device(device_selector& selector, vector_class<device>& devices);

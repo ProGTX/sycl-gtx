@@ -86,10 +86,11 @@ public:
 };
 
 
+// TODO: Seems that this isn't part of the specification anymore
 class error_handler {
 public:
 	//  called on error
-	virtual void report_error(exception& error) = 0;
+	virtual void report_error(exception& error) const = 0;
 };
 
 namespace detail {
@@ -97,7 +98,7 @@ namespace error {
 
 class throw_handler : public error_handler {
 public:
-	virtual void report_error(exception& error) override {
+	virtual void report_error(exception& error) const override{
 		throw error;
 	}
 	void report_error(cl_exception& error) {
@@ -116,7 +117,7 @@ private:
 public:
 	code_handler(cl_int& error_code)
 		: error_code(error_code) {}
-	virtual void report_error(exception& error) override {
+	virtual void report_error(exception& error) const override {
 		error_code = ((cl_exception&)error).get_cl_code();
 	}
 };
@@ -132,11 +133,12 @@ private:
 public:
 	async_handler(function_t async_func)
 		: async_func(async_func) {}
-	virtual void report_error(exception& error) override {
+	virtual void report_error(exception& error) const override {
 		return report_error((std::exception&)error);
 	}
-	void report_error(std::exception& error) {
-		list.push_back(error);
+	void report_error(std::exception& error) const {
+		// TODO: Deal with const
+		//list.push_back(error);
 	}
 	void apply() {
 		async_func(list);
@@ -181,18 +183,19 @@ public:
 #endif
 
 private:
-	void report(cl_int error_code, bool is_sycl_specific) {
+	// TODO: SYCL-specific codes
+	void report(cl_int error_code, bool is_sycl_specific) const {
 		cl_exception e(thrower, error_code);
 		actual_hndlr->report_error(e);
 	}
 public:
-	void report(cl_int error_code) {
+	void report(cl_int error_code) const {
 		report(error_code, false);
 	}
-	void report(detail::error::code::value_t error_code) {
+	void report(detail::error::code::value_t error_code) const {
 		report(error_code, true);
 	}
-	void report() {
+	void report() const {
 		cl_exception e;
 		bool right_type = true;
 		try {

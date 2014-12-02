@@ -7,43 +7,34 @@
 using namespace cl::sycl;
 
 
-platform::platform(cl_platform_id platform_id, error_handler& handler)
-	: platform_id(refc::allocate(platform_id)), handler(handler) {}
-
-platform::platform(error_handler& handler)
-	: platform(nullptr, handler) {}
-
-platform::platform(int& error_code)
-	: platform(nullptr, error_code) {}
-
-platform::platform(cl_platform_id platform_id, int& error_code)
-	: platform_id(refc::allocate(platform_id)), handler(error_code) {}
+platform::platform(cl_platform_id platform_id, device_selector& dev_selector)
+	: platform_id(refc::allocate(platform_id)) {}
+platform::platform()
+	: platform(nullptr) {}
+platform::platform(cl_platform_id platform_id)
+	: platform(platform_id, *device_selector::default.get()) {}
+platform::platform(device_selector &dev_selector)
+	: platform(nullptr, dev_selector) {}
 
 cl_platform_id platform::get() const {
 	return platform_id.get();
 }
 
-vector_class<platform> platform::get_platforms(int& error_code) {
-	return get_platforms(detail::error::handler(error_code));
-}
-vector_class<platform> platform::get_platforms(error_handler& handler) {
-	return get_platforms(detail::error::handler(handler));
-}
-
-vector_class<platform> platform::get_platforms(detail::error::handler& handler) {
+vector_class<platform> platform::get_platforms() {
 	static const int MAX_PLATFORMS = 1024;
 	cl_platform_id platform_ids[MAX_PLATFORMS];
 	cl_uint num_platforms;
 	auto error_code = clGetPlatformIDs(MAX_PLATFORMS, platform_ids, &num_platforms);
+	auto handler = detail::error::handler();
 	handler.report(error_code);
 	return vector_class<platform>(platform_ids, platform_ids + num_platforms);
 }
 
-vector_class<device> platform::get_devices(cl_device_type device_type) {
+vector_class<device> platform::get_devices(cl_device_type device_type) const {
 	return detail::get_devices(device_type, platform_id, handler);
 }
 
-// TODO: How to check for this?
+// TODO: Check if SYCL running in Host Mode
 bool platform::is_host() {
 	DSELF() << "not implemented";
 	return true;
