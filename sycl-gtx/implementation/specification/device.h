@@ -6,6 +6,7 @@
 #include "device_selector.h"
 #include "error_handler.h"
 #include "param_traits.h"
+#include "platform.h"
 #include "../debug.h"
 #include "../common.h"
 #include <memory>
@@ -13,35 +14,37 @@
 namespace cl {
 namespace sycl {
 
-// Forward declaration
-class platform;
-
-// 3.2.2 Device class
+// 3.5.3 Device class
 // Encapsulates a cl_device_id and a cl_platform_id
 // In the case of constructing a device instance from an existing cl_device_id the system triggers a clRetainDevice.
 // On destruction a call to clReleaseDevice is triggered.
+// Returns errors via C++ exception class.
 class device {
 private:
-	// TODO: platform_id isn't set anywhere, first we need to select a platform
-	refc::ptr<cl_platform_id> platform_id;
 	refc::ptr<cl_device_id> device_id;
+	platform platfrm;
 	detail::error::handler handler;
 
-	device(cl_device_id device_id, detail::error::handler handler);
+	device(cl_device_id device_id, device_selector& selector);
 public:
-	device(cl_device_id device_id = nullptr, error_handler& handler = detail::error::handler::default);
-	device(error_handler& handler);
-	device(int& error_code);
-	device(cl_device_id device_id, int& error_code);
+	// Default constructor for the device.
+	// It choses a device using default selector.
+	device();
+
+	// Constructs a device class instance using cl device_id of the OpenCL device.
+	device(cl_device_id device_id);
+
+	// Constructs a device class instance using the device selector provided.
+	device(device_selector& selector);
 
 	// Copy and move semantics
 	device(const device&) = default;
 #if MSVC_LOW
 	device(device&& move)
-		: SYCL_MOVE_INIT(platform_id), SYCL_MOVE_INIT(device_id), SYCL_MOVE_INIT(handler) {}
+		: SYCL_MOVE_INIT(device_id), SYCL_MOVE_INIT(platfrm), SYCL_MOVE_INIT(handler) {}
 	friend void swap(device& first, device& second) {
 		using std::swap;
-		SYCL_SWAP(platform_id);
+		SYCL_SWAP(platfrm);
 		SYCL_SWAP(device_id);
 		SYCL_SWAP(handler);
 	}
@@ -127,7 +130,7 @@ public:
 namespace detail {
 
 vector_class<device> get_devices(
-	cl_device_type device_type, refc::ptr<cl_platform_id> platform_id, const error::handler& handler
+	cl_device_type device_type, cl_platform_id platform_id, const error::handler& handler
 );
 
 unsigned int select_best_device(device_selector& selector, vector_class<device>& devices);

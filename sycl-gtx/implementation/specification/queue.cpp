@@ -42,7 +42,7 @@ queue::queue(context ctx, device dev, cl_command_queue_properties properties, er
 // Create queue from existing one
 queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
 	:	command_q(refc::allocate(cmd_queue, clReleaseCommandQueue)),
-		dev(get_info<CL_QUEUE_DEVICE>(), sync_handler),
+		dev(get_info<CL_QUEUE_DEVICE>()),
 		ctx(get_info<CL_QUEUE_CONTEXT>(), sync_handler),
 		handler(sync_handler) {
 	handler.set_thrower(&ctx);

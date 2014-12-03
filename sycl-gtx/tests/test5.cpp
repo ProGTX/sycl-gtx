@@ -64,7 +64,7 @@ bool test5() {
 
 	debug("= Trying to throw an exception");
 	handler h;
-	device dd(h);
+	device dd;
 	devices.clear();
 	try {
 		devices.push_back(dd.get_devices(CL_DEVICE_TYPE_ALL));
