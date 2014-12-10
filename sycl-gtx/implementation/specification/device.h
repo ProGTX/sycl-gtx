@@ -133,7 +133,7 @@ vector_class<device> get_devices(
 	cl_device_type device_type, cl_platform_id platform_id, const error::handler& handler
 );
 
-unsigned int select_best_device(device_selector& selector, vector_class<device>& devices);
+unsigned int select_best_device(const device_selector& selector, vector_class<device>& devices);
 
 } // namespace detail
 

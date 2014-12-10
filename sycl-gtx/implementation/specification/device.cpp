@@ -69,7 +69,7 @@ vector_class<device> detail::get_devices(
 	return vector_class<device>(device_ids, device_ids + num_devices);
 }
 
-unsigned int detail::select_best_device(device_selector& selector, vector_class<device>& devices) {
+unsigned int detail::select_best_device(const device_selector& selector, vector_class<device>& devices) {
 	unsigned int best_id = -1;
 	int best_score = -1;
 	int i = 0;

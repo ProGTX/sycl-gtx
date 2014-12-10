@@ -1,5 +1,7 @@
 #pragma once
 
+// 3.5.4 Context class
+
 #include "refc.h"
 #include "device_selector.h"
 #include "error_handler.h"
@@ -12,6 +14,7 @@ namespace sycl {
 
 // Forward declarations
 class device;
+class platform;
 class program;
 
 // Used as the notification function for contexts.
@@ -49,26 +52,37 @@ private:
 	context(
 		cl_context c,
 		const cl_context_properties* properties,
-		vector_class<device> target_devices,
-		error_handler& handler,
-		context_notify* ctx_notify = nullptr,
-		device_selector& dev_sel = *(device_selector::default)
+		vector_class<device> target_devices = {},
+		const device_selector& dev_sel = *(device_selector::default),
+		error_handler& handler = default_error,
+		platform* plt = nullptr,
+		context_notify* ctx_notify = nullptr
 	);
 public:
-	// Error handling via error_handler&
-	context(cl_context c = nullptr, error_handler& handler = default_error);
-	context(device_selector& dev_sel, error_handler& handler = default_error);
-	context(const cl_context_properties* properties, device_selector& dev_sel, error_handler& handler = default_error);
-	context(const cl_context_properties* properties, vector_class<device> target_devices, error_handler& handler = default_error);
-	context(const cl_context_properties* properties, device target_device, error_handler& handler = default_error);
+	context();
+	explicit context(cl_context context);
+	context(const device_selector& deviceSelector, cl_context_properties* properties = nullptr);
+	context(const device& dev, cl_context_properties* properties = nullptr);
+	context(const platform& plt, cl_context_properties* properties = nullptr);
+	context(vector_class<device> deviceList, cl_context_properties* properties = nullptr);
 
-	// Error handling via context_notify&
-	context(context_notify& handler);
-	context(cl_context c, context_notify& handler);
-	context(device_selector& dev_sel, context_notify& handler);
-	context(const cl_context_properties* properties, device_selector& dev_sel, context_notify& handler);
-	context(const cl_context_properties* properties, vector_class<device> target_devices, context_notify& handler);
-	context(const cl_context_properties* properties, device target_device, context_notify& handler);
+	/* constructors with asynchronous error handler supplied */
+
+	template<class... Args>
+	context(function_class<Args...>& async_handler)
+		: context(nullptr, nullptr, {}, *(device_selector::default), detail::error::async_handler(async_handler)) {}
+
+	template<class... Args>
+	context(const device_selector& deviceSelector, cl_context_properties* properties, function_class<Args...>& async_handler);
+
+	template<class... Args>
+	context(const device& dev, cl_context_properties* properties, function_class<Args...>& async_handler);
+
+	template<class... Args>
+	context(const platform& plt, cl_context_properties* properties, function_class<Args...>& async_handler);
+
+	template<class... Args>
+	context(vector_class<device> deviceList, cl_context_properties* properties, function_class<Args...>& async_handler);
 
 	// Copy and move semantics
 	context(const context&) = default;

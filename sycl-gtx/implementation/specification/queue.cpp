@@ -11,8 +11,8 @@ device queue::select_best_device(device_selector& selector, context& ctx) {
 	return devices[index];
 }
 
-context queue::create_context(queue* q, device_selector& selector, error_handler& sync_handler) {
-	q->ctx = context(selector, sync_handler);
+context queue::create_context(queue* q, device_selector& selector) {
+	q->ctx = context(selector);
 	return std::move(q->ctx);
 }
 
@@ -43,7 +43,7 @@ queue::queue(context ctx, device dev, cl_command_queue_properties properties, er
 queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
 	:	command_q(refc::allocate(cmd_queue, clReleaseCommandQueue)),
 		dev(get_info<CL_QUEUE_DEVICE>()),
-		ctx(get_info<CL_QUEUE_CONTEXT>(), sync_handler),
+		ctx(get_info<CL_QUEUE_CONTEXT>()),
 		handler(sync_handler) {
 	handler.set_thrower(&ctx);
 	auto error_code = clRetainCommandQueue(cmd_queue);
@@ -53,14 +53,14 @@ queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
 queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler)
 	: queue(ctx, dev, properties, sync_handler, false) {}
 queue::queue(device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler)
-	: ctx(selector, sync_handler), handler(sync_handler) {
+	: ctx(selector), handler(sync_handler) {
 	dev = select_best_device(selector, ctx);
 	construct(properties, false);
 }
 queue::queue(context ctx, device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler)
 	: queue(ctx, select_best_device(selector, ctx), properties, sync_handler, true) {}
 queue::queue(device dev, cl_command_queue_properties properties, error_handler& sync_handler)
-	: queue(context(nullptr, dev, sync_handler), dev, properties, sync_handler, false) {}
+	: queue(context(dev), dev, properties, sync_handler, false) {}
 
 queue::~queue() {
 	throw_asynchronous();

@@ -17,13 +17,15 @@ vector_class<device> context::load_devices() {
 }
 
 // Master constructor
+// TODO: Deal with platform pointer
 context::context(
 	cl_context c,
 	const cl_context_properties* properties,
 	vector_class<device> target_devices_,
+	const device_selector& dev_sel,
 	error_handler& handler,
-	context_notify* ctx_notify,
-	device_selector& dev_sel
+	platform* plt,
+	context_notify* ctx_notify
 ) : ctx(reserve(c)), handler(handler), target_devices(target_devices_) {
 	if(c == nullptr) {
 		cl_uint num_devices = target_devices.size();
@@ -57,31 +59,18 @@ context::context(
 	}
 }
 
-// Error handling via error_handler&
-context::context(cl_context c, error_handler& handler)
-	: context(c, nullptr, {}, handler) {}
-context::context(device_selector& dev_sel, error_handler& handler)
-	: context(nullptr, dev_sel, handler) {}
-context::context(const cl_context_properties* properties, device_selector& dev_sel, error_handler& handler)
-	: context(nullptr, properties, {}, handler, nullptr, dev_sel) {}
-context::context(const cl_context_properties* properties, vector_class<device> target_devices, error_handler& handler)
-	: context(nullptr, properties, target_devices, handler) {}
-context::context(const cl_context_properties* properties, device target_device, error_handler& handler)
-	: context(nullptr, properties, { target_device }, handler) {}
-
-// Error handling via context_notify&
-context::context(context_notify& handler)
-	: context(nullptr, nullptr, {}, default_error, &handler) {}
-context::context(cl_context c, context_notify& handler)
-	: context(c, nullptr, {}, default_error, &handler) {}
-context::context(device_selector& dev_sel, context_notify& handler)
-	: context(nullptr, dev_sel, handler) {}
-context::context(const cl_context_properties* properties, device_selector& dev_sel, context_notify& handler)
-	: context(nullptr, properties, {}, default_error, &handler, dev_sel) {}
-context::context(const cl_context_properties* properties, vector_class<device> target_devices, context_notify& handler)
-	: context(nullptr, properties, target_devices, default_error, &handler) {}
-context::context(const cl_context_properties* properties, device target_device, context_notify& handler)
-	: context(nullptr, properties, { target_device }, default_error, &handler) {}
+context::context()
+	: context(nullptr, nullptr) {}
+context::context(cl_context context)
+	: context(context, nullptr) {}
+context::context(const device_selector& deviceSelector, cl_context_properties* properties)
+	: context(nullptr, properties, {}, deviceSelector) {}
+context::context(const device& dev, cl_context_properties* properties)
+	: context(nullptr, properties, {dev}) {}
+context::context(const platform& plt, cl_context_properties* properties)
+	: context(nullptr, properties, {}, *(device_selector::default)) {}
+context::context(vector_class<device> deviceList, cl_context_properties* properties)
+	: context(nullptr, properties, deviceList) {}
 
 cl_context context::get() const {
 	return ctx.get();

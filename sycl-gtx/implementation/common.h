@@ -35,13 +35,15 @@ namespace sycl {
 
 #ifndef CL_SYCL_NO_STD_STRING
 	using string_class = ::std::string;
-#include <vector>
 #endif
 
 #ifndef CL_SYCL_NO_STD_FUNCTION
-	template< class R, class... Args >
-	using function_class = ::std::function<R(Args...)>;
-#include <vector>
+	template<class... Args>
+#if MSVC_LOW
+	class function_class : public ::std::function<void(Args...)> {};
+#else
+	using function_class = ::std::function<void(Args...)>;
+#endif
 #endif
 
 
