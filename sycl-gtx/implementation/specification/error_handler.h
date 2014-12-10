@@ -122,10 +122,10 @@ public:
 	}
 };
 
+template<class... Args>
 class async_handler : public error_handler {
 public:
-	// Specification isn't clear enough on this
-	using function_t = std::function<void(vector_class<std::exception>&)>;
+	using function_t = function_class<Args...>;
 private:
 	friend class handler;
 	function_t async_func;
@@ -161,8 +161,11 @@ public:
 		: actual_hndlr(&default) {}
 	handler(cl_int& error_code)
 		: hidden_hndlr(new code_handler(error_code)), actual_hndlr(hidden_hndlr.get()) {}
-	handler(async_handler::function_t& hndlr)
-		: hidden_hndlr(new async_handler(hndlr)), actual_hndlr(hidden_hndlr.get()), is_async(true) {}
+
+	template<class... Args>
+	handler(typename async_handler<Args...>::function_t& hndlr)
+		: hidden_hndlr(new async_handler<Args...>(hndlr)), actual_hndlr(hidden_hndlr.get()), is_async(true) {}
+
 	handler(error_handler& hndlr)
 		: actual_hndlr(&hndlr) {}
 
@@ -216,7 +219,8 @@ public:
 
 	void apply() {
 		if(is_async) {
-			((async_handler*)actual_hndlr)->apply();
+			// TODO
+			//((async_handler*)actual_hndlr)->apply();
 		}
 	}
 

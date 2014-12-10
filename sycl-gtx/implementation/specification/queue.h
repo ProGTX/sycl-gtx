@@ -16,7 +16,8 @@ namespace sycl {
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
 public:
-	using async_handler_t = detail::error::async_handler::function_t;
+	template<class... Args>
+	using async_handler_t = function_class<Args...>;
 
 private:
 	refc::ptr<cl_command_queue> command_q;

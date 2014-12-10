@@ -70,7 +70,7 @@ public:
 
 	template<class... Args>
 	context(function_class<Args...>& async_handler)
-		: context(nullptr, nullptr, {}, *(device_selector::default), detail::error::async_handler(async_handler)) {}
+		: context(nullptr, nullptr, {}, *(device_selector::default), detail::error::async_handler<Args...>(async_handler)) {}
 
 	template<class... Args>
 	context(const device_selector& deviceSelector, cl_context_properties* properties, function_class<Args...>& async_handler);
