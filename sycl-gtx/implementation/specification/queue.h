@@ -15,10 +15,6 @@ namespace sycl {
 
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
-public:
-	template<class... Args>
-	using async_handler_t = function_class<Args...>;
-
 private:
 	refc::ptr<cl_command_queue> command_q;
 	context ctx;
@@ -26,37 +22,39 @@ private:
 
 	detail::error::handler handler;
 	static error_handler& default_error;
-	bool exceptions_enabled = true;
 
+	static refc::ptr<cl_command_queue> allocate_queue();
 	static device select_best_device(device_selector& selector, context& ctx);
 	static context create_context(queue* q, device_selector& selector);
 
-	// Master constructor
-	void construct(cl_command_queue_properties properties, bool host_fallback);
-	queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback);
+	void create_queue(cl_command_queue_properties* properties);
 public:
-	// Create commmand queue from existing one
-	queue(cl_command_queue cmd_queue, error_handler& sync_handler = default_error);
+	// Creates a queue for a device it chooses according to the heuristics of the default selector.
+	// The OpenCL context object is created implicitly.
+	queue();
 
-	// Creates a command queue using clCreateCommandQueue from a context and a device.
-	// Returns errors via C++ exceptions.
-	queue(context ctx, device dev, cl_command_queue_properties properties = 0, error_handler& sync_handler = default_error);
+	// Creates a SYCL queue from an OpenCL queue.
+	// At construction it does a retain on the queue memory object.
+	// Returns errors via an exception.
+	queue(cl_command_queue cl_queue);
 
-	// This chooses a device to run the command_groups on based on the provided selector.
-	// If no device is selected, runs on the host.
-	// If no selector is provided, the method for choosing the "best" device is undefined.
-	// This constructor cannot report an error, as any error during queue creation enforces queue creation on the host.
-	queue(device_selector& selector = *device_selector::default, cl_command_queue_properties properties = 0, error_handler& sync_handler = default_error);
+	// Creates a queue for the device provided by the device selector.
+	// If no device is selected, an error is reported via an exception.
+	queue(const device_selector& selector);
 
-	// This chooses a device to run the command_groups based on the provided selector, but must be within the provided context.
-	// If no device is selected, an error is reported via a C++ exception.
-	queue(context ctx, device_selector& selector, cl_command_queue_properties properties = 0, error_handler& sync_handler = default_error);
+	// Creates a queue for the provided device.
+	// Any error is reported via an exception.
+	queue(const device& queue_device);
 
-	// This creates a queue on the given device.
-	// Any error is reported via C++ exceptions.
-	queue(device dev, cl_command_queue_properties properties = 0, error_handler& sync_handler = default_error);
+	// Chooses a device based on the provided device selector in the given context.
+	// If no device is selected, an error is reported via an exception.
+	queue(const context& dev_context, device_selector& selector);
 
-	//TODO: queue(..., std::function &async_handler);
+	// Creates a command queue using clCreateCommandQueue from a context and a device given the queue properties.
+	// Returns errors via an exception.
+	queue(const context& dev_context, const device& dev_device, cl_command_queue_properties* properties = nullptr);
+
+	// TODO: queue(..., function_class<Args...>& async_handler);
 
 	~queue();
 
@@ -64,26 +62,31 @@ public:
 	queue(const queue&) = default;
 #if MSVC_LOW
 	queue(queue&& move)
-		: SYCL_MOVE_INIT(command_q), SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(dev), SYCL_MOVE_INIT(handler), exceptions_enabled(move.exceptions_enabled) {}
+		: SYCL_MOVE_INIT(command_q), SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(dev), SYCL_MOVE_INIT(handler) {}
 	friend void swap(queue& first, queue& second) {
 		using std::swap;
 		SYCL_SWAP(command_q);
 		SYCL_SWAP(ctx);
 		SYCL_SWAP(dev);
 		SYCL_SWAP(handler);
-		SYCL_SWAP(exceptions_enabled);
 	}
 #else
 	queue(queue&&) = default;
 #endif
 
+	// TODO: Returns the underlying OpenCL command queue after doing a retain.
+	// Afterwards it needs to be manually released.
 	cl_command_queue get();
-	context get_context();
-	device get_device();
-	cl_int get_error();
+
+	// Returns the SYCL context the queue is using.
+	context get_context() const;
+
+	// Returns the SYCL device the queue is associated with.
+	device get_device() const;
 	
+	// Queries the platform for cl_command_queue info.
 	template<cl_int name>
-	typename param_traits<cl_command_queue_info, name>::param_type get_info() {
+	typename param_traits<cl_command_queue_info, name>::param_type get_info() const {
 		using type = param_traits<cl_command_queue_info, name>::param_type;
 		type param_value;
 		auto q = command_q.get();
@@ -92,9 +95,16 @@ public:
 		return param_value;
 	}
 
-	void disable_exceptions();
+	// Checks to see if any asynchronous errors have been produced by the queue
+	// and if so reports them by passing them to the async_handler provided on construction.
+	// If no async_handler was provided then asynchronous exceptions will be lost.
 	void throw_asynchronous();
+
+	// Performs a blocking wait for the completion all enqueued tasks in the queue.
+	// Synchronous errors will be reported via an exception.
 	void wait();
+
+	// Performs a blocking wait for the completion of all enqueued tasks in the queue.
 	void wait_and_throw();
 };
 

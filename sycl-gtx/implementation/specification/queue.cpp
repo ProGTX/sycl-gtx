@@ -16,51 +16,45 @@ context queue::create_context(queue* q, device_selector& selector) {
 	return std::move(q->ctx);
 }
 
-// Master constructor
-void queue::construct(cl_command_queue_properties properties, bool host_fallback) {
+void queue::create_queue(cl_command_queue_properties* properties) {
 	handler.set_thrower(&ctx);
-	try {
-		cl_int error_code;
-		command_q = refc::allocate(clCreateCommandQueue(ctx.get(), dev.get(), properties, &error_code), clReleaseCommandQueue);
-		handler.report(error_code);
-	}
-	catch(std::exception& e) {
-		if(host_fallback) {
-			// TODO: Any error during queue creation enforces queue creation on the host.
-		}
-		else {
-			throw e;
-		}
-	}
-}
-
-queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler, bool host_fallback)
-	: ctx(ctx), dev(dev), handler(sync_handler) {
-	construct(properties, host_fallback);
-}
-
-// Create queue from existing one
-queue::queue(cl_command_queue cmd_queue, error_handler& sync_handler)
-	:	command_q(refc::allocate(cmd_queue, clReleaseCommandQueue)),
-		dev(get_info<CL_QUEUE_DEVICE>()),
-		ctx(get_info<CL_QUEUE_CONTEXT>()),
-		handler(sync_handler) {
-	handler.set_thrower(&ctx);
-	auto error_code = clRetainCommandQueue(cmd_queue);
+	cl_int error_code;
+	command_q = refc::allocate(
+		clCreateCommandQueue(ctx.get(), dev.get(), ((properties == nullptr) ? 0 : *properties), &error_code),
+		clReleaseCommandQueue
+	);
 	handler.report(error_code);
 }
 
-queue::queue(context ctx, device dev, cl_command_queue_properties properties, error_handler& sync_handler)
-	: queue(ctx, dev, properties, sync_handler, false) {}
-queue::queue(device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler)
-	: ctx(selector), handler(sync_handler) {
-	dev = select_best_device(selector, ctx);
-	construct(properties, false);
+queue::queue()
+	: ctx(), dev(select_best_device(*(device_selector::default), ctx)), handler(default_error) {
+	handler.set_thrower(&ctx);
+	cl_int error_code;
+	command_q = refc::allocate(
+		clCreateCommandQueue(ctx.get(), dev.get(), 0, &error_code),
+		clReleaseCommandQueue
+	);
+	handler.report(error_code);
 }
-queue::queue(context ctx, device_selector& selector, cl_command_queue_properties properties, error_handler& sync_handler)
-	: queue(ctx, select_best_device(selector, ctx), properties, sync_handler, true) {}
-queue::queue(device dev, cl_command_queue_properties properties, error_handler& sync_handler)
-	: queue(context(dev), dev, properties, sync_handler, false) {}
+
+queue::queue(cl_command_queue cl_queue)
+	: command_q(refc::allocate(cl_queue, clReleaseCommandQueue)), handler(default_error) {
+	auto error_code = clRetainCommandQueue(cl_queue);
+	handler.report(error_code);
+
+	ctx = context(get_info<CL_QUEUE_CONTEXT>());
+	handler.set_thrower(&ctx);
+
+	dev = device(get_info<CL_QUEUE_DEVICE>());
+}
+
+queue::queue(const device_selector& selector) {}
+
+queue::queue(const device& queue_device) {}
+
+queue::queue(const context& dev_context, device_selector& selector) {}
+
+queue::queue(const context& dev_context, const device& dev_device, cl_command_queue_properties* properties) {}
 
 queue::~queue() {
 	throw_asynchronous();
@@ -72,21 +66,12 @@ cl_command_queue queue::get() {
 	return command_q.get();
 }
 
-context queue::get_context() {
+context queue::get_context() const {
 	return ctx;
 }
 
-device queue::get_device() {
+device queue::get_device() const {
 	return dev;
-}
-
-// TODO: Which error?
-cl_int queue::get_error() {
-	return 0;
-}
-
-void queue::disable_exceptions() {
-	exceptions_enabled = false;
 }
 
 // TODO: This function checks to see if any asynchronous errors have been thrown in the queue
