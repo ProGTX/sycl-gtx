@@ -102,12 +102,14 @@ public:
 
 public:
 	cl_context get() const;
+	bool is_host() const;
+	vector_class<device> get_devices() const;
 
 private:
 	template<class return_type, cl_int name>
 	struct hidden {
 		using real_return = return_type;
-		static real_return get_info(context* contex) {
+		static real_return get_info(const context* contex) {
 			auto c = contex->ctx.get();
 			real_return param_value;
 			auto error_code = clGetContextInfo(c, name, sizeof(real_return), &param_value, nullptr);
@@ -118,7 +120,7 @@ private:
 	template<class return_type, cl_int name>
 	struct hidden<return_type[], name> {
 		using real_return = vector_class<return_type>;
-		static real_return get_info(context* contex) {
+		static real_return get_info(const context* contex) {
 			auto c = contex->ctx.get();
 			static const int BUFFER_SIZE = 1024;
 			return_type param_value[BUFFER_SIZE];
@@ -133,7 +135,7 @@ private:
 	using param = typename param_traits<cl_context_info, name>::param_type;
 public:
 	template<cl_int name>
-	typename hidden<param<name>, name>::real_return get_info() {
+	typename hidden<param<name>, name>::real_return get_info() const {
 		return hidden<param<name>, name>::get_info(this);
 	}
 };
