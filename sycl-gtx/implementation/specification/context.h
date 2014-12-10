@@ -59,14 +59,26 @@ private:
 		context_notify* ctx_notify = nullptr
 	);
 public:
+	// Chooses the context according to the heuristics of the default selector
 	context();
+
+	// Executes a retain on the cl_context
 	explicit context(cl_context context);
+
+	// Constructs with a single device retrieved from the provided device selector object.
 	context(const device_selector& deviceSelector, cl_context_properties* properties = nullptr);
+
+	// Constructs context from device
 	context(const device& dev, cl_context_properties* properties = nullptr);
+
+	// Constructs context from platform
 	context(const platform& plt, cl_context_properties* properties = nullptr);
+
+	// Constructs context from a list of devices
 	context(vector_class<device> deviceList, cl_context_properties* properties = nullptr);
 
-	/* constructors with asynchronous error handler supplied */
+
+	// Same constructors as above, just with an asynchronous error handler
 
 	template<class... Args>
 	context(function_class<Args...>& async_handler)
@@ -101,8 +113,13 @@ public:
 #endif
 
 public:
+	// TODO: Returns the underlying cl context object, after retaining the cl_context.
 	cl_context get() const;
+
+	// TODO: Specifies whether the context is in SYCL Host Execution Mode
 	bool is_host() const;
+
+	// TODO
 	vector_class<device> get_devices() const;
 
 private:
@@ -134,6 +151,8 @@ private:
 	template<cl_int name>
 	using param = typename param_traits<cl_context_info, name>::param_type;
 public:
+
+	// Queries OpenCL information for the underlying cl_context.
 	template<cl_int name>
 	typename hidden<param<name>, name>::real_return get_info() const {
 		return hidden<param<name>, name>::get_info(this);
