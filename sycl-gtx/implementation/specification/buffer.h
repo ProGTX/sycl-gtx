@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.3.1 Buffers
+// 3.6.1 Buffers
 
 #include "access.h"
 #include "error_handler.h"
@@ -34,6 +34,12 @@ private:
 	bool is_read_only = false;
 	detail::error::handler handler;
 
+	// Associated host memory.
+	buffer_(DataType* host_data, range<dimensions> range, bool read_only)
+		: rang(range) {
+		DSELF() << "not implemented";
+	}
+
 public:
 	// Associated host memory.
 	// The buffer will use this host memory for its full lifetime,
@@ -44,16 +50,11 @@ public:
 	// When the buffer is destroyed, the destructor will block until all work in queues on the buffer has completed,
 	// then copy the contents of the buffer back to the host memory (if required) and then return.
 	buffer_(DataType* host_data, range<dimensions> range)
-		: rang(range) {
-		DSELF() << "not implemented";
-	}
+		: buffer_(host_data, range, false) {}
 
-	// Associated constant host memory creates read-only buffer.
-	// Only read accessors are allowed on the buffer and no copy-back to host memory is performed.
+	// Associated host memory, read-only mode.
 	buffer_(const DataType* host_data, range<dimensions> range)
-		: rang(range), is_read_only(true) {
-		DSELF() << "not implemented";
-	}
+		: buffer_(const_cast<DataType*>(host_data), range, true) {}
 
 	// No associated storage.
 	// The storage for this type of buffer is entirely handled by the SYCL system.
