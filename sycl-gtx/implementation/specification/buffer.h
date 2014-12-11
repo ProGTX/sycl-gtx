@@ -35,7 +35,7 @@ private:
 	detail::error::handler handler;
 
 	// Associated host memory.
-	buffer_(DataType* host_data, range<dimensions> range, bool read_only)
+	buffer_(const DataType* host_data, range<dimensions> range, bool read_only)
 		: rang(range) {
 		DSELF() << "not implemented";
 	}
@@ -54,7 +54,7 @@ public:
 
 	// Associated host memory, read-only mode.
 	buffer_(const DataType* host_data, range<dimensions> range)
-		: buffer_(const_cast<DataType*>(host_data), range, true) {}
+		: buffer_(host_data, range, true) {}
 
 	// No associated storage.
 	// The storage for this type of buffer is entirely handled by the SYCL system.
