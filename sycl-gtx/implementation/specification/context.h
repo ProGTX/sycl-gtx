@@ -113,13 +113,12 @@ public:
 #endif
 
 public:
-	// TODO: Returns the underlying cl context object, after retaining the cl_context.
+	// Returns the underlying cl context object, after retaining the cl_context.
 	cl_context get() const;
 
 	// TODO: Specifies whether the context is in SYCL Host Execution Mode
 	bool is_host() const;
 
-	// TODO
 	vector_class<device> get_devices() const;
 
 private:

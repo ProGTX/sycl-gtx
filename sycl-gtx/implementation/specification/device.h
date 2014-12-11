@@ -25,7 +25,7 @@ private:
 	platform platfrm;
 	detail::error::handler handler;
 
-	device(cl_device_id device_id, device_selector& selector);
+	device(cl_device_id device_id, const device_selector& selector);
 public:
 	// Default constructor for the device.
 	// It choses a device using default selector.
@@ -35,7 +35,7 @@ public:
 	device(cl_device_id device_id);
 
 	// Constructs a device class instance using the device selector provided.
-	device(device_selector& selector);
+	device(const device_selector& selector);
 
 	// Copy and move semantics
 	device(const device&) = default;

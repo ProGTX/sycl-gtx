@@ -72,6 +72,12 @@ context::context(const platform& plt, cl_context_properties* properties)
 context::context(vector_class<device> deviceList, cl_context_properties* properties)
 	: context(nullptr, properties, deviceList) {}
 
+// TODO: Retain
 cl_context context::get() const {
 	return ctx.get();
+}
+
+// TODO:
+vector_class<device> context::get_devices() const {
+	return {};
 }

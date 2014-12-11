@@ -3,7 +3,7 @@
 
 using namespace cl::sycl;
 
-device::device(cl_device_id device_id, device_selector& dev_sel)
+device::device(cl_device_id device_id, const device_selector& dev_sel)
 	: device_id(refc::allocate(device_id, clReleaseDevice)), handler(handler) {
 	if(device_id != nullptr) {
 		auto error_code = clRetainDevice(device_id);
@@ -25,7 +25,7 @@ device::device()
 device::device(cl_device_id device_id)
 	: device(device_id, *device_selector::default.get()) {}
 
-device::device(device_selector& dev_sel)
+device::device(const device_selector& dev_sel)
 	: device(nullptr, dev_sel) {}
 
 cl_device_id device::get() const {

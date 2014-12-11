@@ -17,17 +17,13 @@ namespace sycl {
 class queue {
 private:
 	refc::ptr<cl_command_queue> command_q;
-	context ctx;
 	device dev;
+	context ctx;
 
-	detail::error::handler handler;
 	static error_handler& default_error;
+	detail::error::handler handler = default_error;
 
-	static refc::ptr<cl_command_queue> allocate_queue();
-	static device select_best_device(device_selector& selector, context& ctx);
-	static context create_context(queue* q, device_selector& selector);
-
-	void create_queue(cl_command_queue_properties* properties);
+	void create_queue(cl_command_queue_properties* properties = nullptr);
 public:
 	// Creates a queue for a device it chooses according to the heuristics of the default selector.
 	// The OpenCL context object is created implicitly.
