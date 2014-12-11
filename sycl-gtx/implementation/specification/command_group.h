@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.2.6 Command group class
+// 3.5.6 Command group class
 
 #include "buffer.h"
 #include "event.h"
@@ -31,21 +31,37 @@ private:
 		detail::command_group_::last = nullptr;
 	}
 public:
-	// typename functorT: kernel functor or lambda function
+	// Constructs a command group with the queue the group will enqueue its commands to
+	// and a lambda function or function object containing the body of commands to enqueue.
 	template <typename functorT>
-	command_group(queue q, functorT functor) {
+	command_group(queue& primaryQueue, functorT lambda) {
 		enter();
-		functor();
+		lambda();
 		exit();
 	}
-	event kernel_event() {
-		DSELF() << "not implemented";
-		return event();
-	}
+
+	// TODO
+	// Constructs a command group a primary queue to be used in order to enqueue its commands to
+	// and a lambda function or function object containing the body of commands to enqueue.
+	// If the command group execution fails in the primary queue,
+	// the SYCL runtime will try to re-schedule the whole command group to the secondary queue.
+	template <typename functorT>
+	command_group(queue& primaryQueue, queue& secondaryQueue, functorT lambda);
+
+	// Return the event object that the command group waits on to begin execution.
 	event start_event() {
 		DSELF() << "not implemented";
 		return event();
 	}
+
+	// Return the event representing completion of the command group's kernel.
+	event kernel_event() {
+		DSELF() << "not implemented";
+		return event();
+	}
+
+	// Return the event representing completion of the entire command group
+	// including any required data movement commands.
 	event complete_event() {
 		DSELF() << "not implemented";
 		return event();

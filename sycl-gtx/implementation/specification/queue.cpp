@@ -14,10 +14,7 @@ void queue::create_queue(cl_command_queue_properties* properties) {
 }
 
 queue::queue()
-	: dev(*(device_selector::default)), ctx(dev) {
-	handler.set_thrower(&ctx);
-	create_queue();
-}
+	: queue(*(device_selector::default)) {}
 
 queue::queue(cl_command_queue cl_queue)
 	: command_q(refc::allocate(cl_queue, clReleaseCommandQueue)) {
