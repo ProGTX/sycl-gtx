@@ -4,6 +4,7 @@
 
 #include "../common.h"
 #include "../debug.h"
+#include <initializer_list>
 
 namespace cl {
 namespace sycl {
@@ -48,12 +49,6 @@ public:
 	size_t get(int dimension) const {
 		return dims[n];
 	}
-
-protected:
-	//range_ operator*(range_ b);
-	range_ operator/(range_ divisor);
-	range_ operator+(range_ b);
-	range_ operator-(range_ b);
 };
 
 } // namespace detail
@@ -113,25 +108,22 @@ sycl_static_range_ops(+);
 sycl_static_range_ops(-);
 
 
+// TODO: 3.7.1.3 ID class
 template <int dimensions = 1>
-class id {
-private:
-	range<dimensions> global_size;
-	range<dimensions> local_size;
+class id : public range<dimensions> {
 public:
-	id(
-		range<dimensions> global_size = range<dimensions>(vector_class<size_t>(dimensions, 0).data()),
-		range<dimensions> local_size = range<dimensions>(vector_class<size_t>(dimensions, 0).data())
-	)	: global_size(global_size), local_size(local_size) {}
-	id(int n)
-		: id() {
-		// TODO: Not sure if this is correct
-		global_size[0] = n;
-		local_size[0] = n;
-	}
-	int get(int dimension);
+
+	// TODO
+	id(std::initializer_list<size_t> list)
+		: range<dimensions>::range(vector_class<size_t>(dimensions, 0).data()) {}
+
+	// TODO: This would be much easier if I could inherit constructors ...
+	id(size_t sizeX)
+		: range<dimensions>(sizeX) {}
 };
 
+
+// 3.7.1.2 nd range class
 template <int dimensions = 1>
 class nd_range {
 private:
@@ -142,19 +134,29 @@ private:
 	id<dimensions> offset;
 
 public:
+	static_assert(1 <= dimensions && dimensions <= 3, "Dimensions are between 1 and 3");
+
 	nd_range(range<dimensions> global_size, range<dimensions> local_size, id<dimensions> offset = id<dimensions>())
 		: global_size(global_size), local_size(local_size), offset(offset) {}
 
-	range<dimensions> get_global_range() {
+	range<dimensions> get_global_range() const {
 		return global_size;
 	}
-	range<dimensions> get_local_range() {
+	range<dimensions> get_local_range() const {
 		return local_size;
 	}
-	range<dimensions> get_group_range();
+	id<dimensions> get_offset() const {
+		return offset;
+	}
+
+	// Returns a range representing the number of groups in each dimension.
+	range<dimensions> get_group_range() const {
+		return global_size / local_size;
+	}
 };
 
-// TODO: class item {};
+
+// TODO: 3.7.1.6 Group class
 
 
 } // namespace sycl
