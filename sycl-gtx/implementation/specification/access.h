@@ -4,7 +4,7 @@ namespace cl {
 namespace sycl {
 namespace access {
 
-// 3.3.4.1 Access modes
+// 3.6.4.1 Access modes
 enum mode {
 	read,				// read-only access
 	write,				// write-only access, previous target object contents discarded
@@ -13,7 +13,7 @@ enum mode {
 	discard_read_write,	// read/write access, previous target object contents discarded
 };
 
-// 3.3.4.2 Access targets
+// 3.6.4.2 Access targets
 enum target {
 	global_buffer,		// access buffer via __global memory
 	constant_buffer,	// access buffer via __constant memory

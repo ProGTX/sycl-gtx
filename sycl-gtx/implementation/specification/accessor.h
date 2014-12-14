@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.3.4 Accessors
+// 3.6.4 Accessors
 
 #include "access.h"
 #include "ranges.h"
@@ -28,12 +28,19 @@ public:
 
 namespace detail {
 
-// 3.3.4.3 Core accessors class
+// 3.6.4.3 Core accessors class
 template <typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_core {
 public:
-	int get_size() const;
+	// Returns the size of the underlying buffer in number of elements.
+	size_t get_size() const;
+
+	// Returns the cl_mem object corresponding to the access.
+	// TODO: Only available when target is cl_image or cl_buffer
 	cl_mem get_cl_mem_object() const;
+
+	// Returns the cl_event object corresponding to the last command to access the memory object.
+	// TODO: Only available when target is cl_image or cl_buffer.
 	cl_event get_cl_event_object() const;
 };
 
@@ -49,7 +56,7 @@ template <typename DataType, int dimensions, int mode, int target>								\
 class accessor_<DataType, dimensions, mode, target, select_target<(condition)>>					\
 	: public accessor_core<DataType, dimensions, (access::mode)mode, (access::target)target>
 
-// 3.3.4.4 Buffer accessors
+// 3.6.4.4 Buffer accessors
 SYCL_ACCESSOR_CLASS(target == access::global_buffer || target == access::constant_buffer || target == access::host_buffer) {
 public:
 	accessor_(cl::sycl::buffer<DataType, dimensions>& targette) {
@@ -69,7 +76,7 @@ class accessor;
 		: public detail::accessor_<DataType, dimensions, mode, target>
 
 
-// 3.3.4.4 Buffer accessors
+// 3.6.4.4 Buffer accessors
 
 SYCL_ADD_ACCESSOR(access::read) {
 public:
