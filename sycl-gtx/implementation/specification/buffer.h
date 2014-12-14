@@ -35,8 +35,8 @@ private:
 	detail::error::handler handler;
 
 	// Associated host memory.
-	buffer_(const DataType* host_data, range<dimensions> range, bool read_only)
-		: rang(range) {
+	buffer_(const DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
+		: rang(range), is_read_only(is_read_only), is_blocking(is_blocking) {
 		DSELF() << "not implemented";
 	}
 
@@ -62,7 +62,7 @@ public:
 	// Instead, the SYCL system frees any storage required for the buffer asynchronously when it is no longer in use in queues.
 	// The initial contents of the buffer are undefined.
 	buffer_(range<dimensions> range)
-		: buffer_(nullptr, range), is_blocking(false) {
+		: buffer_(nullptr, range, false, false) {
 		DSELF() << "not implemented";
 	}
 
@@ -76,29 +76,35 @@ public:
 	// but which only have access to the range specified at time of construction of the sub-buffer.
 	//buffer_(buffer_, index<dimensions> base_index, range<dimensions> sub_range);
 
-	// Creates and initializes buffer from the OpenCL memory object.
-	// The SYCL system may copy the data to another device and/or context,
-	// but must copy it back (if modified) at the point of destruction of the buffer.
-	// The memory object is assumed to only be available to the SYCL scheduler after the event has signaled
-	// and is assumed to be currently resident on the context and device signified by the queue.
+	// Creates a buffer from an existing OpenCL memory object associated to a context
+	// after waiting for an event signaling the availability of the OpenCL data.
+	// mem_object is the OpenCL memory object to use.
+	// from_queue is the queue associated to the memory object.
+	// available_event specifies the event to wait for if non null
 	buffer_(cl_mem mem_object, queue from_queue, event available_event);
 
+	// Return a range object representing the size of the buffer
+	// in terms of number of elements in each dimension as passed to the constructor.
 	range<dimensions> get_range() {
 		return rang;
 	}
 
 	// Total number of elements in the buffer
-	size_t get_count();
+	size_t get_count() {
+		size_t count = 0;
+		for(int i = 0; i < dimensions; ++i) {
+			count += rang[i];
+		}
+		return count;
+	}
 
 	// Total number of bytes in the buffer
-	size_t get_size();
-
-private:
-	void lazy_init() {
-		// TODO: Lazy initialization
+	size_t get_size() {
+		return get_count() * sizeof(DataType);
 	}
 
 public:
+	// TODO: Take read_only into consideration
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
 		if(command_group_::last == nullptr) {
@@ -128,11 +134,10 @@ struct buffer<DataType, 1> : public detail::buffer_<DataType, 1> {
 #else
 	using detail::buffer_<DataType, 1>::buffer;
 #endif
-	// Construction via copy constructor from any structure that has contiguous storage.
-	// The original structure or class does not get updated by the buffer after the processing.
-	// The buffer allocates a new host storage object,
-	// where the values of the the copy constructor are used as an initialization.
-	buffer(DataType* startIterator, DataType* endIterator);
+	// Create a new allocated 1D buffer initialized from the given elements
+	// ranging from first up to one before last
+	template <class InputIterator>
+	buffer(InputIterator* startIterator, InputIterator* endIterator);
 
 	// TODO: Used by the Codeplay SYCL example
 	buffer(vector_class<DataType> host_data)
@@ -158,7 +163,7 @@ struct buffer<DataType, 2> : public detail::buffer_<DataType, 2>{
 	using detail::buffer_<DataType, 2>::buffer;
 #endif
 	buffer(size_t sizeX, size_t sizeY)
-		: buffer({ sizeX, sizeY }) {}
+		: buffer(range<2>{ sizeX, sizeY }) {}
 	buffer(DataType* host_data, size_t sizeX, size_t sizeY)
 		: buffer(host_data, { sizeX, sizeY }) {}
 };
@@ -180,7 +185,7 @@ struct buffer<DataType, 3> : public detail::buffer_<DataType, 3>{
 	using detail::buffer_<DataType, 3>::buffer;
 #endif
 	buffer(size_t sizeX, size_t sizeY, size_t sizeZ)
-		: buffer({ sizeX, sizeY, sizeZ }) {}
+		: buffer(range<3>{ sizeX, sizeY, sizeZ }) {}
 	buffer(DataType* host_data, size_t sizeX, size_t sizeY, size_t sizeZ)
 		: buffer(host_data, { sizeX, sizeY, sizeZ }) {}
 };
