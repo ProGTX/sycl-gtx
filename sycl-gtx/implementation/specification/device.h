@@ -117,14 +117,6 @@ public:
 	typename hidden<param<name>, name>::real_return get_info() {
 		return hidden<param<name>, name>::get_info(this);
 	}
-
-	void a() {
-		auto b1 = get_info<CL_DEVICE_ADDRESS_BITS>();
-		auto b2 = get_info<CL_DEVICE_AVAILABLE>();
-		auto b3 = get_info<CL_DEVICE_DOUBLE_FP_CONFIG>();
-		auto b4 = get_info<CL_DEVICE_PARTITION_TYPE>();
-		auto b5 = get_info<CL_DEVICE_NAME>();
-	}
 };
 
 namespace detail {
