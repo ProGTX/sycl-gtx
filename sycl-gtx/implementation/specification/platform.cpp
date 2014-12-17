@@ -7,13 +7,14 @@
 using namespace cl::sycl;
 
 
-platform::platform(cl_platform_id platform_id, device_selector& dev_selector)
+platform::platform(cl_platform_id platform_id, const device_selector& dev_selector)
 	: platform_id(refc::allocate(platform_id)) {}
+
 platform::platform()
 	: platform(nullptr) {}
 platform::platform(cl_platform_id platform_id)
 	: platform(platform_id, *device_selector::default.get()) {}
-platform::platform(device_selector &dev_selector)
+platform::platform(const device_selector& dev_selector)
 	: platform(nullptr, dev_selector) {}
 
 cl_platform_id platform::get() const {

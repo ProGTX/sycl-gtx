@@ -20,7 +20,7 @@ private:
 	refc::ptr<cl_platform_id> platform_id;
 	detail::error::handler handler;
 
-	platform(cl_platform_id platform_id, device_selector& dev_selector);
+	platform(cl_platform_id platform_id, const device_selector& dev_selector);
 public:
 	// Default constructor for platform.
 	// It constructs a platform object to encapsulate the device returned by the default device selector
@@ -30,7 +30,7 @@ public:
 	platform(cl_platform_id platform_id);
 
 	// Construct a platform object from the device returned by a device selector of the user’s choice.
-	platform(device_selector &dev_selector);
+	platform(const device_selector& dev_selector);
 
 	// Returns the cl platform id of the underlying OpenCL platform.
 	// If the platform is not a valid OpenCL platform, for example it is the SYCL host,

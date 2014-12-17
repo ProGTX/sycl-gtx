@@ -4,18 +4,23 @@
 using namespace cl::sycl;
 
 device::device(cl_device_id device_id, const device_selector& dev_sel)
-	: device_id(refc::allocate(device_id, clReleaseDevice)), handler(handler) {
+	: device_id(refc::allocate(device_id, clReleaseDevice)), platfrm(dev_sel), handler(handler) {
 	if(device_id != nullptr) {
 		auto error_code = clRetainDevice(device_id);
 		handler.report(error_code);
 	}
 	else {
-		// TODO: The "default" device constructed corresponds to the host.
-		// This is also the device that the system will "fall-back" to,
-		// if there are no existing or valid OpenCL devices associated with the system.
-		// TODO: Device selector
-		// TODO: Init platform
-		debug::warning(__func__) << "does not support a default device yet";
+		auto devices = platfrm.get_devices();
+		auto id = detail::select_best_device(dev_sel, devices);
+		if(id < 0) {
+			// TODO: The "default" device constructed corresponds to the host.
+			// This is also the device that the system will "fall-back" to,
+			// if there are no existing or valid OpenCL devices associated with the system.
+			debug::warning(__func__) << "does not support a default device yet";
+		}
+		else {
+			*this = std::move(devices[id]);
+		}
 	}
 }
 
