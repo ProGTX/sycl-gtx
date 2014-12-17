@@ -30,7 +30,7 @@ protected:
 		: thrower(thrower) {}
 public:
 	// Returns a descriptive string for the error, if available.
-	string_class get_description() {
+	virtual string_class get_description() const {
 		return "Undefined SYCL error";
 	}
 
@@ -55,6 +55,10 @@ private:
 public:
 	cl_exception()
 		: cl_exception(CL_SUCCESS) {}
+
+	virtual string_class get_description() const override {
+		return detail::error_string(error_code);
+	}
 
 	// Thrown as a result of an OpenCL API error code
 	cl_int get_cl_code() const {
@@ -98,7 +102,8 @@ namespace error {
 
 class throw_handler : public error_handler {
 public:
-	virtual void report_error(exception& error) const override{
+	virtual void report_error(exception& error) const override {
+		debug("SYCL_ERROR::", error.get_description());
 		throw error;
 	}
 	void report_error(cl_exception& error) {
