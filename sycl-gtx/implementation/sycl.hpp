@@ -1,7 +1,6 @@
 #pragma once
 
-// TODO
-#define CL_SYCL_LANGUAGE_VERSION
+#define CL_SYCL_LANGUAGE_VERSION 120
 
 #include "specification\accessor.h"
 #include "specification\buffer.h"

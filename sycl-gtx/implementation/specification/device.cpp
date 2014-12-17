@@ -10,8 +10,8 @@ device::device(cl_device_id device_id, const device_selector& dev_sel)
 		handler.report(error_code);
 	}
 	else {
-		// TODO: The “default” device constructed corresponds to the host.
-		// This is also the device that the system will “fall-back” to,
+		// TODO: The "default" device constructed corresponds to the host.
+		// This is also the device that the system will "fall-back" to,
 		// if there are no existing or valid OpenCL devices associated with the system.
 		// TODO: Device selector
 		// TODO: Init platform

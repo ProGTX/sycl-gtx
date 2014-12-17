@@ -41,7 +41,7 @@ public:
 	}
 
 	// TODO
-	// Constructs a command group a primary queue to be used in order to enqueue its commands to
+	// Constructs a command group from a primary queue to be used in order to enqueue its commands to
 	// and a lambda function or function object containing the body of commands to enqueue.
 	// If the command group execution fails in the primary queue,
 	// the SYCL runtime will try to re-schedule the whole command group to the secondary queue.
