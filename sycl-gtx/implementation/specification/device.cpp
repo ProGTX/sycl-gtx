@@ -10,8 +10,12 @@ device::device(cl_device_id device_id, const device_selector& dev_sel)
 		handler.report(error_code);
 	}
 	else {
+		// TODO: Platform selection
+		auto platforms = platform::get_platforms();
+		platfrm = std::move(platforms[0]);
+
 		auto devices = platfrm.get_devices();
-		auto id = detail::select_best_device(dev_sel, devices);
+		auto id = detail::best_device_id(dev_sel, devices);
 		if(id < 0) {
 			// TODO: The "default" device constructed corresponds to the host.
 			// This is also the device that the system will "fall-back" to,
@@ -74,7 +78,7 @@ vector_class<device> detail::get_devices(
 	return vector_class<device>(device_ids, device_ids + num_devices);
 }
 
-unsigned int detail::select_best_device(const device_selector& selector, vector_class<device>& devices) {
+unsigned int detail::best_device_id(const device_selector& selector, vector_class<device>& devices) {
 	unsigned int best_id = -1;
 	int best_score = -1;
 	int i = 0;

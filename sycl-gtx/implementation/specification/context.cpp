@@ -34,7 +34,7 @@ context::context(
 			target_devices = load_devices();
 			num_devices = target_devices.size();
 		}
-		best_device_id = detail::select_best_device(dev_sel, target_devices);
+		best_device_id = detail::best_device_id(dev_sel, target_devices);
 		if(best_device_id < 0) {
 			// TODO: Maybe an exception?
 		}

@@ -43,7 +43,7 @@ queue::queue(const context& dev_context, device_selector& selector)
 	: ctx(dev_context) {
 	handler.set_thrower(&ctx);
 	auto devices = ctx.get_devices();
-	auto best_id = detail::select_best_device(selector, devices);
+	auto best_id = detail::best_device_id(selector, devices);
 	if(best_id < 0) {
 		// TODO: Report no device selected.
 		//handler.report();
