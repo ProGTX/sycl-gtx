@@ -2,7 +2,7 @@
 
 using namespace cl::sycl;
 
-error_handler& queue::default_error = detail::error::handler::default;
+detail::error::handler& queue::default_error = detail::error::handler::default;
 
 void queue::create_queue(cl_command_queue_properties* properties) {
 	cl_int error_code;
@@ -46,7 +46,7 @@ queue::queue(const context& dev_context, device_selector& selector)
 	auto best_id = detail::select_best_device(selector, devices);
 	if(best_id < 0) {
 		// TODO: Report no device selected.
-		handler.report();
+		//handler.report();
 	}
 	else {
 		dev = std::move(devices[best_id]);

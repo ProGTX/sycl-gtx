@@ -43,7 +43,7 @@ private:
 	unsigned int best_device_id = 0;
 
 	detail::error::handler handler;
-	static error_handler& default_error;
+	static detail::error::handler& default_error;
 
 	static refc::ptr<cl_context> reserve(cl_context c = nullptr);
 	static vector_class<device> load_devices();
@@ -54,7 +54,7 @@ private:
 		const cl_context_properties* properties,
 		vector_class<device> target_devices = {},
 		const device_selector& dev_sel = *(device_selector::default),
-		error_handler& handler = default_error,
+		detail::error::handler& handler = default_error,
 		platform* plt = nullptr,
 		context_notify* ctx_notify = nullptr
 	);

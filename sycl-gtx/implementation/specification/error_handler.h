@@ -90,19 +90,13 @@ public:
 };
 
 
-// TODO: Seems that this isn't part of the specification anymore
-class error_handler {
-public:
-	//  called on error
-	virtual void report_error(exception& error) const = 0;
-};
-
 namespace detail {
 namespace error {
 
-class throw_handler : public error_handler {
+
+class throw_handler {
 public:
-	virtual void report_error(exception& error) const override {
+	virtual void report_error(exception& error) {
 		debug("SYCL_ERROR::", error.get_description());
 		throw error;
 	}
@@ -115,76 +109,30 @@ public:
 	}
 };
 
-class code_handler : public error_handler {
-private:
-	cl_int& error_code;
-	friend class handler;
-public:
-	code_handler(cl_int& error_code)
-		: error_code(error_code) {}
-	virtual void report_error(exception& error) const override {
-		error_code = ((cl_exception&)error).get_cl_code();
-	}
-};
-
-template<class... Args>
-class async_handler : public error_handler {
-public:
-	using function_t = function_class<Args...>;
-private:
-	friend class handler;
-	function_t async_func;
-	vector_class<std::exception> list;
-public:
-	async_handler(function_t async_func)
-		: async_func(async_func) {}
-	virtual void report_error(exception& error) const override {
-		return report_error((std::exception&)error);
-	}
-	void report_error(std::exception& error) const {
-		// TODO: Deal with const
-		//list.push_back(error);
-	}
-	void apply() {
-		async_func(list);
-		list.clear();
-	}
-};
-
 class handler {
 private:
-	std::shared_ptr<error_handler> hidden_hndlr;
-	error_handler* actual_hndlr;
+	std::shared_ptr<throw_handler> hidden_hndlr;
 	bool is_async = false;
 	context* thrower = nullptr;
 
 public:
-	static throw_handler default;
+	static handler default;
 
 	// TODO: Add thrower to constructors
 	handler()
-		: actual_hndlr(&default) {}
-	handler(cl_int& error_code)
-		: hidden_hndlr(new code_handler(error_code)), actual_hndlr(hidden_hndlr.get()) {}
-
-	template<class... Args>
-	handler(typename async_handler<Args...>::function_t& hndlr)
-		: hidden_hndlr(new async_handler<Args...>(hndlr)), actual_hndlr(hidden_hndlr.get()), is_async(true) {}
-
-	handler(error_handler& hndlr)
-		: actual_hndlr(&hndlr) {}
+		: hidden_hndlr(new throw_handler()) {}
 
 	// Copy and move semantics
 	handler(const handler&) = default;
 #if MSVC_LOW
 	handler(handler&& move)
-		: SYCL_MOVE_INIT(hidden_hndlr), SYCL_MOVE_INIT(actual_hndlr), is_async(move.is_async)
+		: SYCL_MOVE_INIT(hidden_hndlr), is_async(move.is_async), thrower(move.thrower)
 	{}
 	friend void swap(handler& first, handler& second) {
 		using std::swap;
 		SYCL_SWAP(hidden_hndlr);
-		SYCL_SWAP(actual_hndlr);
 		SYCL_SWAP(is_async);
+		SYCL_SWAP(thrower);
 	}
 #else
 	handler(handler&&) = default;
@@ -194,7 +142,7 @@ private:
 	// TODO: SYCL-specific codes
 	void report(cl_int error_code, bool is_sycl_specific) const {
 		cl_exception e(thrower, error_code);
-		actual_hndlr->report_error(e);
+		hidden_hndlr->report_error(e);
 	}
 public:
 	void report(cl_int error_code) const {
@@ -202,20 +150,6 @@ public:
 	}
 	void report(detail::error::code::value_t error_code) const {
 		report(error_code, true);
-	}
-	void report() const {
-		cl_exception e;
-		bool right_type = true;
-		try {
-			e = cl_exception(thrower, ((code_handler*)actual_hndlr)->error_code);
-		}
-		catch(std::bad_cast&) {
-			right_type = false;
-			// TODO: Do something else?
-		}
-		if(right_type) {
-			actual_hndlr->report_error(e);
-		}
 	}
 
 	void set_thrower(context* thrower) {
@@ -227,10 +161,6 @@ public:
 			// TODO
 			//((async_handler*)actual_hndlr)->apply();
 		}
-	}
-
-	error_handler& get() {
-		return *actual_hndlr;
 	}
 };
 

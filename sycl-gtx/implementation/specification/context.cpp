@@ -4,7 +4,7 @@
 
 using namespace cl::sycl;
 
-error_handler& context::default_error = detail::error::handler::default;
+detail::error::handler& context::default_error = detail::error::handler::default;
 
 refc::ptr<cl_context> context::reserve(cl_context c) {
 	return refc::allocate(c, clReleaseContext);
@@ -23,7 +23,7 @@ context::context(
 	const cl_context_properties* properties,
 	vector_class<device> target_devices_,
 	const device_selector& dev_sel,
-	error_handler& handler,
+	detail::error::handler& handler,
 	platform* plt,
 	context_notify* ctx_notify
 ) : ctx(reserve(c)), handler(handler), target_devices(target_devices_) {

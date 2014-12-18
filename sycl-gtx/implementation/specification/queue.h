@@ -20,7 +20,7 @@ private:
 	device dev;
 	context ctx;
 
-	static error_handler& default_error;
+	static detail::error::handler& default_error;
 	detail::error::handler handler = default_error;
 
 	void create_queue(cl_command_queue_properties* properties = nullptr);

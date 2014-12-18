@@ -2,4 +2,4 @@
 
 using namespace cl::sycl::detail::error;
 
-throw_handler handler::default;
+handler handler::default;

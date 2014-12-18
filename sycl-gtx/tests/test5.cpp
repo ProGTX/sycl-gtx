@@ -3,13 +3,6 @@
 #define DISPLAY_TRAIT(object, trait)	\
 debug(#trait ":\t") << object.get_info<trait>();
 
-class handler : public cl::sycl::error_handler {
-public:
-	virtual void report_error(cl::sycl::exception& error) const override {
-		debug("OpenCL error:\t") << ((cl::sycl::cl_exception&)error).get_cl_code();
-	}
-};
-
 bool test5() {
 	debug();
 	using namespace cl::sycl;
@@ -63,7 +56,6 @@ bool test5() {
 	debug();
 
 	debug("= Trying to throw an exception");
-	handler h;
 	device dd;
 	devices.clear();
 	try {
