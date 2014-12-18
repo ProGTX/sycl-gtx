@@ -16,12 +16,12 @@ namespace sycl {
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
 private:
+	static detail::error::handler& default_error;
+	detail::error::handler handler = default_error;
+
 	refc::ptr<cl_command_queue> command_q;
 	device dev;
 	context ctx;
-
-	static detail::error::handler& default_error;
-	detail::error::handler handler = default_error;
 
 	void create_queue(cl_command_queue_properties* properties = nullptr);
 public:

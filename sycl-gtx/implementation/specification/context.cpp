@@ -27,6 +27,7 @@ context::context(
 	platform* plt,
 	context_notify* ctx_notify
 ) : ctx(reserve(c)), handler(handler), target_devices(target_devices_) {
+	handler.set_thrower(this);
 	if(c == nullptr) {
 		cl_uint num_devices = target_devices.size();
 

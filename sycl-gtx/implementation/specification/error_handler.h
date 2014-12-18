@@ -118,9 +118,10 @@ private:
 public:
 	static handler default;
 
-	// TODO: Add thrower to constructors
 	handler()
 		: hidden_hndlr(new throw_handler()) {}
+	handler(context& thrower)
+		: thrower(&thrower), hidden_hndlr(new throw_handler()) {}
 
 	// Copy and move semantics
 	handler(const handler&) = default;

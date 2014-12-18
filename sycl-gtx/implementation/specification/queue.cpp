@@ -17,31 +17,26 @@ queue::queue()
 	: queue(*(device_selector::default)) {}
 
 queue::queue(cl_command_queue cl_queue)
-	: command_q(refc::allocate(cl_queue, clReleaseCommandQueue)) {
+	: handler(ctx), command_q(refc::allocate(cl_queue, clReleaseCommandQueue)) {
 	auto error_code = clRetainCommandQueue(cl_queue);
 	handler.report(error_code);
 
 	ctx = context(get_info<CL_QUEUE_CONTEXT>());
-	handler.set_thrower(&ctx);
-
 	dev = device(get_info<CL_QUEUE_DEVICE>());
 }
 
 queue::queue(const device_selector& selector)
-	: dev(selector), ctx(dev) {
-	handler.set_thrower(&ctx);
+	: handler(ctx), dev(selector), ctx(dev) {
 	create_queue();
 }
 
 queue::queue(const device& queue_device)
-	: dev(queue_device), ctx(dev) {
-	handler.set_thrower(&ctx);
+	: handler(ctx), dev(queue_device), ctx(dev) {
 	create_queue();
 }
 
 queue::queue(const context& dev_context, device_selector& selector)
-	: ctx(dev_context) {
-	handler.set_thrower(&ctx);
+	: handler(ctx), ctx(dev_context) {
 	auto devices = ctx.get_devices();
 	auto best_id = detail::best_device_id(selector, devices);
 	if(best_id < 0) {
@@ -54,8 +49,7 @@ queue::queue(const context& dev_context, device_selector& selector)
 }
 
 queue::queue(const context& dev_context, const device& dev_device, cl_command_queue_properties* properties)
-	: dev(dev_device), ctx(dev_context) {
-	handler.set_thrower(&ctx);
+	: handler(ctx), dev(dev_device), ctx(dev_context) {
 	create_queue(properties);
 }
 
