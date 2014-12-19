@@ -13,9 +13,16 @@ namespace sycl {
 
 namespace detail {
 
-struct command_group_ {
+class cmd_group {
+private:
+	friend class ::cl::sycl::command_group;
 	// TODO: Should be thread_local
 	static command_group* last;
+public:
+	using command_t = function_class<void>;
+	static void add(command_t command);
+	static bool in_scope();
+	static void flush();
 };
 
 } // namespace detail
@@ -24,12 +31,12 @@ struct command_group_ {
 // for queued data transfers that it needs in order for its execution to be successful.
 class command_group {
 private:
-	void enter() {
-		detail::command_group_::last = this;
-	}
-	void exit() {
-		detail::command_group_::last = nullptr;
-	}
+	friend class detail::cmd_group;
+	using command_t = detail::cmd_group::command_t;
+	vector_class<command_t> commands;
+
+	void enter();
+	void exit();
 public:
 	// Constructs a command group with the queue the group will enqueue its commands to
 	// and a lambda function or function object containing the body of commands to enqueue.
