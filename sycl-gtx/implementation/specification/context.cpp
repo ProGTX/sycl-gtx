@@ -23,10 +23,10 @@ context::context(
 	const cl_context_properties* properties,
 	vector_class<device> target_devices_,
 	const device_selector& dev_sel,
-	detail::error::handler& handler,
+	detail::error::handler& handler_,
 	platform* plt,
 	context_notify* ctx_notify
-) : ctx(reserve(c)), handler(handler), target_devices(target_devices_) {
+) : ctx(reserve(c)), handler(handler_), target_devices(target_devices_) {
 	handler.set_thrower(this);
 	if(c == nullptr) {
 		cl_uint num_devices = target_devices.size();
@@ -50,13 +50,13 @@ context::context(
 		cl_int error_code;
 		c = clCreateContext(properties, num_devices, devices.data(), pfn_notify, ctx_notify, &error_code);
 		if(pfn_notify == nullptr) {
-			this->handler.report(error_code);
+			handler.report(error_code);
 		}
 		ctx = reserve(c);
 	}
 	else {
 		auto error_code = clRetainContext(c);
-		this->handler.report(error_code);
+		handler.report(error_code);
 	}
 }
 

@@ -46,6 +46,7 @@ queue::queue(const context& dev_context, device_selector& selector)
 	else {
 		dev = std::move(devices[best_id]);
 	}
+	create_queue();
 }
 
 queue::queue(const context& dev_context, const device& dev_device, cl_command_queue_properties* properties)
