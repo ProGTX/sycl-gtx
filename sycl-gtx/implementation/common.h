@@ -40,7 +40,21 @@ namespace sycl {
 #ifndef CL_SYCL_NO_STD_FUNCTION
 	template<class... Args>
 #if MSVC_LOW
-	class function_class : public ::std::function<void(Args...)> {};
+	class function_class : public ::std::function<void(Args...)> {
+	private:
+		using Base = ::std::function<void(Args...)>;
+	public:
+		function_class() {}
+		function_class(nullptr_t fn)
+			: Base(fn) {}
+		template <class Fn>
+		function_class(Fn fn)
+			: Base(fn) {}
+		function_class(const Base& x)
+			: Base(x) {}
+		function_class(Base&& x)
+			: Base(std::move(x)) {}
+	};
 #else
 	using function_class = ::std::function<void(Args...)>;
 #endif
