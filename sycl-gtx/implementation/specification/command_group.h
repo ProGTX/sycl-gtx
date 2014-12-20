@@ -18,11 +18,20 @@ private:
 	friend class ::cl::sycl::command_group;
 	// TODO: Should be thread_local
 	static command_group* last;
+
+	template <class... Args>
+	using fn = void(*)(queue*, Args...);
+
 public:
-	using command_t = function_class<void>;
-	static void add(command_t command);
+	template<class... Args>
+	static void add(fn<Args...> function, Args... params) {
+		last->commands.push_back(std::bind(function, std::placeholders::_1, params...));
+	}
+
 	static bool in_scope();
-	static void flush();
+	static void flush(queue* q);
+
+	using command_t = function_class<queue*>;
 };
 
 } // namespace detail

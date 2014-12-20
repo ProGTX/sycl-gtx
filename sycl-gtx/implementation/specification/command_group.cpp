@@ -14,13 +14,9 @@ using namespace detail;
 
 command_group* cmd_group::last = nullptr;
 
-void cmd_group::add(command_t command) {
-	last->commands.push_back(command);
-}
-
-void cmd_group::flush() {
+void cmd_group::flush(queue* q) {
 	for(auto&& command : last->commands) {
-		command();
+		command(q);
 	}
 	last->commands.clear();
 }
