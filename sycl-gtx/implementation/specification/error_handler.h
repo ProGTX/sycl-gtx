@@ -109,6 +109,13 @@ public:
 	}
 };
 
+struct report {
+	template<class T>
+	report(T* caller, cl_int error_code) {
+		caller->handler.report(error_code);
+	}
+};
+
 class handler {
 private:
 	std::shared_ptr<throw_handler> hidden_hndlr;

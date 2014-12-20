@@ -16,6 +16,8 @@ namespace sycl {
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
 private:
+	friend struct detail::error::report;
+
 	static detail::error::handler& default_error;
 	detail::error::handler handler = default_error;
 
