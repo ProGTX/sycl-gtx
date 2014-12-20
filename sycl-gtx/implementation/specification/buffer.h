@@ -111,8 +111,9 @@ private:
 	template<cl_mem_flags FLAGS>
 	static void create(queue* q, buffer_* buffer) {
 		cl_int error_code;
+		const cl_mem_flags all_flags = FLAGS | ((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR);
 		buffer->device_data = refc::allocate(
-			clCreateBuffer(q->get_context().get(), FLAGS, buffer->get_size(), buffer->host_data, &error_code),
+			clCreateBuffer(q->get_context().get(), all_flags, buffer->get_size(), buffer->host_data, &error_code),
 			clReleaseMemObject
 		);
 		error::report(q, error_code);
