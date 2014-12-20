@@ -31,7 +31,7 @@ template <typename DataType, int dimensions>
 class buffer_ {
 protected:
 	range<dimensions> rang;
-	const DataType* host_data;
+	DataType* host_data = nullptr;
 	cl_mem device_data;
 	bool is_blocking = true;
 	bool is_initialized = false;
@@ -39,7 +39,7 @@ protected:
 	detail::error::handler handler;
 
 	// Associated host memory.
-	buffer_(const DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
+	buffer_(DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
 		: host_data(host_data), rang(range), is_read_only(is_read_only), is_blocking(is_blocking) {
 		DSELF() << "not implemented";
 	}
@@ -108,24 +108,39 @@ public:
 	}
 
 private:
+	template<cl_mem_flags FLAGS>
 	static void create(queue* q, buffer_* buffer) {
 		cl_int error_code;
-		buffer->device_data = clCreateBuffer(q->get_context().get(), CL_MEM_READ_ONLY, buffer->get_size(), nullptr, &error_code);
+		buffer->device_data = clCreateBuffer(q->get_context().get(), FLAGS, buffer->get_size(), buffer->host_data, &error_code);
 		error::report(q, error_code);
 	}
 
-public:
-	// TODO: Take read_only into consideration
-	template<access::mode mode, access::target target = access::global_buffer>
-	accessor<DataType, dimensions, mode, target> get_access() {
+	void check_scope() {
 		if(!cmd_group::in_scope()) {
 			handler.report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
 		}
+	}
+
+	template<cl_mem_flags FLAGS>
+	void init() {
 		if(!is_initialized) {
-			cmd_group::add(create, this);
+			cmd_group::add(create<FLAGS>, this);
 			is_initialized = true;
 		}
-		return accessor<DataType, dimensions, mode, target>(*reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this));
+	}
+
+	template<access::mode mode, access::target target>
+	accessor<DataType, dimensions, mode, target> create_accessor() {
+		return accessor<DataType, dimensions, mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
+	}
+
+public:
+	// TODO: Take mode and target into consideration
+	template<access::mode mode, access::target target = access::global_buffer>
+	accessor<DataType, dimensions, mode, target> get_access() {
+		check_scope();
+		init<CL_MEM_READ_WRITE>();
+		return create_accessor<mode, target>();
 	}
 };
 
