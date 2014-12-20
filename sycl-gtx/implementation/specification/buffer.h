@@ -111,7 +111,7 @@ private:
 	static void create(queue* q, buffer_* buffer) {
 		cl_int error_code;
 		buffer->device_data = clCreateBuffer(q->get_context().get(), CL_MEM_READ_ONLY, buffer->get_size(), nullptr, &error_code);
-		detail::error::report(q, error_code);
+		error::report(q, error_code);
 	}
 
 public:

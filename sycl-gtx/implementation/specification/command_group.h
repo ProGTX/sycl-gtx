@@ -29,7 +29,7 @@ public:
 	}
 
 	static bool in_scope();
-	static void flush(queue* q);
+	static void flush();
 
 	using command_t = function_class<queue*>;
 };
@@ -42,7 +42,9 @@ class command_group {
 private:
 	friend class detail::cmd_group;
 	using command_t = detail::cmd_group::command_t;
+
 	vector_class<command_t> commands;
+	queue* q;
 
 	void enter();
 	void exit();
@@ -50,7 +52,8 @@ public:
 	// Constructs a command group with the queue the group will enqueue its commands to
 	// and a lambda function or function object containing the body of commands to enqueue.
 	template <typename functorT>
-	command_group(queue& primaryQueue, functorT lambda) {
+	command_group(queue& primaryQueue, functorT lambda)
+		: q(&primaryQueue) {
 		enter();
 		lambda();
 		exit();
