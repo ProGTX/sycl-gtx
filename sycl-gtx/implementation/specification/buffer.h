@@ -32,7 +32,7 @@ class buffer_ {
 protected:
 	range<dimensions> rang;
 	DataType* host_data = nullptr;
-	cl_mem device_data;
+	refc::ptr<cl_mem> device_data;
 	bool is_blocking = true;
 	bool is_initialized = false;
 	bool is_read_only = false;
@@ -111,7 +111,10 @@ private:
 	template<cl_mem_flags FLAGS>
 	static void create(queue* q, buffer_* buffer) {
 		cl_int error_code;
-		buffer->device_data = clCreateBuffer(q->get_context().get(), FLAGS, buffer->get_size(), buffer->host_data, &error_code);
+		buffer->device_data = refc::allocate(
+			clCreateBuffer(q->get_context().get(), FLAGS, buffer->get_size(), buffer->host_data, &error_code),
+			clReleaseMemObject
+		);
 		error::report(q, error_code);
 	}
 
