@@ -7,7 +7,6 @@
 #include "event.h"
 #include "ranges.h"
 #include "refc.h"
-#include "queue.h"
 #include "../common.h"
 #include "../debug.h"
 #include <vector>
@@ -16,19 +15,24 @@ namespace cl {
 namespace sycl {
 
 // Forward declarations
-template <typename DataType, int dimensions = 1>
-struct buffer;
 template <typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor;
+template <typename DataType, int dimensions = 1>
+struct buffer;
 class command_group;
+class queue;
 
 namespace detail {
 
+// Forward declaration
+struct cmd_queue;
+
 template <typename DataType, int dimensions>
 class buffer_ {
-private:
+protected:
 	range<dimensions> rang;
-	refc::ptr<cl_mem> data;
+	const DataType* host_data;
+	cl_mem device_data;
 	bool is_blocking = true;
 	bool is_initialized = false;
 	bool is_read_only = false;
@@ -36,7 +40,7 @@ private:
 
 	// Associated host memory.
 	buffer_(const DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
-		: rang(range), is_read_only(is_read_only), is_blocking(is_blocking) {
+		: host_data(host_data), rang(range), is_read_only(is_read_only), is_blocking(is_blocking) {
 		DSELF() << "not implemented";
 	}
 
@@ -103,12 +107,23 @@ public:
 		return get_count() * sizeof(DataType);
 	}
 
+private:
+	static void create(queue* q, buffer_* buffer) {
+		cl_int error_code;
+		buffer->device_data = clCreateBuffer(q->get_context().get(), CL_MEM_READ_ONLY, buffer->get_size(), nullptr, &error_code);
+		detail::error::report(q, error_code);
+	}
+
 public:
 	// TODO: Take read_only into consideration
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
-		if(command_group_::last == nullptr) {
+		if(!cmd_group::in_scope()) {
 			handler.report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
+		}
+		if(!is_initialized) {
+			cmd_group::add(create, this);
+			is_initialized = true;
 		}
 		return accessor<DataType, dimensions, mode, target>(*reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this));
 	}
