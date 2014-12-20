@@ -134,14 +134,30 @@ private:
 		return accessor<DataType, dimensions, mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
 	}
 
-public:
-	// TODO: Take mode and target into consideration
-	template<access::mode mode, access::target target = access::global_buffer>
+	template<access::mode mode, access::target target, cl_mem_flags FLAGS>
 	accessor<DataType, dimensions, mode, target> get_access() {
 		check_scope();
-		init<CL_MEM_READ_WRITE>();
+		init<FLAGS>();
 		return create_accessor<mode, target>();
 	}
+
+public:
+	template<access::mode mode, access::target target = access::global_buffer>
+	accessor<DataType, dimensions, mode, target> get_access() {
+		return get_access<mode, target, CL_MEM_READ_WRITE>();
+	}
+
+#define SYCL_GET_ACCESS(mode, target, flags)					\
+	template<>													\
+	accessor<DataType, dimensions, mode, target> get_access() {	\
+		return get_access<mode, target, flags>();				\
+	}
+
+	// TODO: Implement other combinations
+	SYCL_GET_ACCESS(access::read, access::global_buffer, CL_MEM_READ_ONLY);
+	SYCL_GET_ACCESS(access::write, access::global_buffer, CL_MEM_WRITE_ONLY);
+
+#undef SYCL_GET_ACCESS
 };
 
 } // namespace detail
