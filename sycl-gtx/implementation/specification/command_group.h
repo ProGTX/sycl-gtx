@@ -16,6 +16,7 @@ namespace detail {
 class cmd_group {
 private:
 	friend class ::cl::sycl::command_group;
+
 	// TODO: Should be thread_local
 	static command_group* last;
 
@@ -27,10 +28,7 @@ public:
 	static void add(fn<Args...> function, Args... params) {
 		last->commands.push_back(std::bind(function, std::placeholders::_1, params...));
 	}
-
 	static bool in_scope();
-	static void flush();
-
 	using command_t = function_class<queue*>;
 };
 
@@ -48,6 +46,7 @@ private:
 
 	void enter();
 	void exit();
+	void flush();
 public:
 	// Constructs a command group with the queue the group will enqueue its commands to
 	// and a lambda function or function object containing the body of commands to enqueue.
@@ -66,6 +65,8 @@ public:
 	// the SYCL runtime will try to re-schedule the whole command group to the secondary queue.
 	template <typename functorT>
 	command_group(queue& primaryQueue, queue& secondaryQueue, functorT lambda);
+
+	~command_group();
 
 	// Return the event object that the command group waits on to begin execution.
 	event start_event() {
