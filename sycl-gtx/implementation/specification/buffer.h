@@ -132,33 +132,37 @@ private:
 		}
 	}
 
+	void check_write() {
+		if(is_read_only) {
+			handler.report(error::code::TRYING_TO_WRITE_READ_ONLY_BUFFER);
+		}
+	}
+
 	template<access::mode mode, access::target target>
 	accessor<DataType, dimensions, mode, target> create_accessor() {
 		return accessor<DataType, dimensions, mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
 	}
 
-	template<access::mode mode, access::target target, cl_mem_flags FLAGS>
-	accessor<DataType, dimensions, mode, target> get_access() {
-		check_scope();
-		init<FLAGS>();
-		return create_accessor<mode, target>();
-	}
-
 public:
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
-		return get_access<mode, target, CL_MEM_READ_WRITE>();
+		check_scope();
+		init<CL_MEM_READ_ONLY>();
+		return create_accessor<mode, target>();
 	}
 
-#define SYCL_GET_ACCESS(mode, target, flags)					\
+#define SYCL_GET_ACCESS(mode, target, flags, code)				\
 	template<>													\
 	accessor<DataType, dimensions, mode, target> get_access() {	\
-		return get_access<mode, target, flags>();				\
+		check_scope();											\
+		code;													\
+		init<flags>();											\
+		return create_accessor<mode, target>();					\
 	}
 
 	// TODO: Implement other combinations
-	SYCL_GET_ACCESS(access::read, access::global_buffer, CL_MEM_READ_ONLY);
-	SYCL_GET_ACCESS(access::write, access::global_buffer, CL_MEM_WRITE_ONLY);
+	SYCL_GET_ACCESS(access::write, access::global_buffer, CL_MEM_WRITE_ONLY, check_write());
+	SYCL_GET_ACCESS(access::read_write, access::global_buffer, CL_MEM_READ_WRITE, check_write());
 
 #undef SYCL_GET_ACCESS
 };

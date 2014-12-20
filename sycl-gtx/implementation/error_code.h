@@ -97,6 +97,7 @@ struct code {
 	enum value_t : int {
 		GENERAL_FAILURE = 1,
 		NOT_IN_COMMAND_GROUP_SCOPE,
+		TRYING_TO_WRITE_READ_ONLY_BUFFER
 	};
 };
 
@@ -106,6 +107,7 @@ struct code {
 static const std::unordered_map<code::value_t, string_class> codes = {
 	SYCL_ADD_ERROR(code::GENERAL_FAILURE),
 	SYCL_ADD_ERROR(code::NOT_IN_COMMAND_GROUP_SCOPE),
+	SYCL_ADD_ERROR(code::TRYING_TO_WRITE_READ_ONLY_BUFFER),
 };
 
 } // namespace error
