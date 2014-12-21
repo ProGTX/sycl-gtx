@@ -1,7 +1,7 @@
 #pragma once
 
-// 3.4 Expressing parallelism through kernels
-// 3.4.1 is not included here, but rather in ranges.h
+// 3.7 Expressing parallelism through kernels
+// 3.7.1 is not included here, but rather in ranges.h
 
 #include "../common.h"
 #include "../debug.h"
@@ -10,58 +10,66 @@
 namespace cl {
 namespace sycl {
 
-// 3.4.2 Defining kernels
+// 3.7.2.5 Kernel class
 
-// typename T: kernel functor type
-template <typename T>
 class kernel {
-	kernel<typename T>(context target_cont, device target_dev) {
-		DSELF() << "not implemented";
-	}
-	kernel(context target_cont, device target_dev, string_class string_kernel, string_class string_name) {
-		DSELF() << "not implemented";
-	}
+private:
+	friend class program;
+public:
+	// The default object is not valid because there is no
+	// program or cl_kernel associated with it
+	kernel() = delete;
 
-	cl_kernel get();
-	context get_context();
-	program get_program();
-	string_class get_kernel_attributes();
-	string_class get_function_name();
-	void set_arg(int arg_index, accessor acc_obj);
+	// Constructs from a valid, initialized OpenCL kernel
+	kernel(cl_kernel openclKernelObejct);
 
-	template<typename T>
-	void set_arg(int arg_index, T scalar_value);
+	// Return the OpenCL kernel object for this kernel.
+	cl_kernel get() const;
+
+	// Return the context that this kernel is defined for.
+	context get_context() const;
+
+	// Return the program that this kernel is part of.
+	program get_program() const;
+
+	// Return the name of the kernel function.
+	string_class get_kernel_attributes() const;
+
+	template<cl_int name>
+	typename detail::param_traits<cl_kernel_info, name>::param_type get_info() const;
 };
 
-// 3.4.3 Invoking kernels
+// 3.7.3 Invoking kernels
 
-template <typename functorT>
-void single_task(functorT f) {
-	DSELF() << "not implemented";
+// TODO: Passing kernel names
+// Will need to divert slightly from the specification
+
+template<class KernelType>
+void single_task(string_class KernelName, KernelType kern) {
+	DSELF() << "not implemented.";
 }
 
-template <typename functorT>
-void parallel_for(int total_number_of_work_items, functorT f) {
-	DSELF() << "not implemented";
-}
+/*
 
-template <typename functorT>
-functorT kernel_lambda(string_class name, functorT f) {
-	DSELF() << "not implemented";
-	return f;
-}
+template<typename KernelName, class KernelType>
+void single_task(KernelType);
 
-template <typename functorT>
-functorT kernel_functor(string_class name, functorT f) {
-	DSELF() << "not implemented";
-	return f;
-}
+template<typename KernelName, class KernelType, int dimensions>
+void parallel_for(range<dimensions> num_work_items, KernelType);
 
-template <typename functorT>
-functorT kernel_functor(functorT f) {
-	DSELF() << "not implemented";
-	return f;
-}
+template<typename KernelName, class KernelType, int dimensions>
+void parallel_for(range<dimensions> num_work_items, id<dimensions> work_item_offset, KernelType);
+
+template<typename KernelName, class KernelType, int dimensions>
+void parallel_for(nd_range<dimensions> execution_range, KernelType);
+
+template<class KernelName, class WorkgroupFunctionType, int dimensions>
+void parallel_for_work_group(range<dimensions> num_work_groups, WorkgroupFunctionType);
+
+template<class KernelType, int dimensions>
+void parallel_for_work_item(group num_work_items, KernelType);
+
+*/
 
 } // namespace sycl
 } // namespace cl
