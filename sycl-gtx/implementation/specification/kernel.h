@@ -9,8 +9,9 @@
 namespace cl {
 namespace sycl {
 
-// Forward declaration
+// Forward declarations
 class program;
+class context;
 
 // 3.7.2.5 Kernel class
 

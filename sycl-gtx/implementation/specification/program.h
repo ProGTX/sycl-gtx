@@ -3,14 +3,14 @@
 // 3.7.2.6 Program class
 
 #include "../common.h"
-#include "context.h"
-#include "device.h"
 
 namespace cl {
 namespace sycl {
 
-// Forward declaration
+// Forward declarations
 class kernel;
+class context;
+class device;
 
 class program {
 public:
