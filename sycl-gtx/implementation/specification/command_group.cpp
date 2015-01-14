@@ -31,3 +31,9 @@ command_group* cmd_group::last = nullptr;
 bool cmd_group::in_scope() {
 	return last != nullptr;
 }
+
+void cmd_group::check_scope(error::handler& handler) {
+	if(!in_scope()) {
+		handler.report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
+	}
+}

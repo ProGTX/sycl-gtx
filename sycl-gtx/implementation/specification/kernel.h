@@ -23,7 +23,7 @@ public:
 	kernel() = delete;
 
 	// Constructs from a valid, initialized OpenCL kernel
-	kernel(cl_kernel openclKernelObejct);
+	kernel(cl_kernel openclKernelObject);
 
 	// Return the OpenCL kernel object for this kernel.
 	cl_kernel get() const;
@@ -48,6 +48,8 @@ public:
 
 template<class KernelType>
 void single_task(string_class KernelName, KernelType kern) {
+	using detail::cmd_group;
+	cmd_group::check_scope();
 	DSELF() << "not implemented.";
 }
 

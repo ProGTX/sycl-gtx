@@ -119,12 +119,6 @@ private:
 		error::report(q, error_code);
 	}
 
-	void check_scope() {
-		if(!cmd_group::in_scope()) {
-			handler.report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
-		}
-	}
-
 	template<cl_mem_flags FLAGS>
 	void init() {
 		if(!is_initialized) {
@@ -147,7 +141,7 @@ private:
 public:
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
-		check_scope();
+		cmd_group::check_scope(handler);
 		init<CL_MEM_READ_ONLY>();
 		return create_accessor<mode, target>();
 	}
@@ -155,7 +149,7 @@ public:
 #define SYCL_GET_ACCESS(mode, target, flags, code)				\
 	template<>													\
 	accessor<DataType, dimensions, mode, target> get_access() {	\
-		check_scope();											\
+		cmd_group::check_scope(handler);						\
 		code;													\
 		init<flags>();											\
 		return create_accessor<mode, target>();					\

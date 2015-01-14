@@ -29,8 +29,13 @@ public:
 		last->commands.push_back(std::bind(function, std::placeholders::_1, params...));
 	}
 	static bool in_scope();
+	static void check_scope(error::handler& handler = error::handler::default);
+
 	using command_t = function_class<queue*>;
 };
+
+
+
 
 } // namespace detail
 

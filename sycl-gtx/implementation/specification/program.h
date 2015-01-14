@@ -39,8 +39,7 @@ public:
 	kernel get_kernel() const;
 	
 	template<cl_int name> typename
-	param_traits<cl_program_info, name>::param_type
-	get_info() const;
+	param_traits<cl_program_info, name>::param_type get_info() const;
 
 	vector_class<vector_class<char>> get_binaries() const;
 	vector_class<::size_t> get_binary_sizes() const;
