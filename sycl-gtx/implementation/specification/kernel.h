@@ -39,7 +39,7 @@ public:
 	string_class get_kernel_attributes() const;
 
 	template<cl_int name>
-	typename detail::param_traits<cl_kernel_info, name>::param_type get_info() const;
+	typename param_traits<cl_kernel_info, name>::param_type get_info() const;
 };
 
 // 3.7.3 Invoking kernels
@@ -47,10 +47,19 @@ public:
 // TODO: Passing kernel names
 // Will need to divert slightly from the specification
 
+namespace detail {
+
+// TODO: Create kernel source
+// TODO: Check for kernel scope
+
+} // namespace detail
+
 template<class KernelType>
 void single_task(string_class KernelName, KernelType kern) {
 	using detail::cmd_group;
 	cmd_group::check_scope();
+	// TODO: Create kernel source
+	// TODO: Enqueue kernel invocation
 	DSELF() << "not implemented.";
 }
 
