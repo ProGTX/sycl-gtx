@@ -17,7 +17,11 @@ class cmd_group {
 private:
 	friend class ::cl::sycl::command_group;
 
-	// TODO: Should be thread_local
+#if MSVC_LOW
+	__declspec(thread)
+#else
+	thread_local
+#endif
 	static command_group* last;
 
 	template <class... Args>
@@ -33,9 +37,6 @@ public:
 
 	using command_t = function_class<queue*>;
 };
-
-
-
 
 } // namespace detail
 
