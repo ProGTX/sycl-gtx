@@ -5,10 +5,12 @@
 
 #include "../common.h"
 #include "../debug.h"
-#include "program.h"
 
 namespace cl {
 namespace sycl {
+
+// Forward declaration
+class program;
 
 // 3.7.2.5 Kernel class
 
