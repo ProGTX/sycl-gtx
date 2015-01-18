@@ -27,9 +27,12 @@ namespace detail {
 // Forward declaration
 struct cmd_queue;
 
+static unsigned int buffer_counter = 0;
+
 template <typename DataType, int dimensions>
 class buffer_ {
 protected:
+	string_class name;
 	range<dimensions> rang;
 	DataType* host_data = nullptr;
 	refc::ptr<cl_mem> device_data;
@@ -119,10 +122,16 @@ private:
 		error::report(q, error_code);
 	}
 
+	// TODO: to_string may be a problem if string_class not std::string
+	void generate_name() {
+		name = name + "sycl_buf_" + std::to_string(++buffer_counter);
+	}
+
 	template<cl_mem_flags FLAGS>
 	void init() {
 		if(!is_initialized) {
 			cmd_group::add(create<FLAGS>, this);
+			generate_name();
 			is_initialized = true;
 		}
 	}
@@ -146,6 +155,7 @@ public:
 		return create_accessor<mode, target>();
 	}
 
+	// TODO: Handle multiple access requests
 #define SYCL_GET_ACCESS(mode, target, flags, code)				\
 	template<>													\
 	accessor<DataType, dimensions, mode, target> get_access() {	\
