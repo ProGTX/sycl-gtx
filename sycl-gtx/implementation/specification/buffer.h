@@ -170,6 +170,22 @@ public:
 	SYCL_GET_ACCESS(access::read_write, access::global_buffer, CL_MEM_READ_WRITE, check_write());
 
 #undef SYCL_GET_ACCESS
+
+private:
+	// TODO
+	void enqueue(queue* q, buffer_* buffer, decltype(&clEnqueueWriteBuffer) clEnqueueBuffer) {
+		cl_int error_code = clEnqueueBuffer(
+			q->get(),
+			buffer->device_data.get(),
+			// TODO: Should it block?
+			false,
+			// TODO: Sub-buffer access
+			0, buffer->get_size(),
+			// TODO: Events
+			buffer->host_data, 0, nullptr, nullptr
+		);
+		error::report(q, error_code);
+	}
 };
 
 } // namespace detail
