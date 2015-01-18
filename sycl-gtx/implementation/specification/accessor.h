@@ -57,11 +57,31 @@ class accessor_<DataType, dimensions, mode, target, select_target<(condition)>>	
 	: public accessor_core<DataType, dimensions, (access::mode)mode, (access::target)target>
 
 // 3.6.4.4 Buffer accessors
-SYCL_ACCESSOR_CLASS(target == access::global_buffer || target == access::constant_buffer || target == access::host_buffer) {
+SYCL_ACCESSOR_CLASS(
+	target == access::cl_buffer			||
+	target == access::constant_buffer	||
+	target == access::global_buffer		||
+	target == access::host_buffer
+) {
+private:
+	cl::sycl::buffer<DataType, dimensions>* buf;
 public:
-	accessor_(cl::sycl::buffer<DataType, dimensions>& targette) {
+	// This accessor limits the processing of the buffer to the [offset, offset + range] for every dimension
+	// Any other parts of the buffer will be unaffected
+	accessor_(
+		cl::sycl::buffer<DataType, dimensions>& bufferRef,
+		range<dimensions> offset,
+		range<dimensions> range
+	)	: buf(&bufferRef) {
 		DSELF() << "not implemented";
 	}
+
+	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef)
+		: accessor_(
+			bufferRef,
+			range<dimensions>::range(vector_class<size_t>(dimensions, 0).data()),
+			bufferRef.get_range()
+		) {}
 };
 
 } // namespace detail
