@@ -17,6 +17,7 @@ class cmd_group {
 private:
 	friend class ::cl::sycl::command_group;
 
+	// TODO: Need to deal better with threads
 #if MSVC_LOW
 	__declspec(thread)
 #else
