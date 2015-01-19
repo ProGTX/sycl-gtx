@@ -44,20 +44,44 @@ public:
 
 // 3.7.3 Invoking kernels
 
+namespace detail {
+namespace kernel_ {
+
+class source {
+private:
+	string_class KernelName;
+	vector_class<string_class> src;
+
+	// TODO: Need also a vector of accessors
+	// Possibly store a tuple of access mode, target, and some accessor metadata (hash?)
+
+public:
+	template<class KernelType>
+	source(string_class KernelName, KernelType kern)
+		: KernelName(KernelName) {
+		// TODO: Create kernel source
+		// TODO: Check for kernel scope
+	}
+
+	~source() {}
+};
+
+template<class KernelType>
+static void generate(string_class KernelName, KernelType kern) {
+	source(KernelName, kern);
+}
+
 // TODO: Passing kernel names
 // Will need to divert slightly from the specification
+// Diversion could be avoided if I could get functor name at compile time
 
-namespace detail {
-
-// TODO: Create kernel source
-// TODO: Check for kernel scope
-
+} // namespace kernel_
 } // namespace detail
 
 template<class KernelType>
 void single_task(string_class KernelName, KernelType kern) {
-	using detail::cmd_group;
-	cmd_group::check_scope();
+	detail::cmd_group::check_scope();
+	detail::kernel_::generate(KernelName, kern);
 	// TODO: Create kernel source
 	// TODO: Enqueue kernel invocation
 	DSELF() << "not implemented.";
