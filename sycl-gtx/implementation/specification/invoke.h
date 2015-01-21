@@ -26,7 +26,6 @@ private:
 	vector_class<string_class> src;
 	vector_class<std::tuple<access::mode, access::target, accessor_base*>> resources;
 
-public:
 	// TODO: Multithreading support
 	static source* scope;
 
@@ -35,7 +34,12 @@ public:
 		: KernelName(KernelName) {}
 
 	void execute();
+	string_class get_source() {
+		DSELF() << "not implemented";
+		return "";
+	}
 
+public:
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
 	static void add(accessor<DataType, dimensions, mode, target>& acc) {
 		if(scope == nullptr) {
@@ -45,29 +49,29 @@ public:
 
 		scope->resources.emplace_back(mode, target, &acc);
 	}
-
-	~source() {}
+	
+	template<class KernelType>
+	static string_class generate(string_class KernelName, KernelType kern) {
+		auto src = source(KernelName, kern);
+		source::scope = &src;
+		src.execute();
+		source::scope = nullptr;
+		return src.get_source();
+	}
 };
 
-template<class KernelType>
-static void generate(string_class KernelName, KernelType kern) {
-	auto src = source(KernelName, kern);
-	source::scope = &src;
-	src.execute();
-	source::scope = nullptr;
-}
+} // namespace kernel_
+} // namespace detail
+
 
 // TODO: Passing kernel names
 // Will need to divert slightly from the specification
 // Diversion could be avoided if I could get functor name at compile time
 
-} // namespace kernel_
-} // namespace detail
-
 template<class KernelType>
 void single_task(string_class KernelName, KernelType kern) {
 	detail::cmd_group::check_scope();
-	detail::kernel_::generate(KernelName, kern);
+	auto src = detail::kernel_::source::generate(KernelName, kern);
 	// TODO: Enqueue kernel invocation
 	DSELF() << "not implemented.";
 }
