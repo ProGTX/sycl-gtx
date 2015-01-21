@@ -79,7 +79,7 @@ public:
 	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef)
 		: accessor_(
 			bufferRef,
-			range<dimensions>::range(vector_class<size_t>(dimensions, 0).data()),
+			detail::empty_range<dimensions>(),
 			bufferRef.get_range()
 		) {}
 };

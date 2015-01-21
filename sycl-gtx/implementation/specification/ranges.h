@@ -107,6 +107,14 @@ sycl_static_range_ops(/);
 sycl_static_range_ops(+);
 sycl_static_range_ops(-);
 
+namespace detail {
+
+template<int dimensions>
+static range<dimensions> empty_range() {
+	return range<dimensions>(vector_class<size_t>(dimensions, 0).data());
+};
+
+}
 
 // TODO: 3.7.1.3 ID class
 template <int dimensions = 1>
