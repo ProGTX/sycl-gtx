@@ -9,6 +9,10 @@
 namespace cl {
 namespace sycl {
 
+// Forward declaration
+template <typename DataType, int dimensions, access::mode mode, access::target target>
+class accessor;
+
 namespace detail {
 
 // Forward declaration
@@ -23,16 +27,14 @@ private:
 	vector_class<std::tuple<access::mode, access::target, accessor_base*>> resources;
 
 public:
-	// TODO: Multithreading
+	// TODO: Multithreading support
 	static source* scope;
 
 	template<class KernelType>
 	source(string_class KernelName, KernelType kern)
 		: KernelName(KernelName) {}
 
-	void execute() {
-		// TODO: Create kernel source
-	}
+	void execute();
 
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
 	static void add(accessor<DataType, dimensions, mode, target>& acc) {
@@ -50,9 +52,9 @@ public:
 template<class KernelType>
 static void generate(string_class KernelName, KernelType kern) {
 	auto src = source(KernelName, kern);
-	//source::scope = &src;
+	source::scope = &src;
 	src.execute();
-	//source::scope = nullptr;
+	source::scope = nullptr;
 }
 
 // TODO: Passing kernel names
