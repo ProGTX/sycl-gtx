@@ -51,16 +51,28 @@ class source {
 private:
 	string_class KernelName;
 	vector_class<string_class> src;
-
-	// TODO: Need also a vector of accessors
-	// Possibly store a tuple of access mode, target, and some accessor metadata (hash?)
+	vector_class<std::tuple<access::mode, access::target, accessor_base*>> resources;
 
 public:
+	// TODO: Multithreading
+	static source* scope;
+
 	template<class KernelType>
 	source(string_class KernelName, KernelType kern)
-		: KernelName(KernelName) {
+		: KernelName(KernelName) {}
+
+	void execute() {
 		// TODO: Create kernel source
-		// TODO: Check for kernel scope
+	}
+
+	template <typename DataType, int dimensions, access::mode mode, access::target target>
+	static void add(accessor<DataType, dimensions, mode, target>& acc) {
+		if(scope == nullptr) {
+			error::report(acc, error::code::NOT_IN_KERNEL_SCOPE);
+			return;
+		}
+
+		scope->resources.emplace_back(mode, target, &acc);
 	}
 
 	~source() {}
@@ -68,7 +80,10 @@ public:
 
 template<class KernelType>
 static void generate(string_class KernelName, KernelType kern) {
-	source(KernelName, kern);
+	auto src = source(KernelName, kern);
+	//source::scope = &src;
+	src.execute();
+	//source::scope = nullptr;
 }
 
 // TODO: Passing kernel names
@@ -82,7 +97,6 @@ template<class KernelType>
 void single_task(string_class KernelName, KernelType kern) {
 	detail::cmd_group::check_scope();
 	detail::kernel_::generate(KernelName, kern);
-	// TODO: Create kernel source
 	// TODO: Enqueue kernel invocation
 	DSELF() << "not implemented.";
 }

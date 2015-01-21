@@ -41,6 +41,8 @@ protected:
 	bool is_read_only = false;
 	detail::error::handler handler;
 
+	friend class accessor_base;
+
 	// Associated host memory.
 	buffer_(DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
 		: host_data(host_data), rang(range), is_read_only(is_read_only), is_blocking(is_blocking) {

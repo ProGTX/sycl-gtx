@@ -28,9 +28,22 @@ public:
 
 namespace detail {
 
+class accessor_base {
+protected:
+	virtual string_class resource_name() {
+		DSELF() << "not implemented";
+		return "";
+	}
+
+	template <class ResourceType>
+	static string_class obtain_resource_name(ResourceType* resource) {
+		return resource->name;
+	}
+};
+
 // 3.6.4.3 Core accessors class
 template <typename DataType, int dimensions, access::mode mode, access::target target>
-class accessor_core {
+class accessor_core : public accessor_base {
 public:
 	// Returns the size of the underlying buffer in number of elements.
 	size_t get_size() const;
@@ -82,6 +95,10 @@ public:
 			detail::empty_range<dimensions>(),
 			bufferRef.get_range()
 		) {}
+
+	virtual string_class resource_name() override {
+		return obtain_resource_name(buf);
+	}
 };
 
 } // namespace detail
