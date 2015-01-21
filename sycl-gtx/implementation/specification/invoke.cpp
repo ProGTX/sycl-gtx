@@ -2,8 +2,15 @@
 
 using namespace cl::sycl;
 
-detail::kernel_::source* detail::kernel_::source::scope = nullptr;
+using namespace detail::kernel_;
 
-void detail::kernel_::source::execute() {
+source* source::scope = nullptr;
+
+void source::execute() {
 	// TODO: Create kernel source
+}
+
+string_class source::get_source() {
+	// TODO: Create kernel source
+	return "";
 }

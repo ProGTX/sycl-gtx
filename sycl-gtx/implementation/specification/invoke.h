@@ -34,10 +34,7 @@ private:
 		: KernelName(KernelName) {}
 
 	void execute();
-	string_class get_source() {
-		DSELF() << "not implemented";
-		return "";
-	}
+	string_class get_source();
 
 public:
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
