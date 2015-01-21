@@ -7,6 +7,7 @@
 #include "specification\command_group.h"
 #include "specification\context.h"
 #include "specification\device.h"
+#include "specification\invoke.h"
 #include "specification\kernel.h"
 #include "specification\platform.h"
 #include "specification\program.h"

@@ -149,6 +149,7 @@
     <ClCompile Include="implementation\specification\device.cpp" />
     <ClCompile Include="implementation\specification\device_selector.cpp" />
     <ClCompile Include="implementation\specification\error_handler.cpp" />
+    <ClCompile Include="implementation\specification\invoke.cpp" />
     <ClCompile Include="implementation\specification\platform.cpp" />
     <ClCompile Include="implementation\specification\queue.cpp" />
     <ClCompile Include="main.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="implementation\specification\device_selector.h" />
     <ClInclude Include="implementation\specification\error_handler.h" />
     <ClInclude Include="implementation\specification\event.h" />
+    <ClInclude Include="implementation\specification\invoke.h" />
     <ClInclude Include="implementation\specification\kernel.h" />
     <ClInclude Include="implementation\specification\param_traits.h" />
     <ClInclude Include="implementation\specification\platform.h" />

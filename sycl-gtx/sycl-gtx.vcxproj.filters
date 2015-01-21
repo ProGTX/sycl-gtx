@@ -69,6 +69,9 @@
     <ClCompile Include="tests\test7.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\specification\invoke.cpp">
+      <Filter>Source Files\specification</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="implementation\error_code.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\invoke.h">
+      <Filter>Header Files\specification</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
