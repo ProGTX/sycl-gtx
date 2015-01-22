@@ -91,8 +91,19 @@ public:
 
 
 namespace detail {
-namespace error {
 
+struct sycl_exception : ::cl::sycl::exception {
+private:
+	error::code::value_t error_code;
+public:
+	sycl_exception(error::code::value_t error_code)
+		: exception(nullptr) {}
+	virtual string_class get_description() const override {
+		return (*error::codes.find(error_code)).second;
+	}
+};
+
+namespace error {
 
 class throw_handler {
 public:
@@ -106,13 +117,6 @@ public:
 			debug("SYCL_ERROR::", error.get_description());
 			throw error;
 		}
-	}
-};
-
-struct report {
-	template<class T>
-	report(T* caller, cl_int error_code) {
-		caller->handler.report(error_code);
 	}
 };
 
@@ -146,18 +150,13 @@ public:
 	handler(handler&&) = default;
 #endif
 
-private:
-	// TODO: SYCL-specific codes
-	void report(cl_int error_code, bool is_sycl_specific) const {
+	void report(cl_int error_code) const {
 		cl_exception e(thrower, error_code);
 		hidden_hndlr->report_error(e);
 	}
-public:
-	void report(cl_int error_code) const {
-		report(error_code, false);
-	}
-	void report(detail::error::code::value_t error_code) const {
-		report(error_code, true);
+	void report(code::value_t error_code) const {
+		sycl_exception e(error_code);
+		hidden_hndlr->report_error(e);
 	}
 
 	void set_thrower(context* thrower) {
@@ -169,6 +168,21 @@ public:
 			// TODO
 			//((async_handler*)actual_hndlr)->apply();
 		}
+	}
+};
+
+struct report {
+	template<class T>
+	report(T* caller, cl_int error_code) {
+		caller->handler.report(error_code);
+	}
+	template<class T>
+	report(T* caller, code::value_t error_code) {
+		caller->handler.report(error_code);
+	}
+	report(code::value_t error_code) {
+		handler h;
+		h.report(error_code);
 	}
 };
 
