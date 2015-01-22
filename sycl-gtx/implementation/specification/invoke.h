@@ -5,6 +5,7 @@
 #include "access.h"
 #include "../common.h"
 #include "../debug.h"
+#include <unordered_map>
 
 namespace cl {
 namespace sycl {
@@ -24,7 +25,7 @@ class source {
 private:
 	string_class KernelName;
 	vector_class<string_class> src;
-	vector_class<std::tuple<access::mode, access::target, accessor_base*>> resources;
+	std::unordered_map<accessor_base*, std::tuple<std::string, access::mode, access::target>> resources;
 
 	// TODO: Multithreading support
 	static source* scope;
@@ -36,15 +37,23 @@ private:
 	void execute();
 	string_class get_source();
 
+	string_class generate_accessor_list();
+	static string_class get_name(access::target);
+	template<typename DataType>
+	static string_class get_name() {
+		// TODO
+		return "int*";
+	}
+
 public:
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
 	static void add(accessor<DataType, dimensions, mode, target>& acc) {
 		if(scope == nullptr) {
-			error::report(acc, error::code::NOT_IN_KERNEL_SCOPE);
+			error::report(error::code::NOT_IN_KERNEL_SCOPE);
 			return;
 		}
 
-		scope->resources.emplace_back(mode, target, &acc);
+		scope->resources[&acc] = { get_name<DataType>(), mode, target };
 	}
 	
 	template<class KernelType>

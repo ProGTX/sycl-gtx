@@ -28,8 +28,15 @@ public:
 
 namespace detail {
 
+// Forward declaration
+namespace kernel_ {
+	class source;
+}
+
 class accessor_base {
 protected:
+	friend class kernel_::source;
+
 	virtual string_class resource_name() {
 		DSELF() << "not implemented";
 		return "";
