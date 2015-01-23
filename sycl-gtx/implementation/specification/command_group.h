@@ -18,12 +18,7 @@ private:
 	friend class ::cl::sycl::command_group;
 
 	// TODO: Need to deal better with threads
-#if MSVC_LOW
-	__declspec(thread)
-#else
-	thread_local
-#endif
-	static command_group* last;
+	SYCL_THREAD_LOCAL static command_group* last;
 
 	template <class... Args>
 	using fn = void(*)(queue*, Args...);

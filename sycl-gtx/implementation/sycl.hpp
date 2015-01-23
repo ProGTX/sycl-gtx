@@ -18,3 +18,5 @@
 #undef SYCL_SWAP
 #undef SYCL_MOVE_INIT
 #endif
+
+#undef SYCL_THREAD_LOCAL

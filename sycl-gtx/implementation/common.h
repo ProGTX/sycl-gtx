@@ -9,6 +9,9 @@
 #if MSVC_LOW
 #define SYCL_SWAP(member) swap(first.member, second.member)
 #define SYCL_MOVE_INIT(member) member(std::move(move.member))
+#define SYCL_THREAD_LOCAL __declspec(thread)
+#else
+#define SYCL_THREAD_LOCAL thread_local
 #endif
 
 // 3.3 Vector, string and function classes in interfaces

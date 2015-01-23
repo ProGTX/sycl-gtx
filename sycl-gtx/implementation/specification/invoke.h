@@ -28,7 +28,7 @@ private:
 	std::unordered_map<accessor_base*, std::tuple<std::string, access::mode, access::target>> resources;
 
 	// TODO: Multithreading support
-	static source* scope;
+	SYCL_THREAD_LOCAL static source* scope;
 
 	template<class KernelType>
 	source(string_class KernelName, KernelType kern)
