@@ -23,9 +23,16 @@ namespace kernel_ {
 
 class source {
 private:
+	// C++14 would come in handy here with addressing tuples by type
+	struct tuple {
+		string_class type;
+		access::mode mode;
+		access::target target;
+	};
+
 	string_class kernelName;
 	vector_class<string_class> lines;
-	std::unordered_map<accessor_base*, std::tuple<std::string, access::mode, access::target>> resources;
+	std::unordered_map<accessor_base*, tuple> resources;
 
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;

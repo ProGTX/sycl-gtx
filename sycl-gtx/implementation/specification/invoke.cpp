@@ -31,11 +31,11 @@ string_class source::generate_accessor_list() {
 	}
 
 	for(auto&& acc : resources) {
-		list += get_name(std::get<2>(acc.second)) + " ";
-		if(std::get<1>(acc.second) == access::mode::read) {
+		list += get_name(acc.second.target) + " ";
+		if(acc.second.mode == access::mode::read) {
 			list += "const ";
 		}
-		list += std::get<0>(acc.second) + " ";
+		list += acc.second.type + " ";
 		list += acc.first->resource_name() + ", ";
 	}
 
