@@ -37,7 +37,7 @@ class accessor_base {
 protected:
 	friend class kernel_::source;
 
-	virtual string_class resource_name() {
+	virtual string_class resource_name() const {
 		DSELF() << "not implemented";
 		return "";
 	}
@@ -103,7 +103,7 @@ public:
 			bufferRef.get_range()
 		) {}
 
-	virtual string_class resource_name() override {
+	virtual string_class resource_name() const override {
 		return obtain_resource_name(buf);
 	}
 };
@@ -144,6 +144,7 @@ public:
 	// Reference to target element.
 	__write_ref<DataType> operator[](id<dimensions> index) const {
 		DSELF() << "not implemented";
+		detail::kernel_::source::add(this);
 		return __write_ref<DataType>();
 	}
 };

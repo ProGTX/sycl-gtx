@@ -32,7 +32,7 @@ private:
 
 	string_class kernelName;
 	vector_class<string_class> lines;
-	std::unordered_map<accessor_base*, tuple> resources;
+	std::unordered_map<const accessor_base*, tuple> resources;
 
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;
@@ -56,13 +56,13 @@ private:
 
 public:
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
-	static void add(accessor<DataType, dimensions, mode, target>& acc) {
+	static void add(const accessor<DataType, dimensions, mode, target>* const acc) {
 		if(scope == nullptr) {
-			error::report(error::code::NOT_IN_KERNEL_SCOPE);
+			//error::report(error::code::NOT_IN_KERNEL_SCOPE);
 			return;
 		}
 
-		auto accessor_it = scope->resources.find(&acc);
+		auto accessor_it = scope->resources.find(acc);
 		if(accessor_it != scope->resources.end()) {
 			accessor_it->second = { get_name<DataType>(), mode, target };
 		}
