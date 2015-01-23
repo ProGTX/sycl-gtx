@@ -8,11 +8,18 @@
 namespace cl {
 namespace sycl {
 
+namespace detail {
+
 // Forward declarations
 template <typename DataType, int dimensions>
-struct buffer;
+struct cl::sycl::buffer;
+namespace kernel_ {
+	class source;
+}
+
 
 // Data reference wrappers
+// TODO: They seem to be removed from the specification
 template <typename DataType>
 class __atomic_ref;
 template <typename DataType>
@@ -26,12 +33,6 @@ public:
 	}
 };
 
-namespace detail {
-
-// Forward declaration
-namespace kernel_ {
-	class source;
-}
 
 class accessor_base {
 protected:
@@ -131,9 +132,9 @@ public:
 	using detail::accessor_<DataType, dimensions, access::read, target>::accessor_;
 #endif
 	// Read element from target data.
-	__read_ref<DataType> operator[](id<dimensions>) const {
+	detail::__read_ref<DataType> operator[](id<dimensions>) const {
 		DSELF() << "not implemented";
-		return __read_ref<DataType>();
+		return detail::__read_ref<DataType>();
 	}
 };
 
@@ -142,10 +143,10 @@ public:
 	accessor(buffer<DataType, dimensions>& targette)
 		: detail::accessor_<DataType, dimensions, access::write, target>(targette) {}
 	// Reference to target element.
-	__write_ref<DataType> operator[](id<dimensions> index) const {
+	detail::__write_ref<DataType> operator[](id<dimensions> index) const {
 		DSELF() << "not implemented";
 		detail::kernel_::source::add(this);
-		return __write_ref<DataType>();
+		return detail::__write_ref<DataType>();
 	}
 };
 
@@ -154,7 +155,7 @@ public:
 	accessor(buffer<DataType, dimensions>& targette)
 		: detail::accessor_<DataType, dimensions, access::atomic, target>(targette) {}
 	// Atomic reference to element from target data.
-	__atomic_ref<DataType> operator[](id<dimensions>) const;
+	detail::__atomic_ref<DataType> operator[](id<dimensions>) const;
 };
 
 } // namespace sycl

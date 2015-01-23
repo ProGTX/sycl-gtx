@@ -9,12 +9,11 @@
 namespace cl {
 namespace sycl {
 
-namespace detail {
-
 // Forward declaration
 template <typename DataType, int dimensions>
-class buffer;
+struct buffer;
 
+namespace detail {
 
 // 3.7.1.1 Range class
 
