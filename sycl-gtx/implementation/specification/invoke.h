@@ -23,22 +23,24 @@ namespace kernel_ {
 
 class source {
 private:
-	string_class KernelName;
-	vector_class<string_class> src;
+	string_class kernelName;
+	vector_class<string_class> lines;
 	std::unordered_map<accessor_base*, std::tuple<std::string, access::mode, access::target>> resources;
 
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;
 
 	template<class KernelType>
-	source(string_class KernelName, KernelType kern)
-		: KernelName(KernelName) {}
+	source(string_class kernelName, KernelType kern)
+		: kernelName(kernelName) {
+		scope = this;
+		kern();
+		scope = nullptr;
+	}
 
-	void execute();
-	string_class get_source();
-
+	string_class get();
 	string_class generate_accessor_list();
-	static string_class get_name(access::target);
+	static string_class get_name(access::target target);
 	template<typename DataType>
 	static string_class get_name() {
 		// TODO
@@ -53,16 +55,16 @@ public:
 			return;
 		}
 
-		scope->resources[&acc] = { get_name<DataType>(), mode, target };
+		auto accessor_it = scope->resources.find(&acc);
+		if(accessor_it != scope->resources.end()) {
+			accessor_it->second = { get_name<DataType>(), mode, target };
+		}
 	}
 	
 	template<class KernelType>
-	static string_class generate(string_class KernelName, KernelType kern) {
-		auto src = source(KernelName, kern);
-		source::scope = &src;
-		src.execute();
-		source::scope = nullptr;
-		return src.get_source();
+	static string_class generate(string_class kernelName, KernelType kern) {
+		auto src = source(kernelName, kern);
+		return src.get();
 	}
 };
 
@@ -75,9 +77,9 @@ public:
 // Diversion could be avoided if I could get functor name at compile time
 
 template<class KernelType>
-void single_task(string_class KernelName, KernelType kern) {
+void single_task(string_class kernelName, KernelType kern) {
 	detail::cmd_group::check_scope();
-	auto src = detail::kernel_::source::generate(KernelName, kern);
+	auto src = detail::kernel_::source::generate(kernelName, kern);
 	// TODO: Enqueue kernel invocation
 	DSELF() << "not implemented.";
 }

@@ -8,13 +8,20 @@ using namespace detail::kernel_;
 
 source* source::scope = nullptr;
 
-void source::execute() {
-	// TODO: Create kernel source
-}
+// Creates kernel source
+string_class source::get() {
+	string_class src;
+	static const char newline = '\n';
 
-string_class source::get_source() {
-	// TODO: Create kernel source
-	return "";
+	src = src + "__kernel void " + kernelName + "(" + generate_accessor_list() + ") {" + newline;
+
+	for(auto&& line : lines) {
+		src += std::move(line) + newline;
+	}
+
+	src = src + "}" + newline;
+
+	return src;
 }
 
 string_class source::generate_accessor_list() {
@@ -36,7 +43,7 @@ string_class source::generate_accessor_list() {
 	return list.substr(0, list.length() - 2);
 }
 
-string_class source::get_name(access::target) {
+string_class source::get_name(access::target target) {
 	// TODO
 	return "";
 }
