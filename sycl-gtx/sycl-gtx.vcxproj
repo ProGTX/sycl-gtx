@@ -144,12 +144,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="implementation\gen_source.cpp" />
     <ClCompile Include="implementation\specification\command_group.cpp" />
     <ClCompile Include="implementation\specification\context.cpp" />
     <ClCompile Include="implementation\specification\device.cpp" />
     <ClCompile Include="implementation\specification\device_selector.cpp" />
     <ClCompile Include="implementation\specification\error_handler.cpp" />
-    <ClCompile Include="implementation\specification\invoke.cpp" />
     <ClCompile Include="implementation\specification\platform.cpp" />
     <ClCompile Include="implementation\specification\queue.cpp" />
     <ClCompile Include="main.cpp" />
@@ -165,6 +165,7 @@
     <ClInclude Include="implementation\common.h" />
     <ClInclude Include="implementation\debug.h" />
     <ClInclude Include="implementation\error_code.h" />
+    <ClInclude Include="implementation\gen_source.h" />
     <ClInclude Include="implementation\specification\accessor.h" />
     <ClInclude Include="implementation\specification\access.h" />
     <ClInclude Include="implementation\specification\buffer.h" />

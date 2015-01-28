@@ -4,6 +4,7 @@
 
 #include "access.h"
 #include "ranges.h"
+#include "../gen_source.h"
 
 namespace cl {
 namespace sycl {
@@ -16,23 +17,6 @@ struct cl::sycl::buffer;
 namespace kernel_ {
 	class source;
 }
-
-
-// Data reference wrappers
-// TODO: They seem to be removed from the specification
-template <typename DataType>
-class __atomic_ref;
-template <typename DataType>
-class __read_ref;
-
-template <typename DataType>
-class __write_ref {
-public:
-	__write_ref& operator=(int n) {
-		return *this;
-	}
-};
-
 
 class accessor_base {
 protected:
@@ -132,10 +116,10 @@ public:
 	using detail::accessor_<DataType, dimensions, access::read, target>::accessor_;
 #endif
 	// Read element from target data.
-	detail::__read_ref<DataType> operator[](id<dimensions>) const {
-		DSELF() << "not implemented";
-		return detail::__read_ref<DataType>();
-	}
+	//detail::__read_ref operator[](id<dimensions>) const {
+	//	DSELF() << "not implemented";
+	//	return detail::__read_ref();
+	//}
 };
 
 SYCL_ADD_ACCESSOR(access::write) {
@@ -143,10 +127,10 @@ public:
 	accessor(buffer<DataType, dimensions>& targette)
 		: detail::accessor_<DataType, dimensions, access::write, target>(targette) {}
 	// Reference to target element.
-	detail::__write_ref<DataType> operator[](id<dimensions> index) const {
+	detail::__write_ref operator[](id<dimensions> index) const {
 		DSELF() << "not implemented";
 		detail::kernel_::source::add(this);
-		return detail::__write_ref<DataType>();
+		return detail::__write_ref(resource_name() + "[" + "]");
 	}
 };
 
@@ -155,7 +139,7 @@ public:
 	accessor(buffer<DataType, dimensions>& targette)
 		: detail::accessor_<DataType, dimensions, access::atomic, target>(targette) {}
 	// Atomic reference to element from target data.
-	detail::__atomic_ref<DataType> operator[](id<dimensions>) const;
+	//detail::__atomic_ref<DataType> operator[](id<dimensions>) const;
 };
 
 } // namespace sycl

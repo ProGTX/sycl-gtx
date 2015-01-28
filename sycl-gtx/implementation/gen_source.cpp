@@ -1,6 +1,5 @@
-#include "invoke.h"
-
-#include "accessor.h"
+#include "gen_source.h"
+#include "specification\accessor.h"
 
 using namespace cl::sycl;
 

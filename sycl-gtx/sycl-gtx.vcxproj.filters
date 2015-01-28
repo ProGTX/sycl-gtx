@@ -69,8 +69,8 @@
     <ClCompile Include="tests\test7.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\invoke.cpp">
-      <Filter>Source Files\specification</Filter>
+    <ClCompile Include="implementation\gen_source.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="implementation\specification\invoke.h">
       <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\gen_source.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
