@@ -4,7 +4,7 @@
 
 #include "access.h"
 #include "ranges.h"
-#include "../gen_source.h"
+#include "../data_ref.h"
 
 namespace cl {
 namespace sycl {

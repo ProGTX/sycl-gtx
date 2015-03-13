@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common.h"
+#include "../gen_source.h"
 
 // 3.7.3 Invoking kernels
 

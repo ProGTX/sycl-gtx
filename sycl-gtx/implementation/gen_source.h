@@ -1,6 +1,7 @@
 #pragma once
 
 #include "specification\access.h"
+#include "specification\accessor.h"
 #include "common.h"
 #include "debug.h"
 #include <unordered_map>
@@ -8,11 +9,6 @@
 
 namespace cl {
 namespace sycl {
-
-// Forward declaration
-template <typename DataType, int dimensions, access::mode mode, access::target target>
-class accessor;
-
 
 namespace detail {
 
@@ -57,7 +53,7 @@ private:
 
 public:
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
-	static void add(const accessor<DataType, dimensions, mode, target>* const acc) {
+	static void add(const ::cl::sycl::accessor<DataType, dimensions, mode, target>* acc) {
 		if(scope == nullptr) {
 			//error::report(error::code::NOT_IN_KERNEL_SCOPE);
 			return;
@@ -76,7 +72,7 @@ public:
 
 	template<class KernelType>
 	static string_class generate(string_class kernelName, KernelType kern) {
-		auto src = source(kernelName, kern);
+		source src(kernelName, kern);
 		return src.get();
 	}
 };
@@ -84,22 +80,7 @@ public:
 } // namespace kernel_
 
 
-// Data reference wrappers
-// TODO: They seem to be removed from the specification
-class __atomic_ref;
-class __read_ref;
-class __write_ref {
-private:
-	string_class name;
-public:
-	__write_ref(string_class name)
-		: name(name) {}
-	const __write_ref& operator=(int n) const {
-		DSELF() << "not implemented";
-		kernel_::source::add(name + "=" + std::to_string(n));
-		return *this;
-	}
-};
+
 
 } // namespace detail
 

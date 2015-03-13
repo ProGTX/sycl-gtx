@@ -144,6 +144,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="implementation\data_ref.cpp" />
     <ClCompile Include="implementation\gen_source.cpp" />
     <ClCompile Include="implementation\specification\command_group.cpp" />
     <ClCompile Include="implementation\specification\context.cpp" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\common.h" />
+    <ClInclude Include="implementation\data_ref.h" />
     <ClInclude Include="implementation\debug.h" />
     <ClInclude Include="implementation\error_code.h" />
     <ClInclude Include="implementation\gen_source.h" />

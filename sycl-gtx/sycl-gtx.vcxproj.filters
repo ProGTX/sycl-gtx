@@ -72,6 +72,9 @@
     <ClCompile Include="implementation\gen_source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\data_ref.cpp">
+      <Filter>Source Files\specification</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">
@@ -141,6 +144,9 @@
       <Filter>Header Files\specification</Filter>
     </ClInclude>
     <ClInclude Include="implementation\gen_source.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\data_ref.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
