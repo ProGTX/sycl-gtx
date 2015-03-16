@@ -4,7 +4,7 @@
 #include "specification\accessor.h"
 #include "common.h"
 #include "debug.h"
-#include <unordered_map>
+#include <vector>
 
 
 namespace cl {
@@ -20,8 +20,8 @@ namespace kernel_ {
 
 class source {
 private:
-	// C++14 would come in handy here with addressing tuples by type
 	struct tuple {
+		string_class name;
 		string_class type;
 		access::mode mode;
 		access::target target;
@@ -29,7 +29,7 @@ private:
 
 	string_class kernelName;
 	vector_class<string_class> lines;
-	std::unordered_map<const accessor_base*, tuple> resources;
+	std::vector<tuple> resources;
 
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;
@@ -53,16 +53,13 @@ private:
 
 public:
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
-	static void add(const ::cl::sycl::accessor<DataType, dimensions, mode, target>* acc) {
+	static void add(const accessor_core<DataType, dimensions, mode, target>& acc) {
 		if(scope == nullptr) {
 			//error::report(error::code::NOT_IN_KERNEL_SCOPE);
 			return;
 		}
 
-		auto accessor_it = scope->resources.find(acc);
-		if(accessor_it == scope->resources.end()) {
-			scope->resources[acc] = { get_name<DataType>(), mode, target };
-		}
+		scope->resources.push_back({ acc.resource_name(), get_name<DataType>(), mode, target });
 	}
 
 	// TODO: Should be better hidden

@@ -29,13 +29,13 @@ string_class source::generate_accessor_list() {
 		return list;
 	}
 
-	for(auto&& acc : resources) {
-		list += get_name(acc.second.target) + " ";
-		if(acc.second.mode == access::mode::read) {
+	for(auto& acc : resources) {
+		list += get_name(acc.target) + " ";
+		if(acc.mode == access::mode::read) {
 			list += "const ";
 		}
-		list += acc.second.type + " ";
-		list += acc.first->resource_name() + ", ";
+		list += acc.type + " ";
+		list += acc.name + ", ";
 	}
 
 	// 2 to get rid of the last comma and space

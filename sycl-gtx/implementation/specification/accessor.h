@@ -20,13 +20,6 @@ namespace kernel_ {
 
 class accessor_base {
 protected:
-	friend class kernel_::source;
-
-	virtual string_class resource_name() const {
-		DSELF() << "not implemented";
-		return "";
-	}
-
 	template <class ResourceType>
 	static string_class obtain_resource_name(ResourceType* resource) {
 		return resource->name;
@@ -47,6 +40,14 @@ public:
 	// Returns the cl_event object corresponding to the last command to access the memory object.
 	// TODO: Only available when target is cl_image or cl_buffer.
 	cl_event get_cl_event_object() const;
+
+protected:
+	friend class kernel_::source;
+
+	virtual string_class resource_name() const {
+		DSELF() << "not implemented";
+		return "";
+	}
 };
 
 template<bool>
@@ -88,6 +89,7 @@ public:
 			bufferRef.get_range()
 		) {}
 
+protected:
 	virtual string_class resource_name() const override {
 		return obtain_resource_name(buf);
 	}
@@ -129,7 +131,7 @@ public:
 	// Reference to target element.
 	detail::__write_ref operator[](id<dimensions> index) const {
 		DSELF() << "not implemented";
-		detail::kernel_::source::add(this);
+		detail::kernel_::source::add(*this);
 		return detail::__write_ref(resource_name() + "[" + "]");
 	}
 };
