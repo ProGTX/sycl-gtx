@@ -130,9 +130,8 @@ public:
 		: detail::accessor_<DataType, dimensions, access::write, target>(targette) {}
 	// Reference to target element.
 	detail::__write_ref operator[](id<dimensions> index) const {
-		DSELF() << "not implemented";
 		detail::kernel_::source::register_resource(*this);
-		return detail::__write_ref(resource_name() + "[" + "]");
+		return detail::__write_ref(resource_name() + "[" + detail::kernel_::source::to_string(index) + "]");
 	}
 };
 

@@ -2,6 +2,7 @@
 
 #include "specification\access.h"
 #include "specification\accessor.h"
+#include "specification\ranges.h"
 #include "common.h"
 #include "debug.h"
 #include <unordered_map>
@@ -69,6 +70,16 @@ public:
 	// TODO: Should be better hidden
 	static void add(string_class line) {
 		scope->lines.push_back('\t' + line + ';');
+	}
+
+	template <int dimensions>
+	static string_class to_string(id<dimensions> index) {
+		// TODO
+		return "0";
+	}
+	template <>
+	static string_class to_string(id<1> index) {
+		return std::to_string(index[0]);
 	}
 
 	template<class KernelType>
