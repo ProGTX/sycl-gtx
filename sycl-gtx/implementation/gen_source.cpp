@@ -42,6 +42,15 @@ string_class source::generate_accessor_list() {
 }
 
 string_class source::get_name(access::target target) {
-	// TODO
-	return "";
+	// TODO: All cases
+	switch(target) {
+		case access::target::global_buffer:
+			return "__global";
+		case access::target::constant_buffer:
+			return "__constant";
+		case access::target::local:
+			return "__local";
+		default:
+			return "";
+	}
 }

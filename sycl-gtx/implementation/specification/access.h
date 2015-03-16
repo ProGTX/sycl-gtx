@@ -15,7 +15,7 @@ enum mode {
 
 // 3.6.4.2 Access targets
 enum target {
-	global_buffer,		// access buffer via __global memory
+	global_buffer = 0,	// access buffer via __global memory
 	constant_buffer,	// access buffer via __constant memory
 	local,				// access work-group - local memory
 	image,				// access an image
