@@ -13,9 +13,15 @@ namespace sycl {
 
 namespace detail {
 
+// Forward declaration
+namespace kernel_ {
+	class source;
+}
+
 class cmd_group {
 private:
 	friend class ::cl::sycl::command_group;
+	friend class kernel_::source;
 
 	// TODO: Need to deal better with threads
 	SYCL_THREAD_LOCAL static command_group* last;
@@ -41,6 +47,7 @@ public:
 class command_group {
 private:
 	friend class detail::cmd_group;
+	friend class detail::kernel_::source;
 	using command_t = detail::cmd_group::command_t;
 
 	vector_class<command_t> commands;

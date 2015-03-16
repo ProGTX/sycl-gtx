@@ -2,6 +2,7 @@
 
 #include "specification\access.h"
 #include "specification\accessor.h"
+#include "specification\command_group.h"
 #include "specification\program.h"
 #include "specification\ranges.h"
 #include "common.h"
@@ -84,7 +85,7 @@ public:
 	}
 
 	static void compile(string_class source) {
-		program p(source);
+		program p(source, cmd_group::last->q);
 	}
 
 	template<class KernelType>

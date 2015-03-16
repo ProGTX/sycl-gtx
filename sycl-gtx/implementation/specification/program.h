@@ -12,6 +12,7 @@ namespace sycl {
 class kernel;
 class context;
 class device;
+class queue;
 
 namespace detail {
 namespace kernel_ {
@@ -23,7 +24,7 @@ namespace kernel_ {
 class program {
 protected:
 	friend class detail::kernel_::source;
-	program(string_class source);
+	program(string_class source, queue* q);
 
 public:
 	// Creates an empty program object for all devices associated with context
