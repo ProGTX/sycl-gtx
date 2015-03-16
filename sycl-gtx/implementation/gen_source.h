@@ -4,7 +4,7 @@
 #include "specification\accessor.h"
 #include "common.h"
 #include "debug.h"
-#include <vector>
+#include <unordered_map>
 
 
 namespace cl {
@@ -21,7 +21,6 @@ namespace kernel_ {
 class source {
 private:
 	struct tuple {
-		string_class name;
 		string_class type;
 		access::mode mode;
 		access::target target;
@@ -29,7 +28,7 @@ private:
 
 	string_class kernelName;
 	vector_class<string_class> lines;
-	std::vector<tuple> resources;
+	std::unordered_map<string_class, tuple> resources;
 
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;
@@ -59,7 +58,12 @@ public:
 			return;
 		}
 
-		scope->resources.push_back({ acc.resource_name(), get_name<DataType>(), mode, target });
+		auto name = acc.resource_name();
+		auto it = scope->resources.find(name);
+
+		if(it == scope->resources.end()) {
+			scope->resources[name] = { get_name<DataType>(), mode, target };
+		}
 	}
 
 	// TODO: Should be better hidden
@@ -75,10 +79,6 @@ public:
 };
 
 } // namespace kernel_
-
-
-
-
 } // namespace detail
 
 } // namespace sycl
