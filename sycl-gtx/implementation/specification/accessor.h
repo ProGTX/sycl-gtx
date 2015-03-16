@@ -131,7 +131,7 @@ public:
 	// Reference to target element.
 	detail::__write_ref operator[](id<dimensions> index) const {
 		DSELF() << "not implemented";
-		detail::kernel_::source::add(*this);
+		detail::kernel_::source::register_resource(*this);
 		return detail::__write_ref(resource_name() + "[" + "]");
 	}
 };

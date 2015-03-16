@@ -52,7 +52,7 @@ private:
 
 public:
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
-	static void add(const accessor_core<DataType, dimensions, mode, target>& acc) {
+	static void register_resource(const accessor_core<DataType, dimensions, mode, target>& acc) {
 		if(scope == nullptr) {
 			//error::report(error::code::NOT_IN_KERNEL_SCOPE);
 			return;
