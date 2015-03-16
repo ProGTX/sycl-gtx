@@ -1,5 +1,6 @@
 #pragma once
 
+#include "program.h"
 #include "../common.h"
 #include "../gen_source.h"
 
@@ -18,6 +19,7 @@ void single_task(string_class kernelName, KernelType kern) {
 	auto src = detail::kernel_::source::generate(kernelName, kern);
 	debug() << src;
 	// TODO: Enqueue kernel invocation
+	detail::kernel_::source::compile(src);
 	DSELF() << "not implemented.";
 }
 

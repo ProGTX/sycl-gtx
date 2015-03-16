@@ -3,6 +3,7 @@
 // 3.7.2.6 Program class
 
 #include "../common.h"
+#include "param_traits.h"
 
 namespace cl {
 namespace sycl {
@@ -12,7 +13,18 @@ class kernel;
 class context;
 class device;
 
+namespace detail {
+namespace kernel_ {
+	class source;
+}
+}
+
+
 class program {
+protected:
+	friend class detail::kernel_::source;
+	program(string_class source);
+
 public:
 	// Creates an empty program object for all devices associated with context
 	program(const context& context);

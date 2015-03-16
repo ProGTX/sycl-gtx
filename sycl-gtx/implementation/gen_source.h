@@ -2,6 +2,7 @@
 
 #include "specification\access.h"
 #include "specification\accessor.h"
+#include "specification\program.h"
 #include "specification\ranges.h"
 #include "common.h"
 #include "debug.h"
@@ -80,6 +81,10 @@ public:
 	template <>
 	static string_class to_string(id<1> index) {
 		return std::to_string(index[0]);
+	}
+
+	static void compile(string_class source) {
+		program p(source);
 	}
 
 	template<class KernelType>

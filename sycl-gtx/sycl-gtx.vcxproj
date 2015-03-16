@@ -152,6 +152,7 @@
     <ClCompile Include="implementation\specification\device_selector.cpp" />
     <ClCompile Include="implementation\specification\error_handler.cpp" />
     <ClCompile Include="implementation\specification\platform.cpp" />
+    <ClCompile Include="implementation\specification\program.cpp" />
     <ClCompile Include="implementation\specification\queue.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tests\test1.cpp" />
