@@ -65,8 +65,12 @@ kernel source::compile() {
 	cl_kernel k = clCreateKernel(p.get(), kernelName.c_str(), &clError);
 	// TODO: Handle error
 
-	// TODO: Bind arguments
-	//clError = clSetKernelArg(k, 0, )
+	int i = 0;
+	for(auto& acc : resources) {
+		clError = clSetKernelArg(k, i, sizeof(cl_mem), acc.second.argument);
+		// TODO: Handle error
+		++i;
+	}
 
 	return kernel(k);
 }
