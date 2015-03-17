@@ -3,6 +3,7 @@
 #include "specification\access.h"
 #include "specification\accessor.h"
 #include "specification\command_group.h"
+#include "specification\kernel.h"
 #include "specification\program.h"
 #include "specification\ranges.h"
 #include "common.h"
@@ -36,15 +37,6 @@ private:
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;
 
-	template<class KernelType>
-	source(string_class kernelName, KernelType kern)
-		: kernelName(kernelName) {
-		scope = this;
-		kern();
-		scope = nullptr;
-	}
-
-	string_class get();
 	string_class generate_accessor_list();
 	static string_class get_name(access::target target);
 	template<typename DataType>
@@ -54,6 +46,21 @@ private:
 	}
 
 public:
+	template<class KernelType>
+	source(string_class kernelName, KernelType kern)
+		: kernelName(kernelName) {
+		scope = this;
+		kern();
+		scope = nullptr;
+	}
+
+	string_class get_code();
+
+	kernel compile() {
+		program p(get_code(), cmd_group::last->q);
+		return kernel(nullptr);
+	}
+
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
 	static void register_resource(const accessor_core<DataType, dimensions, mode, target>& acc) {
 		if(scope == nullptr) {
@@ -82,16 +89,6 @@ public:
 	template <>
 	static string_class to_string(id<1> index) {
 		return std::to_string(index[0]);
-	}
-
-	static void compile(string_class source) {
-		program p(source, cmd_group::last->q);
-	}
-
-	template<class KernelType>
-	static string_class generate(string_class kernelName, KernelType kern) {
-		source src(kernelName, kern);
-		return src.get();
 	}
 };
 

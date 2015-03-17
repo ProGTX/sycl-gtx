@@ -3,6 +3,8 @@
 // 3.7 Expressing parallelism through kernels
 // 3.7.1 is not included here, but rather in ranges.h
 
+#include "program.h"
+#include "refc.h"
 #include "../common.h"
 #include "../debug.h"
 
@@ -10,14 +12,14 @@ namespace cl {
 namespace sycl {
 
 // Forward declarations
-class program;
 class context;
 
 // 3.7.2.5 Kernel class
 
 class kernel {
 private:
-	friend class program;
+	refc::ptr<cl_kernel> kern;
+	program prog;
 public:
 	// The default object is not valid because there is no
 	// program or cl_kernel associated with it

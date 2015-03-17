@@ -1,6 +1,6 @@
 #pragma once
 
-#include "program.h"
+#include "kernel.h"
 #include "../common.h"
 #include "../gen_source.h"
 
@@ -14,12 +14,13 @@ namespace sycl {
 // Diversion could be avoided if I could get functor name at compile time
 
 template<class KernelType>
-void single_task(string_class kernelName, KernelType kern) {
+void single_task(string_class kernelName, KernelType kernFunctor) {
 	detail::cmd_group::check_scope();
-	auto src = detail::kernel_::source::generate(kernelName, kern);
-	debug() << src;
+	detail::kernel_::source src(kernelName, kernFunctor);
+	auto kern = src.compile();
+	//debug() << src;
 	// TODO: Enqueue kernel invocation
-	detail::kernel_::source::compile(src);
+	//detail::kernel_::source::compile(src);
 	DSELF() << "not implemented.";
 }
 

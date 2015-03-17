@@ -78,6 +78,9 @@
     <ClCompile Include="implementation\specification\program.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\specification\kernel.cpp">
+      <Filter>Source Files\specification</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">

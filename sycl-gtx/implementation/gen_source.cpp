@@ -7,7 +7,7 @@ using namespace detail::kernel_;
 source* source::scope = nullptr;
 
 // Creates kernel source
-string_class source::get() {
+string_class source::get_code() {
 	string_class src;
 	static const char newline = '\n';
 

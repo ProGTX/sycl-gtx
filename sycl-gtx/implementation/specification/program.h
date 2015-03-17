@@ -2,8 +2,9 @@
 
 // 3.7.2.6 Program class
 
-#include "../common.h"
 #include "param_traits.h"
+#include "refc.h"
+#include "../common.h"
 
 namespace cl {
 namespace sycl {
@@ -26,6 +27,7 @@ protected:
 	friend class detail::kernel_::source;
 	program(string_class source, queue* q);
 
+	refc::ptr<cl_program> prog;
 public:
 	// Creates an empty program object for all devices associated with context
 	program(const context& context);
