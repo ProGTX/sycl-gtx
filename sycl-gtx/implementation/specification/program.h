@@ -30,13 +30,13 @@ protected:
 	refc::ptr<cl_program> prog;
 public:
 	// Creates an empty program object for all devices associated with context
-	program(const context& context);
+	program(const context& context) {}
 	
 	// Creates an empty program object devices in list associated with the context
 	program(const context& context, vector_class<device> device_list);
 
 	// Creates a program object from a cl_program object
-	program(const context& context, cl_program clProgram);
+	program(const context& context, cl_program clProgram) {}
 
 	// Creates a program by linking a list of other programs
 	program(vector_class<program> program_list, string_class link_options = "");

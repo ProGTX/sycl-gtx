@@ -2,6 +2,7 @@
 
 // 3.5.4 Context class
 
+#include "device.h"
 #include "refc.h"
 #include "device_selector.h"
 #include "error_handler.h"
@@ -13,7 +14,6 @@ namespace cl {
 namespace sycl {
 
 // Forward declarations
-class device;
 class platform;
 class program;
 
@@ -142,7 +142,7 @@ private:
 			return_type param_value[BUFFER_SIZE];
 			std::size_t actual_size;
 			std::size_t type_size = sizeof(return_type);
-			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE * type_size, &param_value, &actual_size);
+			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE * type_size, param_value, &actual_size);
 			contex->handler.report(error_code);
 			return real_return(param_value, param_value + actual_size / type_size);
 		}
