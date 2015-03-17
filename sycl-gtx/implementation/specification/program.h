@@ -28,9 +28,6 @@ protected:
 	program(string_class source, queue* q);
 
 	refc::ptr<cl_program> prog;
-
-	static void PrintBuildLog(cl_program Program, cl_device_id Device);
-
 public:
 	// Creates an empty program object for all devices associated with context
 	program(const context& context) {}
