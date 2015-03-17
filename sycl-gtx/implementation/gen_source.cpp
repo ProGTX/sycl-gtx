@@ -1,5 +1,8 @@
 #include "gen_source.h"
+
 #include "specification\accessor.h"
+#include "specification\kernel.h"
+#include "specification\program.h"
 
 using namespace cl::sycl;
 using namespace detail::kernel_;
@@ -53,4 +56,17 @@ string_class source::get_name(access::target target) {
 		default:
 			return "";
 	}
+}
+
+kernel source::compile() {
+	program p(get_code(), cmd_group::last->q);
+
+	cl_int clError;
+	cl_kernel k = clCreateKernel(p.get(), kernelName.c_str(), &clError);
+	// TODO: Handle error
+
+	// TODO: Bind arguments
+	//clError = clSetKernelArg(k, 0, )
+
+	return kernel(nullptr);
 }

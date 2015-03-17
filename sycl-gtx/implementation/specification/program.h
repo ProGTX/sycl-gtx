@@ -28,6 +28,9 @@ protected:
 	program(string_class source, queue* q);
 
 	refc::ptr<cl_program> prog;
+
+	static void PrintBuildLog(cl_program Program, cl_device_id Device);
+
 public:
 	// Creates an empty program object for all devices associated with context
 	program(const context& context) {}
@@ -60,7 +63,9 @@ public:
 	vector_class<::size_t> get_binary_sizes() const;
 	vector_class<device> get_devices() const;
 	string_class get_build_options() const;
-	cl_program get() const;
+	cl_program get() const {
+		return prog.get();
+	}
 };
 
 } // namespace sycl

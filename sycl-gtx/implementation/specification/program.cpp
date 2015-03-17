@@ -21,10 +21,32 @@ program::program(string_class source, queue* q) {
 	}
 
 	clError = clBuildProgram(prog, 1, &Device, nullptr, nullptr, nullptr);
-	//PrintBuildLog(prog, Device);
+	PrintBuildLog(prog, Device);
 	if(clError != CL_SUCCESS) {
 		debug() << "Failed to build CL program.";
 		clReleaseProgram(prog);
 	}
+}
 
+void program::PrintBuildLog(cl_program Program, cl_device_id Device) {
+	cl_build_status buildStatus;
+	clGetProgramBuildInfo(Program, Device, CL_PROGRAM_BUILD_STATUS, sizeof(cl_build_status), &buildStatus, NULL);
+
+	// let's print out possible warnings even if the kernel compiled..
+	//if(buildStatus == CL_SUCCESS)
+	//	return;
+
+	//there were some errors.
+	size_t logSize;
+	clGetProgramBuildInfo(Program, Device, CL_PROGRAM_BUILD_LOG, 0, NULL, &logSize);
+	string_class buildLog(logSize, ' ');
+
+	clGetProgramBuildInfo(Program, Device, CL_PROGRAM_BUILD_LOG, logSize, &buildLog[0], NULL);
+	buildLog[logSize] = '\0';
+
+	if(buildStatus != CL_SUCCESS) {
+		debug() << "There were build errors!";
+	}
+	debug() << "Build log:";
+	debug() << buildLog;
 }
