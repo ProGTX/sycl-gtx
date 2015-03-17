@@ -36,7 +36,7 @@ string_class source::generate_accessor_list() {
 		if(acc.second.mode == access::mode::read) {
 			list += "const ";
 		}
-		list += acc.second.type + " ";
+		list += acc.second.type_name + " ";
 		list += acc.first + ", ";
 	}
 
@@ -68,5 +68,5 @@ kernel source::compile() {
 	// TODO: Bind arguments
 	//clError = clSetKernelArg(k, 0, )
 
-	return kernel(nullptr);
+	return kernel(k);
 }

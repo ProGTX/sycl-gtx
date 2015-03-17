@@ -35,7 +35,9 @@ public:
 
 	// Returns the cl_mem object corresponding to the access.
 	// TODO: Only available when target is cl_image or cl_buffer
-	cl_mem get_cl_mem_object() const;
+	virtual cl_mem get_cl_mem_object() const {
+		return nullptr;
+	}
 
 	// Returns the cl_event object corresponding to the last command to access the memory object.
 	// TODO: Only available when target is cl_image or cl_buffer.
@@ -57,6 +59,24 @@ struct select_target;
 template <typename DataType, int dimensions, int mode, int target, typename = select_target<true>>
 class accessor_;
 
+template <typename DataType, int dimensions>
+class accessor_buffer {
+protected:
+	cl::sycl::buffer<DataType, dimensions>* buf;
+public:
+	accessor_buffer(
+		cl::sycl::buffer<DataType, dimensions>& bufferRef,
+		range<dimensions> offset,
+		range<dimensions> range
+	) : buf(&bufferRef) {
+		DSELF() << "not implemented";
+	}
+protected:
+	cl_mem get_buffer_object() const {
+		return buf->device_data.get();
+	}
+};
+
 #define SYCL_ACCESSOR_CLASS(condition)															\
 template <typename DataType, int dimensions, int mode, int target>								\
 class accessor_<DataType, dimensions, mode, target, select_target<(condition)>>					\
@@ -68,9 +88,8 @@ SYCL_ACCESSOR_CLASS(
 	target == access::constant_buffer	||
 	target == access::global_buffer		||
 	target == access::host_buffer
-) {
+), public accessor_buffer<DataType, dimensions> {
 private:
-	cl::sycl::buffer<DataType, dimensions>* buf;
 public:
 	// This accessor limits the processing of the buffer to the [offset, offset + range] for every dimension
 	// Any other parts of the buffer will be unaffected
@@ -78,9 +97,7 @@ public:
 		cl::sycl::buffer<DataType, dimensions>& bufferRef,
 		range<dimensions> offset,
 		range<dimensions> range
-	)	: buf(&bufferRef) {
-		DSELF() << "not implemented";
-	}
+	) : accessor_buffer(bufferRef, offset, range) {}
 
 	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef)
 		: accessor_(
@@ -88,6 +105,10 @@ public:
 			detail::empty_range<dimensions>(),
 			bufferRef.get_range()
 		) {}
+
+	virtual cl_mem get_cl_mem_object() const override {
+		return get_buffer_object();
+	}
 
 protected:
 	virtual string_class resource_name() const override {

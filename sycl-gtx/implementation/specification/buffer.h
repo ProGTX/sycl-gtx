@@ -26,6 +26,8 @@ namespace detail {
 
 // Forward declaration
 struct cmd_queue;
+template <typename DataType, int dimensions>
+class accessor_buffer;
 
 static unsigned int buffer_counter = 0;
 
@@ -42,6 +44,7 @@ protected:
 	detail::error::handler handler;
 
 	friend class accessor_base;
+	friend class accessor_buffer<DataType, dimensions>;
 
 	// Associated host memory.
 	buffer_(DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)

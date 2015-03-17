@@ -21,12 +21,14 @@ class context;
 class kernel {
 private:
 	refc::ptr<cl_kernel> kern;
-	program prog;
 	context ctx;
+	program prog;
+
 public:
 	// The default object is not valid because there is no
 	// program or cl_kernel associated with it
 	kernel() = delete;
+	kernel(nullptr_t) = delete;
 
 	// Constructs from a valid, initialized OpenCL kernel
 	kernel(cl_kernel openclKernelObject);
