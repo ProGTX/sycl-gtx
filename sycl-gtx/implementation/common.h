@@ -21,7 +21,7 @@
 #endif
 
 #ifndef CL_SYCL_NO_STD_STRING
-#include <vector>
+#include <string>
 #endif
 
 #ifndef CL_SYCL_NO_STD_FUNCTION
