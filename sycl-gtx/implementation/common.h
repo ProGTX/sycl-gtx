@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <CL/cl.h>
 
 #if _MSC_VER <= 1800
@@ -78,6 +79,9 @@ bool has_extension(T* sycl_class, const string_class extension_name) {
 	string_class ext_str(extensions);
 	return ext_str.find(extension_name) != string_class::npos;
 }
+
+template<class T>
+using shared_unique = std::shared_ptr<std::unique_ptr<T>>;
 
 } // namespace detail
 } // namespace sycl

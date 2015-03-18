@@ -1,8 +1,10 @@
 #include "gen_source.h"
 
 #include "specification\accessor.h"
+#include "specification\command_group.h"
 #include "specification\kernel.h"
 #include "specification\program.h"
+#include "specification\queue.h"
 
 using namespace cl::sycl;
 using namespace detail::kernel_;
@@ -58,19 +60,26 @@ string_class source::get_name(access::target target) {
 	}
 }
 
-kernel source::compile() {
-	program p(get_code(), cmd_group::last->q);
+
+void source::compile_command(queue* q, source* src, detail::shared_unique<kernel> kern) {
+	program p(src->get_code(), cmd_group::last->q);
 
 	cl_int clError;
-	cl_kernel k = clCreateKernel(p.get(), kernelName.c_str(), &clError);
+	cl_kernel k = clCreateKernel(p.get(), src->kernelName.c_str(), &clError);
 	// TODO: Handle error
 
 	int i = 0;
-	for(auto& acc : resources) {
+	for(auto& acc : src->resources) {
 		clError = clSetKernelArg(k, i, sizeof(cl_mem), acc.second.argument);
 		// TODO: Handle error
 		++i;
 	}
 
-	return kernel(k);
+	*kern = std::unique_ptr<kernel>(new kernel(k));
+}
+
+detail::shared_unique<kernel> source::compile() {
+	auto kern = detail::shared_unique<kernel>(new std::unique_ptr<kernel>());
+	cmd_group::add(compile_command, this, kern);
+	return kern;
 }

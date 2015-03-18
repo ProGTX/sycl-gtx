@@ -12,14 +12,14 @@
 namespace cl {
 namespace sycl {
 
-// Forward declaration
+// Forward declarations
 class kernel;
+class queue;
 
 namespace detail {
 
 // Forward declaration
 class accessor_base;
-
 
 namespace kernel_ {
 
@@ -47,6 +47,8 @@ private:
 		return "int*";
 	}
 
+	static void compile_command(queue* q, source* src, shared_unique<kernel> kern);
+
 public:
 	template<class KernelType>
 	source(string_class kernelName, KernelType kern)
@@ -57,7 +59,7 @@ public:
 	}
 
 	string_class get_code();
-	kernel compile();
+	shared_unique<kernel> compile();
 
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
 	static void register_resource(const accessor_core<DataType, dimensions, mode, target>& acc) {
