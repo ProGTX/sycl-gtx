@@ -39,20 +39,20 @@ public:
 	}
 
 	// Return the context that this kernel is defined for.
-	context get_context() const;
+	context get_context() const {
+		return ctx;
+	}
 
 	// Return the program that this kernel is part of.
-	program get_program() const;
-
-	// Return the name of the kernel function.
-	string_class get_kernel_attributes() const;
-
+	program get_program() const {
+		return prog;
+	}
 
 private:
 	template<class return_type, cl_int name>
 	struct hidden {
 		using real_return = return_type;
-		static real_return get_info(kernel* kern) {
+		static real_return get_info(const kernel* kern) {
 			auto k = kern->get();
 			real_return param_value;
 			auto error_code = clGetKernelInfo(k, name, sizeof(cl_uint), &param_value, nullptr);
@@ -63,7 +63,7 @@ private:
 	template<cl_int name>
 	struct hidden<char[], name> {
 		using real_return = string_class;
-		static real_return get_info(kernel* kern) {
+		static real_return get_info(const kernel* kern) {
 			auto k = kern->get();
 			static const int BUFFER_SIZE = 8192;
 			char param_value[BUFFER_SIZE];
@@ -77,8 +77,18 @@ private:
 
 public:
 	template<cl_int name>
-	typename hidden<param<name>, name>::real_return get_info() {
+	typename hidden<param<name>, name>::real_return get_info() const {
 		return hidden<param<name>, name>::get_info(this);
+	}
+
+	// Return the name of the kernel function
+	string_class get_kernel_attributes() const {
+		return get_info<CL_KERNEL_ATTRIBUTES>();
+	}
+
+	// Return the name of the kernel function
+	string_class get_function_name() {
+		return get_info<CL_KERNEL_FUNCTION_NAME>();
 	}
 };
 
