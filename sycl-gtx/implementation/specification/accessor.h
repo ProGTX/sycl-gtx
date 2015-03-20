@@ -50,6 +50,10 @@ protected:
 		DSELF() << "not implemented";
 		return "";
 	}
+
+	virtual void* resource() const {
+		return nullptr;
+	}
 };
 
 template<bool>
@@ -113,6 +117,10 @@ public:
 protected:
 	virtual string_class resource_name() const override {
 		return obtain_resource_name(buf);
+	}
+
+	virtual void* resource() const override {
+		return buf;
 	}
 };
 

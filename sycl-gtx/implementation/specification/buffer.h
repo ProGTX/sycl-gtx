@@ -24,10 +24,14 @@ class queue;
 
 namespace detail {
 
-// Forward declaration
+// Forward declarations
 struct cmd_queue;
 template <typename DataType, int dimensions>
 class accessor_buffer;
+
+namespace kernel_ {
+	class source;
+}
 
 static unsigned int buffer_counter = 0;
 
@@ -36,15 +40,18 @@ class buffer_ {
 protected:
 	string_class name;
 	range<dimensions> rang;
+	detail::error::handler handler;
+
 	DataType* host_data = nullptr;
 	refc::ptr<cl_mem> device_data;
+
+	bool is_read_only = false;
 	bool is_blocking = true;
 	bool is_initialized = false;
-	bool is_read_only = false;
-	detail::error::handler handler;
 
 	friend class accessor_base;
 	friend class accessor_buffer<DataType, dimensions>;
+	friend class kernel_::source;
 
 	// Associated host memory.
 	buffer_(DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)

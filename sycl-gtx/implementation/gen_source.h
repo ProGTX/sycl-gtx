@@ -29,7 +29,7 @@ private:
 		string_class type_name;
 		access::mode mode;
 		access::target target;
-		cl_mem argument;
+		refc::ptr<cl_mem>* buffer;
 	};
 
 	string_class kernelName;
@@ -72,8 +72,8 @@ public:
 		auto it = scope->resources.find(name);
 
 		if(it == scope->resources.end()) {
-			// TODO: Buffer memory not initialized at this point
-			scope->resources[name] = { get_name<DataType>(), mode, target, acc.get_cl_mem_object() };
+			auto buf = (buffer<DataType, dimensions>*) acc.resource();
+			scope->resources[name] = { get_name<DataType>(), mode, target, &buf->device_data };
 		}
 	}
 
