@@ -1,7 +1,6 @@
 #include "gen_source.h"
 
 #include "specification\accessor.h"
-#include "specification\command_group.h"
 #include "specification\kernel.h"
 #include "specification\program.h"
 #include "specification\queue.h"
@@ -18,7 +17,7 @@ string_class source::get_code() {
 
 	src = src + "__kernel void " + kernelName + "(" + generate_accessor_list() + ") {" + newline;
 
-	for(auto&& line : lines) {
+	for(auto& line : lines) {
 		src += std::move(line) + newline;
 	}
 
@@ -60,16 +59,15 @@ string_class source::get_name(access::target target) {
 	}
 }
 
-
-void source::compile_command(queue* q, source* src, detail::shared_unique<kernel> kern) {
-	program p(src->get_code(), cmd_group::last->q);
+void source::compile_command(queue* q, source src, detail::shared_unique<kernel> kern) {
+	program p(src.get_code(), q);
 
 	cl_int clError;
-	cl_kernel k = clCreateKernel(p.get(), src->kernelName.c_str(), &clError);
+	cl_kernel k = clCreateKernel(p.get(), src.kernelName.c_str(), &clError);
 	// TODO: Handle error
 
 	int i = 0;
-	for(auto& acc : src->resources) {
+	for(auto& acc : src.resources) {
 		clError = clSetKernelArg(k, i, sizeof(cl_mem), acc.second.argument);
 		// TODO: Handle error
 		++i;
@@ -80,6 +78,6 @@ void source::compile_command(queue* q, source* src, detail::shared_unique<kernel
 
 detail::shared_unique<kernel> source::compile() {
 	auto kern = detail::shared_unique<kernel>(new std::unique_ptr<kernel>());
-	cmd_group::add(compile_command, this, kern);
+	cmd_group::add(compile_command, *this, kern);
 	return kern;
 }

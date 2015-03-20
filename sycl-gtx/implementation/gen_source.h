@@ -47,7 +47,7 @@ private:
 		return "int*";
 	}
 
-	static void compile_command(queue* q, source* src, shared_unique<kernel> kern);
+	static void compile_command(queue* q, source src, shared_unique<kernel> kern);
 
 public:
 	template<class KernelType>

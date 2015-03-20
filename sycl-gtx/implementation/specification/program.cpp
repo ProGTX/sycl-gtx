@@ -5,7 +5,7 @@
 
 using namespace cl::sycl;
 
-// TODO: Very rough
+// TODO: Handle errors
 program::program(string_class source, queue* q) {
 	const char* src = source.c_str();
 	size_t length = source.size();

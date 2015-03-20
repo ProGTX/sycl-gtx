@@ -60,6 +60,7 @@ public:
 	vector_class<::size_t> get_binary_sizes() const;
 	vector_class<device> get_devices() const;
 	string_class get_build_options() const;
+
 	cl_program get() const {
 		return prog.get();
 	}

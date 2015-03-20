@@ -1,7 +1,5 @@
 #include "kernel.h"
 
-#include "context.h"
-
 using namespace cl::sycl;
 
 kernel::kernel(cl_kernel k)
