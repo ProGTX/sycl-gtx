@@ -142,6 +142,18 @@ SYCL_ADD_TRAIT(cl_kernel_info, cl_context,	(name == CL_KERNEL_CONTEXT));
 SYCL_ADD_TRAIT(cl_kernel_info, cl_program,	(name == CL_KERNEL_PROGRAM));
 SYCL_ADD_TRAIT(cl_kernel_info, char[],		(name == CL_KERNEL_ATTRIBUTES));
 
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetMemObjectInfo.html
+// TODO: DirectX
+SYCL_ADD_TRAIT(cl_mem_info, cl_mem_object_type,	(name == CL_MEM_TYPE));
+SYCL_ADD_TRAIT(cl_mem_info, cl_mem_flags,		(name == CL_MEM_FLAGS));
+SYCL_ADD_TRAIT(cl_mem_info, size_t,				(name == CL_MEM_SIZE));
+SYCL_ADD_TRAIT(cl_mem_info, void*,				(name == CL_MEM_HOST_PTR));
+SYCL_ADD_TRAIT(cl_mem_info, cl_uint,			(name == CL_MEM_MAP_COUNT));
+SYCL_ADD_TRAIT(cl_mem_info, cl_uint,			(name == CL_MEM_REFERENCE_COUNT));
+SYCL_ADD_TRAIT(cl_mem_info, cl_context,			(name == CL_MEM_CONTEXT));
+SYCL_ADD_TRAIT(cl_mem_info, cl_mem,				(name == CL_MEM_ASSOCIATED_MEMOBJECT));
+SYCL_ADD_TRAIT(cl_mem_info, size_t,				(name == CL_MEM_OFFSET));
+
 } // namespace detail
 
 

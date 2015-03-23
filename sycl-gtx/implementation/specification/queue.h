@@ -81,14 +81,17 @@ public:
 
 	// Returns the SYCL device the queue is associated with.
 	device get_device() const;
+
+
+	template<cl_command_queue_info name>
+	using parameter_t = typename param_traits<cl_command_queue_info, name>::param_type;
 	
 	// Queries the platform for cl_command_queue info.
-	template<cl_int name>
-	typename param_traits<cl_command_queue_info, name>::param_type get_info() const {
-		using type = param_traits<cl_command_queue_info, name>::param_type;
-		type param_value;
+	template<cl_command_queue_info name>
+	parameter_t<name> get_info() const {
+		parameter_t<name> param_value;
 		auto q = command_q.get();
-		auto error_code = clGetCommandQueueInfo(q, name, sizeof(type), &param_value, nullptr);
+		auto error_code = clGetCommandQueueInfo(q, name, sizeof(parameter_t<name>), &param_value, nullptr);
 		handler.report(error_code);
 		return param_value;
 	}

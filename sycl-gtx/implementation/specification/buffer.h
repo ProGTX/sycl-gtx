@@ -5,6 +5,7 @@
 #include "access.h"
 #include "error_handler.h"
 #include "event.h"
+#include "param_traits.h"
 #include "ranges.h"
 #include "refc.h"
 #include "../common.h"
@@ -198,6 +199,20 @@ private:
 			buffer->host_data, 0, nullptr, nullptr
 		);
 		error::report(q, error_code);
+	}
+
+protected:
+
+	template<cl_mem_info name>
+	using parameter_t = typename param_traits<cl_command_queue_info, name>::param_type;
+
+	template<cl_mem_info name>
+	parameter_t<name> get_info() const {
+		parameter_t<name> param_value;
+		auto mem = device_data.get();
+		auto error_code = clGetMemObjectInfo(mem, name, sizeof(parameter_t<name>), &param_value, nullptr);
+		handler.report(error_code);
+		return param_value;
 	}
 };
 
