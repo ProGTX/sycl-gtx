@@ -5,7 +5,6 @@
 
 using namespace cl::sycl;
 
-// TODO: Handle errors
 program::program(string_class source, queue* q) {
 	const char* src = source.c_str();
 	size_t length = source.size();
@@ -15,15 +14,10 @@ program::program(string_class source, queue* q) {
 	auto Device = q->get_device().get();
 
 	cl_program p = clCreateProgramWithSource(Context, 1, &src, &length, &clError);
-	if(clError != CL_SUCCESS) {
-		debug() << "Failed to create CL program from source.";
-		return;
-	}
+	handler.report(clError);
+
 	prog = refc::allocate<cl_program>(p, clReleaseProgram);
 
 	clError = clBuildProgram(p, 1, &Device, nullptr, nullptr, nullptr);
-	//PrintBuildLog(p, Device);
-	if(clError != CL_SUCCESS) {
-		debug() << "Failed to build CL program.";
-	}
+	handler.report(clError);
 }
