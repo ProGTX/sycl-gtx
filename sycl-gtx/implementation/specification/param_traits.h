@@ -129,10 +129,10 @@ SYCL_ADD_TRAIT(cl_context_info, cl_bool, (
 
 
 // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetCommandQueueInfo.html
-SYCL_ADD_TRAIT(cl_command_queue_info, cl_context, (name == CL_QUEUE_CONTEXT));
-SYCL_ADD_TRAIT(cl_command_queue_info, cl_device_id, (name == CL_QUEUE_DEVICE));
-SYCL_ADD_TRAIT(cl_command_queue_info, cl_uint, (name == CL_QUEUE_REFERENCE_COUNT));
-SYCL_ADD_TRAIT(cl_command_queue_info, cl_command_queue_properties, (name == CL_QUEUE_PROPERTIES));
+SYCL_ADD_TRAIT(cl_command_queue_info, cl_context,					(name == CL_QUEUE_CONTEXT));
+SYCL_ADD_TRAIT(cl_command_queue_info, cl_device_id,					(name == CL_QUEUE_DEVICE));
+SYCL_ADD_TRAIT(cl_command_queue_info, cl_uint,						(name == CL_QUEUE_REFERENCE_COUNT));
+SYCL_ADD_TRAIT(cl_command_queue_info, cl_command_queue_properties,	(name == CL_QUEUE_PROPERTIES));
 
 // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetKernelInfo.html
 SYCL_ADD_TRAIT(cl_kernel_info, char[],		(name == CL_KERNEL_FUNCTION_NAME));

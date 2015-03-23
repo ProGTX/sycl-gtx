@@ -204,7 +204,7 @@ private:
 protected:
 
 	template<cl_mem_info name>
-	using parameter_t = typename param_traits<cl_command_queue_info, name>::param_type;
+	using parameter_t = typename param_traits<cl_mem_info, name>::param_type;
 
 	template<cl_mem_info name>
 	parameter_t<name> get_info() const {
