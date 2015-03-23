@@ -18,9 +18,9 @@ void single_task(string_class kernelName, KernelType kernFunctor) {
 	detail::cmd_group::check_scope();
 	detail::kernel_::source src(kernelName, kernFunctor);
 	auto kern = src.compile();
-	//debug() << src;
-	// TODO: Enqueue kernel invocation
-	//detail::kernel_::source::compile(src);
+	src.enqueue_write_buffers();
+	src.enqueue_kernel(kern);
+	src.enqueue_read_buffers();
 	DSELF() << "not implemented.";
 }
 

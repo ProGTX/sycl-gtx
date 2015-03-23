@@ -59,7 +59,10 @@ public:
 	}
 
 	string_class get_code();
-	shared_unique<kernel> compile();
+	shared_unique<kernel> compile() const;
+	void enqueue_write_buffers();
+	void enqueue_kernel(shared_unique<kernel> kern);
+	void enqueue_read_buffers();
 
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
 	static void register_resource(const accessor_core<DataType, dimensions, mode, target>& acc) {

@@ -78,8 +78,16 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 	*kern = std::unique_ptr<kernel>(new kernel(k));
 }
 
-detail::shared_unique<kernel> source::compile() {
+detail::shared_unique<kernel> source::compile() const {
 	auto kern = detail::shared_unique<kernel>(new std::unique_ptr<kernel>());
 	cmd_group::add(compile_command, *this, kern);
 	return kern;
+}
+
+// TODO
+void source::enqueue_write_buffers() {
+}
+void source::enqueue_kernel(detail::shared_unique<kernel> kern) {
+}
+void source::enqueue_read_buffers() {
 }
