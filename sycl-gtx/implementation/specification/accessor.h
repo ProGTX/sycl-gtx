@@ -22,7 +22,7 @@ class accessor_base {
 protected:
 	template <class ResourceType>
 	static string_class obtain_resource_name(ResourceType* resource) {
-		return resource->name;
+		return resource->resource_name;
 	}
 };
 
@@ -46,7 +46,7 @@ public:
 protected:
 	friend class kernel_::source;
 
-	virtual string_class resource_name() const {
+	virtual string_class get_resource_name() const {
 		DSELF() << "not implemented";
 		return "";
 	}
@@ -115,7 +115,7 @@ public:
 	}
 
 protected:
-	virtual string_class resource_name() const override {
+	virtual string_class get_resource_name() const override {
 		return obtain_resource_name(buf);
 	}
 
@@ -160,7 +160,7 @@ public:
 	// Reference to target element.
 	detail::__write_ref operator[](id<dimensions> index) const {
 		detail::kernel_::source::register_resource(*this);
-		return detail::__write_ref(resource_name() + "[" + detail::kernel_::source::to_string(index) + "]");
+		return detail::__write_ref(get_resource_name() + "[" + detail::kernel_::source::to_string(index) + "]");
 	}
 };
 

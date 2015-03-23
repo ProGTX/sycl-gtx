@@ -18,9 +18,6 @@ class queue;
 
 namespace detail {
 
-// Forward declaration
-class accessor_base;
-
 namespace kernel_ {
 
 class source {
@@ -29,7 +26,7 @@ private:
 		string_class type_name;
 		access::mode mode;
 		access::target target;
-		refc::ptr<cl_mem>* buffer;
+		buffer_base* buffer;
 	};
 
 	string_class kernelName;
@@ -71,12 +68,12 @@ public:
 			return;
 		}
 
-		auto name = acc.resource_name();
+		auto name = acc.get_resource_name();
 		auto it = scope->resources.find(name);
 
 		if(it == scope->resources.end()) {
 			auto buf = (buffer<DataType, dimensions>*) acc.resource();
-			scope->resources[name] = { get_name<DataType>(), mode, target, &buf->device_data };
+			scope->resources[name] = { get_name<DataType>(), mode, target, buf };
 		}
 	}
 

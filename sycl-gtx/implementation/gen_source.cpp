@@ -1,6 +1,7 @@
 #include "gen_source.h"
 
 #include "specification\accessor.h"
+#include "specification\buffer.h"
 #include "specification\error_handler.h"
 #include "specification\kernel.h"
 #include "specification\program.h"
@@ -33,7 +34,7 @@ string_class source::generate_accessor_list() {
 		return list;
 	}
 
-	for(auto&& acc : resources) {
+	for(auto& acc : resources) {
 		list += get_name(acc.second.target) + " ";
 		if(acc.second.mode == access::mode::read) {
 			list += "const ";
@@ -69,7 +70,7 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 
 	int i = 0;
 	for(auto& acc : src.resources) {
-		auto mem = acc.second.buffer->get();
+		auto mem = acc.second.buffer->device_data.get();
 		clError = clSetKernelArg(k, i, sizeof(cl_mem), &mem);
 		error::report(q, clError);
 		++i;
@@ -86,6 +87,13 @@ detail::shared_unique<kernel> source::compile() const {
 
 // TODO
 void source::enqueue_write_buffers() {
+	for(auto& acc : resources) {
+		if(	acc.second.mode == access::write		||
+			acc.second.mode == access::read_write	||
+			acc.second.mode == access::discard_read_write
+		) {
+		}
+	}
 }
 void source::enqueue_kernel(detail::shared_unique<kernel> kern) {
 }

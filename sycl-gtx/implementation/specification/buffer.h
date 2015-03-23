@@ -36,15 +36,25 @@ namespace kernel_ {
 
 static unsigned int buffer_counter = 0;
 
-template <typename DataType, int dimensions>
-class buffer_ {
+class buffer_base {
 protected:
-	string_class name;
-	range<dimensions> rang;
-	detail::error::handler handler;
+	friend class kernel_::source;
 
-	DataType* host_data = nullptr;
+	string_class resource_name;
+	detail::error::handler handler;
 	refc::ptr<cl_mem> device_data;
+
+	// TODO: to_string may be a problem if string_class not std::string
+	void generate_name() {
+		resource_name = resource_name + "sycl_buf_" + std::to_string(++buffer_counter);
+	}
+};
+
+template <typename DataType, int dimensions>
+class buffer_ : public buffer_base {
+protected:
+	range<dimensions> rang;
+	DataType* host_data = nullptr;
 
 	bool is_read_only = false;
 	bool is_blocking = true;
@@ -135,11 +145,6 @@ private:
 		error::report(q, error_code);
 	}
 
-	// TODO: to_string may be a problem if string_class not std::string
-	void generate_name() {
-		name = name + "sycl_buf_" + std::to_string(++buffer_counter);
-	}
-
 	template<cl_mem_flags FLAGS>
 	void init() {
 		if(!is_initialized) {
@@ -197,7 +202,7 @@ private:
 			0, buffer->get_size(),
 			// TODO: Events
 			buffer->host_data, 0, nullptr, nullptr
-			);
+		);
 		error::report(q, error_code);
 	}
 
