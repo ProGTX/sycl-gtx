@@ -1,6 +1,7 @@
 #include "gen_source.h"
 
 #include "specification\accessor.h"
+#include "specification\error_handler.h"
 #include "specification\kernel.h"
 #include "specification\program.h"
 #include "specification\queue.h"
@@ -64,13 +65,13 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 
 	cl_int clError;
 	cl_kernel k = clCreateKernel(p.get(), src.kernelName.c_str(), &clError);
-	// TODO: Handle error
+	error::report(q, clError);
 
 	int i = 0;
 	for(auto& acc : src.resources) {
 		// TODO: Buffer memory not valid
 		clError = clSetKernelArg(k, i, sizeof(cl_mem), acc.second.buffer->get());
-		// TODO: Handle error
+			error::report(q, clError);
 		++i;
 	}
 
