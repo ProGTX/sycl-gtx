@@ -69,9 +69,9 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 
 	int i = 0;
 	for(auto& acc : src.resources) {
-		// TODO: Buffer memory not valid
-		clError = clSetKernelArg(k, i, sizeof(cl_mem), acc.second.buffer->get());
-			error::report(q, clError);
+		auto mem = acc.second.buffer->get();
+		clError = clSetKernelArg(k, i, sizeof(cl_mem), &mem);
+		error::report(q, clError);
 		++i;
 	}
 

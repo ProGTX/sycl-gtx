@@ -177,7 +177,7 @@ public:
 		code;													\
 		init<flags>();											\
 		return create_accessor<mode, target>();					\
-	}
+		}
 
 	// TODO: Implement other combinations
 	SYCL_GET_ACCESS(access::write, access::global_buffer, CL_MEM_WRITE_ONLY, check_write());
@@ -197,12 +197,11 @@ private:
 			0, buffer->get_size(),
 			// TODO: Events
 			buffer->host_data, 0, nullptr, nullptr
-		);
+			);
 		error::report(q, error_code);
 	}
 
 protected:
-
 	template<cl_mem_info name>
 	using parameter_t = typename param_traits<cl_mem_info, name>::param_type;
 
