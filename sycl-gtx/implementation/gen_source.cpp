@@ -64,15 +64,15 @@ string_class source::get_name(access::target target) {
 void source::compile_command(queue* q, source src, detail::shared_unique<kernel> kern) {
 	program p(src.get_code(), q);
 
-	cl_int clError;
-	cl_kernel k = clCreateKernel(p.get(), src.kernelName.c_str(), &clError);
-	error::report(q, clError);
+	cl_int error_code;
+	cl_kernel k = clCreateKernel(p.get(), src.kernelName.c_str(), &error_code);
+	error::report(q, error_code);
 
 	int i = 0;
 	for(auto& acc : src.resources) {
 		auto mem = acc.second.buffer->device_data.get();
-		clError = clSetKernelArg(k, i, sizeof(cl_mem), &mem);
-		error::report(q, clError);
+		error_code = clSetKernelArg(k, i, sizeof(cl_mem), &mem);
+		error::report(q, error_code);
 		++i;
 	}
 

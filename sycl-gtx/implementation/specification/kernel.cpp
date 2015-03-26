@@ -11,10 +11,10 @@ kernel::kernel(cl_kernel k)
 {}
 
 void kernel::enqueue_task(queue* q) {
-	auto clError = clEnqueueTask(
+	auto error_code = clEnqueueTask(
 		q->get(), kern.get(),
 		// TODO: Events
 		0, nullptr, nullptr
 	);
-	detail::error::report(q, clError);
+	detail::error::report(q, error_code);
 }
