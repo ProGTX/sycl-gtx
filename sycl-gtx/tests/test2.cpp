@@ -5,6 +5,8 @@
 bool test2() {
 	using namespace cl::sycl;
 
+	static const int expected = 1024;
+
 	int result; // this is where we will write our result
 
 	{	// by sticking all the SYCL work in a {} block, we ensure
@@ -23,13 +25,14 @@ bool test2() {
 
 			// enqueue a single, simple task
 			single_task("simple_test", [=]() {
-				writeResult[0] = 1234;
+				writeResult[0] = expected;
 			});
 		}); // end of our commands for this queue
 
 	} // end scope, so we wait for the queue to complete
 
-	printf("Result = %d\n", result);
+	debug() << "Expected result" << expected;
+	debug() << "Actual result" << result;
 
-	return true;
+	return result == expected;
 }

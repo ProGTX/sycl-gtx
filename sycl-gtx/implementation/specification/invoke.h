@@ -21,7 +21,6 @@ void single_task(string_class kernelName, KernelType kernFunctor) {
 	src.write_buffers_to_device();
 	src.enqueue_task(kern);
 	src.read_buffers_from_device();
-	DSELF() << "not implemented.";
 }
 
 /*
