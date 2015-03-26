@@ -15,6 +15,13 @@ namespace sycl {
 
 // Forward declarations
 class context;
+class queue;
+
+namespace detail {
+namespace kernel_ {
+	class source;
+}
+}
 
 // 3.7.2.5 Kernel class
 
@@ -23,6 +30,8 @@ private:
 	refc::ptr<cl_kernel> kern;
 	context ctx;
 	program prog;
+
+	friend class detail::kernel_::source;
 
 public:
 	// The default object is not valid because there is no
@@ -90,6 +99,9 @@ public:
 	string_class get_function_name() {
 		return get_info<CL_KERNEL_FUNCTION_NAME>();
 	}
+
+private:
+	void enqueue_task(queue* q);
 };
 
 } // namespace sycl

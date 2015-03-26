@@ -45,6 +45,7 @@ private:
 	}
 
 	static void compile_command(queue* q, source src, shared_unique<kernel> kern);
+	static void enqueue_task_command(queue* q, shared_unique<kernel> kern);
 
 public:
 	template<class KernelType>
@@ -58,7 +59,7 @@ public:
 	string_class get_code();
 	shared_unique<kernel> compile() const;
 	void enqueue_write_buffers() const;
-	void enqueue_kernel(shared_unique<kernel> kern);
+	void enqueue_task(shared_unique<kernel> kern);
 	void enqueue_read_buffers() const;
 
 	template <typename DataType, int dimensions, access::mode mode, access::target target>

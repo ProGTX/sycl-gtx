@@ -98,14 +98,19 @@ void source::enqueue_write_buffers() const {
 	}
 }
 
-void source::enqueue_kernel(detail::shared_unique<kernel> kern) {
-	// TODO
+
+void source::enqueue_task_command(queue* q, detail::shared_unique<kernel> kern) {
+	(*kern)->enqueue_task(q);
+}
+
+void source::enqueue_task(detail::shared_unique<kernel> kern) {
+	cmd_group::add(enqueue_task_command, kern);
 }
 
 void source::enqueue_read_buffers() const {
 	for(auto& acc : resources) {
-		if(acc.second.mode == access::read ||
-			acc.second.mode == access::read_write ||
+		if(	acc.second.mode == access::read			||
+			acc.second.mode == access::read_write	||
 			acc.second.mode == access::discard_read_write
 		) {
 			cmd_group::add(buffer_base::enqueue_read_command, acc.second.buffer);
