@@ -48,6 +48,21 @@ protected:
 	void generate_name() {
 		resource_name = resource_name + "sycl_buf_" + std::to_string(++buffer_counter);
 	}
+
+	// TODO: Find a way to combine read/write into one function
+	virtual void enqueue_write(queue* q) {
+		DSELF() << "not implemented";
+	}
+	virtual void enqueue_read(queue* q) {
+		DSELF() << "not implemented";
+	}
+
+	static void enqueue_write_command(queue* q, buffer_base* buffer) {
+		buffer->enqueue_write(q);
+	}
+	static void enqueue_read_command(queue* q, buffer_base* buffer) {
+		buffer->enqueue_read(q);
+	}
 };
 
 template <typename DataType, int dimensions>
@@ -120,7 +135,7 @@ public:
 	}
 
 	// Total number of elements in the buffer
-	size_t get_count() {
+	size_t get_count() const {
 		size_t count = 0;
 		for(int i = 0; i < dimensions; ++i) {
 			count += rang[i];
@@ -129,7 +144,7 @@ public:
 	}
 
 	// Total number of bytes in the buffer
-	size_t get_size() {
+	size_t get_size() const {
 		return get_count() * sizeof(DataType);
 	}
 
@@ -182,7 +197,7 @@ public:
 		code;													\
 		init<flags>();											\
 		return create_accessor<mode, target>();					\
-		}
+	}
 
 	// TODO: Implement other combinations
 	SYCL_GET_ACCESS(access::write, access::global_buffer, CL_MEM_WRITE_ONLY, check_write());
@@ -192,16 +207,29 @@ public:
 
 private:
 	// TODO
-	void enqueue(queue* q, buffer_* buffer, decltype(&clEnqueueWriteBuffer) clEnqueueBuffer) {
-		cl_int error_code = clEnqueueBuffer(
+	virtual void enqueue_write(queue* q) override {
+		cl_int error_code = clEnqueueWriteBuffer(
 			q->get(),
-			buffer->device_data.get(),
+			device_data.get(),
 			// TODO: Should it block?
 			false,
 			// TODO: Sub-buffer access
-			0, buffer->get_size(),
+			0, get_size(),
 			// TODO: Events
-			buffer->host_data, 0, nullptr, nullptr
+			host_data, 0, nullptr, nullptr
+		);
+		error::report(q, error_code);
+	}
+	virtual void enqueue_read(queue* q) override {
+		cl_int error_code = clEnqueueReadBuffer(
+			q->get(),
+			device_data.get(),
+			// TODO: Should it block?
+			false,
+			// TODO: Sub-buffer access
+			0, get_size(),
+			// TODO: Events
+			host_data, 0, nullptr, nullptr
 		);
 		error::report(q, error_code);
 	}

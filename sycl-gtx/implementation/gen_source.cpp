@@ -79,23 +79,36 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 	*kern = std::unique_ptr<kernel>(new kernel(k));
 }
 
+// Note: MSVC2013 editor reports errors on cmd_group::add, but the code compiles and links
+
 detail::shared_unique<kernel> source::compile() const {
 	auto kern = detail::shared_unique<kernel>(new std::unique_ptr<kernel>());
 	cmd_group::add(compile_command, *this, kern);
 	return kern;
 }
 
-// TODO
 void source::enqueue_write_buffers() {
 	for(auto& acc : resources) {
 		if(	acc.second.mode == access::write		||
 			acc.second.mode == access::read_write	||
 			acc.second.mode == access::discard_read_write
 		) {
+			cmd_group::add(buffer_base::enqueue_write_command, acc.second.buffer);
 		}
 	}
 }
+
 void source::enqueue_kernel(detail::shared_unique<kernel> kern) {
+	// TODO
 }
+
 void source::enqueue_read_buffers() {
+	for(auto& acc : resources) {
+		if(acc.second.mode == access::write ||
+			acc.second.mode == access::read_write ||
+			acc.second.mode == access::discard_read_write
+		) {
+			cmd_group::add(buffer_base::enqueue_read_command, acc.second.buffer);
+		}
+	}
 }
