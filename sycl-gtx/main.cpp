@@ -17,6 +17,7 @@ int main() {
 		//{ "test5", test5 },
 		//{ "test6", test6 },
 		//{ "test7", test7 },
+		//{ "test8", test8 },
 	};
 
 	for(auto&& test : tests) {

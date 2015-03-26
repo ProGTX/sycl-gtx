@@ -23,6 +23,10 @@ void single_task(string_class kernelName, KernelType kernFunctor) {
 	src.read_buffers_from_device();
 }
 
+template<class KernelType, int dimensions>
+void parallel_for(string_class KernelName, range<dimensions> num_work_items, KernelType kernFunctor) {}
+
+
 /*
 
 template<typename KernelName, class KernelType>

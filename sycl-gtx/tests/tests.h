@@ -10,3 +10,4 @@ bool test4();
 bool test5();
 bool test6();
 bool test7();
+bool test8();

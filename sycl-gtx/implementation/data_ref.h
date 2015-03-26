@@ -1,5 +1,7 @@
 #pragma once
 
+#include "specification\ranges.h"
+
 #include "common.h"
 #include "debug.h"
 
@@ -19,6 +21,12 @@ public:
 	__write_ref(string_class name)
 		: name(name) {}
 	const __write_ref& operator=(int n) const;
+
+	template <int dimensions>
+	const __write_ref& operator=(id<dimensions> id_) const {
+		DSELF() << "not implemented";
+		return *this;
+	}
 };
 
 } // namespace detail
