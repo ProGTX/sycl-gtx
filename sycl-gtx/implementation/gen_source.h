@@ -36,7 +36,7 @@ private:
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;
 
-	string_class generate_accessor_list();
+	string_class generate_accessor_list() const;
 	static string_class get_name(access::target target);
 	template<typename DataType>
 	static string_class get_name() {
@@ -57,9 +57,9 @@ public:
 
 	string_class get_code();
 	shared_unique<kernel> compile() const;
-	void enqueue_write_buffers();
+	void enqueue_write_buffers() const;
 	void enqueue_kernel(shared_unique<kernel> kern);
-	void enqueue_read_buffers();
+	void enqueue_read_buffers() const;
 
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
 	static void register_resource(const accessor_core<DataType, dimensions, mode, target>& acc) {

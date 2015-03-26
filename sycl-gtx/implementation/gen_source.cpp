@@ -28,7 +28,7 @@ string_class source::get_code() {
 	return src;
 }
 
-string_class source::generate_accessor_list() {
+string_class source::generate_accessor_list() const {
 	string_class list;
 	if(resources.empty()) {
 		return list;
@@ -87,7 +87,7 @@ detail::shared_unique<kernel> source::compile() const {
 	return kern;
 }
 
-void source::enqueue_write_buffers() {
+void source::enqueue_write_buffers() const {
 	for(auto& acc : resources) {
 		if(	acc.second.mode == access::write		||
 			acc.second.mode == access::read_write	||
@@ -102,9 +102,9 @@ void source::enqueue_kernel(detail::shared_unique<kernel> kern) {
 	// TODO
 }
 
-void source::enqueue_read_buffers() {
+void source::enqueue_read_buffers() const {
 	for(auto& acc : resources) {
-		if(acc.second.mode == access::write ||
+		if(acc.second.mode == access::read ||
 			acc.second.mode == access::read_write ||
 			acc.second.mode == access::discard_read_write
 		) {
