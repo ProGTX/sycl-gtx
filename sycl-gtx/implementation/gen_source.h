@@ -17,8 +17,12 @@ class kernel;
 class queue;
 
 namespace detail {
-
 namespace kernel_ {
+
+// Forward declaration
+template<class Input>
+struct constructor;
+
 
 class source {
 private:
@@ -36,6 +40,9 @@ private:
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;
 
+	template<class Input>
+	friend struct constructor;
+
 	string_class generate_accessor_list() const;
 	static string_class get_name(access::target target);
 	template<typename DataType>
@@ -49,20 +56,20 @@ private:
 
 public:
 	// TODO: Generate kernel name
-
-	template<class KernelType>
-	source(KernelType kern)
-		: kernelName(string_class("__sycl_kernel_") + std::to_string(std::rand())) {
-		scope = this;
-		kern();
-		scope = nullptr;
-	}
+	source()
+		: kernelName(string_class("__sycl_kernel_") + std::to_string(std::rand())) {}
 
 	string_class get_code();
 	shared_unique<kernel> compile() const;
 	void write_buffers_to_device() const;
 	void enqueue_task(shared_unique<kernel> kern) const;
 	void read_buffers_from_device() const;
+
+	template<int dimensions>
+	void enqueue_range(shared_unique<kernel> kern, range<dimensions> num_work_items) const {
+		DSELF() << "not implemented";
+	}
+
 
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
 	static void register_resource(const accessor_core<DataType, dimensions, mode, target>& acc) {
@@ -93,6 +100,32 @@ public:
 	template <>
 	static string_class to_string(id<1> index) {
 		return std::to_string(index[0]);
+	}
+};
+
+// Single task invoke
+template<>
+struct constructor<void> {
+	static source get(std::function<void(void)> kern) {
+		source src;
+		source::scope = &src;
+		kern();
+		source::scope = nullptr;
+		return src;
+	}
+};
+
+// Parallel For
+template<int dimensions>
+struct constructor<id<dimensions>> {
+	static source get(std::function<void(id<dimensions>)> kern) {
+		source src;
+		source::scope = &src;
+		// TODO: id
+		id<dimensions> id_(0);
+		kern(id_);
+		source::scope = nullptr;
+		return src;
 	}
 };
 

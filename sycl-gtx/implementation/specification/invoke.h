@@ -13,19 +13,27 @@ namespace sycl {
 // From my understanding of the specification (revision 2014-09-16, section 2.6),
 // the kernel name isn't really needed here - can generate own name
 
+// 3.7.3.1 Single Task invoke
 template<class KernelType>
 void single_task(KernelType kernFunctor) {
 	detail::cmd_group::check_scope();
-	detail::kernel_::source src(kernFunctor);
+	auto src = detail::kernel_::constructor<void>::get(kernFunctor);
 	auto kern = src.compile();
 	src.write_buffers_to_device();
 	src.enqueue_task(kern);
 	src.read_buffers_from_device();
 }
 
+// 3.7.3.2 Parallel For invoke
+
 template<class KernelType, int dimensions>
 void parallel_for(range<dimensions> num_work_items, KernelType kernFunctor) {
 	detail::cmd_group::check_scope();
+	auto src = detail::kernel_::constructor<id<dimensions>>::get(kernFunctor);
+	auto kern = src.compile();
+	src.write_buffers_to_device();
+	src.enqueue_range(kern, num_work_items);
+	src.read_buffers_from_device();
 }
 
 
