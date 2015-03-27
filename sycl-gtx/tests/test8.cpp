@@ -6,7 +6,8 @@
 bool test8() {
 	using namespace cl::sycl;
 
-	int data[1024]; // initialize data to be worked on
+	static const int size = 1024;
+	int data[size]; // initialize data to be worked on
 
 	// By including all the SYCL work in a {} block, we ensure
 	// all SYCL tasks must complete before exiting the block
@@ -15,7 +16,7 @@ bool test8() {
 		queue myQueue;
 
 		// wrap our data variable in a buffer
-		buffer<int, 1> resultBuf(data, 1024);
+		buffer<int, 1> resultBuf(data, size);
 
 		// create a command_group to issue commands to the queue
 		command_group(myQueue, [&]() {
@@ -23,7 +24,7 @@ bool test8() {
 			auto writeResult = resultBuf.get_access<access::write>();
 
 			// enqueue a prallel_for task
-			parallel_for<>(range<1>(1024), [=](id<1> idx) {
+			parallel_for<>(range<1>(size), [=](id<1> idx) {
 				writeResult[idx] = idx;
 			}); // end of the kernel function
 		}); // end of our commands for this queue
@@ -31,7 +32,7 @@ bool test8() {
 	} // end of scope, so we wait for the queued work to complete
 
 	// print result
-	for(int i = 0; i < 1024; i++) {
+	for(int i = 0; i < size; i++) {
 		printf("data[%d] = %d\n", i, data[i]);
 	}
 

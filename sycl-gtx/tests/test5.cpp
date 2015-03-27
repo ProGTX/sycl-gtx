@@ -10,7 +10,7 @@ bool test5() {
 	debug("= Getting all platforms");
 	auto platforms = platform::get_platforms();
 	debug("platforms size:") << platforms.size();
-	int i = 0;
+	unsigned int i = 0;
 	for(auto& p : platforms) {
 		debug();
 		debug("== platform") << (i++);
