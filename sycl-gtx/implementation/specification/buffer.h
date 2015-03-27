@@ -49,19 +49,12 @@ protected:
 		resource_name = resource_name + "sycl_buf_" + std::to_string(++buffer_counter);
 	}
 
-	// TODO: Find a way to combine read/write into one function
-	virtual void enqueue_write(queue* q) {
+	using clEnqueueBuffer_f = decltype(&clEnqueueWriteBuffer);
+	virtual void enqueue(queue* q, clEnqueueBuffer_f clEnqueueBuffer) {
 		DSELF() << "not implemented";
 	}
-	virtual void enqueue_read(queue* q) {
-		DSELF() << "not implemented";
-	}
-
-	static void enqueue_write_command(queue* q, buffer_base* buffer) {
-		buffer->enqueue_write(q);
-	}
-	static void enqueue_read_command(queue* q, buffer_base* buffer) {
-		buffer->enqueue_read(q);
+	static void enqueue_command(queue* q, buffer_base* buffer, clEnqueueBuffer_f clEnqueueBuffer) {
+		buffer->enqueue(q, clEnqueueBuffer);
 	}
 };
 
@@ -207,21 +200,8 @@ public:
 
 private:
 	// TODO
-	virtual void enqueue_write(queue* q) override {
-		cl_int error_code = clEnqueueWriteBuffer(
-			q->get(),
-			device_data.get(),
-			// TODO: Should it block?
-			false,
-			// TODO: Sub-buffer access
-			0, get_size(),
-			// TODO: Events
-			host_data, 0, nullptr, nullptr
-		);
-		error::report(q, error_code);
-	}
-	virtual void enqueue_read(queue* q) override {
-		cl_int error_code = clEnqueueReadBuffer(
+	virtual void enqueue(queue* q, clEnqueueBuffer_f clEnqueueBuffer) override {
+		cl_int error_code = clEnqueueBuffer(
 			q->get(),
 			device_data.get(),
 			// TODO: Should it block?

@@ -89,7 +89,11 @@ detail::shared_unique<kernel> source::compile() const {
 
 void source::write_buffers_to_device() const {
 	for(auto& acc : resources) {
-		cmd_group::add(buffer_base::enqueue_write_command, acc.second.buffer);
+		cmd_group::add(
+			buffer_base::enqueue_command,
+			acc.second.buffer,
+			&clEnqueueWriteBuffer
+		);
 	}
 }
 
@@ -103,6 +107,10 @@ void source::enqueue_task(detail::shared_unique<kernel> kern) const {
 
 void source::read_buffers_from_device() const {
 	for(auto& acc : resources) {
-		cmd_group::add(buffer_base::enqueue_read_command, acc.second.buffer);
+		cmd_group::add(
+			buffer_base::enqueue_command,
+			acc.second.buffer,
+			reinterpret_cast<buffer_base::clEnqueueBuffer_f>(&clEnqueueReadBuffer)
+		);
 	}
 }
