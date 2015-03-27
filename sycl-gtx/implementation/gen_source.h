@@ -48,9 +48,11 @@ private:
 	static void enqueue_task_command(queue* q, shared_unique<kernel> kern);
 
 public:
+	// TODO: Generate kernel name
+
 	template<class KernelType>
-	source(string_class kernelName, KernelType kern)
-		: kernelName(kernelName) {
+	source(KernelType kern)
+		: kernelName(string_class("__sycl_kernel_") + std::to_string(std::rand())) {
 		scope = this;
 		kern();
 		scope = nullptr;

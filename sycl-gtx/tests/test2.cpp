@@ -25,7 +25,7 @@ bool test2() {
 			auto writeResult = resultBuf.get_access<access::write>();
 
 			// enqueue a single, simple task
-			single_task("simple_test", [=]() {
+			single_task<>([=]() {
 				writeResult[0] = expected;
 			});
 		}); // end of our commands for this queue

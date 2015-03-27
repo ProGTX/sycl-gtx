@@ -10,13 +10,13 @@ namespace cl {
 namespace sycl {
 
 // TODO: Passing kernel names
-// Will need to divert slightly from the specification
-// Diversion could be avoided if I could get functor name at compile time
+// From my understanding of the specification (revision 2014-09-16, section 2.6),
+// the kernel name isn't really needed here - can generate own name
 
 template<class KernelType>
-void single_task(string_class kernelName, KernelType kernFunctor) {
+void single_task(KernelType kernFunctor) {
 	detail::cmd_group::check_scope();
-	detail::kernel_::source src(kernelName, kernFunctor);
+	detail::kernel_::source src(kernFunctor);
 	auto kern = src.compile();
 	src.write_buffers_to_device();
 	src.enqueue_task(kern);
@@ -24,7 +24,9 @@ void single_task(string_class kernelName, KernelType kernFunctor) {
 }
 
 template<class KernelType, int dimensions>
-void parallel_for(string_class KernelName, range<dimensions> num_work_items, KernelType kernFunctor) {}
+void parallel_for(range<dimensions> num_work_items, KernelType kernFunctor) {
+	detail::cmd_group::check_scope();
+}
 
 
 /*

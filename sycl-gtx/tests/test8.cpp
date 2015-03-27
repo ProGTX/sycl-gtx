@@ -23,7 +23,7 @@ bool test8() {
 			auto writeResult = resultBuf.get_access<access::write>();
 
 			// enqueue a prallel_for task
-			parallel_for("simple_test", range<1>(1024), [=](id<1> idx) {
+			parallel_for<>(range<1>(1024), [=](id<1> idx) {
 				writeResult[idx] = idx;
 			}); // end of the kernel function
 		}); // end of our commands for this queue
