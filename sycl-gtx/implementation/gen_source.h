@@ -54,11 +54,11 @@ private:
 	static void compile_command(queue* q, source src, shared_unique<kernel> kern);
 	static void enqueue_task_command(queue* q, shared_unique<kernel> kern);
 
-public:
 	// TODO: Generate kernel name
 	source()
 		: kernelName(string_class("__sycl_kernel_") + std::to_string(std::rand())) {}
 
+public:
 	string_class get_code();
 	shared_unique<kernel> compile() const;
 	void write_buffers_to_device() const;
@@ -106,10 +106,13 @@ public:
 // Single task invoke
 template<>
 struct constructor<void> {
-	static source get(std::function<void(void)> kern) {
+	static source get(function_class<void> kern) {
 		source src;
 		source::scope = &src;
+
+		// MSVC2013 complains about this, but compiles and links.
 		kern();
+
 		source::scope = nullptr;
 		return src;
 	}
@@ -118,7 +121,7 @@ struct constructor<void> {
 // Parallel For
 template<int dimensions>
 struct constructor<id<dimensions>> {
-	static source get(std::function<void(id<dimensions>)> kern) {
+	static source get(function_class<id<dimensions>> kern) {
 		source src;
 		source::scope = &src;
 		// TODO: id
