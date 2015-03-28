@@ -35,6 +35,7 @@ private:
 
 	string_class kernelName;
 	vector_class<string_class> lines;
+	string_class final_code;
 	std::unordered_map<string_class, tuple> resources;
 
 	// TODO: Multithreading support

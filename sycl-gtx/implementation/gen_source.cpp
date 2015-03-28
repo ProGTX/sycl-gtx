@@ -14,18 +14,22 @@ source* source::scope = nullptr;
 
 // Creates kernel source
 string_class source::get_code() {
-	string_class src;
-	static const char newline = '\n';
-
-	src = src + "__kernel void " + kernelName + "(" + generate_accessor_list() + ") {" + newline;
-
-	for(auto& line : lines) {
-		src += std::move(line) + newline;
+	if(!final_code.empty()) {
+		return final_code;
 	}
 
-	src = src + "}" + newline;
+	static const char newline = '\n';
 
-	return src;
+	final_code = string_class("__kernel void ") + kernelName + "(" + generate_accessor_list() + ") {" + newline;
+
+	for(auto& line : lines) {
+		final_code += std::move(line) + newline;
+	}
+	lines.clear();
+
+	final_code = final_code + "}" + newline;
+
+	return final_code;
 }
 
 string_class source::generate_accessor_list() const {
