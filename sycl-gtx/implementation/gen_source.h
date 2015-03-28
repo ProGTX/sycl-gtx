@@ -135,7 +135,7 @@ private:
 		}
 
 		// TODO: id
-		id<dimensions> index(0);
+		id<dimensions> index{0, 0, 0};
 		return index;
 	}
 public:
