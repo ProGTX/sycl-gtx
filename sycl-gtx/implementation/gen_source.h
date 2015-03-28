@@ -58,7 +58,6 @@ private:
 	static void compile_command(queue* q, source src, shared_unique<kernel> kern);
 	static void enqueue_task_command(queue* q, shared_unique<kernel> kern);
 
-	// TODO: Generate kernel name
 	source()
 		:	kernel_id(++num_kernels),
 			kernel_name(string_class("_sycl_kernel_") + std::to_string(kernel_id)) {}

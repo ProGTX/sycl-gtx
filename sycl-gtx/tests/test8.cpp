@@ -7,7 +7,13 @@ bool test8() {
 	using namespace cl::sycl;
 
 	static const int size = 1024;
-	int data[size]; // initialize data to be worked on
+	int data[size];		// Initialize data to be worked on
+
+	// Expected results
+	int expected[size];
+	for(int i = 0; i < size; ++i) {
+		expected[i] = i;
+	}
 
 	// By including all the SYCL work in a {} block, we ensure
 	// all SYCL tasks must complete before exiting the block
@@ -31,10 +37,16 @@ bool test8() {
 
 	} // end of scope, so we wait for the queued work to complete
 
-	// print result
-	for(int i = 0; i < size; i++) {
-		printf("data[%d] = %d\n", i, data[i]);
+	bool success = true;
+
+	// Print result
+	debug() << "index, expected, actual";
+	for(int i = 0; i < size; ++i) {
+		if(data[i] != expected[i]) {
+			success = false;
+		}
+		debug() << i << ",\t" << expected[i] << ",\t" << data[i];
 	}
 
-	return true;
+	return success;
 }
