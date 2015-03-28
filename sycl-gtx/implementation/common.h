@@ -33,7 +33,7 @@ namespace cl {
 namespace sycl {
 
 #ifndef CL_SYCL_NO_STD_VECTOR
-	template < class T, class Alloc = ::std::allocator<T> >
+	template<class T, class Alloc = ::std::allocator<T>>
 	using vector_class = ::std::vector<T, Alloc>;
 #endif
 
@@ -42,8 +42,8 @@ namespace sycl {
 #endif
 
 #ifndef CL_SYCL_NO_STD_FUNCTION
-	template<class... Args>
 #if MSVC_LOW
+	template<class... Args>
 	class function_class : public ::std::function<void(Args...)> {
 	private:
 		using Base = ::std::function<void(Args...)>;
@@ -51,7 +51,7 @@ namespace sycl {
 		function_class() {}
 		function_class(nullptr_t fn)
 			: Base(fn) {}
-		template <class Fn>
+		template<class Fn>
 		function_class(Fn fn)
 			: Base(fn) {}
 		function_class(const Base& x)
@@ -60,6 +60,7 @@ namespace sycl {
 			: Base(std::move(x)) {}
 	};
 #else
+	template<class... Args>
 	using function_class = ::std::function<void(Args...)>;
 #endif
 #endif

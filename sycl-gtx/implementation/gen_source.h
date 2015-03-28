@@ -110,8 +110,7 @@ struct constructor<void> {
 		source src;
 		source::scope = &src;
 
-		// MSVC2013 complains about this, but compiles and links.
-		kern();
+		kern(); // MSVC2013 complains about this, but compiles and links.
 
 		source::scope = nullptr;
 		return src;
@@ -124,9 +123,11 @@ struct constructor<id<dimensions>> {
 	static source get(function_class<id<dimensions>> kern) {
 		source src;
 		source::scope = &src;
+
 		// TODO: id
 		id<dimensions> id_(0);
 		kern(id_);
+
 		source::scope = nullptr;
 		return src;
 	}
