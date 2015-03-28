@@ -173,6 +173,7 @@
     <ClInclude Include="implementation\gen_source.h" />
     <ClInclude Include="implementation\specification\accessor.h" />
     <ClInclude Include="implementation\specification\access.h" />
+    <ClInclude Include="implementation\specification\accessor\buffer.h" />
     <ClInclude Include="implementation\specification\buffer.h" />
     <ClInclude Include="implementation\specification\command_group.h" />
     <ClInclude Include="implementation\specification\context.h" />

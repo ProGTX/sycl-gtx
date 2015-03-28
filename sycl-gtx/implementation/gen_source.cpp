@@ -1,6 +1,6 @@
 #include "gen_source.h"
 
-#include "specification\accessor.h"
+#include "specification\accessor\buffer.h"
 #include "specification\buffer.h"
 #include "specification\error_handler.h"
 #include "specification\kernel.h"

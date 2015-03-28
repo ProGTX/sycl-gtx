@@ -22,6 +22,9 @@
     <Filter Include="Source Files\specification">
       <UniqueIdentifier>{76112fff-eaac-4239-8355-76ce97a5d1e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\specification\accessor">
+      <UniqueIdentifier>{24e9e996-50a2-41bd-aff5-8b00bcbc900a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -157,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="implementation\data_ref.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\accessor\buffer.h">
+      <Filter>Header Files\specification\accessor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "specification\access.h"
-#include "specification\accessor.h"
+#include "specification\accessor\buffer.h"
 #include "specification\command_group.h"
 #include "specification\ranges.h"
 #include "common.h"
