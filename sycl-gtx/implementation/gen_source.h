@@ -124,12 +124,25 @@ struct constructor<void> {
 // Parallel For
 template<int dimensions>
 struct constructor<id<dimensions>> {
+private:
+	static id<dimensions> generate_id_code() {
+		for(int i = 0; i < dimensions; ++i) {
+			auto id_s = std::to_string(i);
+			source::add(
+				string_class("int _sycl_id") + id_s + " = get_global_id(" + id_s + ")"
+			);
+		}
+
+		// TODO: id
+		id<dimensions> id_(0);
+		return id_;
+	}
+public:
 	static source get(function_class<id<dimensions>> kern) {
 		source src;
 		source::scope = &src;
 
-		// TODO: id
-		id<dimensions> id_(0);
+		auto id_ = generate_id_code();
 		kern(id_);
 
 		source::scope = nullptr;
