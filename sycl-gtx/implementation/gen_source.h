@@ -48,12 +48,6 @@ private:
 	friend struct constructor;
 
 	string_class generate_accessor_list() const;
-	static string_class get_name(access::target target);
-	template<typename DataType>
-	static string_class get_name() {
-		// TODO
-		return "int*";
-	}
 
 	static void compile_command(queue* q, source src, shared_unique<kernel> kern);
 	static void enqueue_task_command(queue* q, shared_unique<kernel> kern);
@@ -96,14 +90,17 @@ public:
 		scope->lines.push_back('\t' + line + ';');
 	}
 
-	template <int dimensions>
-	static string_class to_string(id<dimensions> index) {
+	static string_class get_name(access::target target);
+	template<typename DataType>
+	static string_class get_name() {
 		// TODO
-		return "0";
+		return "int*";
 	}
-	template <>
-	static string_class to_string(id<1> index) {
-		return std::to_string(index[0]);
+
+	template<int dimensions>
+	static string_class get_name(id<dimensions> index) {
+		// TODO
+		return "_sycl_id0";
 	}
 };
 
@@ -134,16 +131,16 @@ private:
 		}
 
 		// TODO: id
-		id<dimensions> id_(0);
-		return id_;
+		id<dimensions> index(0);
+		return index;
 	}
 public:
 	static source get(function_class<id<dimensions>> kern) {
 		source src;
 		source::scope = &src;
 
-		auto id_ = generate_id_code();
-		kern(id_);
+		auto index = generate_id_code();
+		kern(index);
 
 		source::scope = nullptr;
 		return src;

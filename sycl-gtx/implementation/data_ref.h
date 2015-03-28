@@ -23,8 +23,9 @@ public:
 	const __write_ref& operator=(int n) const;
 
 	template <int dimensions>
-	const __write_ref& operator=(id<dimensions> id_) const {
+	const __write_ref& operator=(id<dimensions> index) const {
 		DSELF() << "not implemented";
+		kernel_::source::add(name + " = " + kernel_::source::get_name(index));
 		return *this;
 	}
 };

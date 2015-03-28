@@ -119,7 +119,6 @@ static range<dimensions> empty_range() {
 template <int dimensions = 1>
 class id : public range<dimensions> {
 public:
-
 	// TODO
 	id(std::initializer_list<size_t> list)
 		: range<dimensions>::range(vector_class<size_t>(dimensions, 0).data()) {}

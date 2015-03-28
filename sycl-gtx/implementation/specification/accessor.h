@@ -157,10 +157,19 @@ SYCL_ADD_ACCESSOR(access::write) {
 public:
 	accessor(buffer<DataType, dimensions>& targette)
 		: detail::accessor_<DataType, dimensions, access::write, target>(targette) {}
-	// Reference to target element.
+
+	detail::__write_ref operator[](int index) const {
+		detail::kernel_::source::register_resource(*this);
+		return detail::__write_ref(
+			get_resource_name() + "[" + std::to_string(index) + "]"
+		);
+	}
+
 	detail::__write_ref operator[](id<dimensions> index) const {
 		detail::kernel_::source::register_resource(*this);
-		return detail::__write_ref(get_resource_name() + "[" + detail::kernel_::source::to_string(index) + "]");
+		return detail::__write_ref(
+			get_resource_name() + "[" + detail::kernel_::source::get_name(index) + "]"
+		);
 	}
 };
 
