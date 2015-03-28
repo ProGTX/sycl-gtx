@@ -6,6 +6,7 @@
 #include "context.h"
 #include "error_handler.h"
 #include "program.h"
+#include "ranges.h"
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
@@ -102,6 +103,18 @@ public:
 
 private:
 	void enqueue_task(queue* q);
+
+	template<int dimensions>
+	void enqueue_range(queue* q, range<dimensions> num_work_items) {
+		size_t* global_work_size = &num_work_items[0];
+		auto error_code = clEnqueueNDRangeKernel(
+			q->get(), kern.get(), dimensions,
+			nullptr, global_work_size, nullptr,
+			// TODO: Events
+			0, nullptr, nullptr
+		);
+		detail::error::report(q, error_code);
+	}
 };
 
 } // namespace sycl

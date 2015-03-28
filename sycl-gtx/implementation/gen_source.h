@@ -64,8 +64,12 @@ public:
 	void read_buffers_from_device() const;
 
 	template<int dimensions>
+	static void enqueue_range_command(queue* q, detail::shared_unique<kernel> kern, range<dimensions> num_work_items) {
+		(*kern)->enqueue_range(q, num_work_items);
+	}
+	template<int dimensions>
 	void enqueue_range(shared_unique<kernel> kern, range<dimensions> num_work_items) const {
-		DSELF() << "not implemented";
+		cmd_group::add(enqueue_range_command, kern, num_work_items);
 	}
 
 
