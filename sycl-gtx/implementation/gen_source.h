@@ -33,7 +33,10 @@ private:
 		buffer_base* buffer;
 	};
 
-	string_class kernelName;
+	static int num_kernels;
+	int kernel_id;
+
+	string_class kernel_name;
 	vector_class<string_class> lines;
 	string_class final_code;
 	std::unordered_map<string_class, tuple> resources;
@@ -57,7 +60,8 @@ private:
 
 	// TODO: Generate kernel name
 	source()
-		: kernelName(string_class("__sycl_kernel_") + std::to_string(std::rand())) {}
+		:	kernel_id(++num_kernels),
+			kernel_name(string_class("_sycl_kernel_") + std::to_string(kernel_id)) {}
 
 public:
 	string_class get_code();

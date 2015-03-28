@@ -46,7 +46,7 @@ protected:
 
 	// TODO: to_string may be a problem if string_class not std::string
 	void generate_name() {
-		resource_name = resource_name + "sycl_buf_" + std::to_string(++buffer_counter);
+		resource_name = resource_name + "_sycl_buf_" + std::to_string(++buffer_counter);
 	}
 
 	using clEnqueueBuffer_f = decltype(&clEnqueueWriteBuffer);

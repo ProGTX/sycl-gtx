@@ -10,6 +10,7 @@
 using namespace cl::sycl;
 using namespace detail::kernel_;
 
+int source::num_kernels = 0;
 source* source::scope = nullptr;
 
 // Creates kernel source
@@ -20,7 +21,7 @@ string_class source::get_code() {
 
 	static const char newline = '\n';
 
-	final_code = string_class("__kernel void ") + kernelName + "(" + generate_accessor_list() + ") {" + newline;
+	final_code = string_class("__kernel void ") + kernel_name + "(" + generate_accessor_list() + ") {" + newline;
 
 	for(auto& line : lines) {
 		final_code += std::move(line) + newline;
@@ -69,7 +70,7 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 	program p(src.get_code(), q);
 
 	cl_int error_code;
-	cl_kernel k = clCreateKernel(p.get(), src.kernelName.c_str(), &error_code);
+	cl_kernel k = clCreateKernel(p.get(), src.kernel_name.c_str(), &error_code);
 	error::report(q, error_code);
 
 	int i = 0;
