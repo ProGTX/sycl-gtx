@@ -94,6 +94,10 @@ detail::shared_unique<kernel> source::compile() const {
 
 void source::write_buffers_to_device() const {
 	for(auto& acc : resources) {
+		if(acc.second.mode == access::write || acc.second.mode == access::discard_read_write) {
+			// Don't need to copy data that won't be used
+			continue;
+		}
 		cmd_group::add(
 			buffer_base::enqueue_command,
 			__func__,
@@ -113,6 +117,10 @@ void source::enqueue_task(detail::shared_unique<kernel> kern) const {
 
 void source::read_buffers_from_device() const {
 	for(auto& acc : resources) {
+		if(acc.second.mode == access::read) {
+			// Don't need to read back read-only buffers
+			continue;
+		}
 		cmd_group::add(
 			buffer_base::enqueue_command,
 			__func__,
