@@ -156,7 +156,7 @@ private:
 	template<cl_mem_flags FLAGS>
 	void init() {
 		if(!is_initialized) {
-			cmd_group::add(create<FLAGS>, this);
+			cmd_group::add(create<FLAGS>, __func__, this);
 			generate_name();
 			is_initialized = true;
 		}

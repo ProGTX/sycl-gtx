@@ -12,8 +12,9 @@ void command_group::exit() {
 void command_group::flush() {
 	DSELF();
 
-	for(auto&& command : commands) {
-		command(q);
+	for(auto& command : commands) {
+		debug() << "command:" << command.first;
+		command.second(q);
 	}
 	commands.clear();
 }

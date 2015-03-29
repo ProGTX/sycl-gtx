@@ -25,8 +25,8 @@ private:
 
 public:
 	template<class... Args>
-	static void add(fn<Args...> function, Args... params) {
-		last->commands.push_back(std::bind(function, std::placeholders::_1, params...));
+	static void add(fn<Args...> function, string_class name, Args... params) {
+		last->commands.emplace_back(name, std::bind(function, std::placeholders::_1, params...));
 	}
 	static bool in_scope();
 	static void check_scope(error::handler& handler = error::handler::default);
@@ -43,7 +43,7 @@ private:
 	friend class detail::cmd_group;
 	using command_t = detail::cmd_group::command_t;
 
-	vector_class<command_t> commands;
+	vector_class<std::pair<string_class, command_t>> commands;
 	queue* q;
 
 	void enter();

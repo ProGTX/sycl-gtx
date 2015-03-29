@@ -69,7 +69,7 @@ public:
 	}
 	template<int dimensions>
 	void enqueue_range(shared_unique<kernel> kern, range<dimensions> num_work_items) const {
-		cmd_group::add(enqueue_range_command, kern, num_work_items);
+		cmd_group::add(enqueue_range_command, __func__, kern, num_work_items);
 	}
 
 

@@ -88,7 +88,7 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 
 detail::shared_unique<kernel> source::compile() const {
 	auto kern = detail::shared_unique<kernel>(new std::unique_ptr<kernel>());
-	cmd_group::add(compile_command, *this, kern);
+	cmd_group::add(compile_command, __func__, *this, kern);
 	return kern;
 }
 
@@ -96,6 +96,7 @@ void source::write_buffers_to_device() const {
 	for(auto& acc : resources) {
 		cmd_group::add(
 			buffer_base::enqueue_command,
+			__func__,
 			acc.second.buffer,
 			&clEnqueueWriteBuffer
 		);
@@ -107,13 +108,14 @@ void source::enqueue_task_command(queue* q, detail::shared_unique<kernel> kern) 
 }
 
 void source::enqueue_task(detail::shared_unique<kernel> kern) const {
-	cmd_group::add(enqueue_task_command, kern);
+	cmd_group::add(enqueue_task_command, __func__, kern);
 }
 
 void source::read_buffers_from_device() const {
 	for(auto& acc : resources) {
 		cmd_group::add(
 			buffer_base::enqueue_command,
+			__func__,
 			acc.second.buffer,
 			reinterpret_cast<buffer_base::clEnqueueBuffer_f>(&clEnqueueReadBuffer)
 		);
