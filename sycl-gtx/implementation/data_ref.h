@@ -14,15 +14,25 @@ namespace detail {
 class data_ref {
 private:
 	string_class name;
+	bool assignable = true;
+
 public:
 	data_ref(string_class name)
 		: name(name) {}
-	const data_ref& operator=(int n) const;
+
+	data_ref& operator=(int n);
+	data_ref& operator=(data_ref dref);
+	data_ref& operator+(data_ref dref);
 
 	template <int dimensions>
-	const data_ref& operator=(id<dimensions> index) const {
+	data_ref& operator=(id<dimensions> index) {
 		DSELF() << "not implemented";
-		kernel_::source::add(name + " = " + kernel_::source::get_name(index));
+		if(assignable) {
+			kernel_::source::add(name + " = " + kernel_::source::get_name(index));
+		}
+		else {
+			// TODO: Error
+		}
 		return *this;
 	}
 };

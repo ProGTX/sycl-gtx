@@ -38,9 +38,8 @@ bool test1() {
 			auto c = d_c.get_access<access::read>();
 			auto r = d_r.get_access<access::write>();
 			// Kernel
-			parallel_for<>(range<1>(count), [=](id<> item) {
-				//int i = item.get_global(0);
-				//r[i] = a[i] + b[i] + c[i];
+			parallel_for<>(range<1>(count), [=](id<> i) {
+				r[i] = a[i] + b[i] + c[i];
 			});
 		});
 	}
