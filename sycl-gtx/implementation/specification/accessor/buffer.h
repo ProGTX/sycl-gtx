@@ -92,11 +92,6 @@ public:
 #else
 	using detail::accessor_<DataType, dimensions, access::read, target>::accessor_;
 #endif
-	// Read element from target data.
-	//detail::__read_ref operator[](id<dimensions>) const {
-	//	DSELF() << "not implemented";
-	//	return detail::__read_ref();
-	//}
 };
 
 SYCL_ADD_ACCESSOR(access::write) {
@@ -109,8 +104,6 @@ SYCL_ADD_ACCESSOR(access::atomic) {
 public:
 	accessor(buffer<DataType, dimensions>& targette)
 		: detail::accessor_<DataType, dimensions, access::atomic, target>(targette) {}
-	// Atomic reference to element from target data.
-	//detail::__atomic_ref<DataType> operator[](id<dimensions>) const;
 };
 
 } // namespace sycl
