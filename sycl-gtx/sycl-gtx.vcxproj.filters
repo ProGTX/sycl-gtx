@@ -75,9 +75,6 @@
     <ClCompile Include="implementation\gen_source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\data_ref.cpp">
-      <Filter>Source Files\specification</Filter>
-    </ClCompile>
     <ClCompile Include="implementation\specification\program.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
@@ -86,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="tests\test8.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="implementation\data_ref.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

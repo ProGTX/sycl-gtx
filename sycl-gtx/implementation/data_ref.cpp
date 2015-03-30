@@ -13,7 +13,7 @@ data_ref& data_ref::operator=(data_ref dref) {
 	DSELF() << "not implemented";
 	if(assignable) {
 		// TODO: Somehow causes a segfault
-		//kernel_::source::add(name + " = " + dref.name);
+		kernel_::source::add(name + " = " + dref.name);
 	}
 	else {
 		// TODO: Error
