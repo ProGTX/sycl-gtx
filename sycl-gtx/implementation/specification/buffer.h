@@ -12,6 +12,7 @@
 #include "../debug.h"
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 
 namespace cl {
@@ -78,9 +79,10 @@ protected:
 
 	// Associated host memory.
 	buffer_(DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
-		: host_data(ptr_t(host_data, [](DataType* ptr) {})), rang(range), is_read_only(is_read_only), is_blocking(is_blocking) {
-		DSELF() << "not implemented";
-	}
+		: host_data(ptr_t(host_data, [](DataType* ptr) {})), rang(range), is_read_only(is_read_only), is_blocking(is_blocking) {}
+
+	buffer_(nullptr_t host_data, range<dimensions> range)
+		: buffer_(nullptr, range, false) {}
 
 public:
 	// Associated host memory.
@@ -255,7 +257,10 @@ struct buffer<DataType, 1> : public detail::buffer_<DataType, 1> {
 	// Create a new allocated 1D buffer initialized from the given elements
 	// ranging from first up to one before last
 	template <class InputIterator>
-	buffer(InputIterator* startIterator, InputIterator* endIterator);
+	buffer(InputIterator first, InputIterator last)
+		: detail::buffer_<DataType, 1>(nullptr, last - first) {
+		host_data = ptr_t(new DataType[last - first]);
+		std::copy(first, last, host_data.get());
 	}
 
 	buffer(vector_class<DataType>& host_data)
