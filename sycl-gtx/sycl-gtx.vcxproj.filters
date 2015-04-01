@@ -25,6 +25,9 @@
     <Filter Include="Header Files\specification\accessor">
       <UniqueIdentifier>{24e9e996-50a2-41bd-aff5-8b00bcbc900a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\specification\ranges">
+      <UniqueIdentifier>{c5abcb55-673b-4329-8c4a-0693f461aae8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -163,6 +166,12 @@
     </ClInclude>
     <ClInclude Include="implementation\specification\accessor\buffer.h">
       <Filter>Header Files\specification\accessor</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\ranges\range.h">
+      <Filter>Header Files\specification\ranges</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\ranges\id.h">
+      <Filter>Header Files\specification\ranges</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

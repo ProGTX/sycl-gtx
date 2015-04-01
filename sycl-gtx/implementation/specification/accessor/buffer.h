@@ -7,11 +7,11 @@
 namespace cl {
 namespace sycl {
 
-namespace detail {
-
 // Forward declaration
 template <typename DataType, int dimensions>
-struct cl::sycl::buffer;
+struct buffer;
+
+namespace detail {
 
 template <typename DataType, int dimensions>
 class accessor_buffer {
