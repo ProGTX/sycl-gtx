@@ -79,7 +79,10 @@ protected:
 
 	// Associated host memory.
 	buffer_(DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
-		: host_data(ptr_t(host_data, [](DataType* ptr) {})), rang(range), is_read_only(is_read_only), is_blocking(is_blocking) {}
+		:	host_data(ptr_t(host_data, [](DataType* ptr) {})),
+			rang(range),
+			is_read_only(is_read_only),
+			is_blocking(is_blocking) {}
 
 	buffer_(nullptr_t host_data, range<dimensions> range)
 		: buffer_(nullptr, range, false) {}
@@ -106,9 +109,10 @@ public:
 	// Instead, the SYCL system frees any storage required for the buffer asynchronously when it is no longer in use in queues.
 	// The initial contents of the buffer are undefined.
 	buffer_(range<dimensions> range)
-		: buffer_(nullptr, range, false, false) {
-		DSELF() << "not implemented";
-	}
+		:	host_data(ptr_t(new DataType[ range[0]*range[1]*range[2] ])),
+			rang(range),
+			is_read_only(false),
+			is_blocking(false) {}
 
 	// Associated storage object.
 	// The storage object must not be destroyed by the user until after the buffer has been destroyed.
