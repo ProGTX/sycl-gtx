@@ -284,6 +284,8 @@ struct buffer<DataType, 2> : public detail::buffer_<DataType, 2>{
 		: buffer(range<2>{ sizeX, sizeY }) {}
 	buffer(DataType* host_data, size_t sizeX, size_t sizeY)
 		: buffer(host_data, { sizeX, sizeY }) {}
+	buffer(const DataType* host_data, size_t sizeX, size_t sizeY)
+		: buffer(host_data, { sizeX, sizeY }) {}
 };
 
 template <typename DataType>
@@ -305,6 +307,8 @@ struct buffer<DataType, 3> : public detail::buffer_<DataType, 3>{
 	buffer(size_t sizeX, size_t sizeY, size_t sizeZ)
 		: buffer(range<3>{ sizeX, sizeY, sizeZ }) {}
 	buffer(DataType* host_data, size_t sizeX, size_t sizeY, size_t sizeZ)
+		: buffer(host_data, { sizeX, sizeY, sizeZ }) {}
+	buffer(const DataType* host_data, size_t sizeX, size_t sizeY, size_t sizeZ)
 		: buffer(host_data, { sizeX, sizeY, sizeZ }) {}
 };
 
