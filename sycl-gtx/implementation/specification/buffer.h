@@ -256,12 +256,12 @@ struct buffer<DataType, 1> : public detail::buffer_<DataType, 1> {
 	// ranging from first up to one before last
 	template <class InputIterator>
 	buffer(InputIterator* startIterator, InputIterator* endIterator);
-
-	// TODO: Used by the Codeplay SYCL example
-	buffer(vector_class<DataType> host_data)
-		: detail::buffer_<DataType, 1>(host_data.data(), host_data.size()) {
-		DSELF() << "not implemented";
 	}
+
+	buffer(vector_class<DataType>& host_data)
+		: detail::buffer_<DataType, 1>(host_data.data(), host_data.size()) {}
+	buffer(const vector_class<DataType>& host_data)
+		: detail::buffer_<DataType, 1>(host_data.data(), host_data.size()) {}
 };
 
 template <typename DataType>
