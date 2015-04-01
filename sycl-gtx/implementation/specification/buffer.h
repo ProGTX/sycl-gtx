@@ -10,7 +10,9 @@
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
+#include <memory>
 #include <vector>
+
 
 namespace cl {
 namespace sycl {
@@ -46,7 +48,7 @@ protected:
 
 	// TODO: to_string may be a problem if string_class not std::string
 	void generate_name() {
-		resource_name = resource_name + "_sycl_buf_" + std::to_string(++buffer_counter);
+		resource_name = string_class("_sycl_buf_") + std::to_string(++buffer_counter);
 	}
 
 	using clEnqueueBuffer_f = decltype(&clEnqueueWriteBuffer);
@@ -61,8 +63,10 @@ protected:
 template <typename DataType, int dimensions>
 class buffer_ : public buffer_base {
 protected:
+	using ptr_t = std::shared_ptr<DataType>;
+
 	range<dimensions> rang;
-	DataType* host_data = nullptr;
+	ptr_t host_data;
 
 	bool is_read_only = false;
 	bool is_blocking = true;
@@ -74,7 +78,7 @@ protected:
 
 	// Associated host memory.
 	buffer_(DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
-		: host_data(host_data), rang(range), is_read_only(is_read_only), is_blocking(is_blocking) {
+		: host_data(ptr_t(host_data, [](DataType* ptr) {})), rang(range), is_read_only(is_read_only), is_blocking(is_blocking) {
 		DSELF() << "not implemented";
 	}
 
@@ -147,7 +151,7 @@ private:
 		cl_int error_code;
 		const cl_mem_flags all_flags = FLAGS | ((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR);
 		buffer->device_data = refc::allocate(
-			clCreateBuffer(q->get_context().get(), all_flags, buffer->get_size(), buffer->host_data, &error_code),
+			clCreateBuffer(q->get_context().get(), all_flags, buffer->get_size(), buffer->host_data.get(), &error_code),
 			clReleaseMemObject
 		);
 		error::report(q, error_code);
@@ -209,7 +213,7 @@ private:
 			// TODO: Sub-buffer access
 			0, get_size(),
 			// TODO: Events
-			host_data, 0, nullptr, nullptr
+			host_data.get(), 0, nullptr, nullptr
 		);
 		error::report(q, error_code);
 	}
