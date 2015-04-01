@@ -54,7 +54,7 @@ bool test1() {
 			correct++;
 		}
 		else {
-			//printf(" tmp %f h_a %f h_b %f h_c %f h_r %f \n", tmp, h_a[i], h_b[i], h_c[i], h_r[i]);
+			debug() << h_r[i] << "=\t" << h_a[i] << "+\t" << h_b[i] << "+\t" << h_c[i];
 		}
 	}
 
