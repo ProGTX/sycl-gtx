@@ -31,6 +31,12 @@ protected:
 	cl_mem get_buffer_object() const {
 		return buf->device_data.get();
 	}
+	size_t access_buffer_range(int n) const {
+		return buf->rang[n];
+	}
+	DataType* access_host_data() const {
+		return buf->host_data.get();
+	}
 };
 
 #define SYCL_BUFFER_CONSTRUCTORS(init)					\
@@ -121,8 +127,13 @@ protected:
 	SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR();
 public:
 	DataType operator[](int index) {
-		// TODO
-		return 0;
+		// http://stackoverflow.com/questions/7367770
+		int multiplier = 1;
+		for(int i = 1; i < dimensions; ++i) {
+			multiplier *= acc->access_buffer_range(i - 1);
+			index += rang[i] * multiplier;
+		}
+		return acc->access_host_data()[index];
 	}
 };
 
@@ -178,6 +189,7 @@ public:
 } // namespace sycl
 } // namespace cl
 
+#undef SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR
 #undef SYCL_BUFFER_CONSTRUCTORS
 
 #undef SYCL_ACCESSOR_CLASS
