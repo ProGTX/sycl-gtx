@@ -28,6 +28,9 @@
     <Filter Include="Header Files\specification\ranges">
       <UniqueIdentifier>{c5abcb55-673b-4329-8c4a-0693f461aae8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\specification\ranges">
+      <UniqueIdentifier>{ed7dbd73-90ba-4636-8903-4dbdfc2e6d61}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -89,6 +92,9 @@
     </ClCompile>
     <ClCompile Include="implementation\data_ref.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="implementation\specification\ranges\id.cpp">
+      <Filter>Source Files\specification\ranges</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

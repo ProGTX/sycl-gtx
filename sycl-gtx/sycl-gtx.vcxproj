@@ -157,6 +157,7 @@
     <ClCompile Include="implementation\specification\platform.cpp" />
     <ClCompile Include="implementation\specification\program.cpp" />
     <ClCompile Include="implementation\specification\queue.cpp" />
+    <ClCompile Include="implementation\specification\ranges\id.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tests\test1.cpp" />
     <ClCompile Include="tests\test2.cpp" />
