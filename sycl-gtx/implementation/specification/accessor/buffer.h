@@ -98,25 +98,37 @@ public:
 
 
 SYCL_ADD_ACCESSOR(access::read) {
+	using Base = detail::accessor_<DataType, dimensions, access::read, target>;
 public:
 #if MSVC_LOW
-	accessor(buffer<DataType, dimensions>& targette)
-		: detail::accessor_<DataType, dimensions, access::read, target>(targette) {}
+	accessor(buffer<DataType, dimensions>& bufferRef)
+		: Base(bufferRef) {}
+	accessor(
+		buffer<DataType, dimensions>& bufferRef,
+		range<dimensions> offset,
+		range<dimensions> range
+	)
+		: Base(bufferRef, offset, range) {}
 #else
-	using detail::accessor_<DataType, dimensions, access::read, target>::accessor_;
+	using Base::accessor_;
 #endif
 };
 
 SYCL_ADD_ACCESSOR(access::write) {
+	using Base = detail::accessor_<DataType, dimensions, access::write, target>;
 public:
-	accessor(buffer<DataType, dimensions>& targette)
-		: detail::accessor_<DataType, dimensions, access::write, target>(targette) {}
-};
-
-SYCL_ADD_ACCESSOR(access::atomic) {
-public:
-	accessor(buffer<DataType, dimensions>& targette)
-		: detail::accessor_<DataType, dimensions, access::atomic, target>(targette) {}
+#if MSVC_LOW
+	accessor(buffer<DataType, dimensions>& bufferRef)
+		: Base(bufferRef) {}
+	accessor(
+		buffer<DataType, dimensions>& bufferRef,
+		range<dimensions> offset,
+		range<dimensions> range
+	)
+		: Base(bufferRef, offset, range) {}
+#else
+	using Base::accessor_;
+#endif
 };
 
 } // namespace sycl
