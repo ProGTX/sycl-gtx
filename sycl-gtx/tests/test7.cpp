@@ -22,12 +22,12 @@ bool test7() {
 
 		// Launch a first asynchronous kernel to initialize a
 		command_group(myQueue, [&]() {
-			// The kernel write a, so get a write accessor on it
+			// The kernel writes a, so get a write accessor on it
 			auto A = a.get_access<access::write>();
 
 			// Enqueue a parallel kernel iterating on a N*M 2D iteration space
 			parallel_for</*class init_a*/>(range<2>(N, M), [=](id<2> index) {
-				//A[index] = index[0] * 2 + index[1];
+				A[index] = index[0] * 2 + index[1];
 			});
 		});
 
@@ -41,7 +41,7 @@ bool test7() {
 
 			// Enqueue a parallel kernel iterating on a N*M 2D iteration space
 			parallel_for</*class init_b*/>(range<2>(N, M), [=](id<2> index) {
-				//B[index] = index[0] * 2014 + index[1] * 42;
+				B[index] = index[0] * 2014 + index[1] * 42;
 			});
 		});
 
@@ -56,7 +56,7 @@ bool test7() {
 
 			// Enqueue a parallel kernel iterating on a N*M 2D iteration space
 			parallel_for</*class matrix_add*/>(range<2>(N, M), [=](id<2> index) {
-				//C[index] = A[index] + B[index];
+				C[index] = A[index] + B[index];
 			});
 		});
 
@@ -67,12 +67,10 @@ bool test7() {
 		for(size_t i = 0; i < N; i++) {
 			for(size_t j = 0; j < M; j++) {
 				// Compare the result to the analytic value
-				/*
-				if(C[i][j] != i*(2 + 2014) + j*(1 + 42)) {
-					debug() << "Wrong value " << C[i][j] << " on element " << i << " " << j;
-					return false;
+				int expected = i*(2 + 2014) + j*(1 + 42);
+				if(C[i][j] != expected) {
+					debug() << "expected" << expected << "actual" << C[i][j] << "element" << i << j;
 				}
-				*/
 			}
 		}
 
