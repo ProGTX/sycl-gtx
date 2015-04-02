@@ -91,9 +91,30 @@ protected:
 	}
 };
 
-SYCL_ACCESSOR_CLASS(target == access::host_buffer), public accessor_buffer<DataType, dimensions> {
+template <int level, typename DataType, int dimensions, access::mode mode>
+class accessor_host_ref {
+protected:
+	using Lower = accessor_host_ref<dimensions - 1, DataType, dimensions, mode>;
+	using acc_t = accessor_<DataType, dimensions, mode, access::host_buffer>;
+	friend class acc_t;
+	friend class accessor_host_ref;
+	acc_t* acc;
+	accessor_host_ref(acc_t* acc = nullptr)
+		: acc(acc) {}
 public:
-	SYCL_BUFFER_CONSTRUCTORS(dimensions, {});
+	Lower operator[](int index) {
+		return Lower(acc);
+	}
+};
+
+SYCL_ACCESSOR_CLASS(target == access::host_buffer),
+	public accessor_buffer<DataType, dimensions>,
+	public accessor_host_ref<dimensions, DataType, dimensions, (access::mode)mode>
+{
+public:
+	SYCL_BUFFER_CONSTRUCTORS(dimensions, {
+		acc = this;
+	});
 };
 
 } // namespace detail
