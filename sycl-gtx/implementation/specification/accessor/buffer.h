@@ -91,19 +91,38 @@ protected:
 	}
 };
 
+#define SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR()									\
+	using acc_t = accessor_<DataType, dimensions, mode, access::host_buffer>;	\
+	friend class acc_t;															\
+	friend class accessor_host_ref;												\
+	acc_t* acc;																	\
+	range<3> rang;																\
+	accessor_host_ref(acc_t* acc, range<3> range)								\
+		: acc(acc), rang(range) {}												\
+	accessor_host_ref()															\
+		: accessor_host_ref(nullptr, empty_range<3>()) {}
+
 template <int level, typename DataType, int dimensions, access::mode mode>
 class accessor_host_ref {
 protected:
 	using Lower = accessor_host_ref<dimensions - 1, DataType, dimensions, mode>;
-	using acc_t = accessor_<DataType, dimensions, mode, access::host_buffer>;
-	friend class acc_t;
-	friend class accessor_host_ref;
-	acc_t* acc;
-	accessor_host_ref(acc_t* acc = nullptr)
-		: acc(acc) {}
+	SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR();
 public:
 	Lower operator[](int index) {
-		return Lower(acc);
+		auto rang_copy = rang;
+		rang_copy[dimensions] = index;
+		return Lower(acc, rang_copy);
+	}
+};
+
+template <typename DataType, int dimensions, access::mode mode>
+class accessor_host_ref<1, DataType, dimensions, mode> {
+protected:
+	SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR();
+public:
+	DataType operator[](int index) {
+		// TODO
+		return 0;
 	}
 };
 
@@ -111,6 +130,8 @@ SYCL_ACCESSOR_CLASS(target == access::host_buffer),
 	public accessor_buffer<DataType, dimensions>,
 	public accessor_host_ref<dimensions, DataType, dimensions, (access::mode)mode>
 {
+	template <int level, typename DataType, int dimensions, access::mode mode>
+	friend class accessor_host_ref;
 public:
 	SYCL_BUFFER_CONSTRUCTORS({
 		acc = this;
