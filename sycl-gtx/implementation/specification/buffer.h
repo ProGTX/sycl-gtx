@@ -139,9 +139,9 @@ public:
 
 	// Total number of elements in the buffer
 	size_t get_count() const {
-		size_t count = 0;
-		for(int i = 0; i < dimensions; ++i) {
-			count += rang[i];
+		size_t count = rang[0];
+		for(int i = 1; i < dimensions; ++i) {
+			count *= rang[i];
 		}
 		return count;
 	}
