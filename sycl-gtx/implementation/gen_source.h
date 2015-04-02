@@ -17,6 +17,26 @@ class kernel;
 class queue;
 
 namespace detail {
+
+namespace type_name {
+
+template <typename DataType>
+static string_class get();
+
+#define STRING_TYPE_FUNCION(type)	\
+template<>							\
+static string_class get<type>() {	\
+	return #type "*";				\
+}
+
+STRING_TYPE_FUNCION(int)
+STRING_TYPE_FUNCION(float)
+
+#undef STRING_TYPE_FUNCION
+
+} // namespace type_name
+
+
 namespace kernel_ {
 
 // Forward declaration
@@ -87,7 +107,7 @@ public:
 
 		if(it == scope->resources.end()) {
 			auto buf = (buffer<DataType, dimensions>*) acc.resource();
-			scope->resources[name] = { get_name<DataType>(), mode, target, buf };
+			scope->resources[name] = { type_name::get<DataType>(), mode, target, buf };
 		}
 	}
 
@@ -97,11 +117,6 @@ public:
 	}
 
 	static string_class get_name(access::target target);
-	template<typename DataType>
-	static string_class get_name() {
-		// TODO
-		return "int*";
-	}
 };
 
 // Single task invoke
