@@ -33,7 +33,7 @@ protected:
 	}
 };
 
-#define SYCL_BUFFER_CONSTRUCTORS(dimensions, init)					\
+#define SYCL_BUFFER_CONSTRUCTORS(init)					\
 	accessor_(														\
 		cl::sycl::buffer<DataType, dimensions>& bufferRef,			\
 		range<dimensions> offset,									\
@@ -54,7 +54,7 @@ SYCL_ACCESSOR_CLASS(
 	target == access::global_buffer
 ), public accessor_buffer<DataType, dimensions> {
 public:
-	SYCL_BUFFER_CONSTRUCTORS(dimensions, {});
+	SYCL_BUFFER_CONSTRUCTORS({});
 
 	virtual cl_mem get_cl_mem_object() const override {
 		return get_buffer_object();
@@ -112,7 +112,7 @@ SYCL_ACCESSOR_CLASS(target == access::host_buffer),
 	public accessor_host_ref<dimensions, DataType, dimensions, (access::mode)mode>
 {
 public:
-	SYCL_BUFFER_CONSTRUCTORS(dimensions, {
+	SYCL_BUFFER_CONSTRUCTORS({
 		acc = this;
 	});
 };
