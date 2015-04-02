@@ -31,7 +31,7 @@ void single_task(KernelType kernFunctor) {
 template<class KernelType, int dimensions>
 void parallel_for(range<dimensions> num_work_items, KernelType kernFunctor) {
 	detail::cmd_group::check_scope();
-	auto src = detail::kernel_::constructor<id<dimensions>>::get(kernFunctor);
+	auto src = detail::kernel_::constructor<id<dimensions>>::get(kernFunctor, num_work_items);
 	auto kern = src.compile();
 	debug() << "Compiled kernel:";
 	debug() << src.get_code();

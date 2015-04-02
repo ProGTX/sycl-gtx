@@ -137,7 +137,7 @@ struct constructor<void> {
 template<int dimensions>
 struct constructor<id<dimensions>> {
 private:
-	static id<dimensions> generate_id_code() {
+	static id<dimensions> generate_id_code(range<dimensions> num_work_items) {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
@@ -145,16 +145,24 @@ private:
 			);
 		}
 
-		// TODO: id
+		if(dimensions == 2) {
+			source::add(
+				string_class("int ") + id_base_all_name + " = " +
+				id_base_name + "1 * " + std::to_string(num_work_items[0]) + " + " + id_base_name + "0"
+			);
+		}
+
+		// TODO: 3d
+
 		id<dimensions> index{0, 0, 0};
 		return index;
 	}
 public:
-	static source get(function_class<id<dimensions>> kern) {
+	static source get(function_class<id<dimensions>> kern, range<dimensions> num_work_items) {
 		source src;
 		source::scope = &src;
 
-		auto index = generate_id_code();
+		auto index = generate_id_code(num_work_items);
 		kern(index);
 
 		source::scope = nullptr;

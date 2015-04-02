@@ -16,7 +16,8 @@ namespace kernel_ {
 	class source;
 }
 
-static const string_class id_base_name = "_sycl_id";
+static const string_class id_base_name		= "_sycl_id_";
+static const string_class id_base_all_name	= "_sycl_id_d";
 
 template <int dimensions>
 struct id_ {
