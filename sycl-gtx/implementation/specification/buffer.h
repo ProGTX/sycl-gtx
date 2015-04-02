@@ -187,8 +187,10 @@ public:
 	// Default access is read-only
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
-		cmd_group::check_scope(handler);
-		init<CL_MEM_READ_ONLY>();
+		if(target != access::host_buffer) {
+			cmd_group::check_scope(handler);
+			init<CL_MEM_READ_ONLY>();
+		}
 		return create_accessor<mode, target>();
 	}
 
@@ -196,9 +198,13 @@ public:
 #define SYCL_GET_ACCESS(mode, target, flags, code)				\
 	template<>													\
 	accessor<DataType, dimensions, mode, target> get_access() {	\
-		cmd_group::check_scope(handler);						\
+		if(target != access::host_buffer) {						\
+			cmd_group::check_scope(handler);					\
+		}														\
 		code;													\
-		init<flags>();											\
+		if(target != access::host_buffer) {						\
+			init<flags>();										\
+		}														\
 		return create_accessor<mode, target>();					\
 	}
 

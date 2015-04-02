@@ -34,8 +34,7 @@ protected:
 SYCL_ACCESSOR_CLASS(
 	target == access::cl_buffer ||
 	target == access::constant_buffer ||
-	target == access::global_buffer ||
-	target == access::host_buffer
+	target == access::global_buffer
 ), public accessor_buffer<DataType, dimensions> {
 public:
 	// This accessor limits the processing of the buffer to the [offset, offset + range] for every dimension
@@ -64,6 +63,7 @@ public:
 		);
 	}
 
+	// TODO: Limit id to same dimension as buffer
 	detail::data_ref operator[](id<1> index) const {
 		detail::kernel_::source::register_resource(*this);
 		return detail::data_ref(
@@ -85,6 +85,24 @@ protected:
 	virtual void* resource() const override {
 		return buf;
 	}
+};
+
+SYCL_ACCESSOR_CLASS(target == access::host_buffer), public accessor_buffer<DataType, dimensions> {
+public:
+	// This accessor limits the processing of the buffer to the [offset, offset + range] for every dimension
+	// Any other parts of the buffer will be unaffected
+	accessor_(
+		cl::sycl::buffer<DataType, dimensions>& bufferRef,
+		range<dimensions> offset,
+		range<dimensions> range
+	) : accessor_buffer(bufferRef, offset, range) {}
+
+	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef)
+		: accessor_(
+		bufferRef,
+		detail::empty_range<dimensions>(),
+		bufferRef.get_range()
+	) {}
 };
 
 } // namespace detail
