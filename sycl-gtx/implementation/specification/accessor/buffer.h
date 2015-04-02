@@ -29,6 +29,10 @@ protected:
 	cl_mem get_buffer_object() const {
 		return buf->device_data.get();
 	}
+
+	size_t access_range(int n) const {
+		return buf->rang[n];
+	}
 };
 
 SYCL_ACCESSOR_CLASS(
@@ -65,17 +69,15 @@ public:
 	}
 
 	detail::data_ref operator[](id<1> index) const {
-		using namespace detail::kernel_;
-		source::register_resource(*this);
+		detail::kernel_::source::register_resource(*this);
 		return detail::data_ref(
 			get_resource_name() + "[" + index[0].name + "]"
 		);
 	}
 	detail::data_ref operator[](id<2> index) const {
-		using namespace detail::kernel_;
-		source::register_resource(*this);
+		detail::kernel_::source::register_resource(*this);
 		return detail::data_ref(
-			get_resource_name() + "[" + index[0].name + "]"
+			get_resource_name() + "[" + index[1].name + "*" + std::to_string(access_range(0)) + " + " + index[0].name + "]"
 		);
 	}
 
