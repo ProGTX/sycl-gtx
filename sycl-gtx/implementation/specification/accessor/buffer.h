@@ -64,10 +64,18 @@ public:
 		);
 	}
 
-	detail::data_ref operator[](id<dimensions> index) const {
-		detail::kernel_::source::register_resource(*this);
+	detail::data_ref operator[](id<1> index) const {
+		using namespace detail::kernel_;
+		source::register_resource(*this);
 		return detail::data_ref(
-			get_resource_name() + "[" + detail::kernel_::source::get_name(index) + "]"
+			get_resource_name() + "[" + index[0].name + "]"
+		);
+	}
+	detail::data_ref operator[](id<2> index) const {
+		using namespace detail::kernel_;
+		source::register_resource(*this);
+		return detail::data_ref(
+			get_resource_name() + "[" + index[0].name + "]"
 		);
 	}
 

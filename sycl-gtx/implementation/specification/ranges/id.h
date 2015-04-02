@@ -16,12 +16,12 @@ namespace kernel_ {
 	class source;
 }
 
+static const string_class id_base_name = "_sycl_id";
 
 template <int dimensions>
 struct id_ {
 protected:
 	friend class kernel_::source;
-	static const string_class base_name;
 
 	size_t values[3];
 

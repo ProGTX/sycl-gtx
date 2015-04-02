@@ -3,9 +3,6 @@
 
 using namespace cl::sycl;
 
-template <int dimensions>
-const string_class detail::id_<dimensions>::base_name = "_sycl_id";
-
 #define SUBSCRIPT_OPERATOR(dimension)							\
 template <>														\
 detail::id_ref detail::id_<dimension>::operator[](size_t n) {	\

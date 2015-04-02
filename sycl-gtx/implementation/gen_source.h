@@ -102,12 +102,6 @@ public:
 		// TODO
 		return "int*";
 	}
-
-	template<int dimensions>
-	static string_class get_name(id<dimensions> index) {
-		// TODO
-		return "_sycl_id0";
-	}
 };
 
 // Single task invoke
@@ -132,7 +126,7 @@ private:
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
-				string_class("int _sycl_id") + id_s + " = get_global_id(" + id_s + ")"
+				string_class("int ") + id_base_name + id_s + " = get_global_id(" + id_s + ")"
 			);
 		}
 
