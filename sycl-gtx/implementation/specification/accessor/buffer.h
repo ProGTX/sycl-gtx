@@ -31,26 +31,26 @@ protected:
 	}
 };
 
+#define SYCL_BUFFER_CONSTRUCTORS(dimensions)						\
+	accessor_(														\
+		cl::sycl::buffer<DataType, dimensions>& bufferRef,			\
+		range<dimensions> offset,									\
+		range<dimensions> range										\
+	) : accessor_buffer(bufferRef, offset, range) {}				\
+	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef)	\
+		: accessor_(												\
+		bufferRef,													\
+		detail::empty_range<dimensions>(),							\
+		bufferRef.get_range()										\
+	) {}
+
 SYCL_ACCESSOR_CLASS(
 	target == access::cl_buffer ||
 	target == access::constant_buffer ||
 	target == access::global_buffer
 ), public accessor_buffer<DataType, dimensions> {
 public:
-	// This accessor limits the processing of the buffer to the [offset, offset + range] for every dimension
-	// Any other parts of the buffer will be unaffected
-	accessor_(
-		cl::sycl::buffer<DataType, dimensions>& bufferRef,
-		range<dimensions> offset,
-		range<dimensions> range
-	) : accessor_buffer(bufferRef, offset, range) {}
-
-	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef)
-		: accessor_(
-		bufferRef,
-		detail::empty_range<dimensions>(),
-		bufferRef.get_range()
-	) {}
+	SYCL_BUFFER_CONSTRUCTORS(dimensions)
 
 	virtual cl_mem get_cl_mem_object() const override {
 		return get_buffer_object();
@@ -87,28 +87,10 @@ protected:
 	}
 };
 
-#define SYCL_HOST_ACCESSOR(dimensions)																\
-template <typename DataType, int mode, int target>													\
-class accessor_<DataType, dimensions, mode, target, select_target<target == access::host_buffer>>	\
-	:	public accessor_core<DataType, dimensions, (access::mode)mode, (access::target)target>,		\
-		public accessor_buffer<DataType, dimensions> {												\
-public:																								\
-	accessor_(																						\
-		cl::sycl::buffer<DataType, dimensions>& bufferRef,											\
-		range<dimensions> offset,																	\
-		range<dimensions> range																		\
-	) : accessor_buffer(bufferRef, offset, range) {}												\
-	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef)									\
-		: accessor_(																				\
-		bufferRef,																					\
-		detail::empty_range<dimensions>(),															\
-		bufferRef.get_range()																		\
-	) {}																							\
+SYCL_ACCESSOR_CLASS(target == access::host_buffer), public accessor_buffer<DataType, dimensions> {
+public:
+	SYCL_BUFFER_CONSTRUCTORS(dimensions)
 };
-
-SYCL_HOST_ACCESSOR(1)
-SYCL_HOST_ACCESSOR(2)
-SYCL_HOST_ACCESSOR(3)
 
 } // namespace detail
 
@@ -138,7 +120,7 @@ public:
 } // namespace sycl
 } // namespace cl
 
-#undef SYCL_HOST_ACCESSOR
+#undef SYCL_BUFFER_CONSTRUCTORS
 
 #undef SYCL_ACCESSOR_CLASS
 #undef SYCL_ADD_ACCESSOR
