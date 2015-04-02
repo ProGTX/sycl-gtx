@@ -57,6 +57,8 @@ private:
 			kernel_name(string_class("_sycl_kernel_") + std::to_string(kernel_id)) {}
 
 public:
+	static bool in_scope();
+
 	string_class get_code();
 	shared_unique<kernel> compile() const;
 	void write_buffers_to_device() const;

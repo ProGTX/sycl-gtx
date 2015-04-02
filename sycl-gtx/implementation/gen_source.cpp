@@ -13,6 +13,10 @@ using namespace detail::kernel_;
 int source::num_kernels = 0;
 source* source::scope = nullptr;
 
+bool source::in_scope() {
+	return scope != nullptr;
+}
+
 // Creates kernel source
 string_class source::get_code() {
 	if(!final_code.empty()) {
