@@ -17,12 +17,14 @@ template <typename DataType, int dimensions>
 class accessor_buffer {
 protected:
 	cl::sycl::buffer<DataType, dimensions>* buf;
+	range<dimensions> offset;
+	range<dimensions> rang;
 public:
 	accessor_buffer(
 		cl::sycl::buffer<DataType, dimensions>& bufferRef,
 		range<dimensions> offset,
 		range<dimensions> range
-	) : buf(&bufferRef) {
+	) : buf(&bufferRef), offset(offset), rang(range) {
 		DSELF() << "not implemented";
 	}
 protected:
