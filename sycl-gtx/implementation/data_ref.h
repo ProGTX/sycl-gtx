@@ -28,6 +28,7 @@ public:
 	data_ref& operator=(id<1> index);
 	data_ref& operator=(data_ref dref);
 	data_ref& operator+(data_ref dref);
+	data_ref& operator*(int n);
 };
 
 class id_ref : public data_ref {

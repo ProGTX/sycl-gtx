@@ -35,3 +35,9 @@ data_ref& data_ref::operator+(data_ref dref) {
 	name += string_class(" + ") + dref.name;
 	return *this;
 }
+
+data_ref& data_ref::operator*(int n) {
+	assignable = false;
+	name += string_class(" * ") + std::to_string(n);
+	return *this;
+}
