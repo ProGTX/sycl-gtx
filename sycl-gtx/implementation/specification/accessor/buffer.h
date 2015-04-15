@@ -116,7 +116,7 @@ protected:
 public:
 	Lower operator[](int index) {
 		auto rang_copy = rang;
-		rang_copy[dimensions] = index;
+		rang_copy[dimensions - 1] = index;
 		return Lower(acc, rang_copy);
 	}
 };
