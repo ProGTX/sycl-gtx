@@ -15,9 +15,7 @@ class id;
 namespace detail {
 
 class data_ref {
-protected:
-	bool assignable = true;
-
+	static const string_class open_parenthesis;
 public:
 	string_class name;
 
@@ -27,8 +25,12 @@ public:
 	data_ref& operator=(int n);
 	data_ref& operator=(id<1> index);
 	data_ref& operator=(data_ref dref);
-	data_ref& operator+(data_ref dref);
-	data_ref& operator*(int n);
+
+	data_ref operator+(data_ref dref) const;
+	data_ref operator*(int n) const;
+	friend data_ref operator*(int n, data_ref dref) {
+		return dref.operator*(n);
+	}
 };
 
 class id_ref : public data_ref {
