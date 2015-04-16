@@ -27,6 +27,18 @@ public:
 	data_ref& operator=(data_ref dref);
 
 	data_ref operator+(data_ref dref) const;
+	data_ref operator-(data_ref dref) const;
+
+	data_ref operator-(int n) const;
+	friend data_ref operator-(int n, data_ref dref) {
+		return data_ref(open_parenthesis + "- " + dref.operator-(n).name + ")");
+	}
+	data_ref operator-(unsigned int n) const {
+		return operator-((int)n);
+	}
+	friend data_ref operator-(unsigned int n, data_ref dref) {
+		return data_ref(open_parenthesis + "- " + dref.operator-(n).name + ")");
+	}
 	data_ref operator*(int n) const;
 	friend data_ref operator*(int n, data_ref dref) {
 		return dref.operator*(n);

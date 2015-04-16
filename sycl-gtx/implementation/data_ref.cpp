@@ -26,6 +26,14 @@ data_ref data_ref::operator+(data_ref dref) const {
 	return data_ref(open_parenthesis + name + " + " + dref.name + ")");
 }
 
+data_ref data_ref::operator-(data_ref dref) const {
+	return data_ref(open_parenthesis + name + " + " + dref.name + ")");
+}
+
+data_ref data_ref::operator-(int n) const {
+	return data_ref(open_parenthesis + name + " - " + std::to_string(n) + ")");
+}
+
 data_ref data_ref::operator*(int n) const {
 	return data_ref(open_parenthesis + name + " * " + std::to_string(n) + ")");
 }
