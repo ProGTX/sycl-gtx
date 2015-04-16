@@ -28,7 +28,7 @@ bool test3() {
 			auto b = B.get_access<access::write>();
 
 			parallel_for<>(range<2>(N, N), [=](id<2> i) {
-				b[i[0] * N + (N - i[1] - 1)] = a[i];
+				b[N - i[1] - 1][i[0]] = a[i];
 			});
 		});
 
