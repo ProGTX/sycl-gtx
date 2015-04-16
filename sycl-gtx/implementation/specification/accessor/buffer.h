@@ -116,7 +116,7 @@ protected:
 public:
 	Lower operator[](int index) {
 		auto rang_copy = rang;
-		rang_copy[dimensions - 1] = index;
+		rang_copy[dimensions - level] = index;
 		return Lower(acc, rang_copy);
 	}
 };
@@ -128,10 +128,12 @@ protected:
 public:
 	DataType operator[](int index) {
 		// http://stackoverflow.com/questions/7367770
+		rang[dimensions - 1] = index;
+		index = 0;
 		int multiplier = 1;
-		for(int i = 1; i < dimensions; ++i) {
-			multiplier *= acc->access_buffer_range(i - 1);
+		for(int i = 0; i < dimensions; ++i) {
 			index += rang[i] * multiplier;
+			multiplier *= acc->access_buffer_range(i);
 		}
 		return acc->access_host_data()[index];
 	}
