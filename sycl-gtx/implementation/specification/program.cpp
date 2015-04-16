@@ -19,5 +19,26 @@ program::program(string_class source, queue* q) {
 	prog = refc::allocate<cl_program>(p, clReleaseProgram);
 
 	error_code = clBuildProgram(p, 1, &Device, nullptr, nullptr, nullptr);
-	handler.report(error_code);
+	try {
+		handler.report(error_code);
+	}
+	catch(::cl::sycl::exception& e) {
+		// http://stackoverflow.com/a/9467325/793006
+
+		// Determine the size of the log
+		size_t log_size;
+		clGetProgramBuildInfo(p, Device, CL_PROGRAM_BUILD_LOG, 0, nullptr, &log_size);
+
+		// Allocate memory for the log
+		auto log = new char[log_size];
+
+		// Get the log
+		clGetProgramBuildInfo(p, Device, CL_PROGRAM_BUILD_LOG, log_size, log, nullptr);
+
+		debug() << "Error while compiling program:\n" << log;
+
+		delete[] log;
+
+		throw e;
+	}
 }
