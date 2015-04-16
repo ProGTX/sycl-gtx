@@ -69,7 +69,8 @@ bool test7() {
 				// Compare the result to the analytic value
 				int expected = i*(2 + 2014) + j*(1 + 42);
 				if(C[i][j] != expected) {
-					debug() << "expected" << expected << "actual" << C[i][j] << "element" << i << j;
+					debug() << i << j << "expected" << expected << "actual" << C[i][j];
+					return false;
 				}
 			}
 		}
