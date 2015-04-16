@@ -87,6 +87,13 @@ public:
 		);
 	}
 
+	detail::data_ref operator[](detail::data_ref ref) const {
+		detail::kernel_::source::register_resource(*this);
+		return detail::data_ref(
+			get_resource_name() + "[" + ref.name + "]"
+		);
+	}
+
 protected:
 	virtual string_class get_resource_name() const override {
 		return obtain_resource_name(buf);
