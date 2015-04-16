@@ -126,7 +126,7 @@ class accessor_host_ref<1, DataType, dimensions, mode> {
 protected:
 	SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR();
 public:
-	DataType operator[](int index) {
+	DataType& operator[](int index) {
 		// http://stackoverflow.com/questions/7367770
 		rang[dimensions - 1] = index;
 		index = 0;
@@ -181,7 +181,24 @@ public:
 		buffer<DataType, dimensions>& bufferRef,
 		range<dimensions> offset,
 		range<dimensions> range
-	)
+		)
+		: Base(bufferRef, offset, range) {}
+#else
+	using Base::accessor_;
+#endif
+};
+
+SYCL_ADD_ACCESSOR(access::read_write) {
+	using Base = detail::accessor_<DataType, dimensions, access::read_write, target>;
+public:
+#if MSVC_LOW
+	accessor(buffer<DataType, dimensions>& bufferRef)
+		: Base(bufferRef) {}
+	accessor(
+		buffer<DataType, dimensions>& bufferRef,
+		range<dimensions> offset,
+		range<dimensions> range
+		)
 		: Base(bufferRef, offset, range) {}
 #else
 	using Base::accessor_;
