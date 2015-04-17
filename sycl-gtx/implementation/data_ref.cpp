@@ -12,7 +12,6 @@ data_ref& data_ref::operator=(int n) {
 }
 
 data_ref& data_ref::operator=(::cl::sycl::id<1> index) {
-	DSELF() << "not implemented";
 	kernel_::source::add(name + " = " + index[0].name);
 	return *this;
 }
@@ -20,12 +19,4 @@ data_ref& data_ref::operator=(::cl::sycl::id<1> index) {
 data_ref& data_ref::operator=(data_ref dref) {
 	kernel_::source::add(name + " = " + dref.name);
 	return *this;
-}
-
-data_ref data_ref::operator+(data_ref dref) const {
-	return data_ref(open_parenthesis + name + " + " + dref.name + ")");
-}
-
-data_ref data_ref::operator*(int n) const {
-	return data_ref(open_parenthesis + name + " * " + std::to_string(n) + ")");
 }

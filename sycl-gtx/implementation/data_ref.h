@@ -31,13 +31,13 @@ struct data_ref_name<T, false> {
 	static string_class get(T dref);
 };
 
-#define SYCL_DATA_REF_OPERATOR(op)																\
-	template <typename T>																		\
-	data_ref operator op(T n) const {																\
+#define SYCL_DATA_REF_OPERATOR(op)																		\
+	template <typename T>																				\
+	data_ref operator op(T n) const {																	\
 		return data_ref(open_parenthesis + name + " " #op " " + data_ref_name<T>::get(n) + ")");		\
-	}																							\
+	}																									\
 	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>		\
-	friend data_ref operator op(T n, data_ref dref) {												\
+	friend data_ref operator op(T n, data_ref dref) {													\
 		return data_ref(open_parenthesis + data_ref_name<T>::get(n) + " " #op " " + dref.name + ")");	\
 	}
 
@@ -53,14 +53,10 @@ public:
 	data_ref& operator=(id<1> index);
 	data_ref& operator=(data_ref dref);
 
-	data_ref operator+(data_ref dref) const;
-
 	SYCL_DATA_REF_OPERATOR(-);
-
-	data_ref operator*(int n) const;
-	friend data_ref operator*(int n, data_ref dref) {
-		return dref.operator*(n);
-	}
+	SYCL_DATA_REF_OPERATOR(+);
+	SYCL_DATA_REF_OPERATOR(*);
+	SYCL_DATA_REF_OPERATOR(/);
 };
 
 class id_ref : public data_ref {
