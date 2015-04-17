@@ -3,6 +3,8 @@
 #include "common.h"
 #include "debug.h"
 
+#include <type_traits>
+
 // Data reference wrappers
 
 namespace cl {
@@ -14,9 +16,24 @@ class id;
 
 namespace detail {
 
+// Forward declaration
+class data_ref;
+
+// http://stackoverflow.com/a/15598994/793006
+template <typename T, bool = std::is_arithmetic<T>::value>
+struct data_ref_name;
+template <typename T>
+struct data_ref_name<T, true> {
+	static string_class get(T n);
+};
+template <typename T>
+struct data_ref_name<T, false> {
+	static string_class get(T dref);
+};
+
 class data_ref {
-	static const string_class open_parenthesis;
 public:
+	static const string_class open_parenthesis;
 	string_class name;
 
 	data_ref(string_class name)
@@ -27,18 +44,16 @@ public:
 	data_ref& operator=(data_ref dref);
 
 	data_ref operator+(data_ref dref) const;
-	data_ref operator-(data_ref dref) const;
 
-	data_ref operator-(int n) const;
-	friend data_ref operator-(int n, data_ref dref) {
-		return data_ref(open_parenthesis + "- " + dref.operator-(n).name + ")");
+	template <typename T>
+	data_ref operator-(T n) {
+		return data_ref(open_parenthesis + name + " - " + data_ref_name<T>::get(n) + ")");
 	}
-	data_ref operator-(unsigned int n) const {
-		return operator-((int)n);
+	template <typename T>
+	friend data_ref operator-(T n, data_ref dref) {
+		return data_ref(open_parenthesis + data_ref_name<T>::get(n) + " - " + dref.name + ")");
 	}
-	friend data_ref operator-(unsigned int n, data_ref dref) {
-		return data_ref(open_parenthesis + "- " + dref.operator-(n).name + ")");
-	}
+
 	data_ref operator*(int n) const;
 	friend data_ref operator*(int n, data_ref dref) {
 		return dref.operator*(n);
@@ -61,6 +76,16 @@ public:
 	}
 };
 
+template <typename T>
+string_class data_ref_name<T, true>::get(T n) {
+	return std::to_string(n);
+}
+template <typename T>
+string_class data_ref_name<T, false>::get(T dref) {
+	return dref.name;
+}
+
 } // namespace detail
+
 } // namespace sycl
 } // namespace cl
