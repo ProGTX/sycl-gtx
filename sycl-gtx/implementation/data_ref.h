@@ -16,29 +16,17 @@ class id;
 
 namespace detail {
 
-// Forward declaration
-class data_ref;
-
-// http://stackoverflow.com/a/15598994/793006
-template <typename T, bool = std::is_arithmetic<T>::value>
-struct data_ref_name;
-template <typename T>
-struct data_ref_name<T, true> {
-	static string_class get(T n);
-};
-template <typename T>
-struct data_ref_name<T, false> {
-	static string_class get(T dref);
-};
-
-#define SYCL_DATA_REF_OPERATOR(op)																		\
-	template <typename T>																				\
-	data_ref operator op(T n) const {																	\
-		return data_ref(open_parenthesis + name + " " #op " " + data_ref_name<T>::get(n) + ")");		\
-	}																									\
-	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>		\
-	friend data_ref operator op(T n, data_ref dref) {													\
-		return data_ref(open_parenthesis + data_ref_name<T>::get(n) + " " #op " " + dref.name + ")");	\
+#define SYCL_DATA_REF_OPERATOR(op)																	\
+	data_ref operator op(data_ref dref) const {														\
+		return data_ref(open_parenthesis + name + " " #op " " + dref.name + ")");					\
+	}																								\
+	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>	\
+	data_ref operator op(T n) const {																\
+		return data_ref(open_parenthesis + name + " " #op " " + std::to_string(n) + ")");			\
+	}																								\
+	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>	\
+	friend data_ref operator op(T n, data_ref dref) {												\
+		return data_ref(open_parenthesis + std::to_string(n) + " " #op " " + dref.name + ")");		\
 	}
 
 class data_ref {
@@ -74,15 +62,6 @@ public:
 		return *value;
 	}
 };
-
-template <typename T>
-string_class data_ref_name<T, true>::get(T n) {
-	return std::to_string(n);
-}
-template <typename T>
-string_class data_ref_name<T, false>::get(T dref) {
-	return dref.name;
-}
 
 } // namespace detail
 
