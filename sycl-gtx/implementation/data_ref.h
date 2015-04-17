@@ -31,6 +31,16 @@ struct data_ref_name<T, false> {
 	static string_class get(T dref);
 };
 
+#define SYCL_DATA_REF_OPERATOR(op)																\
+	template <typename T>																		\
+	data_ref operator op(T n) const {																\
+		return data_ref(open_parenthesis + name + " " #op " " + data_ref_name<T>::get(n) + ")");		\
+	}																							\
+	template <typename T>																		\
+	friend data_ref operator op(T n, data_ref dref) {												\
+		return data_ref(open_parenthesis + data_ref_name<T>::get(n) + " " #op " " + dref.name + ")");	\
+	}
+
 class data_ref {
 public:
 	static const string_class open_parenthesis;
@@ -45,14 +55,7 @@ public:
 
 	data_ref operator+(data_ref dref) const;
 
-	template <typename T>
-	data_ref operator-(T n) {
-		return data_ref(open_parenthesis + name + " - " + data_ref_name<T>::get(n) + ")");
-	}
-	template <typename T>
-	friend data_ref operator-(T n, data_ref dref) {
-		return data_ref(open_parenthesis + data_ref_name<T>::get(n) + " - " + dref.name + ")");
-	}
+	SYCL_DATA_REF_OPERATOR(-);
 
 	data_ref operator*(int n) const;
 	friend data_ref operator*(int n, data_ref dref) {
@@ -89,3 +92,5 @@ string_class data_ref_name<T, false>::get(T dref) {
 
 } // namespace sycl
 } // namespace cl
+
+#undef SYCL_DATA_REF_OPERATOR
