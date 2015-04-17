@@ -36,7 +36,7 @@ struct data_ref_name<T, false> {
 	data_ref operator op(T n) const {																\
 		return data_ref(open_parenthesis + name + " " #op " " + data_ref_name<T>::get(n) + ")");		\
 	}																							\
-	template <typename T>																		\
+	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>		\
 	friend data_ref operator op(T n, data_ref dref) {												\
 		return data_ref(open_parenthesis + data_ref_name<T>::get(n) + " " #op " " + dref.name + ")");	\
 	}
