@@ -68,17 +68,17 @@ struct id_name<1> {
 };
 
 
-#define SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR()						\
-	using acc_t = accessor_<DataType, dimensions, mode, target>;	\
-	friend class acc_t;												\
-	friend class accessor_device_ref;								\
-	acc_t* acc;														\
-	vector_class<data_ref> rang;									\
-	accessor_device_ref(acc_t* acc, vector_class<data_ref> range)	\
-		: acc(acc), rang(range) {}									\
-	accessor_device_ref()											\
-		: accessor_device_ref(nullptr, {}) {						\
-		rang.reserve(3);											\
+#define SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR()							\
+	using acc_t = accessor_<DataType, dimensions, mode, target>;		\
+	friend class acc_t;													\
+	friend class accessor_device_ref;									\
+	acc_t* acc;															\
+	vector_class<string_class> rang;									\
+	accessor_device_ref(acc_t* acc, vector_class<string_class> range)	\
+		: acc(acc), rang(range) {}										\
+	accessor_device_ref()												\
+		: accessor_device_ref(nullptr, {}) {							\
+		rang.reserve(3);												\
 	}
 
 template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
@@ -88,7 +88,7 @@ protected:
 	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
 public:
 	template <class T, detail::data_ref::is_compatible_t<T>* = nullptr>
-	Lower operator[](T index) {
+	Lower operator[](T index) const {
 		auto rang_copy = rang;
 		rang_copy[dimensions - level] = detail::data_ref::get_name(index);
 		return Lower(acc, rang);
@@ -101,13 +101,15 @@ protected:
 	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
 public:
 	template <class T, detail::data_ref::is_compatible_t<T>* = nullptr>
-	detail::data_ref operator[](T index) {
+	detail::data_ref operator[](T index) const {
 		detail::kernel_::source::register_resource(acc);
-		rang[dimensions - 1] = detail::data_ref::get_name(index);
-		string_class ind = "0";
-		int multiplier = 1;
-		for(int i = 0; i < dimensions; ++i) {
-			ind += string_class(" + ") + (rang[i] * multiplier).name;
+		// Basically the same as with host buffer accessor, just dealing with strings
+		auto rang_copy = rang;
+		rang_copy[dimensions - 1] = detail::data_ref::get_name(index);
+		string_class ind(std::move(rang_copy[0]));
+		auto multiplier = acc->access_buffer_range(0);
+		for(int i = 1; i < dimensions; ++i) {
+			ind += string_class(" + ") + std::move(rang_copy[i]) + " * " + std::to_string(multiplier);
 			multiplier *= acc->access_buffer_range(i);
 		}
 		return detail::data_ref(
