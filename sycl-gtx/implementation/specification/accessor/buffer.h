@@ -67,11 +67,51 @@ struct id_name<1> {
 	}
 };
 
+
+#define SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR()						\
+	using acc_t = accessor_<DataType, dimensions, mode, target>;	\
+	friend class acc_t;												\
+	friend class accessor_device_ref;								\
+	acc_t* acc;														\
+	range<3> rang;													\
+	accessor_device_ref(acc_t* acc, range<3> range)					\
+		: acc(acc), rang(range) {}									\
+	accessor_device_ref()											\
+		: accessor_device_ref(nullptr, empty_range<3>()) {}
+
+template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
+class accessor_device_ref {
+protected:
+	using Lower = accessor_device_ref<dimensions - 1, DataType, dimensions, mode, target>;
+	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
+public:
+	Lower operator[](size_t index) {
+		// TODO
+		return Lower(acc, rang);
+	}
+};
+
+template <typename DataType, int dimensions, access::mode mode, access::target target>
+class accessor_device_ref<1, DataType, dimensions, mode, target> {
+protected:
+	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
+public:
+	detail::data_ref operator[](size_t index) {
+		// TODO
+		detail::kernel_::source::register_resource(acc);
+		return detail::data_ref(
+			acc->get_resource_name() + "[" + std::to_string(index) + "]"
+		);
+	}
+};
+
 SYCL_ACCESSOR_CLASS(
 	target == access::cl_buffer ||
 	target == access::constant_buffer ||
 	target == access::global_buffer
 ), public accessor_buffer<DataType, dimensions> {
+	template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
+	friend class accessor_device_ref;
 public:
 	SYCL_BUFFER_CONSTRUCTORS({});
 
@@ -222,6 +262,7 @@ public:
 } // namespace cl
 
 #undef SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR
+#undef SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR
 #undef SYCL_BUFFER_CONSTRUCTORS
 
 #undef SYCL_ACCESSOR_CLASS
