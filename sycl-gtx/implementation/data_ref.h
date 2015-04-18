@@ -17,16 +17,17 @@ class id;
 namespace detail {
 
 #define SYCL_DATA_REF_OPERATOR(op)																	\
-	data_ref operator op(data_ref dref) const {														\
-		return data_ref(open_parenthesis + name + " " #op " " + dref.name + ")");					\
-	}																								\
-	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>	\
+	template <																						\
+		class T,																					\
+		typename std::enable_if<																	\
+			std::is_arithmetic<T>::value || std::is_base_of<data_ref, T>::value						\
+		>::type* = nullptr>																			\
 	data_ref operator op(T n) const {																\
-		return data_ref(open_parenthesis + name + " " #op " " + std::to_string(n) + ")");			\
+		return data_ref(open_parenthesis + name + " " #op " " + get_name(n) + ")");					\
 	}																								\
 	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>	\
 	friend data_ref operator op(T n, data_ref dref) {												\
-		return data_ref(open_parenthesis + std::to_string(n) + " " #op " " + dref.name + ")");		\
+		return data_ref(open_parenthesis + get_name(n) + " " #op " " + dref.name + ")");			\
 	}
 
 class data_ref {
@@ -40,6 +41,14 @@ public:
 	data_ref& operator=(int n);
 	data_ref& operator=(id<1> index);
 	data_ref& operator=(data_ref dref);
+
+	static string_class get_name(data_ref dref) {
+		return dref.name;
+	}
+	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
+	static string_class get_name(T n) {
+		return std::to_string(n);
+	}
 
 	SYCL_DATA_REF_OPERATOR(-);
 	SYCL_DATA_REF_OPERATOR(+);
