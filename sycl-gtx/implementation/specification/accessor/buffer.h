@@ -54,6 +54,19 @@ protected:
 		bufferRef.get_range()										\
 	) {}
 
+template <int dimensions>
+struct id_name {
+	static string_class get(id<dimensions> index) {
+		return id_base_all_name;
+	}
+};
+template <>
+struct id_name<1> {
+	static string_class get(id<1> index) {
+		return index[0].name;
+	}
+};
+
 SYCL_ACCESSOR_CLASS(
 	target == access::cl_buffer ||
 	target == access::constant_buffer ||
@@ -73,17 +86,10 @@ public:
 		);
 	}
 
-	// TODO: Limit id to same dimension as buffer
-	detail::data_ref operator[](id<1> index) const {
+	detail::data_ref operator[](id<dimensions> index) const {
 		detail::kernel_::source::register_resource(*this);
 		return detail::data_ref(
-			get_resource_name() + "[" + index[0].name + "]"
-		);
-	}
-	detail::data_ref operator[](id<2> index) const {
-		detail::kernel_::source::register_resource(*this);
-		return detail::data_ref(
-			get_resource_name() + "[" + id_base_all_name + "]"
+			get_resource_name() + "[" + id_name<dimensions>::get(index) + "]"
 		);
 	}
 
