@@ -16,12 +16,16 @@ class id;
 
 namespace detail {
 
+// Forward declaration
+class data_ref;
+
+template <class T>
+using is_data_ref_compatible_t = typename std::enable_if<
+	std::is_arithmetic<T>::value || std::is_base_of<data_ref, T>::value
+>::type;
+
 #define SYCL_DATA_REF_OPERATOR(op)																	\
-	template <																						\
-		class T,																					\
-		typename std::enable_if<																	\
-			std::is_arithmetic<T>::value || std::is_base_of<data_ref, T>::value						\
-		>::type* = nullptr>																			\
+	template <class T, is_data_ref_compatible_t<T>* = nullptr>										\
 	data_ref operator op(T n) const {																\
 		return data_ref(open_parenthesis + name + " " #op " " + get_name(n) + ")");					\
 	}																								\
