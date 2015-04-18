@@ -73,11 +73,13 @@ struct id_name<1> {
 	friend class acc_t;												\
 	friend class accessor_device_ref;								\
 	acc_t* acc;														\
-	range<3> rang;													\
-	accessor_device_ref(acc_t* acc, range<3> range)					\
+	vector_class<data_ref> rang;									\
+	accessor_device_ref(acc_t* acc, vector_class<data_ref> range)	\
 		: acc(acc), rang(range) {}									\
 	accessor_device_ref()											\
-		: accessor_device_ref(nullptr, empty_range<3>()) {}
+		: accessor_device_ref(nullptr, {}) {						\
+		rang.reserve(3);											\
+	}
 
 template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_device_ref {
@@ -85,8 +87,10 @@ protected:
 	using Lower = accessor_device_ref<dimensions - 1, DataType, dimensions, mode, target>;
 	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
 public:
-	Lower operator[](size_t index) {
-		// TODO
+	template <class T, detail::data_ref::is_compatible_t<T>* = nullptr>
+	Lower operator[](T index) {
+		auto rang_copy = rang;
+		rang_copy[dimensions - level] = detail::data_ref::get_name(index);
 		return Lower(acc, rang);
 	}
 };
@@ -96,11 +100,18 @@ class accessor_device_ref<1, DataType, dimensions, mode, target> {
 protected:
 	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
 public:
-	detail::data_ref operator[](size_t index) {
-		// TODO
+	template <class T, detail::data_ref::is_compatible_t<T>* = nullptr>
+	detail::data_ref operator[](T index) {
 		detail::kernel_::source::register_resource(acc);
+		rang[dimensions - 1] = detail::data_ref::get_name(index);
+		string_class ind = "0";
+		int multiplier = 1;
+		for(int i = 0; i < dimensions; ++i) {
+			ind += string_class(" + ") + (rang[i] * multiplier).name;
+			multiplier *= acc->access_buffer_range(i);
+		}
 		return detail::data_ref(
-			acc->get_resource_name() + "[" + std::to_string(index) + "]"
+			acc->get_resource_name() + "[" + ind + "]"
 		);
 	}
 };
