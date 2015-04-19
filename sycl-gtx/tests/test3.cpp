@@ -36,8 +36,8 @@ bool test3() {
 		auto bh = B.get_access<access::read, access::host_buffer>();
 		for(int i = 0; i < N; ++i) {
 			for(int j = 0; j < N; ++j) {
-				auto expected = ah[N - j - 1][i];
-				auto actual = bh[i][j];
+				auto expected = ah[i][j];
+				auto actual = bh[N - j - 1][i];
 				if(actual != expected) {
 					debug() << i << j << "expected" << expected << "actual" << actual;
 					return false;

@@ -40,12 +40,11 @@ bool test8() {
 	bool success = true;
 
 	// Print result
-	debug() << "index, expected, actual";
 	for(int i = 0; i < size; ++i) {
 		if(data[i] != expected[i]) {
+			debug() << i << ",\texpected" << expected[i] << ",\tactual" << data[i];
 			success = false;
 		}
-		debug() << i << ",\t" << expected[i] << ",\t" << data[i];
 	}
 
 	return success;
