@@ -9,6 +9,14 @@
 int main() {
 	debug() << "SYCL Provisional Specification.";
 	
+	cl::sycl::device d;
+	debug() << "Default device information:";
+	debug() << d.get_info<CL_DEVICE_NAME>();
+	debug() << d.get_info<CL_DEVICE_OPENCL_C_VERSION>();
+	debug() << d.get_info<CL_DEVICE_PROFILE>();
+	debug() << d.get_info<CL_DEVICE_VERSION>();
+	debug() << d.get_info<CL_DRIVER_VERSION>();
+
 	std::map<std::string, bool(*)()> tests{
 		//{ "test1", test1 },
 		//{ "test2", test2 },
