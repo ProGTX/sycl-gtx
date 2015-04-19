@@ -5,7 +5,7 @@
 using namespace cl::sycl;
 
 // Size of the square matrices
-const size_t N = 2000;
+const size_t N = 1024;
 
 bool test3() {
 	{
