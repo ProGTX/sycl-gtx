@@ -141,13 +141,13 @@ private:
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
-				string_class("int ") + id_base_name + id_s + " = get_global_id(" + id_s + ")"
+				string_class("const int ") + id_base_name + id_s + " = get_global_id(" + id_s + ")"
 			);
 		}
 
 		if(dimensions == 2) {
 			source::add(
-				string_class("int ") + id_base_all_name + " = " +
+				string_class("const int ") + id_base_all_name + " = " +
 				id_base_name + "1 * " + std::to_string(num_work_items[0]) + " + " + id_base_name + "0"
 			);
 		}
