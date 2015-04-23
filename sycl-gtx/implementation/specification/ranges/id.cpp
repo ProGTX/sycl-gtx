@@ -14,3 +14,9 @@ SYCL_ID_SUBSCRIPT_OP(2)
 SYCL_ID_SUBSCRIPT_OP(3)
 
 #undef SYCL_ID_SUBSCRIPT_OP
+
+
+template <>
+detail::data_ref detail::id_<1>::operator+(size_t n) const {
+	return id_ref(0, nullptr) + n;
+}
