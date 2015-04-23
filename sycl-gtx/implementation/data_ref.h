@@ -17,7 +17,7 @@ class id;
 namespace detail {
 
 #define SYCL_DATA_REF_OPERATOR(op)																	\
-	template <class T, is_compatible_t<T>* = nullptr>										\
+	template <class T, is_compatible_t<T>* = nullptr>												\
 	data_ref operator op(T n) const {																\
 		return data_ref(open_parenthesis + name + " " #op " " + get_name(n) + ")");					\
 	}																								\
@@ -30,7 +30,9 @@ class data_ref {
 public:
 	template <class T>
 	using is_compatible_t = typename std::enable_if<
-		std::is_arithmetic<T>::value || std::is_base_of<data_ref, T>::value
+		std::is_arithmetic<T>::value									||
+		std::is_same<id<1>, typename std::decay<T>::type>::value		||
+		std::is_base_of<data_ref, typename std::decay<T>::type>::value
 	>::type;
 
 	static const string_class open_parenthesis;
@@ -39,9 +41,16 @@ public:
 	data_ref(string_class name)
 		: name(name) {}
 
-	data_ref& operator=(int n);
-	data_ref& operator=(id<1> index);
+protected:
+	template <class T, is_compatible_t<T>* = nullptr>
+	void assign(T n);
+
+public:
 	data_ref& operator=(data_ref dref);
+	template <class T, is_compatible_t<T>* = nullptr>
+	data_ref& operator=(T n);
+
+	static string_class get_name(id<1> index);
 
 	static string_class get_name(data_ref dref) {
 		return dref.name;

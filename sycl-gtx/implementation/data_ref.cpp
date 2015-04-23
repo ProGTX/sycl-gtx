@@ -2,21 +2,32 @@
 #include "data_ref.h"
 #include "gen_source.h"
 
-using namespace cl::sycl::detail;
+using namespace cl::sycl;
+using detail::data_ref;
 
-const ::cl::sycl::string_class data_ref::open_parenthesis = "(";
+const string_class data_ref::open_parenthesis = "(";
 
-data_ref& data_ref::operator=(int n) {
-	kernel_::source::add(name + " = " + std::to_string(n));
-	return *this;
-}
+template
+data_ref& data_ref::operator=(id<1> n);
+template
+data_ref& data_ref::operator=(int n);
 
-data_ref& data_ref::operator=(::cl::sycl::id<1> index) {
-	kernel_::source::add(name + " = " + index[0].name);
-	return *this;
+template <class T, data_ref::is_compatible_t<T>*>
+void data_ref::assign(T n) {
+	kernel_::source::add(name + " = " + get_name(n));
 }
 
 data_ref& data_ref::operator=(data_ref dref) {
-	kernel_::source::add(name + " = " + dref.name);
+	assign(dref);
 	return *this;
+}
+
+template <class T, data_ref::is_compatible_t<T>*>
+data_ref& data_ref::operator=(T n) {
+	assign(n);
+	return *this;
+}
+
+string_class data_ref::get_name(id<1> index) {
+	return detail::id_base_name + "0";
 }
