@@ -26,6 +26,12 @@ namespace detail {
 		return data_ref(open_parenthesis + get_name(n) + " " #op " " + dref.name + ")");			\
 	}
 
+#define SYCL_ASSIGNMENT_OPERATOR(op, mode)				\
+	template <class T, is_compatible_t<T>* = nullptr>	\
+	data_ref& operator op(T n) {						\
+		return assign_<assign::mode>(n);				\
+	}
+
 class data_ref {
 public:
 	template <class T>
@@ -58,10 +64,7 @@ public:
 	data_ref& operator=(data_ref dref) {
 		return assign_<assign::normal>(dref);
 	}
-	template <class T, is_compatible_t<T>* = nullptr>
-	data_ref& operator=(T n) {
-		return assign_<assign::normal>(n);
-	}
+	SYCL_ASSIGNMENT_OPERATOR(= , normal);
 
 	static string_class get_name(id<1> index);
 
@@ -101,3 +104,4 @@ public:
 } // namespace cl
 
 #undef SYCL_DATA_REF_OPERATOR
+#undef SYCL_ASSIGNMENT_OPERATOR
