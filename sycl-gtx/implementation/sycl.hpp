@@ -14,6 +14,8 @@
 #include "specification\queue.h"
 #include "specification\ranges.h"
 
+#include "flow_control.h"
+
 #if MSVC_LOW
 #undef SYCL_SWAP
 #undef SYCL_MOVE_INIT

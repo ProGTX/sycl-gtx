@@ -65,9 +65,11 @@ private:
 	}
 
 public:
+	// Without this one explicitly stated, default copy assignment is used
 	data_ref& operator=(data_ref dref) {
 		return assign_<assign::normal>(dref);
 	}
+
 	SYCL_ASSIGNMENT_OPERATOR(= , normal);
 	SYCL_ASSIGNMENT_OPERATOR(+= , add);
 	SYCL_ASSIGNMENT_OPERATOR(-= , subtract);
