@@ -50,6 +50,10 @@ public:
 private:
 	struct assign {
 		static const char normal[];
+		static const char add[];
+		static const char subtract[];
+		static const char multiply[];
+		static const char divide[];
 	};
 
 	void kernel_add(string_class line);
@@ -65,6 +69,10 @@ public:
 		return assign_<assign::normal>(dref);
 	}
 	SYCL_ASSIGNMENT_OPERATOR(= , normal);
+	SYCL_ASSIGNMENT_OPERATOR(+= , add);
+	SYCL_ASSIGNMENT_OPERATOR(-= , subtract);
+	SYCL_ASSIGNMENT_OPERATOR(*= , multiply);
+	SYCL_ASSIGNMENT_OPERATOR(/= , divide);
 
 	static string_class get_name(id<1> index);
 

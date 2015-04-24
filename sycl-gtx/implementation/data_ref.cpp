@@ -8,6 +8,10 @@ using detail::data_ref;
 const string_class data_ref::open_parenthesis = "(";
 
 const char data_ref::assign::normal[]	= " = ";
+const char data_ref::assign::add[]		= " += ";
+const char data_ref::assign::subtract[]	= " -= ";
+const char data_ref::assign::multiply[]	= " *= ";
+const char data_ref::assign::divide[]	= " /= ";
 
 void data_ref::kernel_add(string_class line) {
 	kernel_::source::add(line);
