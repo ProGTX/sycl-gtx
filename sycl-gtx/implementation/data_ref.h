@@ -41,14 +41,27 @@ public:
 	data_ref(string_class name)
 		: name(name) {}
 
-protected:
-	template <class T, is_compatible_t<T>* = nullptr>
-	void assign(T n);
+private:
+	struct assign {
+		static const char normal[];
+	};
+
+	void kernel_add(string_class line);
+
+	template <const char* op, class T, is_compatible_t<T>* = nullptr>
+	data_ref& assign_(T n) {
+		kernel_add(name + op + get_name(n));
+		return *this;
+	}
 
 public:
-	data_ref& operator=(data_ref dref);
+	data_ref& operator=(data_ref dref) {
+		return assign_<assign::normal>(dref);
+	}
 	template <class T, is_compatible_t<T>* = nullptr>
-	data_ref& operator=(T n);
+	data_ref& operator=(T n) {
+		return assign_<assign::normal>(n);
+	}
 
 	static string_class get_name(id<1> index);
 
