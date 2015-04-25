@@ -88,11 +88,26 @@ public:
 		return std::to_string(n);
 	}
 
-	SYCL_DATA_REF_OPERATOR(-);
+	// TODO: https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/operators.html
+
+	// Arithmetic operatos
 	SYCL_DATA_REF_OPERATOR(+);
+	SYCL_DATA_REF_OPERATOR(-);
 	SYCL_DATA_REF_OPERATOR(*);
 	SYCL_DATA_REF_OPERATOR(/);
 	SYCL_DATA_REF_OPERATOR(%);
+
+	// Comparison operators
+	SYCL_DATA_REF_OPERATOR(==);
+	SYCL_DATA_REF_OPERATOR(!=);
+	SYCL_DATA_REF_OPERATOR(<);
+	SYCL_DATA_REF_OPERATOR(<=);
+	SYCL_DATA_REF_OPERATOR(>);
+	SYCL_DATA_REF_OPERATOR(>=);
+
+	// Boolean operators
+	SYCL_DATA_REF_OPERATOR(||);
+	SYCL_DATA_REF_OPERATOR(&&);
 };
 
 class id_ref : public data_ref {
