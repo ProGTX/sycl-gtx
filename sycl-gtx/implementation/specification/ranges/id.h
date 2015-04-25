@@ -42,6 +42,10 @@ public:
 	id_ref operator[](size_t n);
 
 	data_ref operator+(size_t n) const;
+	data_ref operator-(size_t n) const;
+	data_ref operator*(size_t n) const;
+	data_ref operator/(size_t n) const;
+	data_ref operator%(size_t n) const;
 
 	// Return the value of the specified dimension of the id
 	size_t get(int dimension) const {
