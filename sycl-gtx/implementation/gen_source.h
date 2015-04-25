@@ -111,9 +111,9 @@ public:
 		}
 	}
 
-	// TODO: Should be better hidden
+	template <bool auto_end = true>
 	static void add(string_class line) {
-		scope->lines.push_back('\t' + line + ';');
+		scope->lines.push_back('\t' + line + (auto_end ? ';' : ' '));
 	}
 
 	static string_class get_name(access::target target);
