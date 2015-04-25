@@ -54,6 +54,7 @@ private:
 		static const char subtract[];
 		static const char multiply[];
 		static const char divide[];
+		static const char modulo[];
 	};
 
 	void kernel_add(string_class line);
@@ -75,6 +76,7 @@ public:
 	SYCL_ASSIGNMENT_OPERATOR(-= , subtract);
 	SYCL_ASSIGNMENT_OPERATOR(*= , multiply);
 	SYCL_ASSIGNMENT_OPERATOR(/= , divide);
+	SYCL_ASSIGNMENT_OPERATOR(%= , modulo);
 
 	static string_class get_name(id<1> index);
 
