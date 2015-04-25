@@ -90,6 +90,7 @@ public:
 	SYCL_DATA_REF_OPERATOR(+);
 	SYCL_DATA_REF_OPERATOR(*);
 	SYCL_DATA_REF_OPERATOR(/);
+	SYCL_DATA_REF_OPERATOR(%);
 };
 
 class id_ref : public data_ref {
