@@ -30,8 +30,4 @@ SYCL_ID_OPERATOR(*)
 SYCL_ID_OPERATOR(/)
 SYCL_ID_OPERATOR(%)
 
-data_ref operator*(size_t n, id_<1> i) {
-	return n * id_ref(0, nullptr);
-}
-
 #undef SYCL_ID_OPERATOR

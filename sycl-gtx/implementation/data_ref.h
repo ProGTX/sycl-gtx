@@ -114,8 +114,7 @@ class id_ref : public data_ref {
 protected:
 	size_t* value;
 public:
-	id_ref(int n, size_t* value)
-		: data_ref(id_base_name + std::to_string(n)), value(value) {}
+	id_ref(int n, size_t* value);
 
 	operator size_t&() {
 		return *value;

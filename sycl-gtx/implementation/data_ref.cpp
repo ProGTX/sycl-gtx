@@ -4,6 +4,7 @@
 
 using namespace cl::sycl;
 using detail::data_ref;
+using detail::id_ref;
 
 const string_class data_ref::open_parenthesis = "(";
 
@@ -21,3 +22,6 @@ void data_ref::kernel_add(string_class line) {
 string_class data_ref::get_name(id<1> index) {
 	return detail::id_base_name + "0";
 }
+
+id_ref::id_ref(int n, size_t* value)
+	: data_ref(id_base_name + std::to_string(n)), value(value) {}

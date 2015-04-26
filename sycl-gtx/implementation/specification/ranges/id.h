@@ -2,6 +2,7 @@
 
 // TODO: 3.7.1.3 ID class
 
+#include "../../data_ref.h"
 #include "../../common.h"
 #include <initializer_list>
 
@@ -10,15 +11,14 @@ namespace sycl {
 
 namespace detail {
 
-// Forward declarations
-class id_ref;
-class data_ref;
+// Forward declaration
 namespace kernel_ {
 	class source;
 }
 
 static const string_class id_base_name		= "_sycl_id_";
 static const string_class id_base_all_name	= "_sycl_id_d";
+
 
 template <int dimensions>
 struct id_ {
@@ -47,7 +47,9 @@ public:
 	data_ref operator/(size_t n) const;
 	data_ref operator%(size_t n) const;
 
-	friend data_ref operator*(size_t n, id_ i);
+	friend data_ref operator*(size_t n, id_ i) {
+		return n * id_ref(0, nullptr);
+	}
 
 	// Return the value of the specified dimension of the id
 	size_t get(int dimension) const {
@@ -56,8 +58,6 @@ public:
 
 	bool operator==(const id_& rhs) const;
 };
-
-data_ref operator*(size_t n, id_<1> i);
 
 } // namespace detail
 
