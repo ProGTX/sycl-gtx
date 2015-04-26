@@ -21,28 +21,22 @@ bool test4() {
 			});
 
 			// Calculate reduction sum
-			for(size_t offset = 1; offset < N; offset *= 2) {
-				parallel_for<>(range<1>(N), [=](id<1> index) {
-					if(index % (2 * offset) == 0 && index + offset < N) {
-						v[index] += v[index + offset];
-					}
+			for(size_t stride = 1; stride < N; stride *= 2) {
+				parallel_for<>(range<1>(N / 2 / stride), [=](id<1> index) {
+					auto i = 2 * stride * index;
+					v[i] += v[i + stride];
 				});
 			}
 		});
 
 		auto v = V.get_access<access::read, access::host_buffer>();
+		int sum = ((uint64_t)N * (uint64_t)(N - 1)) / 2;
 
-		int sum = 0;
-		for(size_t i = 0; i < N; ++i) {
-			sum += i;
-
-			auto vi = v[i];
-			if(vi != sum) {
-				debug() << i << "expected" << sum << "actual" << vi;
+		if(v[0] != sum) {
+			debug() << "wrong sum, should be" << sum << "- is" << v[0];
 				return false;
 			}
 		}
-	}
 
 	return true;
 }
