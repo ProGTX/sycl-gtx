@@ -47,6 +47,8 @@ public:
 	data_ref operator/(size_t n) const;
 	data_ref operator%(size_t n) const;
 
+	friend data_ref operator*(size_t n, id_ i);
+
 	// Return the value of the specified dimension of the id
 	size_t get(int dimension) const {
 		return values[n];
@@ -54,6 +56,8 @@ public:
 
 	bool operator==(const id_& rhs) const;
 };
+
+data_ref operator*(size_t n, id_<1> i);
 
 } // namespace detail
 
