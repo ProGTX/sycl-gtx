@@ -21,6 +21,8 @@ private:
 	detail::error::handler handler;
 
 	platform(cl_platform_id platform_id, const device_selector& dev_selector);
+
+	static vector_class<platform> platforms;
 public:
 	// Default constructor for platform.
 	// It constructs a platform object to encapsulate the device returned by the default device selector

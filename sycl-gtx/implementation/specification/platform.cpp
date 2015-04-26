@@ -6,6 +6,7 @@
 
 using namespace cl::sycl;
 
+vector_class<platform> platform::platforms;
 
 platform::platform(cl_platform_id platform_id, const device_selector& dev_selector)
 	: platform_id(refc::allocate(platform_id)) {}
@@ -22,13 +23,17 @@ cl_platform_id platform::get() const {
 }
 
 vector_class<platform> platform::get_platforms() {
-	static const int MAX_PLATFORMS = 1024;
-	cl_platform_id platform_ids[MAX_PLATFORMS];
-	cl_uint num_platforms;
-	auto error_code = clGetPlatformIDs(MAX_PLATFORMS, platform_ids, &num_platforms);
-	auto handler = detail::error::handler();
-	handler.report(error_code);
-	return vector_class<platform>(platform_ids, platform_ids + num_platforms);
+	if(platforms.empty()) {
+		// TODO: Thread safe
+		static const int MAX_PLATFORMS = 1024;
+		cl_platform_id platform_ids[MAX_PLATFORMS];
+		cl_uint num_platforms;
+		auto error_code = clGetPlatformIDs(MAX_PLATFORMS, platform_ids, &num_platforms);
+		auto handler = detail::error::handler();
+		handler.report(error_code);
+		platforms = vector_class<platform>(platform_ids, platform_ids + num_platforms);
+	}
+	return platforms;
 }
 
 vector_class<device> platform::get_devices(cl_device_type device_type) const {
