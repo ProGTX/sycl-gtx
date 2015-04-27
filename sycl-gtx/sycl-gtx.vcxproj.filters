@@ -96,6 +96,9 @@
     <ClCompile Include="implementation\specification\ranges\id.cpp">
       <Filter>Source Files\specification\ranges</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\specification\buffer.cpp">
+      <Filter>Source Files\specification</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">

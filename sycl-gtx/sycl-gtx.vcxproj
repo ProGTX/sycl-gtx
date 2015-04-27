@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClCompile Include="implementation\data_ref.cpp" />
     <ClCompile Include="implementation\gen_source.cpp" />
+    <ClCompile Include="implementation\specification\buffer.cpp" />
     <ClCompile Include="implementation\specification\command_group.cpp" />
     <ClCompile Include="implementation\specification\context.cpp" />
     <ClCompile Include="implementation\specification\device.cpp" />

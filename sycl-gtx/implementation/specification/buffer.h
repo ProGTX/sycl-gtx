@@ -34,20 +34,17 @@ namespace kernel_ {
 	class source;
 }
 
-static unsigned int buffer_counter = 0;
-
 class buffer_base {
 protected:
 	friend class kernel_::source;
 
+	static unsigned int counter;
 	string_class resource_name;
 	detail::error::handler handler;
 	refc::ptr<cl_mem> device_data;
 
-	// TODO: to_string may be a problem if string_class not std::string
-	void generate_name() {
-		resource_name = string_class("_sycl_buf_") + std::to_string(++buffer_counter);
-	}
+	void generate_name();
+	void create_accessor_command();
 
 	using clEnqueueBuffer_f = decltype(&clEnqueueWriteBuffer);
 	virtual void enqueue(queue* q, clEnqueueBuffer_f clEnqueueBuffer) {
