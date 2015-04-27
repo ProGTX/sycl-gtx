@@ -250,48 +250,54 @@ protected:
 
 template <typename DataType>
 struct buffer<DataType, 1> : public detail::buffer_<DataType, 1> {
+private:
+	using Base = detail::buffer_<DataType, 1>;
+public:
 #if MSVC_LOW
 	buffer(range<1> range)
-		: detail::buffer_<DataType, 1>(range) {}
+		: Base(range) {}
 	buffer(DataType* host_data, range<1> range)
-		: detail::buffer_<DataType, 1>(host_data, range) {}
+		: Base(host_data, range) {}
 	buffer(const DataType* host_data, range<1> range)
-		: detail::buffer_<DataType, 1>(host_data, range) {}
+		: Base(host_data, range) {}
 	//buffer(storage<DataType>& store, range<1>);
 	//buffer(buffer, index<dimensions> base_index, range<dimensions> sub_range);
 	buffer(cl_mem mem_object, queue from_queue, event available_event)
-		: detail::buffer_<DataType, 1>(mem_object, from_queue, available_event) {}
+		: Base(mem_object, from_queue, available_event) {}
 #else
-	using detail::buffer_<DataType, 1>::buffer;
+	using Base::buffer;
 #endif
 	// Create a new allocated 1D buffer initialized from the given elements
 	// ranging from first up to one before last
 	template <class InputIterator>
 	buffer(InputIterator first, InputIterator last)
-		: detail::buffer_<DataType, 1>(nullptr, last - first) {
+		: Base(nullptr, last - first) {
 		host_data = ptr_t(new DataType[last - first]);
 		std::copy(first, last, host_data.get());
 	}
 
 	buffer(vector_class<DataType>& host_data)
-		: detail::buffer_<DataType, 1>(host_data.data(), host_data.size()) {}
+		: Base(host_data.data(), host_data.size()) {}
 	buffer(const vector_class<DataType>& host_data)
-		: detail::buffer_<DataType, 1>(host_data.data(), host_data.size()) {}
+		: Base(host_data.data(), host_data.size()) {}
 };
 
 template <typename DataType>
 struct buffer<DataType, 2> : public detail::buffer_<DataType, 2>{
 #if MSVC_LOW
+private:
+	using Base = detail::buffer_<DataType, 2>;
+public:
 	buffer(range<2> range)
-		: detail::buffer_<DataType, 2>(range) {}
+		: Base(range) {}
 	buffer(DataType* host_data, range<2> range)
-		: detail::buffer_<DataType, 2>(host_data, range) {}
+		: Base(host_data, range) {}
 	buffer(const DataType* host_data, range<2> range)
-		: detail::buffer_<DataType, 2>(host_data, range) {}
+		: Base(host_data, range) {}
 	//buffer(storage<DataType>& store, range<2>);
 	//buffer(buffer, index<2> base_index, range<2> sub_range);
 	buffer(cl_mem mem_object, queue from_queue, event available_event)
-		: detail::buffer_<DataType, 2>(mem_object, from_queue, available_event) {}
+		: Base(mem_object, from_queue, available_event) {}
 #else
 	using detail::buffer_<DataType, 2>::buffer;
 #endif
@@ -306,16 +312,19 @@ struct buffer<DataType, 2> : public detail::buffer_<DataType, 2>{
 template <typename DataType>
 struct buffer<DataType, 3> : public detail::buffer_<DataType, 3>{
 #if MSVC_LOW
+private:
+	using Base = detail::buffer_<DataType, 3>;
+public:
 	buffer(range<3> range)
-		: detail::buffer_<DataType, 3>(range) {}
+		: Base(range) {}
 	buffer(DataType* host_data, range<3> range)
-		: detail::buffer_<DataType, 3>(host_data, range) {}
+		: Base(host_data, range) {}
 	buffer(const DataType* host_data, range<3> range)
-		: detail::buffer_<DataType, 3>(host_data, range) {}
+		: Base(host_data, range) {}
 	//buffer(storage<DataType>& store, range<3>);
 	//buffer(buffer, index<3> base_index, range<3> sub_range);
 	buffer(cl_mem mem_object, queue from_queue, event available_event)
-		: detail::buffer_<DataType, 3>(mem_object, from_queue, available_event) {}
+		: Base(mem_object, from_queue, available_event) {}
 #else
 	using detail::buffer_<DataType, 3>::buffer;
 #endif
