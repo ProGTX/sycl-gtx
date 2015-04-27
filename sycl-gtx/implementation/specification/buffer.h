@@ -10,7 +10,6 @@
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
-#include <memory>
 #include <vector>
 #include <algorithm>
 
@@ -29,10 +28,8 @@ class queue;
 namespace detail {
 
 // Forward declarations
-struct cmd_queue;
 template <typename DataType, int dimensions>
 class accessor_buffer;
-
 namespace kernel_ {
 	class source;
 }
