@@ -2,7 +2,6 @@
 
 // 3.5.6 Command group class
 
-#include "access.h"
 #include "buffer.h"
 #include "event.h"
 #include "queue.h"
@@ -17,15 +16,9 @@ namespace command {
 
 enum class type_t {
 	unspecified,
-	buffer_creation,
-	accessor,
+	get_accessor,
+	copy_data,
 	kernel
-};
-
-struct buffer_access {
-	buffer_base* buffer;
-	access::mode mode;
-	access::target target;
 };
 
 union metadata {
@@ -39,6 +32,8 @@ struct info {
 	command_t function;
 	type_t type;
 	metadata data;
+
+	static void do_nothing(queue* q) {}
 };
 
 class group_ {
@@ -67,6 +62,20 @@ public:
 	}
 
 	// Add buffer access command
+	template<bool = true>
+	static void add(
+		buffer_access buf_acc,
+		string_class name
+	) {
+		last->commands.push_back({
+			name,
+			std::bind(info::do_nothing, std::placeholders::_1),
+			type_t::get_accessor,
+			buf_acc
+		});
+	}
+
+	// Add buffer copy command
 	template <class... Args>
 	static void add(
 		buffer_access buf_acc,
@@ -77,7 +86,7 @@ public:
 		last->commands.push_back({
 			name,
 			std::bind(function, std::placeholders::_1, params...),
-			type_t::accessor,
+			type_t::copy_data,
 			buf_acc
 		});
 	}

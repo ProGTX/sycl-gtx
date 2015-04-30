@@ -56,6 +56,12 @@ protected:
 	}
 };
 
+struct buffer_access {
+	buffer_base* buffer;
+	access::mode mode;
+	access::target target;
+};
+
 template <typename DataType, int dimensions>
 class buffer_ : public buffer_base {
 protected:
@@ -175,7 +181,9 @@ private:
 
 	template<access::mode mode, access::target target>
 	accessor<DataType, dimensions, mode, target> create_accessor() {
-		DSELF() << resource_name << mode << target;
+		if(command::group_::in_scope()) {
+			command::group_::add(buffer_access{ this, mode, target }, __func__);
+		}
 		return accessor<DataType, dimensions, mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
 	}
 
@@ -195,7 +203,7 @@ public:
 	template<>													\
 	accessor<DataType, dimensions, mode, target> get_access() {	\
 		if(target != access::host_buffer) {						\
-			command::group_::check_scope(handler);					\
+			command::group_::check_scope(handler);				\
 		}														\
 		code;													\
 		if(target != access::host_buffer) {						\

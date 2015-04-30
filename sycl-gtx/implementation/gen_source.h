@@ -47,7 +47,7 @@ struct constructor;
 class source {
 private:
 	struct buf_info {
-		command::buffer_access acc;
+		buffer_access acc;
 		string_class type_name;
 	};
 
