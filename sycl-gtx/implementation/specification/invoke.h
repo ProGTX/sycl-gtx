@@ -16,7 +16,7 @@ namespace sycl {
 // 3.7.3.1 Single Task invoke
 template<class KernelType>
 void single_task(KernelType kernFunctor) {
-	detail::cmd_group::check_scope();
+	detail::command::group_::check_scope();
 	auto src = detail::kernel_::constructor<void>::get(kernFunctor);
 	auto kern = src.compile();
 	debug() << "Compiled kernel:";
@@ -30,7 +30,7 @@ void single_task(KernelType kernFunctor) {
 
 template<class KernelType, int dimensions>
 void parallel_for(range<dimensions> num_work_items, KernelType kernFunctor) {
-	detail::cmd_group::check_scope();
+	detail::command::group_::check_scope();
 	auto src = detail::kernel_::constructor<id<dimensions>>::get(kernFunctor, num_work_items);
 	auto kern = src.compile();
 	debug() << "Compiled kernel:";

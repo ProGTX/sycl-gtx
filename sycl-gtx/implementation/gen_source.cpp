@@ -88,11 +88,11 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 	*kern = std::unique_ptr<kernel>(new kernel(k));
 }
 
-// Note: MSVC2013 editor reports errors on cmd_group::add, but the code compiles and links
+// Note: MSVC2013 editor reports errors on command::group_::add, but the code compiles and links
 
 detail::shared_unique<kernel> source::compile() const {
 	auto kern = detail::shared_unique<kernel>(new std::unique_ptr<kernel>());
-	cmd_group::add(compile_command, __func__, *this, kern);
+	command::group_::add(compile_command, __func__, *this, kern);
 	return kern;
 }
 
@@ -102,7 +102,7 @@ void source::write_buffers_to_device() const {
 			// Don't need to copy data that won't be used
 			continue;
 		}
-		cmd_group::add(
+		command::group_::add(
 			buffer_base::enqueue_command,
 			__func__,
 			acc.second.buffer,
@@ -116,7 +116,7 @@ void source::enqueue_task_command(queue* q, detail::shared_unique<kernel> kern) 
 }
 
 void source::enqueue_task(detail::shared_unique<kernel> kern) const {
-	cmd_group::add(enqueue_task_command, __func__, kern);
+	command::group_::add(enqueue_task_command, __func__, kern);
 }
 
 void source::read_buffers_from_device() const {
@@ -125,7 +125,7 @@ void source::read_buffers_from_device() const {
 			// Don't need to read back read-only buffers
 			continue;
 		}
-		cmd_group::add(
+		command::group_::add(
 			buffer_base::enqueue_command,
 			__func__,
 			acc.second.buffer,

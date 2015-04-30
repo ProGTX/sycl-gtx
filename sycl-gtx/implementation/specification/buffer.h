@@ -10,8 +10,9 @@
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
-#include <vector>
 #include <algorithm>
+#include <memory>
+#include <vector>
 
 
 namespace cl {
@@ -160,7 +161,7 @@ private:
 	template<cl_mem_flags FLAGS>
 	void init() {
 		if(!is_initialized) {
-			cmd_group::add(create<FLAGS>, __func__, this);
+			command::group_::add(create<FLAGS>, __func__, this);
 			generate_name();
 			is_initialized = true;
 		}
@@ -174,6 +175,7 @@ private:
 
 	template<access::mode mode, access::target target>
 	accessor<DataType, dimensions, mode, target> create_accessor() {
+		DSELF() << resource_name << mode << target;
 		return accessor<DataType, dimensions, mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
 	}
 
@@ -182,7 +184,7 @@ public:
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
 		if(target != access::host_buffer) {
-			cmd_group::check_scope(handler);
+			command::group_::check_scope(handler);
 			init<CL_MEM_READ_ONLY>();
 		}
 		return create_accessor<mode, target>();
@@ -193,7 +195,7 @@ public:
 	template<>													\
 	accessor<DataType, dimensions, mode, target> get_access() {	\
 		if(target != access::host_buffer) {						\
-			cmd_group::check_scope(handler);					\
+			command::group_::check_scope(handler);					\
 		}														\
 		code;													\
 		if(target != access::host_buffer) {						\

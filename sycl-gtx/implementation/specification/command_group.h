@@ -12,8 +12,9 @@ namespace cl {
 namespace sycl {
 
 namespace detail {
+namespace command {
 
-class cmd_group {
+class group_ {
 private:
 	friend class ::cl::sycl::command_group;
 
@@ -34,14 +35,16 @@ public:
 	using command_t = function_class<queue*>;
 };
 
+
+} // namespace command
 } // namespace detail
 
 // A command group in SYCL as it is defined in 2.3.1 includes a kernel to be enqueued along with all the commands
 // for queued data transfers that it needs in order for its execution to be successful.
 class command_group {
 private:
-	friend class detail::cmd_group;
-	using command_t = detail::cmd_group::command_t;
+	friend class detail::command::group_;
+	using command_t = detail::command::group_::command_t;
 
 	vector_class<std::pair<string_class, command_t>> commands;
 	queue* q;

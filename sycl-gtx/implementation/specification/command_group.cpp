@@ -3,10 +3,10 @@
 using namespace cl::sycl;
 
 void command_group::enter() {
-	detail::cmd_group::last = this;
+	detail::command::group_::last = this;
 }
 void command_group::exit() {
-	detail::cmd_group::last = nullptr;
+	detail::command::group_::last = nullptr;
 }
 
 void command_group::flush() {
@@ -27,13 +27,13 @@ command_group::~command_group() {
 
 using namespace detail;
 
-command_group* cmd_group::last = nullptr;
+command_group* command::group_::last = nullptr;
 
-bool cmd_group::in_scope() {
+bool command::group_::in_scope() {
 	return last != nullptr;
 }
 
-void cmd_group::check_scope(error::handler& handler) {
+void command::group_::check_scope(error::handler& handler) {
 	if(!in_scope()) {
 		handler.report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
 	}
