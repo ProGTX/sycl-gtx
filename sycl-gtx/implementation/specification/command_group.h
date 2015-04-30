@@ -14,7 +14,7 @@ namespace sycl {
 
 namespace detail {
 namespace command {
-	
+
 enum class type_t {
 	unspecified,
 	buffer_creation,
@@ -29,6 +29,7 @@ struct buffer_access {
 };
 
 union metadata {
+	buffer_access buf_acc;
 };
 	
 struct info {
@@ -64,6 +65,23 @@ public:
 			type_t::unspecified
 		});
 	}
+
+	// Add buffer access command
+	template <class... Args>
+	static void add(
+		buffer_access buf_acc,
+		fn<Args...> function,
+		string_class name,
+		Args... params
+	) {
+		last->commands.push_back({
+			name,
+			std::bind(function, std::placeholders::_1, params...),
+			type_t::accessor,
+			buf_acc
+		});
+	}
+
 	static bool in_scope();
 	static void check_scope(error::handler& handler = error::handler::default);
 

@@ -103,6 +103,7 @@ void source::write_buffers_to_device() const {
 			continue;
 		}
 		command::group_::add(
+			acc.second.acc,
 			buffer_base::enqueue_command,
 			__func__,
 			acc.second.acc.buffer,
@@ -126,6 +127,7 @@ void source::read_buffers_from_device() const {
 			continue;
 		}
 		command::group_::add(
+			acc.second.acc,
 			buffer_base::enqueue_command,
 			__func__,
 			acc.second.acc.buffer,
