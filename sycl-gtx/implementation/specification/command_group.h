@@ -15,6 +15,12 @@ namespace sycl {
 namespace detail {
 namespace command {
 	
+enum class type_t {
+	unspecified,
+	buffer_creation,
+	accessor,
+	kernel
+};
 
 struct buffer_access {
 	buffer_base* buffer;
@@ -22,6 +28,7 @@ struct buffer_access {
 	access::target target;
 };
 
+union metadata {
 };
 	
 struct info {
@@ -29,6 +36,8 @@ struct info {
 
 	string_class name;	// Only for debugging
 	command_t function;
+	type_t type;
+	metadata data;
 };
 
 class group_ {
@@ -42,9 +51,18 @@ private:
 	using fn = void(*)(queue*, Args...);
 
 public:
+	// Add generic command
 	template<class... Args>
-	static void add(fn<Args...> function, string_class name, Args... params) {
-		last->commands.push_back({ name, std::bind(function, std::placeholders::_1, params...) });
+	static void add(
+		fn<Args...> function,
+		string_class name,
+		Args... params
+	) {
+		last->commands.push_back({
+			name,
+			std::bind(function, std::placeholders::_1, params...),
+			type_t::unspecified
+		});
 	}
 	static bool in_scope();
 	static void check_scope(error::handler& handler = error::handler::default);
