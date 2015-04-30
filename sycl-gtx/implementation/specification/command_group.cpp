@@ -13,8 +13,8 @@ void command_group::flush() {
 	DSELF();
 
 	for(auto& command : commands) {
-		debug() << "command:" << command.first;
-		command.second(q);
+		debug() << "command:" << command.name;
+		command.function(q);
 	}
 	commands.clear();
 }

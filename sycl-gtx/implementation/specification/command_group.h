@@ -13,6 +13,13 @@ namespace sycl {
 
 namespace detail {
 namespace command {
+	
+struct info {
+	using command_t = function_class<queue*>;
+
+	string_class name;	// Only for debugging
+	command_t function;
+};
 
 class group_ {
 private:
@@ -27,14 +34,13 @@ private:
 public:
 	template<class... Args>
 	static void add(fn<Args...> function, string_class name, Args... params) {
-		last->commands.emplace_back(name, std::bind(function, std::placeholders::_1, params...));
+		last->commands.push_back({ name, std::bind(function, std::placeholders::_1, params...) });
 	}
 	static bool in_scope();
 	static void check_scope(error::handler& handler = error::handler::default);
 
-	using command_t = function_class<queue*>;
+	using command_t = info::command_t;
 };
-
 
 } // namespace command
 } // namespace detail
@@ -46,7 +52,7 @@ private:
 	friend class detail::command::group_;
 	using command_t = detail::command::group_::command_t;
 
-	vector_class<std::pair<string_class, command_t>> commands;
+	vector_class<detail::command::info> commands;
 	queue* q;
 
 	void enter();
