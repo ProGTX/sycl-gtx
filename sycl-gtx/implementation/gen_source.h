@@ -46,20 +46,13 @@ struct constructor;
 
 class source {
 private:
-	struct tuple {
-		string_class type_name;
-		access::mode mode;
-		access::target target;
-		buffer_base* buffer;
-	};
-
 	static int num_kernels;
 	int kernel_id;
 
 	string_class kernel_name;
 	vector_class<string_class> lines;
 	string_class final_code;
-	std::unordered_map<string_class, tuple> resources;
+	std::unordered_map<string_class, command::buffer_access> resources;
 
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;
@@ -107,7 +100,7 @@ public:
 
 		if(it == scope->resources.end()) {
 			auto buf = (buffer<DataType, dimensions>*) acc.resource();
-			scope->resources[name] = { type_name::get<DataType>(), mode, target, buf };
+			scope->resources[name] = { buf, mode, target, type_name::get<DataType>() };
 		}
 	}
 
