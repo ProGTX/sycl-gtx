@@ -9,8 +9,16 @@ void command_group::exit() {
 	detail::command::group_::last = nullptr;
 }
 
+// TODO: Reschedules commands to achieve better performance
+void command_group::optimize() {
+	DSELF();
+}
+
+// Executes all commands in queue and removes them
 void command_group::flush() {
 	DSELF();
+
+	optimize();
 
 	for(auto& command : commands) {
 		debug() << "command:" << command.name;

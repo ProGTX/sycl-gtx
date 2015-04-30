@@ -112,6 +112,7 @@ private:
 
 	void enter();
 	void exit();
+	void optimize();
 	void flush();
 public:
 	// Constructs a command group with the queue the group will enqueue its commands to
