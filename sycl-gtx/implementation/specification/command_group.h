@@ -3,7 +3,6 @@
 // 3.5.6 Command group class
 
 #include "access.h"
-#include "accessor.h"
 #include "buffer.h"
 #include "event.h"
 #include "queue.h"
@@ -21,7 +20,8 @@ struct buffer_access {
 	buffer_base* buffer;
 	access::mode mode;
 	access::target target;
-	string_class type_name;
+};
+
 };
 	
 struct info {

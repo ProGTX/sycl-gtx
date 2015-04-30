@@ -44,8 +44,8 @@ string_class source::generate_accessor_list() const {
 	}
 
 	for(auto& acc : resources) {
-		list += get_name(acc.second.target) + " ";
-		if(acc.second.mode == access::mode::read) {
+		list += get_name(acc.second.acc.target) + " ";
+		if(acc.second.acc.mode == access::mode::read) {
 			list += "const ";
 		}
 		list += acc.second.type_name + " ";
@@ -79,7 +79,7 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 
 	int i = 0;
 	for(auto& acc : src.resources) {
-		auto mem = acc.second.buffer->device_data.get();
+		auto mem = acc.second.acc.buffer->device_data.get();
 		error_code = clSetKernelArg(k, i, sizeof(cl_mem), &mem);
 		error::report(q, error_code);
 		++i;
@@ -98,14 +98,14 @@ detail::shared_unique<kernel> source::compile() const {
 
 void source::write_buffers_to_device() const {
 	for(auto& acc : resources) {
-		if(acc.second.mode == access::write || acc.second.mode == access::discard_read_write) {
+		if(acc.second.acc.mode == access::write || acc.second.acc.mode == access::discard_read_write) {
 			// Don't need to copy data that won't be used
 			continue;
 		}
 		command::group_::add(
 			buffer_base::enqueue_command,
 			__func__,
-			acc.second.buffer,
+			acc.second.acc.buffer,
 			&clEnqueueWriteBuffer
 		);
 	}
@@ -121,14 +121,14 @@ void source::enqueue_task(detail::shared_unique<kernel> kern) const {
 
 void source::read_buffers_from_device() const {
 	for(auto& acc : resources) {
-		if(acc.second.mode == access::read) {
+		if(acc.second.acc.mode == access::read) {
 			// Don't need to read back read-only buffers
 			continue;
 		}
 		command::group_::add(
 			buffer_base::enqueue_command,
 			__func__,
-			acc.second.buffer,
+			acc.second.acc.buffer,
 			reinterpret_cast<buffer_base::clEnqueueBuffer_f>(&clEnqueueReadBuffer)
 		);
 	}

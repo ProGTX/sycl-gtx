@@ -46,13 +46,18 @@ struct constructor;
 
 class source {
 private:
+	struct buf_info {
+		command::buffer_access acc;
+		string_class type_name;
+	};
+
 	static int num_kernels;
 	int kernel_id;
 
 	string_class kernel_name;
 	vector_class<string_class> lines;
 	string_class final_code;
-	std::unordered_map<string_class, command::buffer_access> resources;
+	std::unordered_map<string_class, buf_info> resources;
 
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;
@@ -100,7 +105,7 @@ public:
 
 		if(it == scope->resources.end()) {
 			auto buf = (buffer<DataType, dimensions>*) acc.resource();
-			scope->resources[name] = { buf, mode, target, type_name::get<DataType>() };
+			scope->resources[name] = { { buf, mode, target }, type_name::get<DataType>() };
 		}
 	}
 
