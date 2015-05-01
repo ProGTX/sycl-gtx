@@ -29,58 +29,60 @@ enum target {
 };
 
 static debug& operator<<(debug& d, mode m) {
-	d << "mode::";
+	std::string str("mode::");
 	switch(m) {
 		case read:
-			d << "read";
+			str += "read";
 			break;
 		case write:
-			d << "write";
+			str += "write";
 			break;
 		case atomic:
-			d << "atomic";
+			str += "atomic";
 			break;
 		case read_write:
-			d << "read_write";
+			str += "read_write";
 			break;
 		case discard_read_write:
-			d << "discard_read_write";
+			str += "discard_read_write";
 			break;
 	}
+	d << str;
 	return d;
 }
 
 static debug& operator<<(debug& d, target t) {
-	d << "target::";
+	std::string str("target::");
 	switch(t) {
 		case global_buffer:
-			d << "global_buffer";
+			str += "global_buffer";
 			break;
 		case constant_buffer:
-			d << "constant_buffer";
+			str += "constant_buffer";
 			break;
 		case local:
-			d << "local";
+			str += "local";
 			break;
 		case image:
-			d << "image";
+			str += "image";
 			break;
 		case host_buffer:
-			d << "host_buffer";
+			str += "host_buffer";
 			break;
 		case host_image:
-			d << "host_image";
+			str += "host_image";
 			break;
 		case image_array:
-			d << "image_array";
+			str += "image_array";
 			break;
 		case cl_buffer:
-			d << "cl_buffer";
+			str += "cl_buffer";
 			break;
 		case cl_image:
-			d << "cl_image";
+			str += "cl_image";
 			break;
 	}
+	d << str;
 	return d;
 }
 

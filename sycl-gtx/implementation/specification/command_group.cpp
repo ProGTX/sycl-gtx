@@ -25,7 +25,7 @@ void command_group::flush() {
 	for(auto& command : commands) {
 		if(command.type == type_t::copy_data || command.type == type_t::get_accessor) {
 			auto& acc = command.data.buf_acc;
-			debug() << acc.buffer << acc.mode << acc.target;
+			debug() << command.type << acc.buffer << acc.mode << acc.target;
 		}
 		else {
 			debug() << "command:" << command.name;

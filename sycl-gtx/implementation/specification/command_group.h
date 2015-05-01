@@ -21,23 +21,24 @@ enum class type_t {
 	kernel
 };
 
-static debug& operator<<(debug& d, type_t t) {
-	d << "command::type::";
+static debug operator<<(debug d, type_t t) {
+	string_class str("command::type::");
 	switch(t) {
 		case type_t::get_accessor:
-			d << "get_accessor";
+			str += "get_accessor";
 			break;
 		case type_t::copy_data:
-			d << "copy_data";
+			str += "copy_data";
 			break;
 		case type_t::kernel:
-			d << "kernel";
+			str += "kernel";
 			break;
 		case type_t::unspecified:
 		default:
-			d << "unspecified";
+			str += "unspecified";
 			break;
 	}
+	d << str;
 	return d;
 }
 
