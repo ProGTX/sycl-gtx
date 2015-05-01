@@ -21,7 +21,7 @@ enum class type_t {
 	kernel
 };
 
-static debug operator<<(debug d, type_t t) {
+static debug& operator<<(debug& d, type_t t) {
 	string_class str("command::type::");
 	switch(t) {
 		case type_t::get_accessor:
