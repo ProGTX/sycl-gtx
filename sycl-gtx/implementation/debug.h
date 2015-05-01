@@ -1,7 +1,5 @@
 #pragma once
 
-#include "specification\access.h"
-
 #include <iostream>
 #include <sstream>
 
@@ -22,66 +20,6 @@ protected:
 	static constexpr bool DEBUG_ACTIVE = true;
 	std::stringstream stream;
 	std::stringstream before;
-
-	void AddToStream(cl::sycl::access::mode mode) {
-		if(DEBUG_ACTIVE) {
-			using namespace cl::sycl::access;
-			stream << "mode::";
-			switch(mode) {
-				case read:
-					stream << "read ";
-					break;
-				case write:
-					stream << "write ";
-					break;
-				case atomic:
-					stream << "atomic ";
-					break;
-				case read_write:
-					stream << "read_write ";
-					break;
-				case discard_read_write:
-					stream << "discard_read_write ";
-					break;
-			}
-		}
-	}
-
-	void AddToStream(cl::sycl::access::target target) {
-		if(DEBUG_ACTIVE) {
-			using namespace cl::sycl::access;
-			stream << "target::";
-			switch(target) {
-				case global_buffer:
-					stream << "global_buffer ";
-					break;
-				case constant_buffer:
-					stream << "constant_buffer ";
-					break;
-				case local:
-					stream << "local ";
-					break;
-				case image:
-					stream << "image ";
-					break;
-				case host_buffer:
-					stream << "host_buffer ";
-					break;
-				case host_image:
-					stream << "host_image ";
-					break;
-				case image_array:
-					stream << "image_array ";
-					break;
-				case cl_buffer:
-					stream << "cl_buffer ";
-					break;
-				case cl_image:
-					stream << "cl_image ";
-					break;
-			}
-		}
-	}
 
 	template<typename T>
 	void AddToStream(T add) {
@@ -121,17 +59,17 @@ public:
 		AddToStream(add);
 	}
 
-	template<typename T>
-	debug& operator<<(T add) {
-		AddToStream(add);
-		return *this;
-	}
-
 	template<typename U, typename T>
 	debug(U before, T add)
 		: debug() {
 		this->before << before;
 		AddToStream(add);
+	}
+
+	template<typename T>
+	debug& operator<<(T add) {
+		AddToStream(add);
+		return *this;
 	}
 
 	virtual ~debug() {

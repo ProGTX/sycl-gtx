@@ -21,6 +21,26 @@ enum class type_t {
 	kernel
 };
 
+static debug& operator<<(debug& d, type_t t) {
+	d << "command::type::";
+	switch(t) {
+		case type_t::get_accessor:
+			d << "get_accessor";
+			break;
+		case type_t::copy_data:
+			d << "copy_data";
+			break;
+		case type_t::kernel:
+			d << "kernel";
+			break;
+		case type_t::unspecified:
+		default:
+			d << "unspecified";
+			break;
+	}
+	return d;
+}
+
 union metadata {
 	buffer_access buf_acc;
 };

@@ -20,8 +20,16 @@ void command_group::flush() {
 
 	optimize();
 
+	using detail::command::type_t;
+
 	for(auto& command : commands) {
-		debug() << "command:" << command.name;
+		if(command.type == type_t::copy_data || command.type == type_t::get_accessor) {
+			auto& acc = command.data.buf_acc;
+			debug() << acc.buffer << acc.mode << acc.target;
+		}
+		else {
+			debug() << "command:" << command.name;
+		}
 		command.function(q);
 	}
 	commands.clear();
