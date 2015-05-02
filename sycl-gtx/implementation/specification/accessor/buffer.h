@@ -235,57 +235,35 @@ public:
 
 } // namespace detail
 
-
-SYCL_ADD_ACCESSOR(access::read) {
-	using Base = detail::accessor_<DataType, dimensions, access::read, target>;
-public:
 #if MSVC_LOW
-	accessor(buffer<DataType, dimensions>& bufferRef)
-		: Base(bufferRef) {}
-	accessor(
-		buffer<DataType, dimensions>& bufferRef,
-		range<dimensions> offset,
-		range<dimensions> range
-	)
-		: Base(bufferRef, offset, range) {}
+#define SYCL_ADD_ACCESSOR_BUFFER(mode)										\
+	SYCL_ADD_ACCESSOR(mode) {												\
+		using Base = detail::accessor_<DataType, dimensions, mode, target>;	\
+	public:																	\
+		accessor(buffer<DataType, dimensions>& bufferRef)					\
+			: Base(bufferRef) {}											\
+		accessor(															\
+			buffer<DataType, dimensions>& bufferRef,						\
+			range<dimensions> offset,										\
+			range<dimensions> range											\
+		)																	\
+			: Base(bufferRef, offset, range) {}								\
+	};
 #else
-	using Base::accessor_;
+#define SYCL_ADD_ACCESSOR_BUFFER(mode)										\
+	SYCL_ADD_ACCESSOR(mode) {												\
+		using Base = detail::accessor_<DataType, dimensions, mode, target>;	\
+	public:																	\
+		using Base::accessor_;												\
+	};
 #endif
-};
 
-SYCL_ADD_ACCESSOR(access::write) {
-	using Base = detail::accessor_<DataType, dimensions, access::write, target>;
-public:
-#if MSVC_LOW
-	accessor(buffer<DataType, dimensions>& bufferRef)
-		: Base(bufferRef) {}
-	accessor(
-		buffer<DataType, dimensions>& bufferRef,
-		range<dimensions> offset,
-		range<dimensions> range
-		)
-		: Base(bufferRef, offset, range) {}
-#else
-	using Base::accessor_;
-#endif
-};
+SYCL_ADD_ACCESSOR_BUFFER(access::read)
+SYCL_ADD_ACCESSOR_BUFFER(access::write)
+SYCL_ADD_ACCESSOR_BUFFER(access::read_write)
+SYCL_ADD_ACCESSOR_BUFFER(access::discard_read_write)
 
-SYCL_ADD_ACCESSOR(access::read_write) {
-	using Base = detail::accessor_<DataType, dimensions, access::read_write, target>;
-public:
-#if MSVC_LOW
-	accessor(buffer<DataType, dimensions>& bufferRef)
-		: Base(bufferRef) {}
-	accessor(
-		buffer<DataType, dimensions>& bufferRef,
-		range<dimensions> offset,
-		range<dimensions> range
-		)
-		: Base(bufferRef, offset, range) {}
-#else
-	using Base::accessor_;
-#endif
-};
+#undef SYCL_ADD_ACCESSOR_BUFFER
 
 } // namespace sycl
 } // namespace cl
