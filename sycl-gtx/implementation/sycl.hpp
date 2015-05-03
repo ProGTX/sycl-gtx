@@ -17,6 +17,7 @@
 #include "flow_control.h"
 
 #if MSVC_LOW
+#undef MSVC_LOW
 #undef SYCL_SWAP
 #undef SYCL_MOVE_INIT
 #endif

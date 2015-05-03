@@ -3,8 +3,7 @@
 // 3.6.4 Accessors
 
 #include "access.h"
-#include "ranges.h"
-#include "../data_ref.h"
+#include "../common.h"
 
 namespace cl {
 namespace sycl {
@@ -61,10 +60,10 @@ struct select_target;
 template <typename DataType, int dimensions, int mode, int target, typename = select_target<true>>
 class accessor_;
 
-#define SYCL_ACCESSOR_CLASS(condition)															\
-template <typename DataType, int dimensions, int mode, int target>								\
-class accessor_<DataType, dimensions, mode, target, select_target<(condition)>>					\
-	: public accessor_core<DataType, dimensions, (access::mode)mode, (access::target)target>
+#define SYCL_ACCESSOR_CLASS(condition)																\
+	template <typename DataType, int dimensions, int mode, int target>								\
+	class accessor_<DataType, dimensions, mode, target, select_target<(condition)>>					\
+		: public accessor_core<DataType, dimensions, (access::mode)mode, (access::target)target>
 
 } // namespace detail
 
@@ -79,7 +78,3 @@ class accessor;
 
 } // namespace sycl
 } // namespace cl
-
-// Note: Must be done in every file that includes this one!
-//#undef SYCL_ACCESSOR_CLASS
-//#undef SYCL_ADD_ACCESSOR

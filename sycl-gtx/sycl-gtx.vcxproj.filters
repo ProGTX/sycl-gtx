@@ -185,5 +185,14 @@
     <ClInclude Include="implementation\flow_control.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\accessor\buffer_device.h">
+      <Filter>Header Files\specification\accessor</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\accessor\buffer_host.h">
+      <Filter>Header Files\specification\accessor</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\accessor\buffer_base.h">
+      <Filter>Header Files\specification\accessor</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

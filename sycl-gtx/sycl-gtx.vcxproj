@@ -181,6 +181,9 @@
     <ClInclude Include="implementation\specification\accessor.h" />
     <ClInclude Include="implementation\specification\access.h" />
     <ClInclude Include="implementation\specification\accessor\buffer.h" />
+    <ClInclude Include="implementation\specification\accessor\buffer_base.h" />
+    <ClInclude Include="implementation\specification\accessor\buffer_device.h" />
+    <ClInclude Include="implementation\specification\accessor\buffer_host.h" />
     <ClInclude Include="implementation\specification\buffer.h" />
     <ClInclude Include="implementation\specification\command_group.h" />
     <ClInclude Include="implementation\specification\context.h" />
