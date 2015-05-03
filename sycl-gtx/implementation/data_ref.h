@@ -2,7 +2,6 @@
 
 #include "common.h"
 #include "debug.h"
-
 #include <type_traits>
 
 // Data reference wrappers
@@ -12,7 +11,7 @@ namespace sycl {
 
 // Forward declaration
 template <int dimensions>
-class id;
+struct id;
 
 namespace detail {
 

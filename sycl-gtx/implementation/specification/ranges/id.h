@@ -2,8 +2,8 @@
 
 // TODO: 3.7.1.3 ID class
 
-#include "../../data_ref.h"
 #include "../../common.h"
+#include "../../data_ref.h"
 #include <initializer_list>
 
 namespace cl {
@@ -27,16 +27,7 @@ protected:
 
 	size_t values[3];
 
-	id_(size_t first, size_t second, size_t third)
-#if MSVC_LOW
-	{
-		values[0] = first;
-		values[1] = second;
-		values[2] = third;
-#else
-		: dims{ first, second, third } {
-#endif
-	}
+	id_(size_t first, size_t second, size_t third);
 
 public:
 	id_ref operator[](size_t n);
@@ -47,23 +38,20 @@ public:
 	data_ref operator/(size_t n) const;
 	data_ref operator%(size_t n) const;
 
-	friend data_ref operator*(size_t n, id_ i) {
-		return n * id_ref(0, nullptr);
+	friend data_ref operator*(size_t n, id_<dimensions> i) {
+		return i * n;
 	}
 
 	// Return the value of the specified dimension of the id
-	size_t get(int dimension) const {
+	size_t get(int n) const {
 		return values[n];
 	}
-
-	bool operator==(const id_& rhs) const;
 };
 
 } // namespace detail
 
-
 template <int dimensions = 1>
-class id;
+struct id;
 
 template <>
 struct id<1> : detail::id_<1> {
