@@ -79,6 +79,8 @@ public:
 	SYCL_ASSIGNMENT_OPERATOR(%= , modulo);
 
 	static string_class get_name(id<1> index);
+	static string_class get_name(id<2> index);
+	static string_class get_name(id<3> index);
 
 	static string_class get_name(data_ref dref) {
 		return dref.name;

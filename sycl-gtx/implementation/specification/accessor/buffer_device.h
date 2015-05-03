@@ -13,19 +13,6 @@ namespace cl {
 namespace sycl {
 namespace detail {
 
-template <int dimensions>
-struct id_name {
-	static string_class get(id<dimensions> index) {
-		return id_base_all_name;
-	}
-};
-template <>
-struct id_name<1> {
-	static string_class get(id<1> index) {
-		return index[0].name;
-	}
-};
-
 // Forward declaration
 template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_device_ref;
@@ -136,7 +123,7 @@ public:
 	data_ref operator[](id<dimensions> index) const {
 		kernel_::source::register_resource(*this);
 		return data_ref(
-			get_resource_name() + "[" + id_name<dimensions>::get(index) + "]"
+			get_resource_name() + "[" + data_ref::get_name(index) + "]"
 		);
 	}
 
