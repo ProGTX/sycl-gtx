@@ -142,8 +142,9 @@ class command_group {
 private:
 	friend class detail::command::group_;
 	using command_f = detail::command::group_::command_f;
+	using command_t = detail::command::info;
 
-	vector_class<detail::command::info> commands;
+	vector_class<command_t> commands;
 	queue* q;
 
 	void enter();

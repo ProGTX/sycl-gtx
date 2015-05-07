@@ -29,9 +29,9 @@ void command_group::flush() {
 			d << command.type << acc.buffer << acc.mode << acc.target;
 		}
 		else if(command.type == type_t::copy_data) {
-			auto& acc = command.data.buf_copy;
+			auto& copy = command.data.buf_copy;
 			auto d = debug();
-			d << command.type << acc.buf.buffer << acc.buf.mode << acc.buf.target << acc.mode;
+			d << command.type << copy.buf.buffer << copy.buf.mode << copy.buf.target << copy.mode;
 		}
 		else {
 			debug() << "command:" << command.name;
