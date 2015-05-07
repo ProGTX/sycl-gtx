@@ -17,10 +17,10 @@ id_<dimensions>::id_(size_t first, size_t second, size_t third)
 	values[0] = first;
 	values[1] = second;
 	values[2] = third;
-#else
-: dims{ first, second, third } {
-#endif
 }
+#else
+	: dims{ first, second, third } {}
+#endif
 
 template <int dimensions>
 id_ref id_<dimensions>::operator[](size_t n) {

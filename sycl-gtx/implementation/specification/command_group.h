@@ -42,8 +42,22 @@ static debug& operator<<(debug& d, type_t t) {
 	return d;
 }
 
+struct buffer_copy {
+	buffer_access buf;
+	access::mode mode;
+};
+
 union metadata {
+	nullptr_t empty;
 	buffer_access buf_acc;
+	buffer_copy buf_copy;
+
+	metadata()
+		: empty(nullptr) {}
+	metadata(buffer_access buf_acc)
+		: buf_acc(buf_acc) {}
+	metadata(buffer_copy buf_copy)
+		: buf_copy(buf_copy) {}
 };
 	
 struct info {
@@ -92,7 +106,7 @@ public:
 			name,
 			std::bind(info::do_nothing, std::placeholders::_1),
 			type_t::get_accessor,
-			buf_acc
+			metadata(buf_acc)
 		});
 	}
 
@@ -100,6 +114,7 @@ public:
 	template <class... Args>
 	static void add(
 		buffer_access buf_acc,
+		access::mode copy_mode,
 		fn<Args...> function,
 		string_class name,
 		Args... params
@@ -108,7 +123,7 @@ public:
 			name,
 			std::bind(function, std::placeholders::_1, params...),
 			type_t::copy_data,
-			buf_acc
+			metadata(buffer_copy{ buf_acc, copy_mode })
 		});
 	}
 

@@ -23,10 +23,15 @@ void command_group::flush() {
 	using detail::command::type_t;
 
 	for(auto& command : commands) {
-		if(command.type == type_t::copy_data || command.type == type_t::get_accessor) {
+		if(command.type == type_t::get_accessor) {
 			auto& acc = command.data.buf_acc;
 			auto d = debug();
 			d << command.type << acc.buffer << acc.mode << acc.target;
+		}
+		else if(command.type == type_t::copy_data) {
+			auto& acc = command.data.buf_copy;
+			auto d = debug();
+			d << command.type << acc.buf.buffer << acc.buf.mode << acc.buf.target << acc.mode;
 		}
 		else {
 			debug() << "command:" << command.name;

@@ -2,6 +2,7 @@
 
 #include "specification\accessor\buffer.h"
 #include "specification\buffer.h"
+#include "specification\command_group.h"
 #include "specification\error_handler.h"
 #include "specification\kernel.h"
 #include "specification\program.h"
@@ -104,6 +105,7 @@ void source::write_buffers_to_device() const {
 		}
 		command::group_::add(
 			acc.second.acc,
+			access::write,
 			buffer_base::enqueue_command,
 			__func__,
 			acc.second.acc.buffer,
@@ -128,6 +130,7 @@ void source::read_buffers_from_device() const {
 		}
 		command::group_::add(
 			acc.second.acc,
+			access::read,
 			buffer_base::enqueue_command,
 			__func__,
 			acc.second.acc.buffer,
