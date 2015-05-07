@@ -61,10 +61,10 @@ union metadata {
 };
 	
 struct info {
-	using command_t = function_class<queue*>;
+	using command_f = function_class<queue*>;
 
 	string_class name;	// Only for debugging
-	command_t function;
+	command_f function;
 	type_t type;
 	metadata data;
 
@@ -130,7 +130,7 @@ public:
 	static bool in_scope();
 	static void check_scope(error::handler& handler = error::handler::default);
 
-	using command_t = info::command_t;
+	using command_f = info::command_f;
 };
 
 } // namespace command
@@ -141,7 +141,7 @@ public:
 class command_group {
 private:
 	friend class detail::command::group_;
-	using command_t = detail::command::group_::command_t;
+	using command_f = detail::command::group_::command_f;
 
 	vector_class<detail::command::info> commands;
 	queue* q;
