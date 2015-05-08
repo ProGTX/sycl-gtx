@@ -10,12 +10,6 @@ refc::ptr<cl_context> context::reserve(cl_context c) {
 	return refc::allocate(c, clReleaseContext);
 }
 
-vector_class<device> context::load_devices() {
-	auto platforms = platform::get_platforms();
-	// TODO: For now just select the first platform
-	return platforms[0].get_devices();
-}
-
 // Master constructor
 // TODO: Deal with platform pointer
 context::context(
@@ -32,12 +26,8 @@ context::context(
 		cl_uint num_devices = target_devices.size();
 
 		if(num_devices == 0) {
-			target_devices = load_devices();
+			target_devices = device_selector::get_platform().get_devices(dev_sel.type);
 			num_devices = target_devices.size();
-		}
-		best_device_id = detail::best_device_id(dev_sel, target_devices);
-		if(best_device_id < 0) {
-			// TODO: Maybe an exception?
 		}
 
 		vector_class<cl_device_id> devices;

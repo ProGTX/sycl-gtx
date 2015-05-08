@@ -37,15 +37,7 @@ queue::queue(const device& queue_device)
 
 queue::queue(const context& dev_context, device_selector& selector)
 	: handler(ctx), ctx(dev_context) {
-	auto devices = ctx.get_devices();
-	auto best_id = detail::best_device_id(selector, devices);
-	if(best_id < 0) {
-		// TODO: Report no device selected.
-		//handler.report();
-	}
-	else {
-		dev = std::move(devices[best_id]);
-	}
+	selector.select_device(ctx.get_devices());
 	create_queue();
 }
 

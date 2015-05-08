@@ -1,12 +1,56 @@
 #include "device_selector.h"
 #include "device.h"
+#include "platform.h"
 #include "../debug.h"
 
 using namespace cl::sycl;
 
-std::unique_ptr<device_selector> device_selector::default = std::unique_ptr<device_selector>(new host_selector());
+const std::unique_ptr<device_selector> device_selector::default = std::unique_ptr<device_selector>(new default_selector());
 
-int host_selector::operator()(device dev) const {
+device device_selector::select_device(vector_class<device> devices) const {
+	int best_id = -1;
+	int best_score = -1;
+	int i = 0;
+
+	for(auto& dev : devices) {
+		int score = operator()(dev);
+		if(score > best_score) {
+			best_id = i;
+			best_score = score;
+		}
+		++i;
+	}
+
+	// Devices with a negative score will never be chosen.
+	if(best_score < 0) {
+		// TODO: The "default" device constructed corresponds to the host.
+		// This is also the device that the system will "fall-back" to,
+		// if there are no existing or valid OpenCL devices associated with the system.
+		debug::warning(__func__) << "does not support a default device yet";
+		throw std::exception();
+	}
+	else {
+		return devices[best_id];
+	}
+}
+
+platform device_selector::get_platform() {
+	auto platforms = platform::get_platforms();
+	// TODO: Platform selection
+	return std::move(platforms[0]);
+}
+
+device device_selector::select_device() const {
+	// MSVC parser complains here
+	return select_device(get_platform().get_devices(type));
+}
+
+int default_selector::operator()(device dev) const {
+	DSELF() << "not implemented";
+	return 0;
+}
+
+int gpu_selector::operator()(device dev) const {
 	DSELF() << "not implemented";
 	return 0;
 }

@@ -40,13 +40,11 @@ class context {
 private:
 	refc::ptr<cl_context> ctx;
 	vector_class<device> target_devices;
-	unsigned int best_device_id = 0;
 
 	detail::error::handler handler;
 	static detail::error::handler& default_error;
 
 	static refc::ptr<cl_context> reserve(cl_context c = nullptr);
-	static vector_class<device> load_devices();
 
 	// Master constructor
 	context(
@@ -100,13 +98,12 @@ public:
 	context(const context&) = default;
 #if MSVC_LOW
 	context(context&& move)
-		: SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(target_devices), SYCL_MOVE_INIT(handler), best_device_id(move.best_device_id) {}
+		: SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(target_devices), SYCL_MOVE_INIT(handler) {}
 	friend void swap(context& first, context& second) {
 		using std::swap;
 		SYCL_SWAP(ctx);
 		SYCL_SWAP(target_devices);
 		SYCL_SWAP(handler);
-		SYCL_SWAP(best_device_id);
 	}
 #else
 	context(context&&) = default;

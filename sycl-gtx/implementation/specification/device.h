@@ -25,7 +25,7 @@ private:
 	platform platfrm;
 	detail::error::handler handler;
 
-	device(cl_device_id device_id, const device_selector& selector);
+	device(cl_device_id device_id, const device_selector* selector);
 public:
 	// Default constructor for the device.
 	// It choses a device using default selector.
@@ -124,8 +124,6 @@ namespace detail {
 vector_class<device> get_devices(
 	cl_device_type device_type, cl_platform_id platform_id, const error::handler& handler
 );
-
-unsigned int best_device_id(const device_selector& selector, vector_class<device>& devices);
 
 } // namespace detail
 

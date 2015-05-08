@@ -3,39 +3,25 @@
 
 using namespace cl::sycl;
 
-device::device(cl_device_id device_id, const device_selector& dev_sel)
-	: device_id(refc::allocate(device_id, clReleaseDevice)), platfrm(dev_sel) {
+device::device(cl_device_id device_id, const device_selector* dev_sel)
+	: device_id(refc::allocate(device_id, clReleaseDevice)), platfrm(*dev_sel) {
 	if(device_id != nullptr) {
 		auto error_code = clRetainDevice(device_id);
 		handler.report(error_code);
 	}
 	else {
-		// TODO: Platform selection
-		auto platforms = platform::get_platforms();
-		platfrm = std::move(platforms[0]);
-
-		auto devices = platfrm.get_devices();
-		auto id = detail::best_device_id(dev_sel, devices);
-		if(id < 0) {
-			// TODO: The "default" device constructed corresponds to the host.
-			// This is also the device that the system will "fall-back" to,
-			// if there are no existing or valid OpenCL devices associated with the system.
-			debug::warning(__func__) << "does not support a default device yet";
-		}
-		else {
-			*this = std::move(devices[id]);
-		}
+		*this = dev_sel->select_device();
 	}
 }
 
 device::device()
-	: device(nullptr, *device_selector::default.get()) {}
+	: device(nullptr, device_selector::default.get()) {}
 
 device::device(cl_device_id device_id)
-	: device(device_id, *device_selector::default.get()) {}
+	: device(device_id, nullptr) {}
 
 device::device(const device_selector& dev_sel)
-	: device(nullptr, dev_sel) {}
+	: device(nullptr, &dev_sel) {}
 
 cl_device_id device::get() const {
 	return device_id.get();
@@ -76,22 +62,4 @@ vector_class<device> detail::get_devices(
 	auto error_code = clGetDeviceIDs(platform_id, device_type, MAX_DEVICES, device_ids, &num_devices);
 	handler.report(error_code);
 	return vector_class<device>(device_ids, device_ids + num_devices);
-}
-
-unsigned int detail::best_device_id(const device_selector& selector, vector_class<device>& devices) {
-	unsigned int best_id = -1;
-	int best_score = -1;
-	int i = 0;
-
-	for(auto&& dev : devices) {
-		int score = selector(dev);
-		if(score > best_score) {
-			best_id = i;
-			best_score = score;
-		}
-		++i;
-	}
-
-	// Devices with a negative score will never be chosen.
-	return (best_score >= 0 ? best_id : -1);
 }
