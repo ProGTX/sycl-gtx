@@ -1,5 +1,6 @@
 #include "command_group.h"
 #include <unordered_map>
+#include <unordered_set>
 
 using namespace cl::sycl;
 
@@ -15,9 +16,60 @@ void command_group::optimize() {
 	DSELF();
 
 	std::unordered_map<command_t*, bool> keep(commands.size());
+	std::unordered_map<detail::buffer_base*, command_t*> last_read;
+	std::unordered_set<detail::buffer_base*> was_written;
+
+	using detail::command::type_t;
 
 	for(auto& command : commands) {
 		keep[&command] = true;
+
+		if(command.type == type_t::get_accessor) {
+			// User accesses the buffer
+
+			auto ptr = command.data.buf_acc.data;
+
+			{
+				// Reset reads
+				auto it = last_read.find(ptr);
+				if(it != last_read.end()) {
+					last_read.erase(it);
+				}
+			}
+
+			{
+				// Reset writes
+				auto it = was_written.find(ptr);
+				if(it != was_written.end()) {
+					was_written.erase(it);
+				}
+			}
+		}
+		else if(command.type == type_t::copy_data) {
+			auto ptr = command.data.buf_copy.buf.data;
+
+			if(command.data.buf_copy.mode == access::read) {
+				auto it = last_read.find(ptr);
+
+				// Keep only the last read
+				if(it != last_read.end()) {
+					keep[it->second] = false;
+				}
+
+				last_read[ptr] = &command;
+			}
+			else if(command.data.buf_copy.mode == access::write) {
+				auto it = was_written.find(ptr);
+
+				// Keep only the first write
+				if(it == was_written.end()) {
+					was_written.insert(ptr);
+				}
+				else {
+					keep[&command] = false;
+				}
+			}
+		}
 	}
 
 	decltype(commands) new_commands;
