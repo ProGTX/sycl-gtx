@@ -1,4 +1,5 @@
 #include "command_group.h"
+#include <unordered_map>
 
 using namespace cl::sycl;
 
@@ -12,6 +13,23 @@ void command_group::exit() {
 // TODO: Reschedules commands to achieve better performance
 void command_group::optimize() {
 	DSELF();
+
+	std::unordered_map<command_t*, bool> keep(commands.size());
+
+	for(auto& command : commands) {
+		keep[&command] = true;
+	}
+
+	decltype(commands) new_commands;
+	new_commands.reserve(commands.size());
+
+	for(auto& command : commands) {
+		if(keep[&command]) {
+			new_commands.push_back(std::move(command));
+		}
+	}
+
+	commands = std::move(new_commands);
 }
 
 // Executes all commands in queue and removes them
