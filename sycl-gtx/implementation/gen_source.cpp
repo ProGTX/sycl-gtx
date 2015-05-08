@@ -80,7 +80,7 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 
 	int i = 0;
 	for(auto& acc : src.resources) {
-		auto mem = acc.second.acc.buffer->device_data.get();
+		auto mem = acc.second.acc.data->device_data.get();
 		error_code = clSetKernelArg(k, i, sizeof(cl_mem), &mem);
 		error::report(q, error_code);
 		++i;
@@ -108,7 +108,7 @@ void source::write_buffers_to_device() const {
 			access::write,
 			buffer_base::enqueue_command,
 			__func__,
-			acc.second.acc.buffer,
+			acc.second.acc.data,
 			&clEnqueueWriteBuffer
 		);
 	}
@@ -133,7 +133,7 @@ void source::read_buffers_from_device() const {
 			access::read,
 			buffer_base::enqueue_command,
 			__func__,
-			acc.second.acc.buffer,
+			acc.second.acc.data,
 			reinterpret_cast<buffer_base::clEnqueueBuffer_f>(&clEnqueueReadBuffer)
 		);
 	}
