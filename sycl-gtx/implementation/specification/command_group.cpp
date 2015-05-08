@@ -44,12 +44,12 @@ void command_group::flush() {
 		if(command.type == type_t::get_accessor) {
 			auto& acc = command.data.buf_acc;
 			auto d = debug();
-			d << command.type << acc.buffer << acc.mode << acc.target;
+			d << command.type << acc.data << acc.mode << acc.target;
 		}
 		else if(command.type == type_t::copy_data) {
 			auto& copy = command.data.buf_copy;
 			auto d = debug();
-			d << command.type << copy.buf.buffer << copy.buf.mode << copy.buf.target << copy.mode;
+			d << command.type << copy.buf.data << copy.buf.mode << copy.buf.target << copy.mode;
 		}
 		else {
 			debug() << "command:" << command.name;

@@ -57,7 +57,7 @@ protected:
 };
 
 struct buffer_access {
-	buffer_base* buffer;
+	buffer_base* data;
 	access::mode mode;
 	access::target target;
 };
