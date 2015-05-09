@@ -6,6 +6,14 @@ namespace cl {
 namespace sycl {
 namespace access {
 
+// 3.4 Synchronization
+enum class fence_space : char {
+	local,
+	global,
+	global_and_local
+};
+
+
 // 3.6.4.1 Access modes
 enum mode {
 	read,				// read-only access

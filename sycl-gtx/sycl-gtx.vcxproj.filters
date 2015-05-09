@@ -194,5 +194,8 @@
     <ClInclude Include="implementation\specification\accessor\buffer_base.h">
       <Filter>Header Files\specification\accessor</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\atomic.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
