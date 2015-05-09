@@ -55,7 +55,7 @@ struct id;
 
 template <>
 struct id<1> : detail::id_<1> {
-	id(size_t size)
+	id(size_t size = 0)
 		: detail::id_<1>(size, 1, 1) {}
 	id(std::initializer_list<size_t> list)
 		: id(*(list.begin())) {}
@@ -66,6 +66,8 @@ template <>
 struct id<2> : detail::id_<2>{
 	id(size_t sizeX, size_t sizeY)
 		: detail::id_<2>(sizeX, sizeY, 1) {}
+	id()
+		: id(0, 0) {}
 	id(std::initializer_list<size_t> list)
 		: id(*(list.begin()), *(list.begin() + 1)) {}
 	id(size_t size[2])
@@ -75,6 +77,8 @@ template <>
 struct id<3> : detail::id_<3>{
 	id(size_t sizeX, size_t sizeY, size_t sizeZ)
 		: detail::id_<3>(sizeX, sizeY, sizeZ) {}
+	id()
+		: id(0, 0, 0) {}
 	id(std::initializer_list<size_t> list)
 		: id(*(list.begin()), *(list.begin() + 1), *(list.begin() + 2)) {}
 	id(size_t size[3])

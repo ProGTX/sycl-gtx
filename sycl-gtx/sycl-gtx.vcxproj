@@ -200,6 +200,8 @@
     <ClInclude Include="implementation\specification\queue.h" />
     <ClInclude Include="implementation\specification\ranges.h" />
     <ClInclude Include="implementation\specification\ranges\id.h" />
+    <ClInclude Include="implementation\specification\ranges\item.h" />
+    <ClInclude Include="implementation\specification\ranges\nd_range.h" />
     <ClInclude Include="implementation\specification\ranges\range.h" />
     <ClInclude Include="implementation\specification\refc.h" />
     <ClInclude Include="implementation\sycl.hpp" />

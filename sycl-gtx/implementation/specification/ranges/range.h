@@ -46,7 +46,7 @@ public:
 } // namespace detail
 
 template <int dimensions = 1>
-class range;
+struct range;
 
 #define sycl_range_op(op, dimensions)				\
 	range operator op(range b) {					\
