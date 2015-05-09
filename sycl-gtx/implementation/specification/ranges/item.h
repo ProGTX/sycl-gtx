@@ -10,9 +10,21 @@ template <int dims>
 struct id;
 template <int dims>
 struct range;
+template <class Input>
+struct constructor;
 
 template <int dims = 1>
 struct item {
+private:
+	friend struct constructor<item<dims>>;
+
+	id<dims> global_id;
+	range<dims> global_range;
+	id<dims> offset;
+
+	item(id<dims> global_id, range<dims> global_range, id<dims> offset)
+		: global_id(global_id), global_range(global_range), offset(offset) {}
+public:
 	item() = delete;
 	id<dims> get_global_id() const;
 

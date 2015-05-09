@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kernel.h"
+#include "ranges.h"
 #include "../common.h"
 #include "../gen_source.h"
 
@@ -26,12 +27,13 @@ void single_task(KernelType kernFunctor) {
 	src.read_buffers_from_device();
 }
 
+
 // 3.7.3.2 Parallel For invoke
 
 template<class KernelType, int dimensions>
 void parallel_for(range<dimensions> num_work_items, KernelType kernFunctor) {
 	detail::command::group_::check_scope();
-	auto src = detail::kernel_::constructor<id<dimensions>>::get(kernFunctor, num_work_items);
+	auto src = detail::kernel_::constructor<item<dimensions>>::get(kernFunctor, num_work_items);
 	auto kern = src.compile();
 	debug() << "Compiled kernel:";
 	debug() << src.get_code();

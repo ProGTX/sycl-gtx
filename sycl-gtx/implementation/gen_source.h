@@ -83,11 +83,11 @@ public:
 	void enqueue_task(shared_unique<kernel> kern) const;
 	void read_buffers_from_device() const;
 
-	template<int dimensions>
+	template <int dimensions>
 	static void enqueue_range_command(queue* q, detail::shared_unique<kernel> kern, range<dimensions> num_work_items) {
 		(*kern)->enqueue_range(q, num_work_items);
 	}
-	template<int dimensions>
+	template <int dimensions>
 	void enqueue_range(shared_unique<kernel> kern, range<dimensions> num_work_items) const {
 		command::group_::add(enqueue_range_command, __func__, kern, num_work_items);
 	}
@@ -121,19 +121,20 @@ public:
 template<>
 struct constructor<void> {
 	static source get(function_class<void> kern) {
-		source src;
-		source::scope = &src;
+	source src;
+	source::scope = &src;
 
-		kern(); // MSVC2013 complains about this, but compiles and links.
+	kern(); // MSVC2013 complains about this, but compiles and links.
 
-		source::scope = nullptr;
-		return src;
-	}
+	source::scope = nullptr;
+	return src;
+}
 };
 
 // Parallel For
-template<int dimensions>
-struct constructor<id<dimensions>> {
+// TODO: Support for kernel with item<dimensions>
+template <int dimensions>
+struct constructor<item<dimensions>> {
 private:
 	static id<dimensions> generate_id_code(range<dimensions> num_work_items) {
 		for(int i = 0; i < dimensions; ++i) {
