@@ -1,68 +1,77 @@
 #include "tests.h"
+#include <ctime>
 
-#define DISPLAY_TRAIT(object, trait)	\
-debug(#trait ":\t") << object.get_info<trait>();
+// Passing functors as nd-range kernels
+
+using namespace cl::sycl;
+
+class example_functor {
+public:
+	using rw_acc_t = accessor<int, 1, access::read_write, access::global_buffer>;
+
+private:
+	rw_acc_t ptr;
+	int random_num;
+
+public:
+	example_functor(rw_acc_t p)
+		: ptr(p) {
+		random_num = std::rand() % (100 - 1) + 1;
+	}
+
+	void operator()(item<1> item) {
+		ptr[item.get_global_id()] = random_num;
+	}
+
+	int get_random() {
+		return random_num;
+	}
+};
 
 bool test5() {
-	debug();
-	using namespace cl::sycl;
+	int data[64];
+	srand(time(0));
 
-	debug("= Getting all platforms");
-	auto platforms = platform::get_platforms();
-	debug("platforms size:") << platforms.size();
-	unsigned int i = 0;
-	for(auto& p : platforms) {
-		debug();
-		debug("== platform") << (i++);
-		DISPLAY_TRAIT(p, CL_PLATFORM_PROFILE);
-		DISPLAY_TRAIT(p, CL_PLATFORM_VERSION);
-		DISPLAY_TRAIT(p, CL_PLATFORM_NAME);
-		DISPLAY_TRAIT(p, CL_PLATFORM_VENDOR);
-		//DISPLAY_TRAIT(p, CL_PLATFORM_EXTENSIONS);
-	}
-	debug();
-	debug();
+	{
+		queue myQueue;
 
-	debug("= Getting all devices");
-	std::vector<std::vector<device>> devices;
-	int j;
-	for(i = 0; i < platforms.size(); ++i) {
-		debug();
-		debug("== platform") << i;
-		devices.push_back(platforms[i].get_devices(CL_DEVICE_TYPE_ALL));
-		j = 0;
-		for(auto& d : devices[i]) {
-			debug();
-			debug("=== device") << (j++);
-			DISPLAY_TRAIT(d, CL_DEVICE_BUILT_IN_KERNELS);
-			DISPLAY_TRAIT(d, CL_DEVICE_NAME);
-			DISPLAY_TRAIT(d, CL_DEVICE_OPENCL_C_VERSION);
-			DISPLAY_TRAIT(d, CL_DEVICE_PROFILE);
-			DISPLAY_TRAIT(d, CL_DEVICE_VENDOR);
-			DISPLAY_TRAIT(d, CL_DEVICE_VERSION);
-			DISPLAY_TRAIT(d, CL_DRIVER_VERSION);
-			DISPLAY_TRAIT(d, CL_DEVICE_AVAILABLE);
-			DISPLAY_TRAIT(d, CL_DEVICE_COMPILER_AVAILABLE);
-			DISPLAY_TRAIT(d, CL_DEVICE_LINKER_AVAILABLE);
-			DISPLAY_TRAIT(d, CL_DEVICE_DOUBLE_FP_CONFIG);
-			DISPLAY_TRAIT(d, CL_DEVICE_SINGLE_FP_CONFIG);
-			DISPLAY_TRAIT(d, CL_DEVICE_PLATFORM);
-			DISPLAY_TRAIT(d, CL_DEVICE_TYPE);
-			DISPLAY_TRAIT(d, CL_DEVICE_QUEUE_PROPERTIES);
-			//DISPLAY_TRAIT(d, CL_DEVICE_EXTENSIONS);
+		buffer<int, 1> buf(data, range<1>(64));
+
+		command_group(myQueue, [&]() {
+			auto ptr = buf.get_access<access::read_write>();
+
+			parallel_for(nd_range<1>(range<1>(64), range<1>(8)),
+				example_functor(ptr)
+			);
+		});
+
+		{
+			int random_num = 0;
+
+			command_group(myQueue, [&]() {
+				auto ptr = buf.get_access<access::read_write>();
+
+				auto functor = example_functor(ptr);
+
+				parallel_for(nd_range<1>(range<1>(64), range<1>(8)),
+					functor
+				);
+
+				random_num = functor.get_random();
+
+				debug() << "-> Random number " << random_num;
+
+			});
+
+			auto hostPtr = buf.get_access<access::read_write, access::host_buffer>();
+
+			if(hostPtr[5] != random_num) {
+				debug() << "The data retrieved from the device " << hostPtr[5]
+					<< "does not match the random number generated: "
+					<< random_num;
+				return false;
+			}
 		}
-	}
-	debug();
-	debug();
-
-	debug("= Trying to throw an exception");
-	device dd;
-	devices.clear();
-	try {
-		devices.push_back(dd.get_devices(CL_DEVICE_TYPE_ALL));
-	}
-	catch(cl_exception& e) {
-		debug("exception:\t") << e.get_description();
 	}
 
 	return true;
