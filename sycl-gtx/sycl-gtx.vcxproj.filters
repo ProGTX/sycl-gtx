@@ -203,5 +203,8 @@
     <ClInclude Include="implementation\specification\ranges\nd_range.h">
       <Filter>Header Files\specification\ranges</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\ranges\nd_item.h">
+      <Filter>Header Files\specification\ranges</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
