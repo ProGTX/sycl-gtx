@@ -32,6 +32,12 @@ void single_task(KernelType kernFunctor) {
 
 template<class KernelType, int dimensions>
 void parallel_for(range<dimensions> num_work_items, KernelType kernFunctor) {
+	parallel_for(num_work_items, id<dimensions>(), kernFunctor);
+}
+
+// TODO: work_item_offset
+template <class KernelType, int dimensions>
+void parallel_for(range<dimensions> num_work_items, id<dimensions> work_item_offset, KernelType kernFunctor) {
 	detail::command::group_::check_scope();
 	auto src = detail::kernel_::constructor<item<dimensions>>::get(kernFunctor, num_work_items);
 	auto kern = src.compile();
