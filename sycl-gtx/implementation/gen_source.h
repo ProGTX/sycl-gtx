@@ -134,13 +134,17 @@ struct constructor<void> {
 // Parallel For with range and kernel parameter id
 template <int dimensions>
 struct constructor<id<dimensions>> {
-	static id<dimensions> generate_id_code(range<dimensions> num_work_items) {
+	static id<dimensions> generate_id_code(range<dimensions> num_work_items, id<dimensions> work_item_offset) {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
-				string_class("const int ") + id_base_name + id_s + " = get_global_id(" + id_s + ")"
+				string_class("const int ") + id_base_name + id_s +
+				" = get_global_id(" + id_s + ")" +
+				" + " + std::to_string((size_t)work_item_offset[i])
 			);
 		}
+
+		// TODO: check if work_item_offset causes problems
 
 		if(dimensions == 2) {
 			source::add(
@@ -155,12 +159,13 @@ struct constructor<id<dimensions>> {
 		return index;
 	}
 
-	// TODO: work_item_offset
 	static source get(function_class<id<dimensions>> kern, range<dimensions> num_work_items, id<dimensions> work_item_offset) {
 		source src;
 		source::scope = &src;
 
-		auto index = generate_id_code(num_work_items);
+		auto index = generate_id_code(
+			num_work_items, work_item_offset
+		);
 		kern(index);
 
 		source::scope = nullptr;
@@ -171,15 +176,15 @@ struct constructor<id<dimensions>> {
 // Parallel For with range and kernel parameter item
 template <int dimensions>
 struct constructor<item<dimensions>> {
-	// TODO: work_item_offset
 	static source get(function_class<item<dimensions>> kern, range<dimensions> num_work_items, id<dimensions> work_item_offset) {
 		source src;
 		source::scope = &src;
 
-		auto index = constructor<id<dimensions>>::generate_id_code(num_work_items);
+		auto index = constructor<id<dimensions>>::generate_id_code(
+			num_work_items, work_item_offset
+		);
 
-		// TODO: range, offset
-		item<dimensions> it(index, num_work_items);
+		item<dimensions> it(index, num_work_items, work_item_offset);
 		kern(it);
 
 		source::scope = nullptr;
