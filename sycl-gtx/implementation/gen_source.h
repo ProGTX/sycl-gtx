@@ -154,7 +154,9 @@ struct constructor<id<dimensions>> {
 		id<dimensions> index{0, 0, 0};
 		return index;
 	}
-	static source get(function_class<id<dimensions>> kern, range<dimensions> num_work_items) {
+
+	// TODO: work_item_offset
+	static source get(function_class<id<dimensions>> kern, range<dimensions> num_work_items, id<dimensions> work_item_offset) {
 		source src;
 		source::scope = &src;
 
@@ -169,13 +171,14 @@ struct constructor<id<dimensions>> {
 // Parallel For with range and kernel parameter item
 template <int dimensions>
 struct constructor<item<dimensions>> {
-	static source get(function_class<item<dimensions>> kern, range<dimensions> num_work_items) {
+	// TODO: work_item_offset
+	static source get(function_class<item<dimensions>> kern, range<dimensions> num_work_items, id<dimensions> work_item_offset) {
 		source src;
 		source::scope = &src;
 
 		auto index = constructor<id<dimensions>>::generate_id_code(num_work_items);
 
-		// TODO
+		// TODO: range, offset
 		item<dimensions> it(index, num_work_items);
 		kern(it);
 

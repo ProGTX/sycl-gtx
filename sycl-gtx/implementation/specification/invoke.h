@@ -66,12 +66,13 @@ void parallel_for(range<dimensions> num_work_items, KernelType kernFunctor) {
 	parallel_for(num_work_items, id<dimensions>(), kernFunctor);
 }
 
-// TODO: work_item_offset
 // This type of kernel can be invoked with a function accepting either an id or an item as parameter
 template <class KernelType, int dimensions>
 void parallel_for(range<dimensions> num_work_items, id<dimensions> work_item_offset, KernelType kernFunctor) {
 	detail::command::group_::check_scope();
-	auto src = detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(kernFunctor, num_work_items);
+	auto src = detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(
+		kernFunctor, num_work_items, work_item_offset
+	);
 	auto kern = src.compile();
 	debug() << "Compiled kernel:";
 	debug() << src.get_code();
