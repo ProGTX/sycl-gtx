@@ -192,6 +192,24 @@ struct constructor<item<dimensions>> {
 	}
 };
 
+// Parallel For with nd_range
+template <int dimensions>
+struct constructor<nd_item<dimensions>> {
+	static source get(function_class<nd_item<dimensions>> kern, nd_range<dimensions> execution_range) {
+		source src;
+		source::scope = &src;
+
+		auto index = constructor<id<dimensions>>::generate_id_code(
+			execution_range.get_global_range(), execution_range.get_offset()
+		);
+
+		// TODO
+
+		source::scope = nullptr;
+		return src;
+	}
+};
+
 } // namespace kernel_
 } // namespace detail
 

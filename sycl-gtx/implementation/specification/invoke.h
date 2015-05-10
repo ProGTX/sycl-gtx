@@ -46,7 +46,7 @@ struct first_arg {
 // the kernel name isn't really needed here - can generate own name
 
 // 3.7.3.1 Single Task invoke
-template<class KernelType>
+template <class KernelType>
 void single_task(KernelType kernFunctor) {
 	detail::command::group_::check_scope();
 	auto src = detail::kernel_::constructor<void>::get(kernFunctor);
@@ -61,7 +61,7 @@ void single_task(KernelType kernFunctor) {
 
 // 3.7.3.2 Parallel For invoke
 
-template<class KernelType, int dimensions>
+template <class KernelType, int dimensions>
 void parallel_for(range<dimensions> num_work_items, KernelType kernFunctor) {
 	parallel_for(num_work_items, id<dimensions>(), kernFunctor);
 }
@@ -81,25 +81,39 @@ void parallel_for(range<dimensions> num_work_items, id<dimensions> work_item_off
 	src.read_buffers_from_device();
 }
 
+template <class KernelType, int dimensions>
+void parallel_for(nd_range<dimensions> execution_range, KernelType kernFunctor) {
+	DSELF() << "not implemented";
+	detail::command::group_::check_scope();
+	auto src = detail::kernel_::constructor<nd_item<dimensions>>::get(
+		kernFunctor, execution_range
+	);
+	auto kern = src.compile();
+	debug() << "Compiled kernel:";
+	debug() << src.get_code();
+	src.write_buffers_to_device();
+	// TODO: enqueue
+	src.read_buffers_from_device();
+}
 
 /*
 
-template<typename KernelName, class KernelType>
+template <typename KernelName, class KernelType>
 void single_task(KernelType);
 
-template<typename KernelName, class KernelType, int dimensions>
+template <typename KernelName, class KernelType, int dimensions>
 void parallel_for(range<dimensions> num_work_items, KernelType);
 
-template<typename KernelName, class KernelType, int dimensions>
+template <typename KernelName, class KernelType, int dimensions>
 void parallel_for(range<dimensions> num_work_items, id<dimensions> work_item_offset, KernelType);
 
-template<typename KernelName, class KernelType, int dimensions>
+template <typename KernelName, class KernelType, int dimensions>
 void parallel_for(nd_range<dimensions> execution_range, KernelType);
 
-template<class KernelName, class WorkgroupFunctionType, int dimensions>
+template <class KernelName, class WorkgroupFunctionType, int dimensions>
 void parallel_for_work_group(range<dimensions> num_work_groups, WorkgroupFunctionType);
 
-template<class KernelType, int dimensions>
+template <class KernelType, int dimensions>
 void parallel_for_work_item(group num_work_items, KernelType);
 
 */
