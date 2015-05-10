@@ -30,47 +30,36 @@ public:
 
 bool test5() {
 	int data[64];
-	srand(time(0));
+	srand(static_cast<unsigned int>(time(nullptr)));
 
 	{
 		queue myQueue;
 
 		buffer<int, 1> buf(data, range<1>(64));
+		int random_num = 0;
 
 		command_group(myQueue, [&]() {
 			auto ptr = buf.get_access<access::read_write>();
 
+			auto functor = example_functor(ptr);
+
 			parallel_for(nd_range<1>(range<1>(64), range<1>(8)),
-				example_functor(ptr)
+				functor
 			);
+
+			random_num = functor.get_random();
+
+			debug() << "-> Random number " << random_num;
+
 		});
 
-		{
-			int random_num = 0;
+		auto hostPtr = buf.get_access<access::read_write, access::host_buffer>();
 
-			command_group(myQueue, [&]() {
-				auto ptr = buf.get_access<access::read_write>();
-
-				auto functor = example_functor(ptr);
-
-				parallel_for(nd_range<1>(range<1>(64), range<1>(8)),
-					functor
-				);
-
-				random_num = functor.get_random();
-
-				debug() << "-> Random number " << random_num;
-
-			});
-
-			auto hostPtr = buf.get_access<access::read_write, access::host_buffer>();
-
-			if(hostPtr[5] != random_num) {
-				debug() << "The data retrieved from the device " << hostPtr[5]
-					<< "does not match the random number generated: "
-					<< random_num;
-				return false;
-			}
+		if(hostPtr[5] != random_num) {
+			debug()
+				<< "The data retrieved from the device" << hostPtr[5]
+				<< "does not match the random number generated:" << random_num;
+			return false;
 		}
 	}
 
