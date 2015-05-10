@@ -29,13 +29,16 @@ public:
 };
 
 bool test5() {
-	int data[64];
+	static const int group_size = 8;
+	static const int size = group_size * 8;
+
+	int data[size];
 	srand(static_cast<unsigned int>(time(nullptr)));
 
 	{
 		queue myQueue;
 
-		buffer<int, 1> buf(data, range<1>(64));
+		buffer<int> buf(data, size);
 		int random_num = 0;
 
 		command_group(myQueue, [&]() {
@@ -43,13 +46,13 @@ bool test5() {
 
 			auto functor = example_functor(ptr);
 
-			parallel_for(nd_range<1>(range<1>(64), range<1>(8)),
+			parallel_for(nd_range<1>(size, group_size),
 				functor
 			);
 
 			random_num = functor.get_random();
 
-			debug() << "-> Random number " << random_num;
+			debug() << "-> Random number" << random_num;
 
 		});
 
