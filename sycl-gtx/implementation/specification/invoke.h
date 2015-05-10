@@ -10,6 +10,37 @@
 namespace cl {
 namespace sycl {
 
+namespace detail {
+
+// Used to determine first argument in a functor
+// https://functionalcpp.wordpress.com/2013/08/05/function-traits/
+template <class T>
+struct first_arg;
+
+// First function argument
+template <class R, class... Args>
+struct first_arg<R(Args...)> {
+	using type = typename std::tuple_element<0, std::tuple<Args...>>::type;
+};
+
+// Member function pointer
+template <class C, class R, class... Args>
+struct first_arg<R(C::*)(Args...)> : public first_arg<R(Args...)>
+{};
+
+// const member function pointer
+template <class C, class R, class... Args>
+struct first_arg<R(C::*)(Args...) const> : public first_arg<R(Args...)>
+{};
+
+// Functor
+template <class F>
+struct first_arg {
+	using type = typename first_arg<decltype(&F::operator())>::type;
+};
+} // namespace detail
+
+
 // TODO: Passing kernel names
 // From my understanding of the specification (revision 2014-09-16, section 2.6),
 // the kernel name isn't really needed here - can generate own name
@@ -36,10 +67,11 @@ void parallel_for(range<dimensions> num_work_items, KernelType kernFunctor) {
 }
 
 // TODO: work_item_offset
+// This type of kernel can be invoked with a function accepting either an id or an item as parameter
 template <class KernelType, int dimensions>
 void parallel_for(range<dimensions> num_work_items, id<dimensions> work_item_offset, KernelType kernFunctor) {
 	detail::command::group_::check_scope();
-	auto src = detail::kernel_::constructor<item<dimensions>>::get(kernFunctor, num_work_items);
+	auto src = detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(kernFunctor, num_work_items);
 	auto kern = src.compile();
 	debug() << "Compiled kernel:";
 	debug() << src.get_code();

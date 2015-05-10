@@ -131,11 +131,9 @@ struct constructor<void> {
 }
 };
 
-// Parallel For
-// TODO: Support for kernel with item<dimensions>
+// Parallel For with range and kernel parameter id
 template <int dimensions>
-struct constructor<item<dimensions>> {
-private:
+struct constructor<id<dimensions>> {
 	static id<dimensions> generate_id_code(range<dimensions> num_work_items) {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
@@ -156,13 +154,30 @@ private:
 		id<dimensions> index{0, 0, 0};
 		return index;
 	}
-public:
 	static source get(function_class<id<dimensions>> kern, range<dimensions> num_work_items) {
 		source src;
 		source::scope = &src;
 
 		auto index = generate_id_code(num_work_items);
 		kern(index);
+
+		source::scope = nullptr;
+		return src;
+	}
+};
+
+// Parallel For with range and kernel parameter item
+template <int dimensions>
+struct constructor<item<dimensions>> {
+	static source get(function_class<item<dimensions>> kern, range<dimensions> num_work_items) {
+		source src;
+		source::scope = &src;
+
+		auto index = constructor<id<dimensions>>::generate_id_code(num_work_items);
+
+		// TODO
+		item<dimensions> it(index, num_work_items);
+		kern(it);
 
 		source::scope = nullptr;
 		return src;
