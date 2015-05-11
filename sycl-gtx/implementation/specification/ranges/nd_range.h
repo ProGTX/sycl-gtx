@@ -2,8 +2,8 @@
 
 // 3.7.1.2 nd_range class
 
-#include "range.h"
 #include "id.h"
+#include "range.h"
 
 namespace cl {
 namespace sycl {

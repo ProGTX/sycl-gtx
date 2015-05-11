@@ -3,7 +3,7 @@
 // 3.7.1.5 nd_item class
 
 #include "../access.h"
-#include "item.h"
+#include "../../data_ref.h"
 
 namespace cl {
 namespace sycl {
@@ -16,37 +16,67 @@ struct range;
 template <int dims>
 struct nd_range;
 
+namespace detail {
+namespace kernel_ {
+	template <class Input>
+	struct constructor;
+}
+}
+
 template <int dims = 1>
 struct nd_item : public item<dims> {
+public:
+	// Remains of the item class
+	size_t get(int dimension) const = delete;
+	size_t& operator[](int dimension) = delete;
+
 protected:
-	nd_item(id<dims> global_id, range<dims> global_range, id<dims> offset = id<dims>())
-		: item(global_id, global_range, offset) {}
+	friend struct detail::kernel_::constructor<nd_item<dims>>;
+
+	item<dims> local_item;
+
+	nd_item(item<dims> global_item, item<dims> local_item)
+		: item(global_item), local_item(local_item) {}
+
+	// A bit of a hack - to the outside it appears to conform to the specification
+	using size_t = detail::id_ref;
+
 public:
 	id<dims> get_global_id() const {
 		return item::get_global_id();
 	}
-	size_t get_global_id(int dimension) const;
+	size_t get_global_id(int dimension) const {
+		return get_global_id()[dimension];
+	}
 
-	id<dims> get_local_id() const;
-	size_t get_local_id(int dimension) const;
+	id<dims> get_local_id() const {
+		return local_item.get_global_id();
+	}
+	size_t get_local_id(int dimension) const {
+		return get_local_id()[dimension];
+	}
 
-	id<dims> get_group_id() const;
-	size_t get_group_id(int dimension) const;
+	id<dims> get_group_id() const {
+		return local_item.get_offset();
+	}
+	size_t get_group_id(int dimension) const {
+		return get_group_id()[dimension];
+	}
 
 	range<dims> get_global_range() const {
 		return item::get_global_range();
 	}
-	range<dims> get_local_range() const;
+	range<dims> get_local_range() const {
+		return local_item.get_global_range();
+	}
 	id<dims> get_offset() const {
 		return item::get_offset();
 	}
-	nd_range<dims> get_nd_range() const;
+	nd_range<dims> get_nd_range() const {
+		return nd_range<dims>(get_global_range(), get_local_range(), get_offset());
+	}
 
 	void barrier(access::fence_space flag = access::fence_space::global_and_local) const;
-
-	// Remains of the item class
-	size_t get(int dimension) const = delete;
-	size_t& operator[](int dimension) = delete;
 };
 
 } // namespace sycl
