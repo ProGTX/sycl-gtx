@@ -4,6 +4,7 @@
 #include "ranges.h"
 #include "../common.h"
 #include "../gen_source.h"
+#include "../invoke_source.h"
 
 // 3.7.3 Invoking kernels
 
