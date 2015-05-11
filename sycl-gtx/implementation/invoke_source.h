@@ -31,23 +31,20 @@ struct constructor<void> {
 // Parallel For with range and kernel parameter id
 template <int dimensions>
 struct constructor<id<dimensions>> {
-	static id<dimensions> generate_global_id_code(range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
+	static id<dimensions> generate_global_id_code(range<dimensions>& num_work_items) {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
 				string_class("const int ") + id_base_name + id_s +
-				" = get_global_id(" + id_s + ")" +
-				" + " + std::to_string((size_t)work_item_offset[i])
-				);
+				" = get_global_id(" + id_s + ")"
+			);
 		}
-
-		// TODO: check if work_item_offset causes problems
 
 		if(dimensions == 2) {
 			source::add(
 				string_class("const int ") + id_base_all_name + " = " +
 				id_base_name + "1 * " + std::to_string(num_work_items[0]) + " + " + id_base_name + "0"
-				);
+			);
 		}
 
 		// TODO: 3d
@@ -59,9 +56,7 @@ struct constructor<id<dimensions>> {
 		source src;
 		source::scope = &src;
 
-		auto index = generate_global_id_code(
-			num_work_items, work_item_offset
-			);
+		auto index = generate_global_id_code(num_work_items);
 		kern(index);
 
 		source::scope = nullptr;
@@ -76,10 +71,7 @@ struct constructor<item<dimensions>> {
 		source src;
 		source::scope = &src;
 
-		auto index = constructor<id<dimensions>>::generate_global_id_code(
-			num_work_items, work_item_offset
-			);
-
+		auto index = constructor<id<dimensions>>::generate_global_id_code(num_work_items);
 		item<dimensions> it(index, num_work_items, work_item_offset);
 		kern(it);
 
@@ -97,7 +89,7 @@ struct constructor<nd_item<dimensions>> {
 			source::add(
 				string_class("const int ") + id_base_name + "local_" + id_s +
 				" = get_local_id(" + id_s + ")"
-				);
+			);
 		}
 
 		// TODO: 2d and 3d
@@ -110,19 +102,17 @@ struct constructor<nd_item<dimensions>> {
 		source::scope = &src;
 
 		item<dimensions> global_item(
-			constructor<id<dimensions>>::generate_global_id_code(
-			execution_range.get_global_range(), execution_range.get_offset()
-			),
+			constructor<id<dimensions>>::generate_global_id_code(execution_range.get_global_range()),
 			execution_range.get_global_range(),
 			execution_range.get_offset()
-			);
+		);
 
 		// TODO: Store group ID into offset of local_item
 		item<dimensions> local_item(
 			generate_local_id_code(),
 			execution_range.get_local_range(),
 			execution_range.get_offset()
-			);
+		);
 
 		nd_item<dimensions> it(std::move(global_item), std::move(local_item));
 		kern(it);

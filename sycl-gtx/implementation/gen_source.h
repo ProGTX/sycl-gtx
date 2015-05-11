@@ -83,12 +83,14 @@ public:
 	void read_buffers_from_device() const;
 
 	template <int dimensions>
-	static void enqueue_range_command(queue* q, detail::shared_unique<kernel> kern, range<dimensions> num_work_items) {
-		(*kern)->enqueue_range(q, num_work_items);
+	static void enqueue_range_command(
+		queue* q, detail::shared_unique<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset
+	) {
+		(*kern)->enqueue_range(q, num_work_items, offset);
 	}
 	template <int dimensions>
-	void enqueue_range(shared_unique<kernel> kern, range<dimensions> num_work_items) const {
-		command::group_::add(enqueue_range_command, __func__, kern, num_work_items);
+	void enqueue_range(shared_unique<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset) const {
+		command::group_::add(enqueue_range_command, __func__, kern, num_work_items, offset);
 	}
 
 

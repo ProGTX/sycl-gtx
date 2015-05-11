@@ -78,7 +78,7 @@ void parallel_for(range<dimensions> num_work_items, id<dimensions> work_item_off
 	debug() << "Compiled kernel:";
 	debug() << src.get_code();
 	src.write_buffers_to_device();
-	src.enqueue_range(kern, num_work_items);
+	src.enqueue_range(kern, num_work_items, work_item_offset);
 	src.read_buffers_from_device();
 }
 

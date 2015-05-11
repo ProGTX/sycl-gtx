@@ -59,7 +59,7 @@ public:
 	}
 
 private:
-	template<class return_type, cl_int name>
+	template <class return_type, cl_int name>
 	struct hidden {
 		using real_return = return_type;
 		static real_return get_info(const kernel* kern) {
@@ -70,7 +70,7 @@ private:
 			return param_value;
 		}
 	};
-	template<cl_int name>
+	template <cl_int name>
 	struct hidden<char[], name> {
 		using real_return = string_class;
 		static real_return get_info(const kernel* kern) {
@@ -82,11 +82,11 @@ private:
 			return real_return(param_value);
 		}
 	};
-	template<cl_int name>
+	template <cl_int name>
 	using param = typename param_traits<cl_kernel_info, name>::param_type;
 
 public:
-	template<cl_int name>
+	template <cl_int name>
 	typename hidden<param<name>, name>::real_return get_info() const {
 		return hidden<param<name>, name>::get_info(this);
 	}
@@ -104,12 +104,13 @@ public:
 private:
 	void enqueue_task(queue* q);
 
-	template<int dimensions>
-	void enqueue_range(queue* q, range<dimensions> num_work_items) {
+	template <int dimensions>
+	void enqueue_range(queue* q, range<dimensions> num_work_items, id<dimensions> offset) const {
 		size_t* global_work_size = &num_work_items[0];
+		size_t* offst = &((size_t&)offset[0]);
 		auto error_code = clEnqueueNDRangeKernel(
 			q->get(), kern.get(), dimensions,
-			nullptr, global_work_size, nullptr,
+			offst, global_work_size, nullptr,
 			// TODO: Events
 			0, nullptr, nullptr
 		);
