@@ -134,7 +134,7 @@ struct constructor<void> {
 // Parallel For with range and kernel parameter id
 template <int dimensions>
 struct constructor<id<dimensions>> {
-	static id<dimensions> generate_id_code(range<dimensions> num_work_items, id<dimensions> work_item_offset) {
+	static id<dimensions> generate_global_id_code(range<dimensions> num_work_items, id<dimensions> work_item_offset) {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
@@ -163,7 +163,7 @@ struct constructor<id<dimensions>> {
 		source src;
 		source::scope = &src;
 
-		auto index = generate_id_code(
+		auto index = generate_global_id_code(
 			num_work_items, work_item_offset
 		);
 		kern(index);
@@ -180,7 +180,7 @@ struct constructor<item<dimensions>> {
 		source src;
 		source::scope = &src;
 
-		auto index = constructor<id<dimensions>>::generate_id_code(
+		auto index = constructor<id<dimensions>>::generate_global_id_code(
 			num_work_items, work_item_offset
 		);
 
@@ -195,13 +195,31 @@ struct constructor<item<dimensions>> {
 // Parallel For with nd_range
 template <int dimensions>
 struct constructor<nd_item<dimensions>> {
+	static id<dimensions> generate_local_id_code() {
+		// TODO
+		return id<dimensions>{0, 0, 0};
+	}
+
 	static source get(function_class<nd_item<dimensions>> kern, nd_range<dimensions> execution_range) {
 		source src;
 		source::scope = &src;
 
-		auto index = constructor<id<dimensions>>::generate_id_code(
-			execution_range.get_global_range(), execution_range.get_offset()
+		item<dimensions> global_item(
+			constructor<id<dimensions>>::generate_global_id_code(
+				execution_range.get_global_range(), execution_range.get_offset()
+			),
+			execution_range.get_global_range(),
+			execution_range.get_offset()
 		);
+
+		// TODO: Store group ID into offset of local_item
+		item<dimensions> local_item(
+			generate_local_id_code(),
+			execution_range.get_local_range(),
+			execution_range.get_offset()
+		);
+
+		nd_item<dimensions> it(std::move(global_item), std::move(local_item));
 
 		// TODO
 
