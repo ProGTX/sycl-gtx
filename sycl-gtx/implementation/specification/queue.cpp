@@ -5,6 +5,7 @@ using namespace cl::sycl;
 detail::error::handler& queue::default_error = detail::error::handler::default;
 
 void queue::display_device_info() const {
+	debug();
 	debug() << "Queue device information:";
 	debug() << dev.get_info<CL_DEVICE_NAME>();
 	debug() << dev.get_info<CL_DEVICE_OPENCL_C_VERSION>();

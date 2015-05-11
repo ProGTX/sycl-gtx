@@ -41,16 +41,21 @@ platform device_selector::get_platform() {
 }
 
 device device_selector::select_device() const {
-	// MSVC parser complains here
 	return select_device(get_platform().get_devices(type));
 }
 
 int default_selector::operator()(device dev) const {
-	DSELF() << "not implemented";
 	return 0;
 }
 
 int gpu_selector::operator()(device dev) const {
-	DSELF() << "not implemented";
+	return 0;
+}
+
+int cpu_selector::operator()(device dev) const {
+	return 0;
+}
+
+int host_selector::operator()(device dev) const {
 	return 0;
 }
