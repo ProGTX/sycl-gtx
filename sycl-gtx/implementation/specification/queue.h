@@ -25,7 +25,9 @@ private:
 	device dev;
 	context ctx;
 
+	void display_device_info() const;
 	void create_queue(cl_command_queue_properties* properties = nullptr);
+
 public:
 	// Creates a queue for a device it chooses according to the heuristics of the default selector.
 	// The OpenCL context object is created implicitly.
