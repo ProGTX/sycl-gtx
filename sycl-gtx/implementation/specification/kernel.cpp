@@ -10,7 +10,7 @@ kernel::kernel(cl_kernel k)
 		prog(ctx, get_info<CL_KERNEL_PROGRAM>())
 {}
 
-void kernel::enqueue_task(queue* q) {
+void kernel::enqueue_task(queue* q) const {
 	auto error_code = clEnqueueTask(
 		q->get(), kern.get(),
 		// TODO: Events

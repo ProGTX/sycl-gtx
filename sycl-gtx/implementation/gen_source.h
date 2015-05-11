@@ -79,8 +79,9 @@ public:
 	string_class get_code();
 	shared_unique<kernel> compile() const;
 	void write_buffers_to_device() const;
-	void enqueue_task(shared_unique<kernel> kern) const;
 	void read_buffers_from_device() const;
+
+	void enqueue_task(shared_unique<kernel> kern) const;
 
 	template <int dimensions>
 	static void enqueue_range_command(
@@ -91,6 +92,17 @@ public:
 	template <int dimensions>
 	void enqueue_range(shared_unique<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset) const {
 		command::group_::add(enqueue_range_command, __func__, kern, num_work_items, offset);
+	}
+
+	template <int dimensions>
+	static void enqueue_nd_range_command(
+		queue* q, detail::shared_unique<kernel> kern, nd_range<dimensions> execution_range
+		) {
+		(*kern)->enqueue_nd_range(q, execution_range);
+	}
+	template <int dimensions>
+	void enqueue_nd_range(shared_unique<kernel> kern, nd_range<dimensions> execution_range) const {
+		command::group_::add(enqueue_nd_range_command, __func__, kern, execution_range);
 	}
 
 

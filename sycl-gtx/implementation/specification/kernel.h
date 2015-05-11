@@ -102,15 +102,31 @@ public:
 	}
 
 private:
-	void enqueue_task(queue* q);
+	void enqueue_task(queue* q) const;
 
 	template <int dimensions>
 	void enqueue_range(queue* q, range<dimensions> num_work_items, id<dimensions> offset) const {
 		size_t* global_work_size = &num_work_items[0];
 		size_t* offst = &((size_t&)offset[0]);
+
 		auto error_code = clEnqueueNDRangeKernel(
 			q->get(), kern.get(), dimensions,
 			offst, global_work_size, nullptr,
+			// TODO: Events
+			0, nullptr, nullptr
+		);
+		detail::error::report(q, error_code);
+	}
+
+	template <int dimensions>
+	void enqueue_nd_range(queue* q, nd_range<dimensions> execution_range) const {
+		size_t* global_work_size = &execution_range.get_group_range()[0];
+		size_t* local_work_size = &execution_range.get_local_range()[0];
+		size_t* offst = &((size_t&)execution_range.get_offset()[0]);
+
+		auto error_code = clEnqueueNDRangeKernel(
+			q->get(), kern.get(), dimensions,
+			offst, global_work_size, local_work_size,
 			// TODO: Events
 			0, nullptr, nullptr
 		);

@@ -93,7 +93,7 @@ void parallel_for(nd_range<dimensions> execution_range, KernelType kernFunctor) 
 	debug() << "Compiled kernel:";
 	debug() << src.get_code();
 	src.write_buffers_to_device();
-	// TODO: enqueue
+	src.enqueue_nd_range(kern, execution_range);
 	src.read_buffers_from_device();
 }
 
