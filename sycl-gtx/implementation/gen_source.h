@@ -134,7 +134,7 @@ struct constructor<void> {
 // Parallel For with range and kernel parameter id
 template <int dimensions>
 struct constructor<id<dimensions>> {
-	static id<dimensions> generate_global_id_code(range<dimensions> num_work_items, id<dimensions> work_item_offset) {
+	static id<dimensions> generate_global_id_code(range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
@@ -155,11 +155,10 @@ struct constructor<id<dimensions>> {
 
 		// TODO: 3d
 
-		id<dimensions> index{0, 0, 0};
-		return index;
+		return id<dimensions>{0, 0, 0};
 	}
 
-	static source get(function_class<id<dimensions>> kern, range<dimensions> num_work_items, id<dimensions> work_item_offset) {
+	static source get(function_class<id<dimensions>> kern, range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
 		source src;
 		source::scope = &src;
 
@@ -176,7 +175,7 @@ struct constructor<id<dimensions>> {
 // Parallel For with range and kernel parameter item
 template <int dimensions>
 struct constructor<item<dimensions>> {
-	static source get(function_class<item<dimensions>> kern, range<dimensions> num_work_items, id<dimensions> work_item_offset) {
+	static source get(function_class<item<dimensions>> kern, range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
 		source src;
 		source::scope = &src;
 
@@ -196,11 +195,20 @@ struct constructor<item<dimensions>> {
 template <int dimensions>
 struct constructor<nd_item<dimensions>> {
 	static id<dimensions> generate_local_id_code() {
-		// TODO
+		for(int i = 0; i < dimensions; ++i) {
+			auto id_s = std::to_string(i);
+			source::add(
+				string_class("const int ") + id_base_name + "local_" + id_s +
+				" = get_local_id(" + id_s + ")"
+			);
+		}
+
+		// TODO: 2d and 3d
+
 		return id<dimensions>{0, 0, 0};
 	}
 
-	static source get(function_class<nd_item<dimensions>> kern, nd_range<dimensions> execution_range) {
+	static source get(function_class<nd_item<dimensions>> kern, nd_range<dimensions>& execution_range) {
 		source src;
 		source::scope = &src;
 
@@ -220,8 +228,7 @@ struct constructor<nd_item<dimensions>> {
 		);
 
 		nd_item<dimensions> it(std::move(global_item), std::move(local_item));
-
-		// TODO
+		kern(it);
 
 		source::scope = nullptr;
 		return src;
