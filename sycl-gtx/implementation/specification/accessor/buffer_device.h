@@ -53,7 +53,7 @@ class accessor_device_ref {
 protected:
 	using subscript_return_t = typename subscript_helper<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>::type;
 	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
-	template <class T, data_ref::is_compatible_t<T>* = nullptr>
+	template <class T>
 	subscript_return_t subscript(T index) const {
 		auto rang_copy = rang;
 		rang_copy[dimensions - level] = data_ref::get_name(index);
@@ -68,7 +68,7 @@ class accessor_device_ref<1, DataType, dimensions, mode, target> {
 protected:
 	using subscript_return_t = data_ref;
 	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
-	template <class T, data_ref::is_compatible_t<T>* = nullptr>
+	template <class T>
 	data_ref subscript(T index) const {
 		kernel_::source::register_resource(*acc);
 		// Basically the same as with host buffer accessor, just dealing with strings

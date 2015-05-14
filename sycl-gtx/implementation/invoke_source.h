@@ -11,11 +11,11 @@ namespace sycl {
 namespace detail {
 namespace kernel_ {
 
-template<class Input>
+template <class Input>
 struct constructor;
 
 // Single task invoke
-template<>
+template <>
 struct constructor<void> {
 	static source get(function_class<void> kern) {
 		source src;
