@@ -76,7 +76,9 @@ public:
 		return nd_range<dims>(get_global_range(), get_local_range(), get_offset());
 	}
 
-	void barrier(access::fence_space flag = access::fence_space::global_and_local) const;
+	void barrier(access::fence_space flag = access::fence_space::global_and_local) const {
+		// TODO
+	}
 };
 
 } // namespace sycl

@@ -8,8 +8,8 @@ bool test6() {
 	{
 		queue myQueue;
 
-		static const auto group_size = myQueue.get_device().get_info<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
-		static const auto size = group_size * 16;
+		const auto group_size = myQueue.get_device().get_info<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
+		const auto size = group_size * 16;
 
 		buffer<float> ping(size);
 		buffer<float> pong(size);
@@ -50,29 +50,33 @@ bool test6() {
 				auto q = Q->get_access<access::read_write>();
 
 				parallel_for<>(nd_range<1>(size, group_size), [=](nd_item<1> index) {
+					auto gid = index.get_global_id(0);
+					auto lid = index.get_local_id(0);
+					auto N = index.get_global_range()[0];
+					auto second = gid + N;
+
+					SYCL_IF(second < 2 * N)
+					SYCL_THEN({
+						// localBlock[lid] = inArray[gid] + inArray[second];
+					})
+
+					index.barrier(access::fence_space::local);
+
+					// N = min(N, index.get_local_range()[0]);
+
 					/*
-					int gid = get_global_id(0);
-					int lid = get_local_id(0);
-
-					int second = gid + N;
-					if(second < 2 * N) {
-						localBlock[lid] = inArray[gid] + inArray[second];
-					}
-					barrier(CLK_LOCAL_MEM_FENCE);
-
-					N = min(N, get_local_size(0));
-
 					for(uint stride = N / 2; stride > 0; stride /= 2) {
 						if(lid < stride) {
 							localBlock[lid] += localBlock[lid + stride];
 						}
 						barrier(CLK_LOCAL_MEM_FENCE);
 					}
-
-					if(lid == 0) {
-						outArray[gid / N] = localBlock[0];
-					}
 					*/
+
+					SYCL_IF(lid == 0)
+					SYCL_THEN({
+						// outArray[gid / N] = localBlock[0];
+					})
 				});
 			});
 
