@@ -10,6 +10,7 @@
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
+#include <algorithm>
 
 namespace cl {
 namespace sycl {
@@ -120,9 +121,20 @@ private:
 
 	template <int dimensions>
 	void enqueue_nd_range(queue* q, nd_range<dimensions> execution_range) const {
-		size_t* global_work_size = &execution_range.get_group_range()[0];
 		size_t* local_work_size = &execution_range.get_local_range()[0];
 		size_t* offst = &((size_t&)execution_range.get_offset()[0]);
+
+		size_t global_work_size[dimensions];
+		size_t* start = &execution_range.get_global_range()[0];
+		std::copy(start, start + dimensions, global_work_size);
+
+		// Adjust global work size
+		for(int i = 0; i < dimensions; ++i) {
+			auto remainder = global_work_size[i] % local_work_size[i];
+			if(remainder > 0) {
+				global_work_size[i] += local_work_size[i] - remainder;
+			}
+		}
 
 		auto error_code = clEnqueueNDRangeKernel(
 			q->get(), kern.get(), dimensions,
