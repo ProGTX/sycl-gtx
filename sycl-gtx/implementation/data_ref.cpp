@@ -20,14 +20,14 @@ void data_ref::kernel_add(string_class line) {
 }
 
 string_class data_ref::get_name(id<1> index) {
-	return detail::id_base_name + "0";
+	return detail::id_global_name + "0";
 }
 string_class data_ref::get_name(id<2> index) {
-	return detail::id_base_all_name;
+	return detail::id_global_all_name;
 }
 string_class data_ref::get_name(id<3> index) {
-	return detail::id_base_all_name;
+	return detail::id_global_all_name;
 }
 
 id_ref::id_ref(int n, size_t* value)
-	: data_ref(id_base_name + std::to_string(n)), value(value) {}
+	: data_ref(id_global_name + std::to_string(n)), value(value) {}
