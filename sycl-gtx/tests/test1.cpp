@@ -48,9 +48,9 @@ bool test1() {
 	int correct = 0;
 	float tmp;
 	for(int i = 0; i < count; i++) {
-		tmp = h_a[i] + h_b[i] + h_c[i];	// assign element i of a+b+c to tmp
-		tmp -= h_r[i];					// compute deviation of expected and output result
-		if(tmp * tmp < TOL * TOL) {		// correct if square deviation is less than tolerance squared
+		tmp = (float)(h_a[i] + h_b[i] + h_c[i]);	// assign element i of a+b+c to tmp
+		tmp -= h_r[i];								// compute deviation of expected and output result
+		if(tmp * tmp < TOL * TOL) {					// correct if square deviation is less than tolerance squared
 			correct++;
 		}
 		else {

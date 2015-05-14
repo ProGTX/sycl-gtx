@@ -1,6 +1,7 @@
 #pragma once
 
 // Host buffer accessors
+// 3.6.4.7 Host accessors
 
 #include "buffer_base.h"
 #include "../access.h"

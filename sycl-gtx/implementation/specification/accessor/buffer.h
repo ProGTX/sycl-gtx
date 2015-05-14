@@ -45,7 +45,4 @@ SYCL_ADD_ACCESSOR_BUFFER(access::discard_read_write)
 } // namespace sycl
 } // namespace cl
 
-#undef SYCL_ACCESSOR_CLASS
-#undef SYCL_ADD_ACCESSOR
 #undef SYCL_ADD_ACCESSOR_BUFFER
-#undef SYCL_BUFFER_CONSTRUCTORS

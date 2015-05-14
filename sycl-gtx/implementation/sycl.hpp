@@ -22,4 +22,6 @@
 #undef SYCL_MOVE_INIT
 #endif
 
+#undef SYCL_ACCESSOR_CLASS
+#undef SYCL_ADD_ACCESSOR
 #undef SYCL_THREAD_LOCAL
