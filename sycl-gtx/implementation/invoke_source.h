@@ -35,15 +35,15 @@ struct constructor<id<dimensions>> {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
-				string_class("const int ") + id_base_name + id_s +
+				string_class("const int ") + id_global_name + id_s +
 				" = get_global_id(" + id_s + ")"
 			);
 		}
 
 		if(dimensions == 2) {
 			source::add(
-				string_class("const int ") + id_base_all_name + " = " +
-				id_base_name + "1 * " + std::to_string(num_work_items[0]) + " + " + id_base_name + "0"
+				string_class("const int ") + id_global_all_name + " = " +
+				id_global_name + "1 * " + std::to_string(num_work_items[0]) + " + " + id_global_name + "0"
 			);
 		}
 
@@ -87,7 +87,7 @@ struct constructor<nd_item<dimensions>> {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
-				string_class("const int ") + id_base_name + "local_" + id_s +
+				string_class("const int ") + id_global_name + "local_" + id_s +
 				" = get_local_id(" + id_s + ")"
 			);
 		}
