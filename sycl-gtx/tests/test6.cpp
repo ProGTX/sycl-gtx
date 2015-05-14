@@ -49,7 +49,7 @@ bool test6() {
 				auto p = P->get_access<access::read_write>();
 				auto q = Q->get_access<access::read_write>();
 
-				parallel_for<>(nd_range<1>(size, group_size), [=](nd_item<1> index) {
+				parallel_for<>(nd_range<1>(N, group_size), [=](nd_item<1> index) {
 					auto gid = index.get_global_id(0);
 					auto lid = index.get_local_id(0);
 					auto N = index.get_global_range()[0];
@@ -57,25 +57,25 @@ bool test6() {
 
 					SYCL_IF(second < 2 * N)
 					SYCL_THEN({
-						// localBlock[lid] = inArray[gid] + inArray[second];
+						// localBlock[lid] = p[gid] + p[second];
 					})
 
 					index.barrier(access::fence_space::local);
 
 					// N = min(N, index.get_local_range()[0]);
 
-					/*
-					for(uint stride = N / 2; stride > 0; stride /= 2) {
-						if(lid < stride) {
-							localBlock[lid] += localBlock[lid + stride];
-						}
-						barrier(CLK_LOCAL_MEM_FENCE);
-					}
-					*/
+					SYCL_FOR(size_t stride = N / 2, stride > 0, stride /= 2)
+					SYCL_BLOCK({
+						SYCL_IF(lid < stride)
+						SYCL_THEN({
+							// localBlock[lid] += localBlock[lid + stride];
+						})
+						index.barrier(access::fence_space::local);
+					})
 
 					SYCL_IF(lid == 0)
 					SYCL_THEN({
-						// outArray[gid / N] = localBlock[0];
+						// q[gid / N] = localBlock[0];
 					})
 				});
 			});
