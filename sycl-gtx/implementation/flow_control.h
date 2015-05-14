@@ -61,3 +61,7 @@ static void else_() {
 
 #define SYCL_ELSE_IF(condition) \
 	::cl::sycl::detail::control::else_if((condition));
+
+// TODO
+#define SYCL_FOR(init, condition, increment)	\
+	for(init; condition; increment)
