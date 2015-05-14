@@ -112,10 +112,16 @@ public:
 };
 
 class id_ref : public data_ref {
+public:
+	enum class type {
+		global,
+		local
+	};
+
 protected:
 	size_t* value;
 public:
-	id_ref(int n, size_t* value);
+	id_ref(int n, size_t* value, type access_type = type::global);
 
 	operator size_t&() {
 		return *value;

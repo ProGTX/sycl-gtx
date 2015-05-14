@@ -9,22 +9,32 @@
 namespace cl {
 namespace sycl {
 
+// Forward declaration
+template <int dims>
+struct nd_item;
+
 namespace detail {
 
-// Forward declaration
+// Forward declarations
 namespace kernel_ {
 	class source;
+	template<class Input>
+	struct constructor;
 }
 
 static const string_class id_global_name		= "_sycl_id_";
 static const string_class id_global_all_name	= "_sycl_id_d";
+static const string_class id_local_name			= "_sycl_id_local_";
 
 
 template <int dimensions>
 struct id_ {
 protected:
+	friend class data_ref;
+	friend struct kernel_::constructor<nd_item<dimensions>>;
 	friend class kernel_::source;
 
+	id_ref::type type;
 	size_t values[3];
 
 	id_(size_t first, size_t second, size_t third);

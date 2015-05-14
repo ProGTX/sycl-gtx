@@ -12,6 +12,7 @@ template struct id_<3>;
 
 template <int dimensions>
 id_<dimensions>::id_(size_t first, size_t second, size_t third)
+	: type(id_ref::type::global)
 #if MSVC_LOW
 {
 	values[0] = first;
@@ -19,18 +20,18 @@ id_<dimensions>::id_(size_t first, size_t second, size_t third)
 	values[2] = third;
 }
 #else
-	: dims{ first, second, third } {}
+	, dims{ first, second, third } {}
 #endif
 
 template <int dimensions>
 id_ref id_<dimensions>::operator[](size_t n) {
-	return id_ref(n, &values[n]);
+	return id_ref(n, &values[n], type);
 }
 
 #define SYCL_ID_OPERATOR(op)								\
 	template <int dimensions>								\
 	data_ref id_<dimensions>::operator op(size_t n) const {	\
-		return id_ref(0, nullptr) op n;						\
+		return id_ref(0, nullptr, type) op n;				\
 	}
 
 SYCL_ID_OPERATOR(+)

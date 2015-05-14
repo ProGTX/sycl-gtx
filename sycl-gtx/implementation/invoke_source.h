@@ -87,14 +87,16 @@ struct constructor<nd_item<dimensions>> {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
-				string_class("const int ") + id_global_name + "local_" + id_s +
+				string_class("const int ") + id_local_name + id_s +
 				" = get_local_id(" + id_s + ")"
 			);
 		}
 
 		// TODO: 2d and 3d
 
-		return id<dimensions>{0, 0, 0};
+		auto i = id<dimensions>{0, 0, 0};
+		i.type = id_ref::type::local;
+		return i;
 	}
 
 	static source get(function_class<nd_item<dimensions>> kern, nd_range<dimensions>& execution_range) {
