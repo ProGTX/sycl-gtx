@@ -3,6 +3,7 @@
 #define CL_SYCL_LANGUAGE_VERSION 120
 
 #include "specification\accessor\buffer.h"
+#include "specification\accessor\local.h"
 #include "specification\buffer.h"
 #include "specification\command_group.h"
 #include "specification\context.h"

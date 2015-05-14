@@ -209,5 +209,8 @@
     <ClInclude Include="implementation\invoke_source.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\accessor\local.h">
+      <Filter>Header Files\specification\accessor</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
