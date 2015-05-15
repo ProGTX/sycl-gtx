@@ -71,9 +71,9 @@ class accessor_;
 template <typename DataType, int dimensions, access::mode mode, access::target target = access::global_buffer>
 class accessor;
 
-#define SYCL_ADD_ACCESSOR(mode)												\
-	template <typename DataType, int dimensions, access::target target>		\
-	class accessor<DataType, dimensions, mode, target>						\
+#define SYCL_ADD_ACCESSOR(mode, target)									\
+	template <typename DataType, int dimensions>						\
+	class accessor<DataType, dimensions, mode, target>					\
 		: public detail::accessor_<DataType, dimensions, mode, target>
 
 } // namespace sycl

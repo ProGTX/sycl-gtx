@@ -15,8 +15,8 @@ template <typename DataType, int dimensions>
 struct buffer;
 
 #if MSVC_LOW
-#define SYCL_ADD_ACCESSOR_BUFFER(mode)										\
-	SYCL_ADD_ACCESSOR(mode) {												\
+#define SYCL_ADD_ACCESSOR_BUFFER(mode, target)								\
+	SYCL_ADD_ACCESSOR(mode, target) {										\
 		using Base = detail::accessor_<DataType, dimensions, mode, target>;	\
 	public:																	\
 		accessor(buffer<DataType, dimensions>& bufferRef)					\
@@ -37,13 +37,20 @@ struct buffer;
 	};
 #endif
 
-SYCL_ADD_ACCESSOR_BUFFER(access::read)
-SYCL_ADD_ACCESSOR_BUFFER(access::write)
-SYCL_ADD_ACCESSOR_BUFFER(access::read_write)
-SYCL_ADD_ACCESSOR_BUFFER(access::discard_write)
-SYCL_ADD_ACCESSOR_BUFFER(access::discard_read_write)
+#define SYCL_ADD_ACC_BUFFERS(mode)							\
+	SYCL_ADD_ACCESSOR_BUFFER(mode, access::cl_buffer)		\
+	SYCL_ADD_ACCESSOR_BUFFER(mode, access::constant_buffer)	\
+	SYCL_ADD_ACCESSOR_BUFFER(mode, access::global_buffer)	\
+	SYCL_ADD_ACCESSOR_BUFFER(mode, access::host_buffer)
+
+SYCL_ADD_ACC_BUFFERS(access::read)
+SYCL_ADD_ACC_BUFFERS(access::write)
+SYCL_ADD_ACC_BUFFERS(access::read_write)
+SYCL_ADD_ACC_BUFFERS(access::discard_write)
+SYCL_ADD_ACC_BUFFERS(access::discard_read_write)
 
 } // namespace sycl
 } // namespace cl
 
 #undef SYCL_ADD_ACCESSOR_BUFFER
+#undef SYCL_ADD_ACC_BUFFERS
