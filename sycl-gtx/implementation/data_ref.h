@@ -16,17 +16,45 @@ struct id;
 namespace detail {
 
 class data_ref {
-public:
-	static const string_class open_parenthesis;
-	string_class name;
-
-	data_ref(string_class name)
-		: name(name) {}
 
 private:
 	void kernel_add(string_class line);
 
 public:
+	static const string_class open_parenthesis;
+	string_class name;
+
+	static string_class get_name(id<1> index);
+	static string_class get_name(id<2> index);
+	static string_class get_name(id<3> index);
+
+	static string_class get_name(const data_ref& dref) {
+		return dref.name;
+	}
+	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
+	static string_class get_name(T n) {
+		return std::to_string(n);
+	}
+
+	data_ref(string_class name)
+		: name(name) {}
+
+	template <class T>
+	data_ref(T type)
+		: name(get_name(type)) {}
+
+	data_ref(const data_ref& copy) = default;
+#if MSVC_LOW
+	data_ref(data_ref&& move)
+		: SYCL_MOVE_INIT(name) {}
+	friend void swap(data_ref& first, data_ref& second) {
+		using std::swap;
+		SYCL_SWAP(name);
+	}
+#else
+	data_ref(data_ref&&) = default;
+#endif
+
 	// Without this one explicitly stated, default copy assignment is used
 	data_ref& operator=(data_ref dref) {
 		kernel_add(name + " = " + dref.name);
@@ -47,18 +75,6 @@ public:
 	SYCL_ASSIGNMENT_OPERATOR(*=);
 	SYCL_ASSIGNMENT_OPERATOR(/=);
 	SYCL_ASSIGNMENT_OPERATOR(%=);
-
-	static string_class get_name(id<1> index);
-	static string_class get_name(id<2> index);
-	static string_class get_name(id<3> index);
-
-	static string_class get_name(data_ref dref) {
-		return dref.name;
-	}
-	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
-	static string_class get_name(T n) {
-		return std::to_string(n);
-	}
 
 #undef SYCL_ASSIGNMENT_OPERATOR
 
