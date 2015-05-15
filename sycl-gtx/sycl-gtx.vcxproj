@@ -184,6 +184,7 @@
     <ClInclude Include="implementation\specification\accessor\buffer_base.h" />
     <ClInclude Include="implementation\specification\accessor\buffer_device.h" />
     <ClInclude Include="implementation\specification\accessor\buffer_host.h" />
+    <ClInclude Include="implementation\specification\accessor\device_reference.h" />
     <ClInclude Include="implementation\specification\accessor\local.h" />
     <ClInclude Include="implementation\specification\atomic.h" />
     <ClInclude Include="implementation\specification\buffer.h" />
