@@ -8,6 +8,7 @@
 #include "../buffer.h"
 #include "../command_group.h"
 #include "../ranges.h"
+#include "../../counter.h"
 
 namespace cl {
 namespace sycl {
@@ -15,6 +16,7 @@ namespace sycl {
 namespace detail {
 
 SYCL_ACCESSOR_CLASS(target == access::local),
+	public counter<>,
 	public accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>
 {
 protected:
@@ -24,7 +26,12 @@ protected:
 	range<dimensions> allocationSize;
 
 	size_t access_buffer_range(int n) const {
-		return allocationSize[0];
+		return allocationSize[n];
+	}
+
+	virtual void* resource() const override {
+		return reinterpret_cast<void*>(counter_id);
+	}
 	}
 
 public:
