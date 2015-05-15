@@ -36,6 +36,10 @@ static void else_() {
 	kernel_::source::add<false>("else");
 }
 
+static void while_(data_ref condition) {
+	kernel_::source::add<false>(string_class("while( ") + condition.name + ")");
+}
+
 } // namespace control
 } // namespace detail
 
@@ -62,6 +66,7 @@ static void else_() {
 #define SYCL_ELSE_IF(condition) \
 	::cl::sycl::detail::control::else_if((condition));
 
-// TODO
-#define SYCL_FOR(init, condition, increment)	\
-	for(init; condition; increment)
+#define SYCL_WHILE(condition)						\
+	::cl::sycl::detail::control::while_(			\
+		::cl::sycl::detail::data_ref((condition))	\
+	);
