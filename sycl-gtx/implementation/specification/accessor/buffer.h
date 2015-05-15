@@ -40,6 +40,7 @@ struct buffer;
 SYCL_ADD_ACCESSOR_BUFFER(access::read)
 SYCL_ADD_ACCESSOR_BUFFER(access::write)
 SYCL_ADD_ACCESSOR_BUFFER(access::read_write)
+SYCL_ADD_ACCESSOR_BUFFER(access::discard_write)
 SYCL_ADD_ACCESSOR_BUFFER(access::discard_read_write)
 
 } // namespace sycl

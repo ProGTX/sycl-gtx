@@ -17,10 +17,10 @@ enum class fence_space : char {
 // 3.6.4.1 Access modes
 enum mode {
 	read,				// read-only access
-	write,				// write-only access, previous target object contents discarded
-	atomic,				// atomic read and write access
-	read_write,			// read/write access
-	discard_read_write,	// read/write access, previous target object contents discarded
+	write,				// write-only access, previous contents NOT discarded
+	read_write,			// read and write access
+	discard_write,		// write-only access, previous contents discarded
+	discard_read_write,	// read and write access, previous contents discarded
 };
 
 // 3.6.4.2 Access targets
@@ -45,11 +45,11 @@ static debug& operator<<(debug& d, mode m) {
 		case write:
 			str += "write";
 			break;
-		case atomic:
-			str += "atomic";
-			break;
 		case read_write:
 			str += "read_write";
+			break;
+		case discard_write:
+			str += "discard_write";
 			break;
 		case discard_read_write:
 			str += "discard_read_write";

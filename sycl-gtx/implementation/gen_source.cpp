@@ -99,7 +99,12 @@ detail::shared_unique<kernel> source::compile() const {
 
 void source::write_buffers_to_device() const {
 	for(auto& acc : resources) {
-		if(acc.second.acc.mode == access::write || acc.second.acc.mode == access::discard_read_write) {
+		auto mode = acc.second.acc.mode;
+		if(
+			mode == access::write			||
+			mode == access::discard_write	||
+			mode == access::discard_read_write
+		) {
 			// Don't need to copy data that won't be used
 			continue;
 		}

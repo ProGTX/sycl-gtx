@@ -89,8 +89,8 @@ public:
 };
 
 SYCL_ACCESSOR_CLASS(
-	target == access::cl_buffer ||
-	target == access::constant_buffer ||
+	target == access::cl_buffer			||
+	target == access::constant_buffer	||
 	target == access::global_buffer
 ),
 	public accessor_buffer<DataType, dimensions>,
