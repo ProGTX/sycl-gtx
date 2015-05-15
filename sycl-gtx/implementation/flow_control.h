@@ -9,14 +9,6 @@ namespace sycl {
 
 namespace detail {
 namespace control {
-
-static void open_curly() {
-	kernel_::source::add<false>("{");
-}
-
-static void close_curly() {
-	kernel_::source::add<false>("}");
-}
 	
 template <class T>
 static void if_(T condition) {
@@ -49,11 +41,11 @@ static void while_(data_ref condition) {
 #define SYCL_IF(condition) \
 	::cl::sycl::detail::control::if_((condition));
 
-#define SYCL_BLOCK(code)						\
-	{											\
-	::cl::sycl::detail::control::open_curly();	\
-	code										\
-	::cl::sycl::detail::control::close_curly();	\
+#define SYCL_BLOCK(code)									\
+	{														\
+	::cl::sycl::detail::kernel_::source::add_curlies();		\
+	code													\
+	::cl::sycl::detail::kernel_::source::remove_curlies();	\
 	}
 
 #define SYCL_THEN(code) \

@@ -11,6 +11,7 @@
 using namespace cl::sycl;
 using namespace detail::kernel_;
 
+string_class source::tab_offset = "\t";
 const string_class source::resource_name_root = "_sycl_buf";
 int source::num_resources = 0;
 int source::num_kernels = 0;
