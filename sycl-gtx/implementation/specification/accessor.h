@@ -41,6 +41,10 @@ protected:
 	virtual void* resource() const {
 		return nullptr;
 	}
+
+	virtual size_t argument_size() const {
+		return 0;
+	}
 };
 
 template<bool>

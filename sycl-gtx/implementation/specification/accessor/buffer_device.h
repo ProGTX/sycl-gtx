@@ -60,6 +60,10 @@ protected:
 	virtual void* resource() const override {
 		return buf;
 	}
+
+	virtual size_t argument_size() const override {
+		return sizeof(cl_mem);
+	}
 };
 
 } // namespace detail

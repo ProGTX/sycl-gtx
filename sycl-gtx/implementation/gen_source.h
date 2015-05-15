@@ -50,6 +50,7 @@ private:
 		buffer_access acc;
 		string_class resource_name;
 		string_class type_name;
+		size_t size;
 	};
 
 	static const string_class resource_name_root;
@@ -130,7 +131,12 @@ public:
 
 		if(it == scope->resources.end()) {
 			resource_name = resource_name_root + std::to_string(++num_resources);
-			scope->resources[buf] = { { buf, mode, target }, resource_name, type_name::get<DataType>() };
+			scope->resources[buf] = {
+				{ buf, mode, target },
+				resource_name,
+				type_name::get<DataType>(),
+				acc.argument_size()
+			};
 		}
 		else {
 			resource_name = it->second.resource_name;

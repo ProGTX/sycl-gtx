@@ -32,6 +32,9 @@ protected:
 	virtual void* resource() const override {
 		return reinterpret_cast<void*>(counter_id);
 	}
+
+	virtual size_t argument_size() const override {
+		return sizeof(DataType) * detail::get_size(allocationSize);
 	}
 
 public:

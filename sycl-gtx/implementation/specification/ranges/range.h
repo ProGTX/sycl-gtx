@@ -101,13 +101,21 @@ sycl_static_range_ops(-);
 
 namespace detail {
 
-template<int dimensions>
+template <int dimensions>
 static range<dimensions> empty_range() {
 	return range<dimensions>(vector_class<size_t>(dimensions, 0).data());
 };
 
+template <int dimensions>
+static size_t get_size(range<dimensions> rang) {
+	size_t size = rang[0];
+	for(int i = 1; i < dimensions; ++i) {
+		size *= rang[i];
+	}
+	return size;
 }
 
+} // namespace detail
 
 } // namespace sycl
 } // namespace cl
