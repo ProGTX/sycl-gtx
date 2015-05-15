@@ -25,8 +25,6 @@ SYCL_ACCESSOR_CLASS(
 	template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
 	friend class accessor_device_ref;
 
-	using subscript_return_t = typename subscript_helper<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>::type;
-
 public:
 	accessor_(
 		cl::sycl::buffer<DataType, dimensions>& bufferRef,
@@ -53,6 +51,9 @@ public:
 		);
 	}
 
+private:
+	using subscript_return_t = typename subscript_helper<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>::type;
+public:
 	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS();
 
 protected:
