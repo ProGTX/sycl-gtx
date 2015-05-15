@@ -16,11 +16,6 @@ namespace kernel_ {
 }
 
 class accessor_base {
-protected:
-	template <class ResourceType>
-	static string_class obtain_resource_name(ResourceType* resource) {
-		return resource->resource_name;
-	}
 };
 
 // 3.6.4.3 Core accessors class
@@ -42,11 +37,6 @@ public:
 
 protected:
 	friend class kernel_::source;
-
-	virtual string_class get_resource_name() const {
-		DSELF() << "not implemented";
-		return "";
-	}
 
 	virtual void* resource() const {
 		return nullptr;

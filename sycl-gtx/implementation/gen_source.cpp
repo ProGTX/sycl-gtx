@@ -11,11 +11,23 @@
 using namespace cl::sycl;
 using namespace detail::kernel_;
 
+const string_class source::resource_name_root = "_sycl_buf";
+int source::num_resources = 0;
 int source::num_kernels = 0;
 source* source::scope = nullptr;
 
 bool source::in_scope() {
 	return scope != nullptr;
+}
+
+void source::enter(source& src) {
+	scope = &src;
+	num_resources = 0;
+}
+
+source source::exit(source& src) {
+	scope = nullptr;
+	return src;
 }
 
 // Creates kernel source
@@ -50,7 +62,7 @@ string_class source::generate_accessor_list() const {
 			list += "const ";
 		}
 		list += acc.second.type_name + " ";
-		list += acc.first + ", ";
+		list += acc.second.resource_name + ", ";
 	}
 
 	// 2 to get rid of the last comma and space

@@ -70,7 +70,6 @@ protected:
 	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
 	template <class T>
 	data_ref subscript(T index) const {
-		kernel_::source::register_resource(*acc);
 		// Basically the same as with host buffer accessor, just dealing with strings
 		auto rang_copy = rang;
 		rang_copy[dimensions - 1] = data_ref::get_name(index);
@@ -80,8 +79,9 @@ protected:
 			ind += string_class(" + ") + std::move(rang_copy[i]) + " * " + std::to_string(multiplier);
 			multiplier *= acc->access_buffer_range(i);
 		}
+		auto resource_name = kernel_::source::register_resource(*acc);
 		return data_ref(
-			acc->get_resource_name() + "[" + ind + "]"
+			resource_name + "[" + ind + "]"
 		);
 	}
 public:
@@ -121,19 +121,15 @@ public:
 	}
 
 	data_ref operator[](id<dimensions> index) const {
-		kernel_::source::register_resource(*this);
+		auto resource_name = kernel_::source::register_resource(*this);
 		return data_ref(
-			get_resource_name() + "[" + data_ref::get_name(index) + "]"
+			resource_name + "[" + data_ref::get_name(index) + "]"
 		);
 	}
 
 	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS();
 
 protected:
-	virtual string_class get_resource_name() const override {
-		return obtain_resource_name(buf);
-	}
-
 	virtual void* resource() const override {
 		return buf;
 	}

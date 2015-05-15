@@ -5,6 +5,7 @@
 #include "specification\command_group.h"
 #include "common.h"
 #include "debug.h"
+#include <memory>
 #include <unordered_map>
 
 
@@ -47,8 +48,12 @@ class source {
 private:
 	struct buf_info {
 		buffer_access acc;
+		string_class resource_name;
 		string_class type_name;
 	};
+
+	static const string_class resource_name_root;
+	SYCL_THREAD_LOCAL static int num_resources;
 
 	static int num_kernels;
 	int kernel_id;
@@ -56,7 +61,7 @@ private:
 	string_class kernel_name;
 	vector_class<string_class> lines;
 	string_class final_code;
-	std::unordered_map<string_class, buf_info> resources;
+	std::unordered_map<void*, buf_info> resources;
 
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;
@@ -68,6 +73,9 @@ private:
 
 	static void compile_command(queue* q, source src, shared_unique<kernel> kern);
 	static void enqueue_task_command(queue* q, shared_unique<kernel> kern);
+
+	static void enter(source& src);
+	static source exit(source& src);
 
 	source()
 		:	kernel_id(++num_kernels),
@@ -107,19 +115,25 @@ public:
 
 
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
-	static void register_resource(const accessor_core<DataType, dimensions, mode, target>& acc) {
+	static string_class register_resource(const accessor_core<DataType, dimensions, mode, target>& acc) {
 		if(scope == nullptr) {
 			//error::report(error::code::NOT_IN_KERNEL_SCOPE);
-			return;
+			return "";
 		}
 
-		auto name = acc.get_resource_name();
-		auto it = scope->resources.find(name);
+		string_class resource_name;
+		auto buf = (buffer<DataType, dimensions>*) acc.resource();
+		auto it = scope->resources.find(buf);
 
 		if(it == scope->resources.end()) {
-			auto buf = (buffer<DataType, dimensions>*) acc.resource();
-			scope->resources[name] = { { buf, mode, target }, type_name::get<DataType>() };
+			resource_name = resource_name_root + std::to_string(++num_resources);
+			scope->resources[buf] = { { buf, mode, target }, resource_name, type_name::get<DataType>() };
 		}
+		else {
+			resource_name = it->second.resource_name;
+		}
+
+		return resource_name;
 	}
 
 	template <bool auto_end = true>

@@ -39,12 +39,9 @@ class buffer_base {
 protected:
 	friend class kernel_::source;
 
-	static unsigned int counter;
-	string_class resource_name;
 	detail::error::handler handler;
 	refc::ptr<cl_mem> device_data;
 
-	void generate_name();
 	void create_accessor_command();
 
 	using clEnqueueBuffer_f = decltype(&clEnqueueWriteBuffer);
@@ -168,7 +165,6 @@ private:
 	void init() {
 		if(!is_initialized) {
 			command::group_::add(create<FLAGS>, __func__, this);
-			generate_name();
 			is_initialized = true;
 		}
 	}

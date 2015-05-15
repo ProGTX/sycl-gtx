@@ -19,12 +19,11 @@ template <>
 struct constructor<void> {
 	static source get(function_class<void> kern) {
 		source src;
-		source::scope = &src;
+		source::enter(src);
 
 		kern(); // MSVC2013 complains about this, but compiles and links.
 
-		source::scope = nullptr;
-		return src;
+		return source::exit(src);
 	}
 };
 
@@ -54,13 +53,12 @@ struct constructor<id<dimensions>> {
 
 	static source get(function_class<id<dimensions>> kern, range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
 		source src;
-		source::scope = &src;
+		source::enter(src);
 
 		auto index = generate_global_id_code(num_work_items);
 		kern(index);
 
-		source::scope = nullptr;
-		return src;
+		return source::exit(src);
 	}
 };
 
@@ -69,14 +67,13 @@ template <int dimensions>
 struct constructor<item<dimensions>> {
 	static source get(function_class<item<dimensions>> kern, range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
 		source src;
-		source::scope = &src;
+		source::enter(src);
 
 		auto index = constructor<id<dimensions>>::generate_global_id_code(num_work_items);
 		item<dimensions> it(index, num_work_items, work_item_offset);
 		kern(it);
 
-		source::scope = nullptr;
-		return src;
+		return source::exit(src);
 	}
 };
 
@@ -101,7 +98,7 @@ struct constructor<nd_item<dimensions>> {
 
 	static source get(function_class<nd_item<dimensions>> kern, nd_range<dimensions>& execution_range) {
 		source src;
-		source::scope = &src;
+		source::enter(src);
 
 		item<dimensions> global_item(
 			constructor<id<dimensions>>::generate_global_id_code(execution_range.get_global_range()),
@@ -119,8 +116,7 @@ struct constructor<nd_item<dimensions>> {
 		nd_item<dimensions> it(std::move(global_item), std::move(local_item));
 		kern(it);
 
-		source::scope = nullptr;
-		return src;
+		return source::exit(src);
 	}
 };
 
