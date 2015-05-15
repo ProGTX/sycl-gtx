@@ -92,9 +92,15 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 
 	int i = 0;
 	for(auto& acc : src.resources) {
-		auto mem = acc.second.acc.data->device_data.get();
-		error_code = clSetKernelArg(k, i, sizeof(cl_mem), &mem);
-		error::report(q, error_code);
+		if(acc.second.acc.target == access::local) {
+			error_code = clSetKernelArg(k, i, acc.second.size, nullptr);
+			error::report(q, error_code);
+		}
+		else {
+			auto mem = acc.second.acc.data->device_data.get();
+			error_code = clSetKernelArg(k, i, acc.second.size, &mem);
+			error::report(q, error_code);
+		}
 		++i;
 	}
 
@@ -113,9 +119,10 @@ void source::write_buffers_to_device() const {
 	for(auto& acc : resources) {
 		auto mode = acc.second.acc.mode;
 		if(
-			mode == access::write			||
-			mode == access::discard_write	||
-			mode == access::discard_read_write
+			mode == access::write				||
+			mode == access::discard_write		||
+			mode == access::discard_read_write	||
+			acc.second.acc.target == access::local
 		) {
 			// Don't need to copy data that won't be used
 			continue;
@@ -141,7 +148,10 @@ void source::enqueue_task(detail::shared_unique<kernel> kern) const {
 
 void source::read_buffers_from_device() const {
 	for(auto& acc : resources) {
-		if(acc.second.acc.mode == access::read) {
+		if(
+			acc.second.acc.mode == access::read	||
+			acc.second.acc.target == access::local
+		) {
 			// Don't need to read back read-only buffers
 			continue;
 		}
