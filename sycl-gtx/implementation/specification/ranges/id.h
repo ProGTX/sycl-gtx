@@ -48,6 +48,13 @@ public:
 	data_ref operator/(size_t n) const;
 	data_ref operator%(size_t n) const;
 
+	data_ref operator>(size_t n) const;
+	data_ref operator<(size_t n) const;
+	data_ref operator>=(size_t n) const;
+	data_ref operator<=(size_t n) const;
+	data_ref operator==(size_t n) const;
+	data_ref operator!=(size_t n) const;
+
 	friend data_ref operator*(size_t n, id_<dimensions> i) {
 		return i * n;
 	}
