@@ -37,9 +37,10 @@ struct buffer;
 	};
 #endif
 
+// 3.6.4.9 Accessor capabilities and restrictions
+
 #define SYCL_ADD_ACC_BUFFERS(mode)							\
 	SYCL_ADD_ACCESSOR_BUFFER(mode, access::cl_buffer)		\
-	SYCL_ADD_ACCESSOR_BUFFER(mode, access::constant_buffer)	\
 	SYCL_ADD_ACCESSOR_BUFFER(mode, access::global_buffer)	\
 	SYCL_ADD_ACCESSOR_BUFFER(mode, access::host_buffer)
 
@@ -48,6 +49,9 @@ SYCL_ADD_ACC_BUFFERS(access::write)
 SYCL_ADD_ACC_BUFFERS(access::read_write)
 SYCL_ADD_ACC_BUFFERS(access::discard_write)
 SYCL_ADD_ACC_BUFFERS(access::discard_read_write)
+
+// Can only be read
+SYCL_ADD_ACCESSOR_BUFFER(access::read, access::constant_buffer)
 
 } // namespace sycl
 } // namespace cl
