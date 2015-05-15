@@ -16,7 +16,7 @@ program::program(string_class source, queue* q) {
 	cl_program p = clCreateProgramWithSource(Context, 1, &src, &length, &error_code);
 	handler.report(error_code);
 
-	prog = refc::allocate<cl_program>(p, clReleaseProgram);
+	prog = p;
 
 	error_code = clBuildProgram(p, 1, &Device, nullptr, nullptr, nullptr);
 	try {

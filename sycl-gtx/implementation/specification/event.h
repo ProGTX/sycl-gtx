@@ -12,13 +12,12 @@ namespace sycl {
 
 class event {
 private:
-	refc::ptr<cl_event> m_event;
+	detail::refc<cl_event, clRetainEvent, clReleaseEvent> m_event;
 
 public:
 	// Constructs a copy sharing the same underlying event.
 	// The underlying event is reference counted.
-	event()
-		: m_event(refc::allocate(clReleaseEvent)) {}
+	event() {}
 
 	cl_event get(cl_context context);
 	vector_class<event> get_wait_list();

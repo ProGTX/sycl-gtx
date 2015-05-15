@@ -9,7 +9,7 @@ using namespace cl::sycl;
 vector_class<platform> platform::platforms;
 
 platform::platform(cl_platform_id platform_id, const device_selector& dev_selector)
-	: platform_id(refc::allocate(platform_id)) {}
+	: platform_id(platform_id) {}
 
 platform::platform()
 	: platform(nullptr) {}

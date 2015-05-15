@@ -21,7 +21,7 @@ namespace sycl {
 // Returns errors via C++ exception class.
 class device {
 private:
-	refc::ptr<cl_device_id> device_id;
+	detail::refc<cl_device_id, clRetainDevice, clReleaseDevice> device_id;
 	platform platfrm;
 	detail::error::handler handler;
 
@@ -44,8 +44,8 @@ public:
 		: SYCL_MOVE_INIT(device_id), SYCL_MOVE_INIT(platfrm), SYCL_MOVE_INIT(handler) {}
 	friend void swap(device& first, device& second) {
 		using std::swap;
-		SYCL_SWAP(platfrm);
 		SYCL_SWAP(device_id);
+		SYCL_SWAP(platfrm);
 		SYCL_SWAP(handler);
 	}
 #else

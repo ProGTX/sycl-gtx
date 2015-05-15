@@ -6,10 +6,6 @@ using namespace cl::sycl;
 
 detail::error::handler& context::default_error = detail::error::handler::default;
 
-refc::ptr<cl_context> context::reserve(cl_context c) {
-	return refc::allocate(c, clReleaseContext);
-}
-
 // Master constructor
 // TODO: Deal with platform pointer
 context::context(
@@ -20,7 +16,7 @@ context::context(
 	detail::error::handler& handler_,
 	platform* plt,
 	context_notify* ctx_notify
-) : ctx(reserve(c)), handler(handler_), target_devices(target_devices_) {
+) : ctx(c), handler(handler_), target_devices(target_devices_) {
 	handler.set_thrower(this);
 	if(c == nullptr) {
 		cl_uint num_devices = target_devices.size();
@@ -42,7 +38,7 @@ context::context(
 		if(pfn_notify == nullptr) {
 			handler.report(error_code);
 		}
-		ctx = reserve(c);
+		ctx = c;
 	}
 	else {
 		auto error_code = clRetainContext(c);

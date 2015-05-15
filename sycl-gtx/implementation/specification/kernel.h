@@ -29,7 +29,7 @@ namespace kernel_ {
 
 class kernel {
 private:
-	refc::ptr<cl_kernel> kern;
+	detail::refc<cl_kernel, clRetainKernel, clReleaseKernel> kern;
 	context ctx;
 	program prog;
 

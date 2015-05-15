@@ -40,7 +40,7 @@ protected:
 	friend class kernel_::source;
 
 	detail::error::handler handler;
-	refc::ptr<cl_mem> device_data;
+	detail::refc<cl_mem, clRetainMemObject, clReleaseMemObject> device_data;
 
 	void create_accessor_command();
 
@@ -154,10 +154,7 @@ private:
 	static void create(queue* q, buffer_* buffer) {
 		cl_int error_code;
 		const cl_mem_flags all_flags = FLAGS | ((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR);
-		buffer->device_data = refc::allocate(
-			clCreateBuffer(q->get_context().get(), all_flags, buffer->get_size(), buffer->host_data.get(), &error_code),
-			clReleaseMemObject
-		);
+		buffer->device_data = clCreateBuffer(q->get_context().get(), all_flags, buffer->get_size(), buffer->host_data.get(), &error_code);
 		error::report(q, error_code);
 	}
 

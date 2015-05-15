@@ -19,10 +19,7 @@ void queue::create_queue(cl_command_queue_properties* properties) {
 	display_device_info();
 
 	cl_int error_code;
-	command_q = refc::allocate(
-		clCreateCommandQueue(ctx.get(), dev.get(), ((properties == nullptr) ? 0 : *properties), &error_code),
-		clReleaseCommandQueue
-	);
+	command_q = clCreateCommandQueue(ctx.get(), dev.get(), ((properties == nullptr) ? 0 : *properties), &error_code);
 	handler.report(error_code);
 }
 
@@ -30,7 +27,7 @@ queue::queue()
 	: queue(*(device_selector::default)) {}
 
 queue::queue(cl_command_queue cl_queue)
-	: handler(ctx), command_q(refc::allocate(cl_queue, clReleaseCommandQueue)) {
+	: handler(ctx), command_q(cl_queue) {
 	display_device_info();
 
 	auto error_code = clRetainCommandQueue(cl_queue);

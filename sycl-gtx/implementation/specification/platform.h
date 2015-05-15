@@ -17,7 +17,7 @@ class device;
 // Constructors return errors via C++ exception class.
 class platform {
 private:
-	refc::ptr<cl_platform_id> platform_id;
+	detail::refc<cl_platform_id> platform_id;
 	detail::error::handler handler;
 
 	platform(cl_platform_id platform_id, const device_selector& dev_selector);

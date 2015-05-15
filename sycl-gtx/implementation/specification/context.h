@@ -38,13 +38,11 @@ public:
 // A given context can only wrap devices owned by a single platform.
 class context {
 private:
-	refc::ptr<cl_context> ctx;
+	detail::refc<cl_context, clRetainContext, clReleaseContext> ctx;
 	vector_class<device> target_devices;
 
 	detail::error::handler handler;
 	static detail::error::handler& default_error;
-
-	static refc::ptr<cl_context> reserve(cl_context c = nullptr);
 
 	// Master constructor
 	context(

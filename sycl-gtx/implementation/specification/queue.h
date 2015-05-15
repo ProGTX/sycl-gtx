@@ -21,7 +21,7 @@ private:
 	static detail::error::handler& default_error;
 	detail::error::handler handler = default_error;
 
-	refc::ptr<cl_command_queue> command_q;
+	detail::refc<cl_command_queue, clRetainCommandQueue, clReleaseCommandQueue> command_q;
 	device dev;
 	context ctx;
 
