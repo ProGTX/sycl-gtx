@@ -172,6 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\common.h" />
+    <ClInclude Include="implementation\counter.h" />
     <ClInclude Include="implementation\data_ref.h" />
     <ClInclude Include="implementation\debug.h" />
     <ClInclude Include="implementation\error_code.h" />

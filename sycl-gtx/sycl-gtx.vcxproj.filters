@@ -212,5 +212,8 @@
     <ClInclude Include="implementation\specification\accessor\device_reference.h">
       <Filter>Header Files\specification\accessor</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\counter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
