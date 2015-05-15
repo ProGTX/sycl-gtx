@@ -34,11 +34,11 @@ public:
 	}
 
 
-#define SYCL_ASSIGNMENT_OPERATOR(op)		 	\
-	template <class T>						 	\
-	data_ref& operator op(T n) {			 	\
-		kernel_add(name + #op + get_name(n));	\
-		return *this;						 	\
+#define SYCL_ASSIGNMENT_OPERATOR(op)					\
+	template <class T>									\
+	data_ref& operator op(T n) {			 			\
+		kernel_add(name + " " #op " " + get_name(n));	\
+		return *this;						 			\
 	}
 
 	SYCL_ASSIGNMENT_OPERATOR(=);
