@@ -29,8 +29,8 @@ struct buffer;
 			: Base(bufferRef, offset, range) {}								\
 	};
 #else
-#define SYCL_ADD_ACCESSOR_BUFFER(mode)										\
-	SYCL_ADD_ACCESSOR(mode) {												\
+#define SYCL_ADD_ACCESSOR_BUFFER(mode, target)								\
+	SYCL_ADD_ACCESSOR(mode, target) {										\
 		using Base = detail::accessor_<DataType, dimensions, mode, target>;	\
 	public:																	\
 		using Base::accessor_;												\
