@@ -55,7 +55,7 @@ private:
 	static const string_class resource_name_root;
 	SYCL_THREAD_LOCAL static int num_resources;
 
-	static string_class tab_offset;
+	string_class tab_offset;
 
 	static int num_kernels;
 	int kernel_id;
@@ -80,7 +80,8 @@ private:
 	static source exit(source& src);
 
 	source()
-		:	kernel_id(++num_kernels),
+		:	tab_offset("\t"),
+			kernel_id(++num_kernels),
 			kernel_name(string_class("_sycl_kernel_") + std::to_string(kernel_id)) {}
 
 public:
@@ -140,15 +141,15 @@ public:
 
 	template <bool auto_end = true>
 	static void add(string_class line) {
-		scope->lines.push_back(tab_offset + line + (auto_end ? ';' : ' '));
+		scope->lines.push_back(scope->tab_offset + line + (auto_end ? ';' : ' '));
 	}
 
 	static void add_curlies() {
 		add<false>("{");
-		tab_offset.push_back('\t');
+		scope->tab_offset.push_back('\t');
 	}
 	static void remove_curlies() {
-		tab_offset.pop_back();
+		scope->tab_offset.pop_back();
 		add<false>("}");
 	}
 
