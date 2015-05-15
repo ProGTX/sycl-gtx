@@ -10,17 +10,15 @@ namespace sycl {
 namespace detail {
 namespace control {
 	
-template <class T>
-static void if_(T condition) {
+static void if_(data_ref condition) {
 	kernel_::source::add<false>(
-		string_class("if(") + data_ref::get_name(condition) + ")"
+		string_class("if(") + condition.name + ")"
 	);
 }
 
-template <class T>
-static void else_if(T condition) {
+static void else_if(data_ref condition) {
 	kernel_::source::add<false>(
-		string_class("else if(") + data_ref::get_name(condition) + ")"
+		string_class("else if(") + condition.name + ")"
 	);
 }
 
@@ -38,8 +36,10 @@ static void while_(data_ref condition) {
 } // namespace sycl
 } // namespace cl
 
-#define SYCL_IF(condition) \
-	::cl::sycl::detail::control::if_((condition));
+#define SYCL_IF(condition)							\
+	::cl::sycl::detail::control::if_(				\
+		::cl::sycl::detail::data_ref((condition))	\
+	);
 
 #define SYCL_BLOCK(code)									\
 	{														\
@@ -55,8 +55,10 @@ static void while_(data_ref condition) {
 	::cl::sycl::detail::control::else_();	\
 	SYCL_BLOCK(code)
 
-#define SYCL_ELSE_IF(condition) \
-	::cl::sycl::detail::control::else_if((condition));
+#define SYCL_ELSE_IF(condition)						\
+	::cl::sycl::detail::control::else_if(			\
+		::cl::sycl::detail::data_ref((condition))	\
+	);
 
 #define SYCL_WHILE(condition)						\
 	::cl::sycl::detail::control::while_(			\
