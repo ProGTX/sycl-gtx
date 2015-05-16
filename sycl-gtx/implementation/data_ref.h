@@ -16,8 +16,7 @@ struct id;
 namespace detail {
 
 class data_ref {
-
-private:
+protected:
 	void kernel_add(string_class line);
 
 public:
