@@ -33,16 +33,25 @@ public:
 		: counter(), data_ref(generate_name()) {
 		kernel_add(type_name() + ' ' + name + " = " + get_name(n));
 	}
+
+	template <class T>
+	detail::data_ref& operator=(T n) {
+		return data_ref::operator=(n);
+	}
 };
 
 } // namespace detail
 
-#define SYCL_CL_TYPE_INHERIT(type)	\
-	type()							\
-		: Base() {}					\
-	template <class T>				\
-	type(T n)						\
-		: Base(n) {}
+#define SYCL_CL_TYPE_INHERIT(type)		\
+	type()								\
+		: Base() {}						\
+	template <class T>					\
+	type(T n)							\
+		: Base(n) {}					\
+	template <class T>					\
+	detail::data_ref& operator=(T n) {	\
+		return Base::operator=(n);		\
+	}
 
 #define SYCL_CL_TYPE_SIGNED(type, numElements)									\
 	class type##numElements : public detail::cl_type<type, numElements, true> {	\
@@ -63,6 +72,7 @@ SYCL_CL_TYPE_UNSIGNED(int, 1)
 SYCL_CL_TYPE_SIGNED(int, 2)
 SYCL_CL_TYPE_UNSIGNED(int, 2)
 
+#undef SYCL_CL_TYPE_INHERIT
 #undef SYCL_CL_TYPE_SIGNED
 #undef SYCL_CL_TYPE_UNSIGNED
 
