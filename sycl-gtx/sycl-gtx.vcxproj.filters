@@ -99,6 +99,9 @@
     <ClCompile Include="implementation\specification\ranges\id.cpp">
       <Filter>Source Files\specification\ranges</Filter>
     </ClCompile>
+    <ClCompile Include="tests\test9.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">
