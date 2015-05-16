@@ -6,11 +6,11 @@ using namespace cl::sycl;
 using detail::data_ref;
 using detail::id_ref;
 
-const string_class data_ref::open_parenthesis = "(";
-
-void data_ref::kernel_add(string_class line) {
+void detail::kernel_add(string_class line) {
 	kernel_::source::add(line);
 }
+
+const string_class data_ref::open_parenthesis = "(";
 
 string_class data_ref::get_name(id<1> index) {
 	return (index.type == id_ref::type::global ? id_global_name : id_local_name) + "0";

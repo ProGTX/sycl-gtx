@@ -15,10 +15,9 @@ struct id;
 
 namespace detail {
 
-class data_ref {
-protected:
-	void kernel_add(string_class line);
+void kernel_add(string_class line);
 
+class data_ref {
 public:
 	static const string_class open_parenthesis;
 	string_class name;
