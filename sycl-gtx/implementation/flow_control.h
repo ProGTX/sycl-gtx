@@ -36,31 +36,37 @@ static void while_(data_ref condition) {
 } // namespace sycl
 } // namespace cl
 
-#define SYCL_IF(condition)							\
-	::cl::sycl::detail::control::if_(				\
-		::cl::sycl::detail::data_ref((condition))	\
-	);
+#define SYCL_IF(condition)						\
+::cl::sycl::detail::control::if_(				\
+	::cl::sycl::detail::data_ref((condition))	\
+);
 
-#define SYCL_BLOCK(code)									\
-	{														\
-	::cl::sycl::detail::kernel_::source::add_curlies();		\
-	code													\
-	::cl::sycl::detail::kernel_::source::remove_curlies();	\
-	}
+#define SYCL_BEGIN	\
+::cl::sycl::detail::kernel_::source::add_curlies();
+
+#define SYCL_END	\
+::cl::sycl::detail::kernel_::source::remove_curlies();
+
+#define SYCL_BLOCK(code)	\
+{							\
+SYCL_BEGIN					\
+code						\
+SYCL_END					\
+}
 
 #define SYCL_THEN(code) \
-	SYCL_BLOCK(code)
+SYCL_BLOCK(code)
 
-#define SYCL_ELSE(code)						\
-	::cl::sycl::detail::control::else_();	\
-	SYCL_BLOCK(code)
+#define SYCL_ELSE(code)					\
+::cl::sycl::detail::control::else_();	\
+SYCL_BLOCK(code)
 
-#define SYCL_ELSE_IF(condition)						\
-	::cl::sycl::detail::control::else_if(			\
-		::cl::sycl::detail::data_ref((condition))	\
-	);
+#define SYCL_ELSE_IF(condition)					\
+::cl::sycl::detail::control::else_if(			\
+	::cl::sycl::detail::data_ref((condition))	\
+);
 
-#define SYCL_WHILE(condition)						\
-	::cl::sycl::detail::control::while_(			\
-		::cl::sycl::detail::data_ref((condition))	\
-	);
+#define SYCL_WHILE(condition)					\
+::cl::sycl::detail::control::while_(			\
+	::cl::sycl::detail::data_ref((condition))	\
+);
