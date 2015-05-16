@@ -215,5 +215,8 @@
     <ClInclude Include="implementation\counter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\types.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

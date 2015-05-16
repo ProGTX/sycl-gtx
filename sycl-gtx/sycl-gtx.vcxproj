@@ -208,6 +208,7 @@
     <ClInclude Include="implementation\specification\ranges\nd_range.h" />
     <ClInclude Include="implementation\specification\ranges\range.h" />
     <ClInclude Include="implementation\specification\refc.h" />
+    <ClInclude Include="implementation\specification\types.h" />
     <ClInclude Include="implementation\sycl.hpp" />
     <ClInclude Include="tests\tests.h" />
   </ItemGroup>
