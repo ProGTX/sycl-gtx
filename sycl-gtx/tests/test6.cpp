@@ -27,55 +27,40 @@ bool test6() {
 		});
 
 		for(unsigned int N = size / 2; N > 0; N /= 2 * group_size) {
-			/*
-			clErr = CL_SUCCESS;
-			clErr |= clSetKernelArg(Kernel, 0, sizeof(cl_mem), &m_dPingArray);
-			clErr |= clSetKernelArg(Kernel, 1, sizeof(cl_mem), &m_dPongArray);
-			clErr |= clSetKernelArg(Kernel, 2, sizeof(cl_uint), &N);
-			V_RETURN_CL(clErr, "Error setting kernel parameters.");
-
-			// Allocate shared (local) memory for the kernel
-			clErr = clSetKernelArg(Kernel, 3, LocalWorkSize[0] * sizeof(cl_uint), nullptr);
-			V_RETURN_CL(clErr, "Error allocating shared memory.");
-
-			globalWorkSize[0] = CLUtil::GetGlobalWorkSize(N, LocalWorkSize[0]);
-			clErr = clEnqueueNDRangeKernel(
-				CommandQueue, Kernel, 1, nullptr, globalWorkSize, LocalWorkSize, 0, nullptr, nullptr
-				);
-			V_RETURN_CL(clErr, "Error enqueuing decomposition kernel.");
-			*/
-
 			command_group(myQueue, [&]() {
-				auto p = P->get_access<access::read_write>();
-				auto q = Q->get_access<access::read_write>();
+				auto input = P->get_access<access::read>();
+				auto output = Q->get_access<access::write>();
+				auto local = accessor<float, 1, access::read_write, access::local>(group_size);
 
 				parallel_for<>(nd_range<1>(N, group_size), [=](nd_item<1> index) {
 					auto gid = index.get_global_id(0);
 					auto lid = index.get_local_id(0);
-					auto N = index.get_global_range()[0];
-					auto second = gid + N;
+					uint1 N = index.get_global_range()[0];
+					uint1 second = gid + N;
 
 					SYCL_IF(second < 2 * N)
 					SYCL_THEN({
-						// localBlock[lid] = p[gid] + p[second];
+						local[lid] = input[gid] + input[second];
 					})
 
 					index.barrier(access::fence_space::local);
 
-					// N = min(N, index.get_local_range()[0]);
+					N = min(N, index.get_local_range()[0]);
 
-					SYCL_FOR(size_t stride = N / 2, stride > 0, stride /= 2)
+					uint1 stride = N / 2;
+					SYCL_WHILE(stride > 0)
 					SYCL_BLOCK({
 						SYCL_IF(lid < stride)
 						SYCL_THEN({
-							// localBlock[lid] += localBlock[lid + stride];
+							local[lid] += local[lid + stride];
 						})
 						index.barrier(access::fence_space::local);
+						stride *= 2;
 					})
 
 					SYCL_IF(lid == 0)
 					SYCL_THEN({
-						// q[gid / N] = localBlock[0];
+						output[gid / N] = local[0];
 					})
 				});
 			});
