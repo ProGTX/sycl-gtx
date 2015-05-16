@@ -217,8 +217,8 @@ private:
 		cl_int error_code = clEnqueueBuffer(
 			q->get(),
 			device_data.get(),
-			// TODO: Should it block?
-			false,
+			// TODO: It shouldn't block here, SYCL runtime needs to take care of consistency
+			true,
 			// TODO: Sub-buffer access
 			0, get_size(),
 			// TODO: Events
