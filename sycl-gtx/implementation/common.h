@@ -93,9 +93,10 @@ static string_class type_string();
 #define SYCL_GET_TYPE_STRING(type)			\
 template <>									\
 static string_class type_string<type>() {	\
-	return #type "*";						\
+	return #type;						\
 }
 
+SYCL_GET_TYPE_STRING(bool)
 SYCL_GET_TYPE_STRING(int)
 SYCL_GET_TYPE_STRING(char)
 SYCL_GET_TYPE_STRING(short)
