@@ -45,7 +45,7 @@ bool test6() {
 
 					index.barrier(access::fence_space::local);
 
-					N = min(N, index.get_local_range()[0]);
+					N = min(N, (uint1)index.get_local_range()[0]);
 
 					uint1 stride = N / 2;
 					SYCL_WHILE(stride > 0)
@@ -55,7 +55,7 @@ bool test6() {
 							local[lid] += local[lid + stride];
 						})
 						index.barrier(access::fence_space::local);
-						stride *= 2;
+						stride /= 2;
 					})
 
 					SYCL_IF(lid == 0)
