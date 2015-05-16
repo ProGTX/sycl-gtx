@@ -63,12 +63,20 @@ public:
 		return get_group_id()[dimension];
 	}
 
-	range<dims> get_global_range() const {
+	const range<dims>& get_global_range() const {
 		return item::get_global_range();
 	}
-	range<dims> get_local_range() const {
+	::size_t get_global_size(int dimension) const {
+		return get_global_range()[dimension];
+	}
+
+	const range<dims>& get_local_range() const {
 		return local_item.get_global_range();
 	}
+	::size_t get_local_size(int dimension) const {
+		return get_local_range()[dimension];
+	}
+
 	id<dims> get_offset() const {
 		return item::get_offset();
 	}
