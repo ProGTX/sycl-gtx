@@ -18,25 +18,6 @@ class queue;
 
 namespace detail {
 
-namespace type_name {
-
-template <typename DataType>
-static string_class get();
-
-#define STRING_TYPE_FUNCION(type)	\
-template<>							\
-static string_class get<type>() {	\
-	return #type "*";				\
-}
-
-STRING_TYPE_FUNCION(int)
-STRING_TYPE_FUNCION(float)
-
-#undef STRING_TYPE_FUNCION
-
-} // namespace type_name
-
-
 namespace kernel_ {
 
 // Forward declaration
@@ -134,7 +115,7 @@ public:
 			scope->resources[buf] = {
 				{ buf, mode, target },
 				resource_name,
-				type_name::get<DataType>(),
+				detail::type_string<DataType>(),
 				acc.argument_size()
 			};
 		}

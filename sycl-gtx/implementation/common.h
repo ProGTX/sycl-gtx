@@ -84,9 +84,32 @@ bool has_extension(T* sycl_class, const string_class extension_name) {
 	return ext_str.find(extension_name) != string_class::npos;
 }
 
-template<class T>
+template <class T>
 using shared_unique = std::shared_ptr<std::unique_ptr<T>>;
 
+template <typename DataType>
+static string_class type_string();
+
+#define SYCL_GET_TYPE_STRING(type)			\
+template <>									\
+static string_class type_string<type>() {	\
+	return #type "*";						\
+}
+
+SYCL_GET_TYPE_STRING(int)
+SYCL_GET_TYPE_STRING(char)
+SYCL_GET_TYPE_STRING(short)
+SYCL_GET_TYPE_STRING(long)
+SYCL_GET_TYPE_STRING(unsigned int)
+SYCL_GET_TYPE_STRING(unsigned char)
+SYCL_GET_TYPE_STRING(unsigned short)
+SYCL_GET_TYPE_STRING(unsigned long)
+SYCL_GET_TYPE_STRING(float)
+SYCL_GET_TYPE_STRING(double)
+
+#undef SYCL_GET_TYPE_STRING
+
 } // namespace detail
+
 } // namespace sycl
 } // namespace cl
