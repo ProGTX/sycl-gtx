@@ -195,6 +195,7 @@
     <ClInclude Include="implementation\specification\device_selector.h" />
     <ClInclude Include="implementation\specification\error_handler.h" />
     <ClInclude Include="implementation\specification\event.h" />
+    <ClInclude Include="implementation\specification\functions\common.h" />
     <ClInclude Include="implementation\specification\invoke.h" />
     <ClInclude Include="implementation\specification\kernel.h" />
     <ClInclude Include="implementation\specification\param_traits.h" />
@@ -209,6 +210,7 @@
     <ClInclude Include="implementation\specification\ranges\range.h" />
     <ClInclude Include="implementation\specification\refc.h" />
     <ClInclude Include="implementation\specification\types.h" />
+    <ClInclude Include="implementation\specification\workitem_functions.h" />
     <ClInclude Include="implementation\sycl.hpp" />
     <ClInclude Include="tests\tests.h" />
   </ItemGroup>

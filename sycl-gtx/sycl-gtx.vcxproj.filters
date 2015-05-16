@@ -31,6 +31,9 @@
     <Filter Include="Source Files\specification\ranges">
       <UniqueIdentifier>{ed7dbd73-90ba-4636-8903-4dbdfc2e6d61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\specification\functions">
+      <UniqueIdentifier>{f1ecb52e-fda3-4a1f-821b-bcd65b73091b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -216,6 +219,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\types.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\functions\common.h">
+      <Filter>Header Files\specification\functions</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\workitem_functions.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
   </ItemGroup>

@@ -15,6 +15,7 @@
 #include "specification\queue.h"
 #include "specification\ranges.h"
 #include "specification\types.h"
+#include "specification\workitem_functions.h"
 
 #include "flow_control.h"
 
