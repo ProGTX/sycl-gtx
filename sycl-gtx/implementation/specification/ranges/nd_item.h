@@ -77,7 +77,22 @@ public:
 	}
 
 	void barrier(access::fence_space flag = access::fence_space::global_and_local) const {
-		// TODO
+		string_class flag_string;
+
+		switch(flag) {
+			case access::fence_space::local:
+				flag_string = "CLK_LOCAL_MEM_FENCE";
+				break;
+			case access::fence_space::global:
+				flag_string = "CLK_GLOBAL_MEM_FENCE";
+				break;
+			case access::fence_space::global_and_local:
+			default:
+				flag_string = "CLK_LOCAL_MEM_FENCE|CLK_GLOBAL_MEM_FENCE";
+				break;
+		}
+
+		detail::kernel_add(string_class("barrier(") + flag_string + ")");
 	}
 };
 
