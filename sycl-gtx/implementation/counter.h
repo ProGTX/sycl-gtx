@@ -6,12 +6,12 @@ namespace cl {
 namespace sycl {
 namespace detail {
 
-template <int start = 0>
+template <class T, unsigned int start = 0>
 class counter {
 private:
-	static int internal_count;
+	static unsigned int internal_count;
 protected:
-	const int counter_id;
+	const unsigned int counter_id;
 
 	counter()
 		: counter_id(internal_count++) {}
@@ -25,8 +25,8 @@ protected:
 #endif
 };
 
-template <int start>
-int counter<start>::internal_count = start;
+template <class T, unsigned int start>
+unsigned int counter<T, start>::internal_count = start;
 
 } // namespace detail
 } // namespace sycl
