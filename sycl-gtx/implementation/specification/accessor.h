@@ -62,7 +62,7 @@ class accessor_;
 } // namespace detail
 
 
-template <typename DataType, int dimensions, access::mode mode = access::read_write, access::target target = access::global_buffer>
+template <typename DataType, int dimensions = 1, access::mode mode = access::read_write, access::target target = access::global_buffer>
 class accessor;
 
 #define SYCL_ADD_ACCESSOR(mode, target)									\

@@ -44,7 +44,7 @@ protected:
 	using target = cl::sycl::access::target;
 
 	// Global memory
-	cl::sycl::accessor<T, 1> input;
+	cl::sycl::accessor<T> input;
 
 	// Local memory
 	cl::sycl::accessor<T, 1, mode::read_write, target::local> localBlock;
@@ -120,6 +120,37 @@ public:
 	}
 };
 
+template <typename T>
+struct prefix_sum_join_kernel {
+protected:
+	using mode = cl::sycl::access::mode;
+	using target = cl::sycl::access::target;
+	using buffer = cl::sycl::buffer<T>;
+
+	// Global memory
+	cl::sycl::accessor<T> data;
+	cl::sycl::accessor<T, 1, mode::read> higher_level;
+
+	// Local memory
+	cl::sycl::accessor<T, 1, mode::read_write, target::local> localBlock;
+
+public:
+	prefix_sum_join_kernel(buffer& data, buffer& higher_level, size_t group_size)
+		: data(data.get_access<mode::read_write>()),
+		higher_level(higher_level.get_access<mode::read>())
+		localBlock(group_size) {}
+
+	void operator()(cl::sycl::nd_item<1> index) {
+		using namespace cl::sycl;
+		int1 GID = index.get_global_id(0);
+		int1 N = 2 * index.get_local_size(0);
+		SYCL_IF(GID >= N)
+		SYCL_THEN({
+			data[GID] += higher_level[GID / N - 1];
+		})
+	}
+};
+
 bool test9() {
 	using namespace cl::sycl;
 
@@ -128,6 +159,7 @@ bool test9() {
 
 		const auto group_size = myQueue.get_device().get_info<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
 		const auto size = group_size * 2;
+		size_t N = size;
 
 		using type = double;
 		buffer<type> data(size);
@@ -144,9 +176,13 @@ bool test9() {
 		command_group(myQueue, [&]() {
 			// TODO: Extend for large arrays
 			parallel_for<>(
-				nd_range<1>(size / 2, group_size),
+				nd_range<1>(N / 2, group_size),
 				prefix_sum_kernel<type>(data, group_size)
 			);
+
+			if(N <= group_size * 2) {
+				return;
+			}
 		});
 
 		return check_sum(data);
