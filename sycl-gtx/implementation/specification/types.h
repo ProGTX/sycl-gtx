@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.9.1 Description of the built-in types available for SYCL host and device
+// 3.8 Data Types
 
 #include "../common.h"
 #include "../counter.h"
@@ -9,13 +9,15 @@
 namespace cl {
 namespace sycl {
 
+// 3.8.1 Vector types
+
 namespace detail {
 
 template <typename dataT, int numElements>
-class cl_type : public counter<cl_type<dataT, numElements>>, public data_ref {
+class vec_base : public detail::counter<vec_base<dataT, numElements>>, public detail::data_ref {
 private:
 	static string_class type_name() {
-		return type_string<dataT>() + (numElements == 1 ? "" : std::to_string(numElements));
+		return detail::type_string<dataT>() + (numElements == 1 ? "" : std::to_string(numElements));
 	}
 
 	string_class generate_name() const {
@@ -23,85 +25,95 @@ private:
 	}
 
 public:
-	cl_type()
+	vec_base()
 		: counter(), data_ref(generate_name()) {
-		kernel_add(type_name() + ' ' + name);
+		detail::kernel_add(type_name() + ' ' + name);
 	}
 
 	template <class T>
-	cl_type(T n)
+	vec_base(T n)
 		: counter(), data_ref(generate_name()) {
-		kernel_add(type_name() + ' ' + name + " = " + get_name(n));
+		detail::kernel_add(type_name() + ' ' + name + " = " + get_name(n));
 	}
 };
 
 } // namespace detail
 
-#define SYCL_CL_TYPE_INHERIT(type)				\
-	type()										\
-		: Base() {}								\
-	template <class T>							\
-	type(T n)									\
-		: Base(n) {}							\
-	template <class T>							\
-	data_ref& operator=(T n) {					\
-		return data_ref::operator=(n);			\
-	}											\
-	template <class T>							\
-	friend data_ref operator*(T n, type elem) {	\
-		return n * (data_ref&&)elem;			\
+
+#define SYCL_VEC_INHERIT(type)						\
+	type()											\
+		: Base() {}									\
+	template <class T>								\
+	type(T n)										\
+		: Base(n) {}								\
+	template <class T>								\
+	data_ref& operator=(T n) {						\
+		return data_ref::operator=(n);				\
+	}												\
+	template <class T>								\
+	friend data_ref operator*(T n, type&& elem) {	\
+		return n * (data_ref&&)elem;				\
 	}
 
-#define SYCL_CL_TYPE_SIGNED(type, numElements)								\
-	class type##numElements : public detail::cl_type<type, numElements> {	\
-		using Base = detail::cl_type<type, numElements>;					\
-		using data_ref = detail::data_ref;									\
+template <typename dataT, int numElements>
+class vec : public detail::vec_base<dataT, numElements> {
+private:
+	using Base = detail::vec_base<dataT, numElements>;
+public:
+	SYCL_VEC_INHERIT(vec)
+};
+
+
+// 3.9.1 Description of the built-in types available for SYCL host and device
+
+#define SYCL_VEC_SIGNED(type, numElements)						\
+	class type##numElements : public vec<type, numElements> {	\
+		using Base = vec<type, numElements>;					\
+	public:														\
+		SYCL_VEC_INHERIT(type##numElements)						\
+	};
+
+#define SYCL_VEC_UNSIGNED(type, numElements)								\
+	class u##type##numElements : public vec<unsigned type, numElements> {	\
+		using Base = vec<unsigned type, numElements>;						\
 	public:																	\
-		SYCL_CL_TYPE_INHERIT(type##numElements)								\
+		SYCL_VEC_INHERIT(u##type##numElements)								\
 	};
 
-#define SYCL_CL_TYPE_UNSIGNED(type, numElements)										\
-	class u##type##numElements : public detail::cl_type<unsigned type, numElements> {	\
-		using Base = detail::cl_type<unsigned type, numElements>;						\
-		using data_ref = detail::data_ref;												\
-	public:																				\
-		SYCL_CL_TYPE_INHERIT(u##type##numElements)										\
-	};
+#define SYCL_ADD_SIGNED_vec(type)	\
+	SYCL_VEC_SIGNED(type, 1)		\
+	SYCL_VEC_SIGNED(type, 2)		\
+	SYCL_VEC_SIGNED(type, 3)		\
+	SYCL_VEC_SIGNED(type, 4)		\
+	SYCL_VEC_SIGNED(type, 8)		\
+	SYCL_VEC_SIGNED(type, 16)
 
-#define SYCL_ADD_SIGNED_CL_TYPE(type)	\
-	SYCL_CL_TYPE_SIGNED(type, 1)		\
-	SYCL_CL_TYPE_SIGNED(type, 2)		\
-	SYCL_CL_TYPE_SIGNED(type, 3)		\
-	SYCL_CL_TYPE_SIGNED(type, 4)		\
-	SYCL_CL_TYPE_SIGNED(type, 8)		\
-	SYCL_CL_TYPE_SIGNED(type, 16)
+#define SYCL_ADD_UNSIGNED_vec(type)	\
+	SYCL_VEC_UNSIGNED(type, 1)		\
+	SYCL_VEC_UNSIGNED(type, 2)		\
+	SYCL_VEC_UNSIGNED(type, 3)		\
+	SYCL_VEC_UNSIGNED(type, 4)		\
+	SYCL_VEC_UNSIGNED(type, 8)		\
+	SYCL_VEC_UNSIGNED(type, 16)
 
-#define SYCL_ADD_UNSIGNED_CL_TYPE(type)	\
-	SYCL_CL_TYPE_UNSIGNED(type, 1)		\
-	SYCL_CL_TYPE_UNSIGNED(type, 2)		\
-	SYCL_CL_TYPE_UNSIGNED(type, 3)		\
-	SYCL_CL_TYPE_UNSIGNED(type, 4)		\
-	SYCL_CL_TYPE_UNSIGNED(type, 8)		\
-	SYCL_CL_TYPE_UNSIGNED(type, 16)
+SYCL_ADD_SIGNED_vec(bool)
+SYCL_ADD_SIGNED_vec(int)
+SYCL_ADD_SIGNED_vec(char)
+SYCL_ADD_SIGNED_vec(short)
+SYCL_ADD_SIGNED_vec(long)
+SYCL_ADD_SIGNED_vec(float)
+SYCL_ADD_SIGNED_vec(double)
 
-SYCL_ADD_SIGNED_CL_TYPE(bool)
-SYCL_ADD_SIGNED_CL_TYPE(int)
-SYCL_ADD_SIGNED_CL_TYPE(char)
-SYCL_ADD_SIGNED_CL_TYPE(short)
-SYCL_ADD_SIGNED_CL_TYPE(long)
-SYCL_ADD_SIGNED_CL_TYPE(float)
-SYCL_ADD_SIGNED_CL_TYPE(double)
+SYCL_ADD_UNSIGNED_vec(int)
+SYCL_ADD_UNSIGNED_vec(char)
+SYCL_ADD_UNSIGNED_vec(short)
+SYCL_ADD_UNSIGNED_vec(long)
 
-SYCL_ADD_UNSIGNED_CL_TYPE(int)
-SYCL_ADD_UNSIGNED_CL_TYPE(char)
-SYCL_ADD_UNSIGNED_CL_TYPE(short)
-SYCL_ADD_UNSIGNED_CL_TYPE(long)
-
-#undef SYCL_ADD_SIGNED_CL_TYPE
-#undef SYCL_ADD_UNSIGNED_CL_TYPE
-#undef SYCL_CL_TYPE_INHERIT
-#undef SYCL_CL_TYPE_SIGNED
-#undef SYCL_CL_TYPE_UNSIGNED
+#undef SYCL_ADD_SIGNED_vec
+#undef SYCL_ADD_UNSIGNED_vec
+#undef SYCL_VEC_INHERIT
+#undef SYCL_VEC_SIGNED
+#undef SYCL_VEC_UNSIGNED
 
 } // namespace sycl
 } // namespace cl
