@@ -73,9 +73,9 @@ public:
 		// Up-sweep
 		uint1 offset = 1;
 		SYCL_WHILE(offset < N)
-			SYCL_BEGIN{
+			SYCL_BEGIN {
 			SYCL_IF(LID % offset == 0)
-			SYCL_BEGIN{
+			SYCL_BEGIN {
 				first = 2 * LID + offset - 1;
 				second = first + offset;
 				localBlock[second] = localBlock[first] + localBlock[second];
@@ -98,9 +98,9 @@ public:
 		// Down-sweep
 		offset = N;
 		SYCL_WHILE(offset > 0)
-		SYCL_BEGIN{
+		SYCL_BEGIN {
 			SYCL_IF(LID % offset == 0)
-			SYCL_BEGIN{
+			SYCL_BEGIN {
 				first = 2 * LID + offset - 1;
 				second = first + offset;
 				tmp = localBlock[second];

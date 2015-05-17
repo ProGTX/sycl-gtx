@@ -35,6 +35,13 @@ public:
 		: counter(), data_ref(generate_name()) {
 		detail::kernel_add(type_name() + ' ' + name + " = " + get_name(n));
 	}
+
+	// TODO: Swizzle methods
+	//swizzled_vec<T, out_dims> swizzle<int s1, ...>();
+#ifdef SYCL_SIMPLE_SWIZZLES
+	swizzled_vec<T, 4> xyzw();
+	...
+#endif // #ifdef SYCL_SIMPLE_SWIZZLES
 };
 
 } // namespace detail
