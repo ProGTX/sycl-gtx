@@ -11,11 +11,11 @@ namespace sycl {
 
 namespace detail {
 
-template <typename dataT, int numElements, bool is_signed>
-class cl_type : public counter<cl_type<dataT, numElements, is_signed>>, public data_ref {
+template <typename dataT, int numElements>
+class cl_type : public counter<cl_type<dataT, numElements>>, public data_ref {
 private:
 	static string_class type_name() {
-		return string_class(is_signed ? "" : "u") + type_string<dataT>() + (numElements == 1 ? "" : std::to_string(numElements));
+		return type_string<dataT>() + (numElements == 1 ? "" : std::to_string(numElements));
 	}
 
 	string_class generate_name() const {
@@ -52,20 +52,20 @@ public:
 		return n * (data_ref&&)elem;			\
 	}
 
-#define SYCL_CL_TYPE_SIGNED(type, numElements)									\
-	class type##numElements : public detail::cl_type<type, numElements, true> {	\
-		using Base = detail::cl_type<type, numElements, true>;					\
-		using data_ref = detail::data_ref;										\
-	public:																		\
-		SYCL_CL_TYPE_INHERIT(type##numElements)									\
+#define SYCL_CL_TYPE_SIGNED(type, numElements)								\
+	class type##numElements : public detail::cl_type<type, numElements> {	\
+		using Base = detail::cl_type<type, numElements>;					\
+		using data_ref = detail::data_ref;									\
+	public:																	\
+		SYCL_CL_TYPE_INHERIT(type##numElements)								\
 	};
 
-#define SYCL_CL_TYPE_UNSIGNED(type, numElements)									\
-	class u##type##numElements : public detail::cl_type<type, numElements, false> {	\
-		using Base = detail::cl_type<type, numElements, false>;						\
-		using data_ref = detail::data_ref;											\
-	public:																			\
-		SYCL_CL_TYPE_INHERIT(u##type##numElements)									\
+#define SYCL_CL_TYPE_UNSIGNED(type, numElements)										\
+	class u##type##numElements : public detail::cl_type<unsigned type, numElements> {	\
+		using Base = detail::cl_type<unsigned type, numElements>;						\
+		using data_ref = detail::data_ref;												\
+	public:																				\
+		SYCL_CL_TYPE_INHERIT(u##type##numElements)										\
 	};
 
 SYCL_CL_TYPE_SIGNED(int, 1)
