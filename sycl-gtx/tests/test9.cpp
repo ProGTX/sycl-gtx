@@ -93,8 +93,7 @@ public:
 		})
 		index.barrier(access::fence_space::local);
 
-		// TODO: Need to make this generic
-		uint1 tmp;
+		vec<T, 1> tmp;
 
 		// Down-sweep
 		offset = N;
@@ -130,7 +129,8 @@ bool test9() {
 		const auto group_size = myQueue.get_device().get_info<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
 		const auto size = group_size * 2;
 
-		buffer<float> data(size);
+		using type = double;
+		buffer<type> data(size);
 
 		// Init
 		command_group(myQueue, [&]() {
@@ -145,7 +145,7 @@ bool test9() {
 			// TODO: Extend for large arrays
 			parallel_for<>(
 				nd_range<1>(size / 2, group_size),
-				prefix_sum_kernel<float>(data, group_size)
+				prefix_sum_kernel<type>(data, group_size)
 			);
 		});
 
