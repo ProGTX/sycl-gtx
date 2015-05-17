@@ -160,13 +160,28 @@ bool test9() {
 		const auto group_size = myQueue.get_device().get_info<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
 		const auto size = group_size * 2;
 		size_t N = size;
-
 		using type = double;
-		buffer<type> data(size);
+
+		// Calculate required number of buffer levels
+		N = size;
+		size_t number_levels = 1;
+		while(N > 0) {
+			N /= 2 * group_size;
+			++number_levels;
+		}
+
+		// Create buffers
+		vector_class<buffer<type>> data;
+		data.reserve(number_levels);
+		N = size;
+		for(size_t i = 0; i < number_levels; ++i) {
+			data.emplace_back(N);
+			N = std::max(N / (2 * group_size), group_size);
+		}
 
 		// Init
 		command_group(myQueue, [&]() {
-			auto d = data.get_access<access::write>();
+			auto d = data[0].get_access<access::write>();
 
 			parallel_for<>(range<1>(size), [=](id<1> index) {
 				d[index] = index;
@@ -174,18 +189,21 @@ bool test9() {
 		});
 
 		command_group(myQueue, [&]() {
-			// TODO: Extend for large arrays
+			N = size;
+
 			parallel_for<>(
 				nd_range<1>(N / 2, group_size),
-				prefix_sum_kernel<type>(data, group_size)
+				prefix_sum_kernel<type>(data[0], group_size)
 			);
 
 			if(N <= group_size * 2) {
 				return;
 			}
+
+			// TODO: Extend for large arrays
 		});
 
-		return check_sum(data);
+		return check_sum(data[0]);
 	}
 
 	return true;
