@@ -44,18 +44,18 @@ device device_selector::select_device() const {
 	return select_device(get_platform().get_devices(type));
 }
 
-int default_selector::operator()(device dev) const {
+int default_selector::operator()(const device& dev) const {
 	return 0;
 }
 
-int gpu_selector::operator()(device dev) const {
+int gpu_selector::operator()(const device& dev) const {
 	return 0;
 }
 
-int cpu_selector::operator()(device dev) const {
+int cpu_selector::operator()(const device& dev) const {
 	return 0;
 }
 
-int host_selector::operator()(device dev) const {
+int host_selector::operator()(const device& dev) const {
 	return 0;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.5.1 Device selection class
+// 3.3.1 Device selection class
 
 #include "../common.h"
 
@@ -31,7 +31,7 @@ public:
 
 	device_selector() : device_selector(CL_DEVICE_TYPE_ALL) {}
 	device select_device() const;
-	virtual int operator()(device dev) const = 0;
+	virtual int operator()(const device& dev) const = 0;
 };
 
 // TODO: Built-in device selectors
@@ -41,7 +41,7 @@ public:
 struct default_selector : device_selector {
 	default_selector()
 		: device_selector(CL_DEVICE_TYPE_DEFAULT) {}
-	virtual int operator()(device dev) const override;
+	virtual int operator()(const device& dev) const override;
 };
 
 // Select devices according to device type CL_DEVICE_TYPE_GPU from all the available OpenCL devices.
@@ -49,7 +49,7 @@ struct default_selector : device_selector {
 struct gpu_selector : device_selector {
 	gpu_selector()
 		: device_selector(CL_DEVICE_TYPE_GPU) {}
-	virtual int operator()(device dev) const override;
+	virtual int operator()(const device& dev) const override;
 };
 
 // Select devices according to device type CL_DEVICE_TYPE_CPU from all the available devices and heuristics.
@@ -57,14 +57,14 @@ struct gpu_selector : device_selector {
 struct cpu_selector : device_selector {
 	cpu_selector()
 		: device_selector(CL_DEVICE_TYPE_CPU) {}
-	virtual int operator()(device dev) const override;
+	virtual int operator()(const device& dev) const override;
 };
 
 // Selects the SYCL host CPU device that does not require an OpenCL runtime.
 struct host_selector : device_selector {
 	host_selector()
 		: device_selector(CL_DEVICE_TYPE_DEFAULT) {}
-	virtual int operator()(device dev) const override;
+	virtual int operator()(const device& dev) const override;
 };
 
 } // namespace sycl
