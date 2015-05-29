@@ -2,7 +2,6 @@
 
 // 3.5.1 Device selection class
 
-#include <memory>
 #include "../common.h"
 
 namespace cl {
@@ -28,7 +27,7 @@ protected:
 		: type(type)
 	{}
 public:
-	static const std::unique_ptr<device_selector> default;
+	static const unique_ptr_class<device_selector> default;
 
 	device_selector() : device_selector(CL_DEVICE_TYPE_ALL) {}
 	device select_device() const;

@@ -6,7 +6,6 @@
 #include "../common.h"
 #include "../debug.h"
 #include "../error_code.h"
-#include <memory>
 #include <functional>
 
 namespace cl {
@@ -122,7 +121,7 @@ public:
 
 class handler {
 private:
-	std::shared_ptr<throw_handler> hidden_hndlr;
+	shared_ptr_class<throw_handler> hidden_hndlr;
 	bool is_async = false;
 	context* thrower = nullptr;
 

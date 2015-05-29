@@ -5,7 +5,7 @@
 
 using namespace cl::sycl;
 
-const std::unique_ptr<device_selector> device_selector::default = std::unique_ptr<device_selector>(new default_selector());
+const unique_ptr_class<device_selector> device_selector::default = unique_ptr_class<device_selector>(new default_selector());
 
 device device_selector::select_device(vector_class<device> devices) const {
 	int best_id = -1;

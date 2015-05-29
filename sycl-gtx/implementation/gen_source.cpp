@@ -104,13 +104,13 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 		++i;
 	}
 
-	*kern = std::unique_ptr<kernel>(new kernel(k));
+	*kern = unique_ptr_class<kernel>(new kernel(k));
 }
 
 // Note: MSVC2013 editor reports errors on command::group_::add, but the code compiles and links
 
 detail::shared_unique<kernel> source::compile() const {
-	auto kern = detail::shared_unique<kernel>(new std::unique_ptr<kernel>());
+	auto kern = detail::shared_unique<kernel>(new unique_ptr_class<kernel>());
 	command::group_::add(compile_command, __func__, *this, kern);
 	return kern;
 }

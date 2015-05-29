@@ -9,7 +9,6 @@
 #include "platform.h"
 #include "../debug.h"
 #include "../common.h"
-#include <memory>
 
 namespace cl {
 namespace sycl {

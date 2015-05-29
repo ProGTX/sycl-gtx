@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <CL/cl.h>
 
 #if _MSC_VER <= 1800
@@ -15,18 +14,28 @@
 #define SYCL_THREAD_LOCAL thread_local
 #endif
 
-// 3.3 Vector, string and function classes in interfaces
+// 3.2 C++ Standard library classes required for the interface
 
 #ifndef CL_SYCL_NO_STD_VECTOR
 #include <vector>
 #endif
-
 #ifndef CL_SYCL_NO_STD_STRING
 #include <string>
 #endif
-
 #ifndef CL_SYCL_NO_STD_FUNCTION
 #include <functional>
+#endif
+#ifndef CL_SYCL_NO_STD_MUTEX
+#include <mutex>
+#endif
+#ifndef CL_SYCL_NO_UNIQUE_PTR
+#include <memory>
+#endif
+#ifndef CL_SYCL_NO_SHARED_PTR
+#include <memory>
+#endif
+#ifndef CL_SYCL_NO_WEAK_PTR
+#include <memory>
 #endif
 
 namespace cl {
@@ -68,6 +77,22 @@ namespace sycl {
 #endif
 #endif
 
+#ifndef CL_SYCL_NO_STD_MUTEX
+	using mutex_class = ::std::mutex;
+#endif
+#ifndef CL_SYCL_NO_UNIQUE_PTR
+	template <class T, class D = ::std::default_delete<T>>
+	using unique_ptr_class = ::std::unique_ptr<T, D>;
+#endif
+#ifndef CL_SYCL_NO_SHARED_PTR
+	template <class T>
+	using shared_ptr_class = ::std::shared_ptr<T>;
+#endif
+#ifndef CL_SYCL_NO_WEAK_PTR
+	template <class T>
+	using weak_ptr_class = ::std::weak_ptr<T>;
+#endif
+
 
 namespace detail {
 
@@ -85,7 +110,7 @@ bool has_extension(T* sycl_class, const string_class extension_name) {
 }
 
 template <class T>
-using shared_unique = std::shared_ptr<std::unique_ptr<T>>;
+using shared_unique = shared_ptr_class<unique_ptr_class<T>>;
 
 template <typename DataType>
 static string_class type_string();

@@ -11,7 +11,6 @@
 #include "../common.h"
 #include "../debug.h"
 #include <algorithm>
-#include <memory>
 #include <vector>
 
 
@@ -62,7 +61,7 @@ struct buffer_access {
 template <typename DataType, int dimensions>
 class buffer_ : public buffer_base {
 protected:
-	using ptr_t = std::shared_ptr<DataType>;
+	using ptr_t = shared_ptr_class<DataType>;
 
 	range<dimensions> rang;
 	ptr_t host_data;

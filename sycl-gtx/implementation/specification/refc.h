@@ -3,8 +3,8 @@
 // 2.5.8 Managing object lifetimes
 // "All OpenCL objects encapsulated in SYCL objects will be reference-counted and destroyed once all references have been released."
 
+#include "../common.h"
 #include <CL/cl.h>
-#include <memory>
 
 namespace cl {
 namespace sycl {
@@ -20,7 +20,7 @@ cl_int CL_API_CALL cl_do_nothing(CL_Type) {
 }
 
 template<class CL_Type>
-using refc_ptr = std::shared_ptr<typename std::remove_pointer<CL_Type>::type>;
+using refc_ptr = shared_ptr_class<typename std::remove_pointer<CL_Type>::type>;
 
 template <class CL_Type, cl_resource_f<CL_Type> retain = cl_do_nothing<CL_Type>, cl_resource_f<CL_Type> release = &cl_do_nothing<CL_Type>>
 class refc : public refc_ptr<CL_Type> {
