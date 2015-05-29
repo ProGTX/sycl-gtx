@@ -16,11 +16,6 @@ namespace sycl {
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
 private:
-	friend struct detail::error::report;
-
-	static detail::error::handler& default_error;
-	detail::error::handler handler = default_error;
-
 	detail::refc<cl_command_queue, clRetainCommandQueue, clReleaseCommandQueue> command_q;
 	device dev;
 	context ctx;
@@ -62,13 +57,12 @@ public:
 	queue(const queue&) = default;
 #if MSVC_LOW
 	queue(queue&& move)
-		: SYCL_MOVE_INIT(command_q), SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(dev), SYCL_MOVE_INIT(handler) {}
+		: SYCL_MOVE_INIT(command_q), SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(dev) {}
 	friend void swap(queue& first, queue& second) {
 		using std::swap;
 		SYCL_SWAP(command_q);
 		SYCL_SWAP(ctx);
 		SYCL_SWAP(dev);
-		SYCL_SWAP(handler);
 	}
 #else
 	queue(queue&&) = default;
@@ -94,7 +88,7 @@ public:
 		parameter_t<name> param_value;
 		auto q = command_q.get();
 		auto error_code = clGetCommandQueueInfo(q, name, sizeof(parameter_t<name>), &param_value, nullptr);
-		handler.report(error_code);
+		detail::error::report(error_code);
 		return param_value;
 	}
 

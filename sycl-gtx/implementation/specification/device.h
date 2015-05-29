@@ -22,7 +22,6 @@ class device {
 private:
 	detail::refc<cl_device_id, clRetainDevice, clReleaseDevice> device_id;
 	platform platfrm;
-	detail::error::handler handler;
 
 	device(cl_device_id device_id, device_selector* selector);
 public:
@@ -40,12 +39,11 @@ public:
 	device(const device&) = default;
 #if MSVC_LOW
 	device(device&& move)
-		: SYCL_MOVE_INIT(device_id), SYCL_MOVE_INIT(platfrm), SYCL_MOVE_INIT(handler) {}
+		: SYCL_MOVE_INIT(device_id), SYCL_MOVE_INIT(platfrm) {}
 	friend void swap(device& first, device& second) {
 		using std::swap;
 		SYCL_SWAP(device_id);
 		SYCL_SWAP(platfrm);
-		SYCL_SWAP(handler);
 	}
 #else
 	device(device&&) = default;
@@ -79,7 +77,7 @@ private:
 			auto did = dev->device_id.get();
 			real_return param_value;
 			auto error_code = clGetDeviceInfo(did, name, sizeof(real_return), &param_value, nullptr);
-			dev->handler.report(error_code);
+			detail::error::report(error_code);
 			return param_value;
 		}
 	};
@@ -93,7 +91,7 @@ private:
 			std::size_t actual_size;
 			std::size_t type_size = sizeof(return_type);
 			auto error_code = clGetDeviceInfo(did, name, BUFFER_SIZE * type_size, param_value, &actual_size);
-			dev->handler.report(error_code);
+			detail::error::report(error_code);
 			return real_return(param_value, param_value + actual_size / type_size);
 		}
 	};
@@ -105,7 +103,7 @@ private:
 			static const int BUFFER_SIZE = 8192;
 			char param_value[BUFFER_SIZE];
 			auto error_code = clGetDeviceInfo(did, name, BUFFER_SIZE * sizeof(char), param_value, nullptr);
-			dev->handler.report(error_code);
+			detail::error::report(error_code);
 			return real_return(param_value);
 		}
 	};
@@ -121,7 +119,7 @@ public:
 namespace detail {
 
 vector_class<device> get_devices(
-	cl_device_type device_type, cl_platform_id platform_id, const error::handler& handler
+	cl_device_type device_type, cl_platform_id platform_id
 );
 
 } // namespace detail

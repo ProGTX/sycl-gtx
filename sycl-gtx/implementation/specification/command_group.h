@@ -128,7 +128,7 @@ public:
 	}
 
 	static bool in_scope();
-	static void check_scope(error::handler& handler = error::handler::default);
+	static void check_scope();
 
 	using command_f = info::command_f;
 };

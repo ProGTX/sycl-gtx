@@ -26,10 +26,10 @@ namespace kernel_ {
 class program {
 protected:
 	friend class detail::kernel_::source;
-	program(string_class source, queue* q);
 
 	detail::refc<cl_program, clRetainProgram, clReleaseProgram> prog;
-	detail::error::handler handler;
+
+	program(string_class source, queue* q);
 public:
 	// Creates an empty program object for all devices associated with context
 	program(const context& context) {}

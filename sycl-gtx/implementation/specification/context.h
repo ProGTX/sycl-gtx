@@ -29,6 +29,7 @@ class context {
 private:
 	detail::refc<cl_context, clRetainContext, clReleaseContext> ctx;
 	vector_class<device> target_devices;
+	async_handler asyncHandler;
 
 	// Master constructor
 	context(
@@ -62,11 +63,12 @@ public:
 	context(const context&) = default;
 #if MSVC_LOW
 	context(context&& move)
-		: SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(target_devices) {}
+		: SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(target_devices), SYCL_MOVE_INIT(asyncHandler) {}
 	friend void swap(context& first, context& second) {
 		using std::swap;
 		SYCL_SWAP(ctx);
 		SYCL_SWAP(target_devices);
+		SYCL_SWAP(asyncHandler);
 	}
 #else
 	context(context&&) = default;

@@ -16,5 +16,5 @@ void kernel::enqueue_task(queue* q) const {
 		// TODO: Events
 		0, nullptr, nullptr
 	);
-	detail::error::report(q, error_code);
+	detail::error::report(error_code);
 }

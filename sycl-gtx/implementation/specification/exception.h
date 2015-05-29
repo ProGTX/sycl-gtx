@@ -4,6 +4,7 @@
 
 #include "../common.h"
 #include "../error_code.h"
+#include <exception>
 
 namespace cl {
 namespace sycl {
@@ -12,13 +13,13 @@ namespace sycl {
 class context;
 namespace detail {
 namespace error {
-	class handler;
+	struct thrower;
 }
 }
 
 struct exception {
 protected:
-	friend class detail::error::handler;
+	friend struct detail::error::thrower;
 	string_class description;
 	context* thrower;
 
@@ -29,7 +30,7 @@ public:
 		: exception("Undefined SYCL Error") {}
 
 	// Returns a descriptive string for the error, if available.
-	string_class what() {
+	string_class what() const {
 		return description;
 	}
 
@@ -42,7 +43,7 @@ public:
 
 struct cl_exception : exception {
 private:
-	friend class detail::error::handler;
+	friend struct detail::error::thrower;
 	cl_int error_code;
 
 	cl_exception(cl_int error_code, context* thrower = nullptr)
@@ -67,7 +68,7 @@ using exception_ptr = std::exception_ptr;
 // TODO: Used as a container for a list of asynchronous exceptions
 class exception_list {
 private:
-	using list_t = vector_class<exception_ptr>;
+	using list_t = vector_class<async_exception>;
 	list_t list;
 
 public:

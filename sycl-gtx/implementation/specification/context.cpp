@@ -12,7 +12,7 @@ context::context(
 	vector_class<device> deviceList,
 	const platform* plt,
 	const device_selector& deviceSelector
-) : ctx(c), target_devices(deviceList) {
+) : ctx(c), target_devices(deviceList), asyncHandler(asyncHandler) {
 	if(c == nullptr) {
 		cl_uint num_devices = target_devices.size();
 

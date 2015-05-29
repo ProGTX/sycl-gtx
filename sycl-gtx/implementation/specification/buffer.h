@@ -38,7 +38,6 @@ class buffer_base {
 protected:
 	friend class kernel_::source;
 
-	detail::error::handler handler;
 	detail::refc<cl_mem, clRetainMemObject, clReleaseMemObject> device_data;
 
 	void create_accessor_command();
@@ -154,7 +153,7 @@ private:
 		cl_int error_code;
 		const cl_mem_flags all_flags = FLAGS | ((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR);
 		buffer->device_data = clCreateBuffer(q->get_context().get(), all_flags, buffer->get_size(), buffer->host_data.get(), &error_code);
-		error::report(q, error_code);
+		detail::error::report(error_code);
 	}
 
 	template<cl_mem_flags FLAGS>
@@ -167,7 +166,7 @@ private:
 
 	void check_write() {
 		if(is_read_only) {
-			handler.report(error::code::TRYING_TO_WRITE_READ_ONLY_BUFFER);
+			detail::error::report(error::code::TRYING_TO_WRITE_READ_ONLY_BUFFER);
 		}
 	}
 
@@ -184,7 +183,7 @@ public:
 	template<access::mode mode, access::target target = access::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access() {
 		if(target != access::host_buffer) {
-			command::group_::check_scope(handler);
+			command::group_::check_scope();
 			init<CL_MEM_READ_ONLY>();
 		}
 		return create_accessor<mode, target>();
@@ -195,7 +194,7 @@ public:
 	template<>													\
 	accessor<DataType, dimensions, mode, target> get_access() {	\
 		if(target != access::host_buffer) {						\
-			command::group_::check_scope(handler);				\
+			command::group_::check_scope();						\
 		}														\
 		code;													\
 		if(target != access::host_buffer) {						\
@@ -223,7 +222,7 @@ private:
 			// TODO: Events
 			host_data.get(), 0, nullptr, nullptr
 		);
-		error::report(q, error_code);
+		detail::error::report(error_code);
 	}
 
 protected:
@@ -235,7 +234,7 @@ protected:
 		parameter_t<name> param_value;
 		auto mem = device_data.get();
 		auto error_code = clGetMemObjectInfo(mem, name, sizeof(parameter_t<name>), &param_value, nullptr);
-		handler.report(error_code);
+		detail::error::report(error_code);
 		return param_value;
 	}
 };

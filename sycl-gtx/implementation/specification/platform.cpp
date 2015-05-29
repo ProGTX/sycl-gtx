@@ -29,15 +29,14 @@ vector_class<platform> platform::get_platforms() {
 		cl_platform_id platform_ids[MAX_PLATFORMS];
 		cl_uint num_platforms;
 		auto error_code = clGetPlatformIDs(MAX_PLATFORMS, platform_ids, &num_platforms);
-		auto handler = detail::error::handler();
-		handler.report(error_code);
+		detail::error::report(error_code);
 		platforms = vector_class<platform>(platform_ids, platform_ids + num_platforms);
 	}
 	return platforms;
 }
 
 vector_class<device> platform::get_devices(info::device_type device_type) const {
-	return detail::get_devices((cl_device_type)device_type, platform_id.get(), handler);
+	return detail::get_devices((cl_device_type)device_type, platform_id.get());
 }
 
 // TODO: Check if SYCL running in Host Mode

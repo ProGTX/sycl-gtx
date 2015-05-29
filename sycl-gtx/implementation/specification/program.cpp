@@ -14,13 +14,13 @@ program::program(string_class source, queue* q) {
 	auto Device = q->get_device().get();
 
 	cl_program p = clCreateProgramWithSource(Context, 1, &src, &length, &error_code);
-	handler.report(error_code);
+	detail::error::report(error_code);
 
 	prog = p;
 
 	error_code = clBuildProgram(p, 1, &Device, nullptr, nullptr, nullptr);
 	try {
-		handler.report(error_code);
+		detail::error::report(error_code);
 	}
 	catch(::cl::sycl::exception& e) {
 		// http://stackoverflow.com/a/9467325/793006

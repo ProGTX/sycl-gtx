@@ -19,7 +19,6 @@ class device;
 class platform {
 private:
 	detail::refc<cl_platform_id> platform_id;
-	detail::error::handler handler;
 
 	platform(cl_platform_id platform_id, device_selector& dev_selector);
 
@@ -51,7 +50,7 @@ public:
 		char buffer[BUFFER_SIZE];
 		auto pid = platform_id.get();
 		auto error_code = clGetPlatformInfo(pid, name, BUFFER_SIZE, buffer, nullptr);
-		handler.report(error_code);
+		detail::error::report(error_code);
 		return string_class(buffer);
 	}
 

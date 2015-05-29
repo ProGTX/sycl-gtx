@@ -88,18 +88,18 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 
 	cl_int error_code;
 	cl_kernel k = clCreateKernel(p.get(), src.kernel_name.c_str(), &error_code);
-	error::report(q, error_code);
+	detail::error::report(error_code);
 
 	int i = 0;
 	for(auto& acc : src.resources) {
 		if(acc.second.acc.target == access::local) {
 			error_code = clSetKernelArg(k, i, acc.second.size, nullptr);
-			error::report(q, error_code);
+			detail::error::report(error_code);
 		}
 		else {
 			auto mem = acc.second.acc.data->device_data.get();
 			error_code = clSetKernelArg(k, i, acc.second.size, &mem);
-			error::report(q, error_code);
+			detail::error::report(error_code);
 		}
 		++i;
 	}

@@ -67,7 +67,7 @@ private:
 			auto k = kern->get();
 			real_return param_value;
 			auto error_code = clGetKernelInfo(k, name, sizeof(cl_uint), &param_value, nullptr);
-			//kern->handler.report(contex, error_code);
+			detail::error::report(error_code);
 			return param_value;
 		}
 	};
@@ -79,7 +79,7 @@ private:
 			static const int BUFFER_SIZE = 8192;
 			char param_value[BUFFER_SIZE];
 			auto error_code = clGetKernelInfo(k, name, sizeof(char) * BUFFER_SIZE, param_value, nullptr);
-			//kern->handler.report(error_code);
+			detail::error::report(error_code);
 			return real_return(param_value);
 		}
 	};
@@ -116,7 +116,7 @@ private:
 			// TODO: Events
 			0, nullptr, nullptr
 		);
-		detail::error::report(q, error_code);
+		detail::error::report(error_code);
 	}
 
 	template <int dimensions>
@@ -142,7 +142,7 @@ private:
 			// TODO: Events
 			0, nullptr, nullptr
 		);
-		detail::error::report(q, error_code);
+		detail::error::report(error_code);
 	}
 };
 

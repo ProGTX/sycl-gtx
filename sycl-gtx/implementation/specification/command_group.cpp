@@ -125,8 +125,8 @@ bool command::group_::in_scope() {
 	return last != nullptr;
 }
 
-void command::group_::check_scope(error::handler& handler) {
+void command::group_::check_scope() {
 	if(!in_scope()) {
-		handler.report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
+		detail::error::report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
 	}
 }
