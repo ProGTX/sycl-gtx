@@ -8,6 +8,15 @@ namespace cl {
 namespace sycl {
 namespace info {
 
+// C.1 Platform Information Descriptors
+enum class platform : unsigned int {
+	profile,
+	version,
+	name,
+	vendor,
+	extensions
+};
+
 // TODO: C.3 Device Information Descriptors
 enum class device_type : unsigned int {
 	cpu			= CL_DEVICE_TYPE_CPU,

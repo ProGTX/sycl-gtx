@@ -8,14 +8,14 @@ using namespace cl::sycl;
 
 vector_class<platform> platform::platforms;
 
-platform::platform(cl_platform_id platform_id, const device_selector& dev_selector)
+platform::platform(cl_platform_id platform_id, device_selector& dev_selector)
 	: platform_id(platform_id) {}
 
 platform::platform()
 	: platform(nullptr) {}
 platform::platform(cl_platform_id platform_id)
 	: platform(platform_id, *device_selector::default.get()) {}
-platform::platform(const device_selector& dev_selector)
+platform::platform(device_selector& dev_selector)
 	: platform(nullptr, dev_selector) {}
 
 cl_platform_id platform::get() const {
@@ -41,11 +41,11 @@ vector_class<device> platform::get_devices(info::device_type device_type) const 
 }
 
 // TODO: Check if SYCL running in Host Mode
-bool platform::is_host() {
+bool platform::is_host() const {
 	DSELF() << "not implemented";
-	return true;
+	return false;
 }
 
-bool platform::has_extension(const string_class extension_name) {
+bool platform::has_extension(const string_class extension_name) const {
 	return detail::has_extension<CL_PLATFORM_EXTENSIONS>(this, extension_name);
 }

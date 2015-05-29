@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.2.5 Queue class
+// 3.3.5 Queue class
 
 #include "context.h"
 #include "device.h"

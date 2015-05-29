@@ -13,7 +13,7 @@
 namespace cl {
 namespace sycl {
 
-// 3.5.3 Device class
+// 3.3.4 Device class
 // Encapsulates a cl_device_id and a cl_platform_id
 // In the case of constructing a device instance from an existing cl_device_id the system triggers a clRetainDevice.
 // On destruction a call to clReleaseDevice is triggered.
@@ -24,17 +24,17 @@ private:
 	platform platfrm;
 	detail::error::handler handler;
 
-	device(cl_device_id device_id, const device_selector* selector);
+	device(cl_device_id device_id, device_selector* selector);
 public:
 	// Default constructor for the device.
 	// It choses a device using default selector.
 	device();
 
 	// Constructs a device class instance using cl device_id of the OpenCL device.
-	device(cl_device_id device_id);
+	explicit device(cl_device_id device_id);
 
 	// Constructs a device class instance using the device selector provided.
-	device(const device_selector& selector);
+	explicit device(device_selector& selector);
 
 	// Copy and move semantics
 	device(const device&) = default;

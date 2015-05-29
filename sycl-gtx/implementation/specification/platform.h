@@ -21,7 +21,7 @@ private:
 	detail::refc<cl_platform_id> platform_id;
 	detail::error::handler handler;
 
-	platform(cl_platform_id platform_id, const device_selector& dev_selector);
+	platform(cl_platform_id platform_id, device_selector& dev_selector);
 
 	static vector_class<platform> platforms;
 public:
@@ -30,24 +30,21 @@ public:
 	platform();
 
 	// Construct a platform object from an OpenCL platform id.
-	platform(cl_platform_id platform_id);
+	explicit platform(cl_platform_id platform_id);
 
 	// Construct a platform object from the device returned by a device selector of the user’s choice.
-	platform(const device_selector& dev_selector);
+	explicit platform(device_selector& dev_selector);
 
-	// Returns the cl platform id of the underlying OpenCL platform.
-	// If the platform is not a valid OpenCL platform, for example it is the SYCL host,
-	// a null cl platform id will be returned.
+	// The OpenCL cl_platform_id or nullptr for SYCL host
 	cl_platform_id get() const;
 
-	// Returns all available platforms in the system.
+	// Returns all the available OpenCL platforms and the SYCL host platform
 	static vector_class<platform> get_platforms();
 
 	// Returns the devices available in this platform
 	vector_class<device> get_devices(info::device_type = info::device_type::all) const;
 
-	// Direct equivalent of the OpenCL C API.
-	// All parameters are char arrays, so the function is simplified
+	// Returns the corresponding descriptor information for all SYCL platforms (OpenCL and host)
 	template<cl_int name>
 	typename string_class get_info() const {
 		static const int BUFFER_SIZE = 8192;
@@ -58,8 +55,11 @@ public:
 		return string_class(buffer);
 	}
 
-	bool is_host();
-	bool has_extension(const string_class extension_name);
+	// True if the platform is host
+	bool is_host() const;
+
+	// Returns the available extensions for all SYCL platforms( OpenCL and host)
+	bool has_extension(const string_class extension_name) const;
 };
 
 } // namespace sycl

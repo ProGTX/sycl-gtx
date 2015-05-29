@@ -3,7 +3,7 @@
 
 using namespace cl::sycl;
 
-device::device(cl_device_id device_id, const device_selector* dev_sel)
+device::device(cl_device_id device_id, device_selector* dev_sel)
 	: device_id(device_id), platfrm(*dev_sel) {
 	if(device_id != nullptr) {
 		auto error_code = clRetainDevice(device_id);
@@ -20,7 +20,7 @@ device::device()
 device::device(cl_device_id device_id)
 	: device(device_id, nullptr) {}
 
-device::device(const device_selector& dev_sel)
+device::device(device_selector& dev_sel)
 	: device(nullptr, &dev_sel) {}
 
 cl_device_id device::get() const {

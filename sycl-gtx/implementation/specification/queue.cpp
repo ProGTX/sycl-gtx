@@ -38,7 +38,8 @@ queue::queue(cl_command_queue cl_queue)
 }
 
 queue::queue(const device_selector& selector)
-	: handler(ctx), dev(selector), ctx(dev) {
+	// TODO: Specification requires const selector in queue and non-const in device
+	: handler(ctx), dev(const_cast<device_selector&>(selector)), ctx(dev) {
 	create_queue();
 }
 
