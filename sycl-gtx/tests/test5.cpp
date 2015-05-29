@@ -41,7 +41,7 @@ bool test5() {
 		buffer<int> buf(data, size);
 		int random_num = 0;
 
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			auto ptr = buf.get_access<access::read_write>();
 
 			auto functor = example_functor(ptr);

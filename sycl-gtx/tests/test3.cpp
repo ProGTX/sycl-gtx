@@ -23,7 +23,7 @@ bool test3() {
 		}
 
 		// Rotate A and store result to B
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			auto a = A.get_access<access::read>();
 			auto b = B.get_access<access::write>();
 

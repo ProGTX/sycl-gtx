@@ -5,6 +5,7 @@
 #include "context.h"
 #include "device.h"
 #include "error_handler.h"
+#include "event.h"
 #include "param_traits.h"
 #include "refc.h"
 #include "../common.h"
@@ -12,6 +13,14 @@
 
 namespace cl {
 namespace sycl {
+
+// TODO
+class handler_event {
+public:
+	event get_kernel() const;
+	event get_complete() const;
+	event get_end() const;
+};
 
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
@@ -61,6 +70,8 @@ public:
 	queue(queue&&) = default;
 #endif
 
+	bool is_host();
+
 	// TODO: Returns the underlying OpenCL command queue after doing a retain.
 	// Afterwards it needs to be manually released.
 	cl_command_queue get();
@@ -96,6 +107,17 @@ public:
 
 	// Performs a blocking wait for the completion of all enqueued tasks in the queue.
 	void wait_and_throw();
+
+	// TODO
+	template <typename T>
+	handler_event submit(T cgf) {
+		command_group(*this, cgf);
+		return handler_event();
+	}
+
+	// TODO
+	template <typename T>
+	handler_event submit(T cgf, queue &secondaryQueue);
 };
 
 } // namespace sycl

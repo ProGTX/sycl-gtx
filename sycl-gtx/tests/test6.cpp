@@ -18,7 +18,7 @@ bool test6() {
 		auto Q = &pong;
 
 		// Init
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			auto p = P->get_access<access::write>();
 
 			parallel_for<>(range<1>(size), [=](id<1> index) {
@@ -27,7 +27,7 @@ bool test6() {
 		});
 
 		for(unsigned int N = size / 2; N > 0; N /= 2 * group_size) {
-			command_group(myQueue, [&]() {
+			myQueue.submit([&]() {
 				auto input = P->get_access<access::read>();
 				auto output = Q->get_access<access::write>();
 				auto local = accessor<float, 1, access::read_write, access::local>(group_size);

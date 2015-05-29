@@ -31,7 +31,7 @@ bool test1() {
 		buffer<int> d_c(h_c);
 		buffer<int> d_r(h_r);
 		queue myQueue;
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			// Data accessors
 			auto a = d_a.get_access<access::read>();
 			auto b = d_b.get_access<access::read>();

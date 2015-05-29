@@ -63,6 +63,10 @@ queue::~queue() {
 	throw_asynchronous();
 }
 
+bool queue::is_host() {
+	return dev.is_host();
+}
+
 cl_command_queue queue::get() {
 	return command_q.get();
 }

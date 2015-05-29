@@ -12,7 +12,7 @@ bool test4() {
 
 		buffer<int> V(N);
 
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			auto v = V.get_access<access::read_write>();
 
 			// Init

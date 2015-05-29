@@ -25,7 +25,7 @@ bool test8() {
 		buffer<int, 1> resultBuf(data, size);
 
 		// create a command_group to issue commands to the queue
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			// request access to the buffer
 			auto writeResult = resultBuf.get_access<access::write>();
 

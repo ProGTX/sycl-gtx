@@ -20,7 +20,7 @@ bool test2() {
 		buffer<int> resultBuf(&result, 1);
 
 		// create some commands for our queue
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			// request access to our buffer
 			auto writeResult = resultBuf.get_access<access::write>();
 

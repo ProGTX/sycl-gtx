@@ -21,7 +21,7 @@ bool test7() {
 		buffer<float, 2> c({ N, M });
 
 		// Launch a first asynchronous kernel to initialize a
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			// The kernel writes a, so get a write accessor on it
 			auto A = a.get_access<access::write>();
 
@@ -32,7 +32,7 @@ bool test7() {
 		});
 
 		// Launch an asynchronous kernel to initialize b
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			// The kernel write b, so get a write accessor on it
 			auto B = b.get_access<access::write>();
 			// From the access pattern above,
@@ -46,7 +46,7 @@ bool test7() {
 		});
 
 		// Launch an asynchronous kernel to compute matrix addition c = a + b
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			// In the kernel a and b are read, but c is written
 			auto A = a.get_access<access::read>();
 			auto B = b.get_access<access::read>();

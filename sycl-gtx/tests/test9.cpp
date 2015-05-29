@@ -180,7 +180,7 @@ bool test9() {
 		}
 
 		// Init
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			auto d = data[0].get_access<access::write>();
 
 			parallel_for<>(range<1>(size), [=](id<1> index) {
@@ -188,7 +188,7 @@ bool test9() {
 			});
 		});
 
-		command_group(myQueue, [&]() {
+		myQueue.submit([&]() {
 			N = size;
 
 			parallel_for<>(
