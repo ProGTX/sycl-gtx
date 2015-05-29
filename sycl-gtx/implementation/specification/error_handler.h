@@ -17,8 +17,20 @@ class context;
 
 namespace detail {
 
+// 3.6.1, paragraph 4
+// If an asynchronous error occurs in a queue that has no user-supplied asynchronous error handler object,
+// then no exception is thrown and the error is not available to the user in any specified way.
+// Implementations may provide extra debugging information to users to trap and handle asynchronous errors.
 static const async_handler default_async_handler = [](cl::sycl::exception_list list) {
-	// TODO
+	for(auto& e : list) {
+		// http://www.cplusplus.com/reference/exception/exception_ptr/
+		try {
+			std::rethrow_exception(e);
+		}
+		catch(const std::exception& e) {
+			debug() << e.what();
+		}
+	}
 };
 
 struct sycl_exception : ::cl::sycl::exception {

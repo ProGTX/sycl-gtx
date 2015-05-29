@@ -62,23 +62,34 @@ struct async_exception : exception {
 };
 
 
-// TODO
-using unspecified_t = int;
-using exception_ptr = unspecified_t;
+using exception_ptr = std::exception_ptr;
 
 // TODO: Used as a container for a list of asynchronous exceptions
 class exception_list {
+private:
+	using list_t = vector_class<exception_ptr>;
+	list_t list;
+
 public:
 	using value_type = exception_ptr;
 	using reference = value_type&;
 	using const_reference = const value_type&;
 	using size_type = size_t;
-	using iterator = unspecified_t;
-	using const_iterator = unspecified_t;
+	using iterator = list_t::const_iterator; // TODO: non const
+	using const_iterator = list_t::const_iterator;
 
-	size_t size() const;
-	iterator begin() const; // first asynchronous exception
-	iterator end() const; // refer to past-the-end last asynchronous exception
+	size_t size() const {
+		return list.size();
+	}
+
+	// // first asynchronous exception
+	iterator begin() const {
+		return list.begin();
+	}
+	// refer to past-the-end last asynchronous exception
+	iterator end() const {
+		return list.end();
+	}
 };
 
 using async_handler = function_class<void(cl::sycl::exception_list)>;
