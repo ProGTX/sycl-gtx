@@ -14,8 +14,7 @@ context::context(
 	vector_class<device> target_devices_,
 	const device_selector& dev_sel,
 	detail::error::handler& handler_,
-	platform* plt,
-	context_notify* ctx_notify
+	platform* plt
 ) : ctx(c), handler(handler_), target_devices(target_devices_) {
 	handler.set_thrower(this);
 	if(c == nullptr) {
@@ -32,12 +31,9 @@ context::context(
 			devices.push_back(device_ptr.get());
 		}
 
-		auto pfn_notify = (ctx_notify == nullptr ? nullptr : &context_notify::forward);
 		cl_int error_code;
-		c = clCreateContext(properties, num_devices, devices.data(), pfn_notify, ctx_notify, &error_code);
-		if(pfn_notify == nullptr) {
-			handler.report(error_code);
-		}
+		c = clCreateContext(properties, num_devices, devices.data(), nullptr, nullptr, &error_code);
+		handler.report(error_code);
 		ctx = c;
 	}
 	else {

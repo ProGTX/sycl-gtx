@@ -17,18 +17,6 @@ namespace sycl {
 class platform;
 class program;
 
-// Used as the notification function for contexts.
-class context_notify {
-private:
-	friend class context;
-	static void CL_CALLBACK forward(const char* errinfo, const void* private_info, size_t cb, void* caller) {
-		static_cast<context_notify*>(caller)->operator()(errinfo, private_info, cb);
-	}
-public:
-	virtual void operator()(const string_class errinfo, const void* private_info, size_t cb) = 0;
-	virtual void operator()(program t_program) = 0;
-};
-
 // 2.3.1, point 2
 // Any OpenCL resource that is acquired by the user is attached to a context.
 // A context contains a collection of devices that the host can use
@@ -51,8 +39,7 @@ private:
 		vector_class<device> target_devices = {},
 		const device_selector& dev_sel = *(device_selector::default),
 		detail::error::handler& handler = default_error,
-		platform* plt = nullptr,
-		context_notify* ctx_notify = nullptr
+		platform* plt = nullptr
 	);
 public:
 	// Chooses the context according to the heuristics of the default selector
