@@ -66,7 +66,6 @@ cl_context context::get() const {
 	return ctx.get();
 }
 
-// TODO:
 vector_class<device> context::get_devices() const {
-	return {};
+	return detail::transform_vector<device>(get_info<CL_CONTEXT_DEVICES>());
 }

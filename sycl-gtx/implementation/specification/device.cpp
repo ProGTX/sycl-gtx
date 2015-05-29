@@ -46,24 +46,27 @@ bool device::is_accelerator() const {
 	return is_type(info::device_type::accelerator);
 }
 
-cl_platform_id device::get_platform() const {
-	return platfrm.get();
+platform device::get_platform() const {
+	return platfrm;
 }
 
-vector_class<device> device::get_devices(cl_device_type device_type) {
-	return detail::get_devices(device_type, platfrm.get());
+
+vector_class<device> device::get_devices(info::device_type deviceType) {
+	return detail::get_devices((cl_device_type)deviceType, nullptr);
 }
 
 bool device::has_extension(const string_class extension_name) {
 	return detail::has_extension<CL_DEVICE_EXTENSIONS>(this, extension_name);
 }
 
-vector_class<device> device::create_sub_devices(
+// TODO
+static vector_class<device> create_sub_devices(
 	const cl_device_partition_property* properties,
 	int devices,
 	unsigned int* num_devices
 ) {
-	auto did = device_id.get();
+	cl_device_id did;
+	//auto did = device_id.get();
 	cl_device_id* device_ids = new cl_device_id[devices];
 	auto error_code = clCreateSubDevices(did, properties, devices, device_ids, num_devices);
 	detail::error::report(error_code);

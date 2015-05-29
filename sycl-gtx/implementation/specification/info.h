@@ -26,6 +26,7 @@ enum class context : int {
 };
 
 // TODO: C.3 Device Information Descriptors
+
 enum class device_type : unsigned int {
 	cpu			= CL_DEVICE_TYPE_CPU,
 	gpu			= CL_DEVICE_TYPE_GPU,
@@ -34,6 +35,32 @@ enum class device_type : unsigned int {
 	defaults	= CL_DEVICE_TYPE_DEFAULT,
 	host,
 	all			= CL_DEVICE_TYPE_ALL
+};
+
+enum class device_partition_property : int {
+	unsupported,
+	partition_equally,
+	partition_by_counts,
+	partition_by_affinity_domain,
+	partition_affinity_domain_next_partitionable
+};
+
+enum class device_affinity_domain : int {
+	unsupported,
+	numa,
+	L4_cache,
+	L3_cache,
+	L2_cache,
+	next_partitionable
+};
+
+enum class device_partition_type : int {
+	no_partition,
+	numa,
+	L4_cache,
+	L3_cache,
+	L2_cache,
+	L1_cache
 };
 
 } // namespace info

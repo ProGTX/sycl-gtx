@@ -57,18 +57,19 @@ public:
 	bool is_gpu() const;
 	bool is_accelerator() const;
 
-	// I believe there is an error in the specification and that this functions should be here instead of "platform get_platforms()"
-	cl_platform_id get_platform() const;
+	platform get_platform() const;
 
-	vector_class<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
+	// Returns all the available OpenCL devices and the SYCL host device
+	static vector_class<device> get_devices(info::device_type deviceType = info::device_type::all);
+
 	bool has_extension(const string_class extension_name);
 
 	// Partition device
 	vector_class<device> create_sub_devices(
-		const cl_device_partition_property* properties,
-		int devices,
-		unsigned int* num_devices
-	);
+		info::device_partition_type partitionType,
+		info::device_partition_property partitionProperty,
+		info::device_affinity_domain affinityDomain
+	) const;
 
 private:
 	template<class return_type, cl_int name>
