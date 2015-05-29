@@ -1,4 +1,5 @@
 #include "device.h"
+#include "info.h"
 #include "platform.h"
 
 using namespace cl::sycl;
@@ -25,6 +26,24 @@ device::device(device_selector& dev_sel)
 
 cl_device_id device::get() const {
 	return device_id.get();
+}
+
+bool device::is_host() const {
+	// TODO
+	return false;
+}
+
+bool device::is_type(info::device_type type) const {
+	return get_info<CL_DEVICE_TYPE>() == (cl_device_type)type;
+}
+bool device::is_cpu() const {
+	return is_type(info::device_type::cpu);
+}
+bool device::is_gpu() const {
+	return is_type(info::device_type::gpu);
+}
+bool device::is_accelerator() const {
+	return is_type(info::device_type::accelerator);
 }
 
 cl_platform_id device::get_platform() const {

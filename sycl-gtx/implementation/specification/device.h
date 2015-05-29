@@ -1,10 +1,11 @@
 #pragma once
 
-// Device classes
+// 3.3.4 Device class
 
 #include "refc.h"
 #include "device_selector.h"
 #include "error_handler.h"
+#include "info.h"
 #include "param_traits.h"
 #include "platform.h"
 #include "../debug.h"
@@ -13,11 +14,7 @@
 namespace cl {
 namespace sycl {
 
-// 3.3.4 Device class
-// Encapsulates a cl_device_id and a cl_platform_id
-// In the case of constructing a device instance from an existing cl_device_id the system triggers a clRetainDevice.
-// On destruction a call to clReleaseDevice is triggered.
-// Returns errors via C++ exception class.
+// Encapsulates a particular SYCL device against on which kernels may be executed
 class device {
 private:
 	detail::refc<cl_device_id, clRetainDevice, clReleaseDevice> device_id;
@@ -51,16 +48,20 @@ public:
 
 	cl_device_id get() const;
 
+private:
+	bool is_type(info::device_type type) const;
+
+public:
+	bool is_host() const;
+	bool is_cpu() const;
+	bool is_gpu() const;
+	bool is_accelerator() const;
+
 	// I believe there is an error in the specification and that this functions should be here instead of "platform get_platforms()"
 	cl_platform_id get_platform() const;
 
 	vector_class<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL);
 	bool has_extension(const string_class extension_name);
-
-	// TODO
-	bool is_host();
-	bool is_cpu();
-	bool is_gpu();
 
 	// Partition device
 	vector_class<device> create_sub_devices(
