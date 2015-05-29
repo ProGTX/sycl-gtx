@@ -17,6 +17,10 @@ class context;
 
 namespace detail {
 
+static const async_handler default_async_handler = [](cl::sycl::exception_list list) {
+	// TODO
+};
+
 struct sycl_exception : ::cl::sycl::exception {
 private:
 	error::code::value_t error_code;

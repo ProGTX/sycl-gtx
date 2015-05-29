@@ -6,6 +6,7 @@
 #include "refc.h"
 #include "device_selector.h"
 #include "error_handler.h"
+#include "info.h"
 #include "param_traits.h"
 #include "../common.h"
 #include "../debug.h"
@@ -29,66 +30,43 @@ private:
 	detail::refc<cl_context, clRetainContext, clReleaseContext> ctx;
 	vector_class<device> target_devices;
 
-	detail::error::handler handler;
-	static detail::error::handler& default_error;
-
 	// Master constructor
 	context(
 		cl_context c,
-		const cl_context_properties* properties,
-		vector_class<device> target_devices = {},
-		const device_selector& dev_sel = *(device_selector::default),
-		detail::error::handler& handler = default_error,
-		platform* plt = nullptr
+		const async_handler& asyncHandler,
+		info::gl_context_interop interopFlag,
+		vector_class<device> deviceList = {},
+		const platform* plt = nullptr,
+		const device_selector& deviceSelector = *(device_selector::default)
 	);
 public:
-	// Chooses the context according to the heuristics of the default selector
+	// Default constructor that chooses the context according the heuristics of the default selector.
+	// Returns synchronous errors via the SYCL exception class.
 	context();
 
+	// Constructs a context object for SYCL host using an async_handler for handling asynchronous errors.
+	explicit context(const async_handler& asyncHandler);
+
 	// Executes a retain on the cl_context
-	explicit context(cl_context context);
+	context(cl_context clContext, const async_handler& asyncHandler = detail::default_async_handler);
 
-	// Constructs with a single device retrieved from the provided device selector object.
-	context(const device_selector& deviceSelector, cl_context_properties* properties = nullptr);
+	context(const device_selector& deviceSelector, info::gl_context_interop interopFlag = false, const async_handler& asyncHandler = detail::default_async_handler);
 
-	// Constructs context from device
-	context(const device& dev, cl_context_properties* properties = nullptr);
+	context(const device& dev, info::gl_context_interop interopFlag = false, const async_handler& asyncHandler = detail::default_async_handler);
 
-	// Constructs context from platform
-	context(const platform& plt, cl_context_properties* properties = nullptr);
+	context(const platform& plt, info::gl_context_interop interopFlag = false, const async_handler& asyncHandler = detail::default_async_handler);
 
-	// Constructs context from a list of devices
-	context(vector_class<device> deviceList, cl_context_properties* properties = nullptr);
-
-
-	// Same constructors as above, just with an asynchronous error handler
-
-	template<class T>
-	context(function_class<T>& async_handler)
-		: context(nullptr, nullptr, {}, *(device_selector::default), detail::error::async_handler<T>(async_handler)) {}
-
-	template<class T>
-	context(const device_selector& deviceSelector, cl_context_properties* properties, function_class<T>& async_handler);
-
-	template<class T>
-	context(const device& dev, cl_context_properties* properties, function_class<T>& async_handler);
-
-	template<class T>
-	context(const platform& plt, cl_context_properties* properties, function_class<T>& async_handler);
-
-	template<class T>
-	context(vector_class<device> deviceList, cl_context_properties* properties, function_class<T>& async_handler);
+	context(vector_class<device> deviceList, info::gl_context_interop interopFlag = false, const async_handler& asyncHandler = detail::default_async_handler);
 
 	// Copy and move semantics
 	context(const context&) = default;
 #if MSVC_LOW
 	context(context&& move)
-		: SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(target_devices), SYCL_MOVE_INIT(handler) {}
+		: SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(target_devices) {}
 	friend void swap(context& first, context& second) {
 		using std::swap;
 		SYCL_SWAP(ctx);
 		SYCL_SWAP(target_devices);
-		SYCL_SWAP(handler);
 	}
 #else
 	context(context&&) = default;
@@ -101,6 +79,10 @@ public:
 	// TODO: Specifies whether the context is in SYCL Host Execution Mode
 	bool is_host() const;
 
+	// Returns the SYCL platform that the context is initialized for.
+	platform get_platform();
+
+	// Returns the set of devices that are part of this context.
 	vector_class<device> get_devices() const;
 
 private:
@@ -110,8 +92,8 @@ private:
 		static real_return get_info(const context* contex) {
 			auto c = contex->ctx.get();
 			real_return param_value;
-			auto error_code = clGetContextInfo(c, name, sizeof(real_return), &param_value, nullptr);
-			contex->handler.report(contex, error_code);
+			auto error_code = clGetContextInfo(c, name, sizeof(real_return),& param_value, nullptr);
+			//contex->handler.report(contex, error_code);
 			return param_value;
 		}
 	};
@@ -124,8 +106,8 @@ private:
 			return_type param_value[BUFFER_SIZE];
 			std::size_t actual_size;
 			std::size_t type_size = sizeof(return_type);
-			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE * type_size, param_value, &actual_size);
-			contex->handler.report(error_code);
+			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE * type_size, param_value,& actual_size);
+			//contex->handler.report(error_code);
 			return real_return(param_value, param_value + actual_size / type_size);
 		}
 	};
