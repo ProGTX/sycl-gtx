@@ -39,12 +39,14 @@ struct thrower {
 	}
 };
 
+// Synchronous error reporting
 static void report(cl_int error_code) {
 	if(error_code != CL_SUCCESS) {
 		thrower::report(thrower::get(error_code));
 	}
 }
 
+// Synchronous error reporting
 static void report(code::value_t error_code) {
 	thrower::report(thrower::get(error_code));
 }

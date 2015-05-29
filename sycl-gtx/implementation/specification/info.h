@@ -17,7 +17,7 @@ enum class platform : unsigned int {
 	extensions
 };
 
-// TODO: C.2 Context Information Descriptors
+// C.2 Context Information Descriptors
 using gl_context_interop = bool;
 enum class context : int {
 	reference_count,
@@ -61,6 +61,15 @@ enum class device_partition_type : int {
 	L3_cache,
 	L2_cache,
 	L1_cache
+};
+
+// C.4 Queue Information Descriptors
+using queue_profiling = cl_command_queue_properties;
+enum class queue : int {
+	context,
+	device,
+	reference_count,
+	properties
 };
 
 } // namespace info

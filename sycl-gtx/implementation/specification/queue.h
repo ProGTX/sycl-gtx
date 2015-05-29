@@ -16,40 +16,33 @@ namespace sycl {
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
 private:
-	detail::refc<cl_command_queue, clRetainCommandQueue, clReleaseCommandQueue> command_q;
 	device dev;
 	context ctx;
+	detail::refc<cl_command_queue, clRetainCommandQueue, clReleaseCommandQueue> command_q;
 
 	void display_device_info() const;
-	void create_queue(cl_command_queue_properties* properties = nullptr);
+	cl_command_queue create_queue(info::queue_profiling properties = 0);
 
 public:
 	// Creates a queue for a device it chooses according to the heuristics of the default selector.
 	// The OpenCL context object is created implicitly.
-	queue();
+	explicit queue(const async_handler& asyncHandler = detail::default_async_handler);
+
+	queue(const device_selector& deviceSelector, const async_handler& asyncHandler = detail::default_async_handler);
+
+	queue(const context& syclContext, const device_selector& deviceSelector, const async_handler& asyncHandler = detail::default_async_handler);
+
+	queue(const context& syclContext, const device& syclDevice, const async_handler& asyncHandler = detail::default_async_handler);
+
+	// Chooses a device based on the provided device selector in the given context.
+	queue(const context& syclContext, const device& syclDevice, info::queue_profiling profilingFlag, const async_handler& asyncHandler = detail::default_async_handler);
+
+	// Creates a queue for the provided device.
+	queue(const device& syclDevice, const async_handler& asyncHandler = detail::default_async_handler);
 
 	// Creates a SYCL queue from an OpenCL queue.
 	// At construction it does a retain on the queue memory object.
-	// Returns errors via an exception.
-	queue(cl_command_queue cl_queue);
-
-	// Creates a queue for the device provided by the device selector.
-	// If no device is selected, an error is reported via an exception.
-	queue(const device_selector& selector);
-
-	// Creates a queue for the provided device.
-	// Any error is reported via an exception.
-	queue(const device& queue_device);
-
-	// Chooses a device based on the provided device selector in the given context.
-	// If no device is selected, an error is reported via an exception.
-	queue(const context& dev_context, device_selector& selector);
-
-	// Creates a command queue using clCreateCommandQueue from a context and a device given the queue properties.
-	// Returns errors via an exception.
-	queue(const context& dev_context, const device& dev_device, cl_command_queue_properties* properties = nullptr);
-
-	// TODO: queue(..., function_class<Args...>& async_handler);
+	queue(cl_command_queue clQueue, const async_handler& asyncHandler = detail::default_async_handler);
 
 	~queue();
 
@@ -87,7 +80,7 @@ public:
 	parameter_t<name> get_info() const {
 		parameter_t<name> param_value;
 		auto q = command_q.get();
-		auto error_code = clGetCommandQueueInfo(q, name, sizeof(parameter_t<name>), &param_value, nullptr);
+		auto error_code = clGetCommandQueueInfo(q, name, sizeof(parameter_t<name>),& param_value, nullptr);
 		detail::error::report(error_code);
 		return param_value;
 	}
