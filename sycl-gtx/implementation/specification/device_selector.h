@@ -2,7 +2,7 @@
 
 // 3.3.1 Device selection class
 
-#include "device_type.h"
+#include "info.h"
 #include "../common.h"
 
 namespace cl {

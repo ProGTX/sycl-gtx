@@ -3,7 +3,7 @@
 // 3.3.2 Platform class
 
 #include "device_selector.h"
-#include "device_type.h"
+#include "info.h"
 #include "refc.h"
 #include "error_handler.h"
 #include "param_traits.h"

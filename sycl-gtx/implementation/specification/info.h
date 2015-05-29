@@ -1,12 +1,14 @@
 #pragma once
 
+// C. Interface of Memory Object Information Descriptors
+
 #include <CL/cl.h>
 
 namespace cl {
 namespace sycl {
-
-// 3.3.2 Platform class
 namespace info {
+
+// TODO: C.3 Device Information Descriptors
 enum class device_type : unsigned int {
 	cpu			= CL_DEVICE_TYPE_CPU,
 	gpu			= CL_DEVICE_TYPE_GPU,
@@ -16,7 +18,7 @@ enum class device_type : unsigned int {
 	host,
 	all			= CL_DEVICE_TYPE_ALL
 };
-} // namespace info
 
+} // namespace info
 } // namespace sycl
 } // namespace cl

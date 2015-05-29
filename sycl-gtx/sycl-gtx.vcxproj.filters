@@ -230,7 +230,7 @@
     <ClInclude Include="implementation\specification\workitem_functions.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\device_type.h">
+    <ClInclude Include="implementation\specification\info.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
   </ItemGroup>
