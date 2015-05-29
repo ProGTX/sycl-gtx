@@ -233,5 +233,8 @@
     <ClInclude Include="implementation\specification\info.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\exception.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
