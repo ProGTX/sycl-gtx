@@ -17,6 +17,14 @@ enum class platform : unsigned int {
 	extensions
 };
 
+// TODO: C.2 Context Information Descriptors
+static bool gl_context_interop;
+enum class context : int {
+	reference_count,
+	num_devices,
+	gl_interop
+};
+
 // TODO: C.3 Device Information Descriptors
 enum class device_type : unsigned int {
 	cpu			= CL_DEVICE_TYPE_CPU,
