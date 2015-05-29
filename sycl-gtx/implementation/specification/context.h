@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.5.4 Context class
+// 3.3.3 Context class
 
 #include "device.h"
 #include "refc.h"
@@ -76,21 +76,21 @@ public:
 
 	// Same constructors as above, just with an asynchronous error handler
 
-	template<class... Args>
-	context(function_class<Args...>& async_handler)
-		: context(nullptr, nullptr, {}, *(device_selector::default), detail::error::async_handler<Args...>(async_handler)) {}
+	template<class T>
+	context(function_class<T>& async_handler)
+		: context(nullptr, nullptr, {}, *(device_selector::default), detail::error::async_handler<T>(async_handler)) {}
 
-	template<class... Args>
-	context(const device_selector& deviceSelector, cl_context_properties* properties, function_class<Args...>& async_handler);
+	template<class T>
+	context(const device_selector& deviceSelector, cl_context_properties* properties, function_class<T>& async_handler);
 
-	template<class... Args>
-	context(const device& dev, cl_context_properties* properties, function_class<Args...>& async_handler);
+	template<class T>
+	context(const device& dev, cl_context_properties* properties, function_class<T>& async_handler);
 
-	template<class... Args>
-	context(const platform& plt, cl_context_properties* properties, function_class<Args...>& async_handler);
+	template<class T>
+	context(const platform& plt, cl_context_properties* properties, function_class<T>& async_handler);
 
-	template<class... Args>
-	context(vector_class<device> deviceList, cl_context_properties* properties, function_class<Args...>& async_handler);
+	template<class T>
+	context(vector_class<device> deviceList, cl_context_properties* properties, function_class<T>& async_handler);
 
 	// Copy and move semantics
 	context(const context&) = default;

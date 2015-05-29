@@ -61,7 +61,7 @@ union metadata {
 };
 	
 struct info {
-	using command_f = function_class<queue*>;
+	using command_f = function_class<void(queue*)>;
 
 	string_class name;	// Only for debugging
 	command_f function;

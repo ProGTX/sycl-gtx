@@ -17,7 +17,7 @@ struct constructor;
 // Single task invoke
 template <>
 struct constructor<void> {
-	static source get(function_class<void> kern) {
+	static source get(function_class<void(void)> kern) {
 		source src;
 		source::enter(src);
 
@@ -51,7 +51,7 @@ struct constructor<id<dimensions>> {
 		return id<dimensions>{0, 0, 0};
 	}
 
-	static source get(function_class<id<dimensions>> kern, range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
+	static source get(function_class<void(id<dimensions>)> kern, range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
 		source src;
 		source::enter(src);
 
@@ -65,7 +65,7 @@ struct constructor<id<dimensions>> {
 // Parallel For with range and kernel parameter item
 template <int dimensions>
 struct constructor<item<dimensions>> {
-	static source get(function_class<item<dimensions>> kern, range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
+	static source get(function_class<void(item<dimensions>)> kern, range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
 		source src;
 		source::enter(src);
 
@@ -96,7 +96,7 @@ struct constructor<nd_item<dimensions>> {
 		return i;
 	}
 
-	static source get(function_class<nd_item<dimensions>> kern, nd_range<dimensions>& execution_range) {
+	static source get(function_class<void(nd_item<dimensions>)> kern, nd_range<dimensions>& execution_range) {
 		source src;
 		source::enter(src);
 
