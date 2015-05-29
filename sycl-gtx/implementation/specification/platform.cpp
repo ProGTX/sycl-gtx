@@ -36,8 +36,8 @@ vector_class<platform> platform::get_platforms() {
 	return platforms;
 }
 
-vector_class<device> platform::get_devices(cl_device_type device_type) const {
-	return detail::get_devices(device_type, platform_id.get(), handler);
+vector_class<device> platform::get_devices(info::device_type device_type) const {
+	return detail::get_devices((cl_device_type)device_type, platform_id.get(), handler);
 }
 
 // TODO: Check if SYCL running in Host Mode

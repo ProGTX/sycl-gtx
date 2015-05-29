@@ -1,8 +1,9 @@
 #pragma once
 
-// 3.5.2 Platform class
+// 3.3.2 Platform class
 
 #include "device_selector.h"
+#include "device_type.h"
 #include "refc.h"
 #include "error_handler.h"
 #include "param_traits.h"
@@ -42,8 +43,8 @@ public:
 	// Returns all available platforms in the system.
 	static vector_class<platform> get_platforms();
 
-	// Returns all the available devices of type device_type for this platform.
-	vector_class<device> get_devices(cl_device_type device_type = CL_DEVICE_TYPE_ALL) const;
+	// Returns the devices available in this platform
+	vector_class<device> get_devices(info::device_type = info::device_type::all) const;
 
 	// Direct equivalent of the OpenCL C API.
 	// All parameters are char arrays, so the function is simplified
