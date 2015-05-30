@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.6.1 Buffers
+// 3.4.2 Buffers
 
 #include "access.h"
 #include "error_handler.h"
@@ -84,48 +84,62 @@ protected:
 		: buffer_(nullptr, range, false) {}
 
 public:
-	// Associated host memory.
-	// The buffer will use this host memory for its full lifetime,
-	// but the contents of this host memory are undefined for the lifetime of the buffer.
-	// If the host memory is modified by the host, or mapped to another buffer or image during the lifetime of this buffer,
-	// then the results are undefined.
-	// The initial contents of the buffer will be the contents of the host memory at the time of construction.
-	// When the buffer is destroyed, the destructor will block until all work in queues on the buffer has completed,
-	// then copy the contents of the buffer back to the host memory (if required) and then return.
-	buffer_(DataType* host_data, range<dimensions> range)
-		: buffer_(host_data, range, false) {}
+	using value_type = DataType;
+	using reference = value_type&;
+	using const_reference = const value_type&;
 
-	// Associated host memory, read-only mode.
-	buffer_(const DataType* host_data, range<dimensions> range)
-		: buffer_(host_data, range, true) {}
+	// Creates a new buffer with associated host memory.
+	// The memory is owned by the runtime during the lifetime of the object.
+	// Data is copied back to the host unless the user overrides the behavior using the set_final_data method.
+	// hostData points to the storage and values used by the buffer and range<dimensions> defines the size.
+	buffer_(DataType* hostData, range<dimensions> range)
+		: buffer_(hostData, range, false) {}
 
-	// No associated storage.
-	// The storage for this type of buffer is entirely handled by the SYCL system.
-	// The destructor for this type of buffer never blocks, even if work on the buffer has not completed.
-	// Instead, the SYCL system frees any storage required for the buffer asynchronously when it is no longer in use in queues.
-	// The initial contents of the buffer are undefined.
-	buffer_(range<dimensions> range)
+	// Creates a new buffer with associated host memory.
+	// hostData points to the storage and values used by the buffer and range<dimensions> defines the size.
+	// The host accesses can be read-only.
+	// However, the typename DataType is not const so the device accesses can be both read and write accesses.
+	// Since the hostData is const, this buffer is only initialized with this memory and there is no write after its destruction,
+	// unless there is another final data address given after construction of the buffer.
+	// The default value of the allocator is going to be the buffer_allocator which will be of type DataType.
+	buffer_(const DataType* hostData, range<dimensions> range)
+		: buffer_(hostData, range, true) {}
+
+	// Create a new buffer of the given size with storage managed by the SYCL runtime.
+	// The default behavior is to use the default host buffer allocator,
+	// in order to allow for host accesses.
+	// If the type of the buffer has the const qualifier,
+	// then the default allocator will remove the qualifier to allow host access to the data.
+	buffer_(const range<dimensions>& range)
 		:	host_data(ptr_t(new DataType[ range[0]*range[1]*range[2] ])),
 			rang(range),
 			is_read_only(false),
 			is_blocking(false) {}
 
-	// Associated storage object.
-	// The storage object must not be destroyed by the user until after the buffer has been destroyed.
-	// The synchronization and copying behavior of the storage is determined by the storage object.
-	//buffer(storage<DataType>& store, range<dimensions>);
+	// Create a new buffer with associated memory, using the data in hostData.
+	// The ownership of the hostData is shared between the runtime and the user.
+	// In order to enable both the user application and the SYCL runtime to use the same pointer, a mutex_class is used.
+	// The mutex m is locked by the runtime whenever the data is in use and unlocked otherwise.
+	// Data is synchronized with hostData, when the mutex is unlocked by the runtime.
+	buffer_(shared_ptr_class<DataType>& hostData, const range<dimensions>& bufferRange, mutex_class * m);
 
-	// Creates a sub-buffer object, which is a sub-range reference to a base buffer.
-	// This sub-buffer can be used to create accessors to the base buffer,
-	// but which only have access to the range specified at time of construction of the sub-buffer.
-	//buffer_(buffer_, index<dimensions> base_index, range<dimensions> sub_range);
+	// Create a new buffer which is initialized by hostData.
+	// The SYCL runtime receives full ownership of the hostData unique_ptr
+	// and in effect there is no synchronization with the application code using hostData.
+	buffer_(unique_ptr_class<void>&& hostData, const range<dimensions>& bufferRange);
+	
+	// Create a new sub-buffer without allocation to have separate accessors later.
+	// b is the buffer with the real data.
+	// baseIndex specifies the origin of the sub-buffer inside the buffer b.
+	// subRange specifies the size of the sub-buffer.
+	buffer_(buffer_& b, const index<dimensions>& baseIndex, const range<dimensions>& subRange);
 
 	// Creates a buffer from an existing OpenCL memory object associated to a context
 	// after waiting for an event signaling the availability of the OpenCL data.
 	// mem_object is the OpenCL memory object to use.
 	// from_queue is the queue associated to the memory object.
 	// available_event specifies the event to wait for if non null
-	buffer_(cl_mem mem_object, queue from_queue, event available_event);
+	buffer_(cl_mem mem_object, queue& from_queue, event available_event = {});
 
 	// Return a range object representing the size of the buffer
 	// in terms of number of elements in each dimension as passed to the constructor.
@@ -237,11 +251,30 @@ protected:
 		detail::error::report(error_code);
 		return param_value;
 	}
+
+public:
+	void set_final_data(weak_ptr_class<DataType>& finalData);
 };
 
 } // namespace detail
 
-// Defines a shared array that can be used by kernels in queues and has to be accessed using accessor classes.
+#if MSVC_LOW
+#define BUFFER_INHERIT_CONSTRUCTORS(dimensions)															\
+	buffer(const range<dimensions>& range)																\
+		: Base(range) {}																				\
+	buffer(DataType* host_data, range<dimensions> range)												\
+		: Base(host_data, range) {}																		\
+	buffer(const DataType* host_data, range<dimensions> range)											\
+		: Base(host_data, range) {}																		\
+	buffer(shared_ptr_class<DataType>& hostData, const range<dimensions>& bufferRange, mutex_class* m)	\
+		: Base(hostData, bufferRange, m) {}																\
+	buffer(unique_ptr_class<void>&& hostData, const range<dimensions>& bufferRange)						\
+		: Base(hostData, bufferRange) {}																\
+	buffer(buffer& b, const index<dimensions>& baseIndex, const range<dimensions>& subRange)			\
+		: Base(b, baseIndex, subRange) {}																\
+	buffer(cl_mem mem_object, queue& from_queue, event available_event = {})							\
+		: Base(mem_object, from_queue, available_event) {}
+#endif
 
 template <typename DataType>
 struct buffer<DataType, 1> : public detail::buffer_<DataType, 1> {
@@ -249,16 +282,7 @@ private:
 	using Base = detail::buffer_<DataType, 1>;
 public:
 #if MSVC_LOW
-	buffer(range<1> range)
-		: Base(range) {}
-	buffer(DataType* host_data, range<1> range)
-		: Base(host_data, range) {}
-	buffer(const DataType* host_data, range<1> range)
-		: Base(host_data, range) {}
-	//buffer(storage<DataType>& store, range<1>);
-	//buffer(buffer, index<dimensions> base_index, range<dimensions> sub_range);
-	buffer(cl_mem mem_object, queue from_queue, event available_event)
-		: Base(mem_object, from_queue, available_event) {}
+	BUFFER_INHERIT_CONSTRUCTORS(1)
 #else
 	using Base::buffer;
 #endif
@@ -283,16 +307,7 @@ struct buffer<DataType, 2> : public detail::buffer_<DataType, 2>{
 private:
 	using Base = detail::buffer_<DataType, 2>;
 public:
-	buffer(range<2> range)
-		: Base(range) {}
-	buffer(DataType* host_data, range<2> range)
-		: Base(host_data, range) {}
-	buffer(const DataType* host_data, range<2> range)
-		: Base(host_data, range) {}
-	//buffer(storage<DataType>& store, range<2>);
-	//buffer(buffer, index<2> base_index, range<2> sub_range);
-	buffer(cl_mem mem_object, queue from_queue, event available_event)
-		: Base(mem_object, from_queue, available_event) {}
+	BUFFER_INHERIT_CONSTRUCTORS(2)
 #else
 	using detail::buffer_<DataType, 2>::buffer;
 #endif
@@ -310,16 +325,7 @@ struct buffer<DataType, 3> : public detail::buffer_<DataType, 3>{
 private:
 	using Base = detail::buffer_<DataType, 3>;
 public:
-	buffer(range<3> range)
-		: Base(range) {}
-	buffer(DataType* host_data, range<3> range)
-		: Base(host_data, range) {}
-	buffer(const DataType* host_data, range<3> range)
-		: Base(host_data, range) {}
-	//buffer(storage<DataType>& store, range<3>);
-	//buffer(buffer, index<3> base_index, range<3> sub_range);
-	buffer(cl_mem mem_object, queue from_queue, event available_event)
-		: Base(mem_object, from_queue, available_event) {}
+	BUFFER_INHERIT_CONSTRUCTORS(3)
 #else
 	using detail::buffer_<DataType, 3>::buffer;
 #endif
@@ -330,6 +336,8 @@ public:
 	buffer(const DataType* host_data, size_t sizeX, size_t sizeY, size_t sizeZ)
 		: buffer(host_data, { sizeX, sizeY, sizeZ }) {}
 };
+
+#undef BUFFER_INHERIT_CONSTRUCTORS
 
 } // namespace sycl
 } // namespace cl

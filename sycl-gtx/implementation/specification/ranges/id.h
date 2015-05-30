@@ -70,6 +70,10 @@ public:
 template <int dimensions = 1>
 struct id;
 
+// TODO
+template <int dimensions = 1>
+using index = id<dimensions>;
+
 template <>
 struct id<1> : detail::id_<1> {
 	id(size_t size = 0)
