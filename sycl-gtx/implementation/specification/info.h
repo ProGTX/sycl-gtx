@@ -72,6 +72,19 @@ enum class queue : int {
 	properties
 };
 
+// C.7 Event Information Descriptors
+enum class event : int {
+	command_type,
+	command_execution_status,
+	reference_count
+};
+enum class event_profiling : int {
+	command_queued,
+	command_submit,
+	command_start,
+	command_end
+};
+
 } // namespace info
 } // namespace sycl
 } // namespace cl

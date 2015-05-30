@@ -22,8 +22,9 @@ namespace detail {
 // then no exception is thrown and the error is not available to the user in any specified way.
 // Implementations may provide extra debugging information to users to trap and handle asynchronous errors.
 static const async_handler default_async_handler = [](cl::sycl::exception_list list) {
+	debug() << "Number of asynchronous errors during queue execution:" << list.size();
 	for(auto& e : list) {
-		debug() << e.what();
+		debug("SYCL_ERROR::", e.what());
 	}
 };
 

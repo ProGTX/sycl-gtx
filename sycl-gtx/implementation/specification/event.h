@@ -1,8 +1,9 @@
 #pragma once
 
-// 3.5.7 Event class
+// 3.3.6 Event class for OpenCL interoperability
 
 #include "error_handler.h"
+#include "info.h"
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
@@ -12,19 +13,31 @@ namespace sycl {
 
 class event {
 private:
-	detail::refc<cl_event, clRetainEvent, clReleaseEvent> m_event;
+	detail::refc<cl_event, clRetainEvent, clReleaseEvent> evnt;
 
 public:
-	// Constructs a copy sharing the same underlying event.
-	// The underlying event is reference counted.
-	event() {}
+	event() = default;
+	explicit event(cl_event clEvent);
 
-	cl_event get(cl_context context);
+	cl_event get();
+
+	// Return the list of events that this event waits for in the dependence graph.
 	vector_class<event> get_wait_list();
+
+	// Wait for the event and the command associated with it to complete.
 	void wait();
-	static void wait(vector_class<event>& event_list);
+
+	// Synchronously wait on a list of events.
+	static void wait(const vector_class<event>& event_list);
+
 	void wait_and_throw();
 	static void wait_and_throw(const vector_class<event>& event_list);
+
+	//template <info::event param>
+	//typename param_traits<info::event, param>::type get_info() const;
+
+	//template <info::event_profiling param>
+	//typename param_traits<info::event_profiling, param>::type get_profiling_info() const;
 };
 
 } // namespace sycl

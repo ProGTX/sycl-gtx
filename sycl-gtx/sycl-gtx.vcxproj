@@ -154,6 +154,7 @@
     <ClCompile Include="implementation\specification\context.cpp" />
     <ClCompile Include="implementation\specification\device.cpp" />
     <ClCompile Include="implementation\specification\device_selector.cpp" />
+    <ClCompile Include="implementation\specification\event.cpp" />
     <ClCompile Include="implementation\specification\kernel.cpp" />
     <ClCompile Include="implementation\specification\platform.cpp" />
     <ClCompile Include="implementation\specification\program.cpp" />
