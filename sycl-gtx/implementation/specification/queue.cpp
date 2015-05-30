@@ -59,8 +59,7 @@ queue::queue(cl_command_queue clQueue, const async_handler& asyncHandler)
 }
 
 queue::~queue() {
-	// TODO
-	throw_asynchronous();
+	wait_and_throw();
 }
 
 bool queue::is_host() {
@@ -79,13 +78,18 @@ device queue::get_device() const {
 	return dev;
 }
 
-// TODO: This function checks to see if any asynchronous errors have been thrown in the queue
-// and if so reports them via exceptions, or via the supplied async_handler
+// Checks to see if any asynchronous errors have been produced by the queue
+// and if so reports them by passing them to the async_handler passed to the queue on construction.
+// If no async_handler was provided then asynchronous exceptions will be lost.
 void queue::throw_asynchronous() {
+	if(ex_list.size() > 0) {
+		detail::error::thrower::report_async(&ctx, ex_list);
+	}
 }
 
-// TODO: This is a blocking wait for all enqueued tasks in the queue to complete.
 void queue::wait() {
+	auto error_code = clFinish(command_q.get());
+	detail::error::report(error_code);
 }
 
 void queue::wait_and_throw() {

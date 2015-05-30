@@ -12,6 +12,9 @@
 namespace cl {
 namespace sycl {
 
+// Forward declaration
+class context;
+
 namespace detail {
 
 // 3.6.1, paragraph 4
@@ -27,28 +30,32 @@ static const async_handler default_async_handler = [](cl::sycl::exception_list l
 namespace error {
 
 struct thrower {
-	static exception get(cl_int error_code) {
-		return cl_exception(error_code);
+	static exception get(cl_int error_code, context* thrower) {
+		return cl_exception(error_code, thrower);
 	}
-	static exception get(code::value_t error_code) {
-		return exception((*error::codes.find(error_code)).second);
+	static exception get(code::value_t error_code, context* thrower) {
+		return exception((*error::codes.find(error_code)).second, thrower);
 	}
 	static void report(exception& error) {
 		debug("SYCL_ERROR::", error.what());
 		throw error;
 	}
+	template <bool delay_linkage = true>
+	static void report_async(context* thrower, exception_list& list) {
+		thrower->asyncHandler(list);
+	}
 };
 
 // Synchronous error reporting
-static void report(cl_int error_code) {
+static void report(cl_int error_code, context* thrower = nullptr) {
 	if(error_code != CL_SUCCESS) {
-		thrower::report(thrower::get(error_code));
+		thrower::report(thrower::get(error_code, thrower));
 	}
 }
 
 // Synchronous error reporting
-static void report(code::value_t error_code) {
-	thrower::report(thrower::get(error_code));
+static void report(code::value_t error_code, context* thrower = nullptr) {
+	thrower::report(thrower::get(error_code, thrower));
 }
 
 } // namespace error

@@ -29,12 +29,12 @@ context::context(
 
 		cl_int error_code;
 		c = clCreateContext(nullptr, num_devices, devices.data(), nullptr, nullptr, &error_code);
-		//handler.report(error_code);
+		detail::error::report(error_code);
 		ctx = c;
 	}
 	else {
 		auto error_code = clRetainContext(c);
-		//handler.report(error_code);
+		detail::error::report(error_code);
 	}
 }
 

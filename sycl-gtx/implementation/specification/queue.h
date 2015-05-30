@@ -28,6 +28,7 @@ private:
 	device dev;
 	context ctx;
 	detail::refc<cl_command_queue, clRetainCommandQueue, clReleaseCommandQueue> command_q;
+	exception_list ex_list;
 
 	void display_device_info() const;
 	cl_command_queue create_queue(info::queue_profiling properties = 0);

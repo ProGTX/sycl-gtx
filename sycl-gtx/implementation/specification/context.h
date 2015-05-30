@@ -30,6 +30,7 @@ private:
 	detail::refc<cl_context, clRetainContext, clReleaseContext> ctx;
 	vector_class<device> target_devices;
 	async_handler asyncHandler;
+	friend struct detail::error::thrower;
 
 	// Master constructor
 	context(
@@ -95,7 +96,7 @@ private:
 			auto c = contex->ctx.get();
 			real_return param_value;
 			auto error_code = clGetContextInfo(c, name, sizeof(real_return),& param_value, nullptr);
-			//contex->handler.report(contex, error_code);
+			detail::error::report(error_code);
 			return param_value;
 		}
 	};
@@ -108,8 +109,8 @@ private:
 			return_type param_value[BUFFER_SIZE];
 			std::size_t actual_size;
 			std::size_t type_size = sizeof(return_type);
-			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE * type_size, param_value,& actual_size);
-			//contex->handler.report(error_code);
+			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE * type_size, param_value, &actual_size);
+			detail::error::report(error_code);
 			return real_return(param_value, param_value + actual_size / type_size);
 		}
 	};
