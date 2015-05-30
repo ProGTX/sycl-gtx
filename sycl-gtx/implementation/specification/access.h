@@ -6,7 +6,7 @@ namespace cl {
 namespace sycl {
 namespace access {
 
-// 3.4 Synchronization
+// 3.8 Synchronization and atomics
 enum class fence_space : char {
 	local,
 	global,
@@ -14,26 +14,25 @@ enum class fence_space : char {
 };
 
 
-// 3.6.4.1 Access modes
+// 3.4.6.1 Access modes
 enum mode {
 	read,				// read-only access
 	write,				// write-only access, previous contents NOT discarded
 	read_write,			// read and write access
 	discard_write,		// write-only access, previous contents discarded
 	discard_read_write,	// read and write access, previous contents discarded
+	atomic,				// atomic access
 };
 
-// 3.6.4.2 Access targets
+// 3.4.6.2 Access targets
 enum target {
-	global_buffer = 0,	// access buffer via __global memory
+	global_buffer,		// access buffer via __global memory
 	constant_buffer,	// access buffer via __constant memory
-	local,				// access work-group - local memory
+	local,				// access work-group-local memory
 	image,				// access an image
 	host_buffer,		// access buffer immediately on the host
 	host_image,			// access image immediately on the host
 	image_array,		// access an array of images on device
-	cl_buffer,			// access an OpenCL cl_mem buffer on device
-	cl_image,			// access an OpenCL cl_mem image on device
 };
 
 static debug& operator<<(debug& d, mode m) {
@@ -53,6 +52,9 @@ static debug& operator<<(debug& d, mode m) {
 			break;
 		case discard_read_write:
 			str += "discard_read_write";
+			break;
+		case atomic:
+			str += "atomic";
 			break;
 	}
 	d << str;
@@ -82,12 +84,6 @@ static debug& operator<<(debug& d, target t) {
 			break;
 		case image_array:
 			str += "image_array";
-			break;
-		case cl_buffer:
-			str += "cl_buffer";
-			break;
-		case cl_image:
-			str += "cl_image";
 			break;
 	}
 	d << str;

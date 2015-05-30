@@ -40,7 +40,6 @@ struct buffer;
 // 3.6.4.9 Accessor capabilities and restrictions
 
 #define SYCL_ADD_ACC_BUFFERS(mode)							\
-	SYCL_ADD_ACCESSOR_BUFFER(mode, access::cl_buffer)		\
 	SYCL_ADD_ACCESSOR_BUFFER(mode, access::global_buffer)	\
 	SYCL_ADD_ACCESSOR_BUFFER(mode, access::host_buffer)
 

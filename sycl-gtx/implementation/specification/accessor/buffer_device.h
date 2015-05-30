@@ -15,7 +15,6 @@ namespace sycl {
 namespace detail {
 
 SYCL_ACCESSOR_CLASS(
-	target == access::cl_buffer			||
 	target == access::constant_buffer	||
 	target == access::global_buffer
 ),
