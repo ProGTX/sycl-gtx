@@ -51,7 +51,9 @@ private:
 	handler() {}
 
 public:
-	void set_arg(int arg_index, detail::accessor_base acc_obj);
+	template <typename DataType, int dimensions, access::mode mode, access::target target>
+	void set_arg(int arg_index, accessor<DataType, dimensions, mode, target>& acc_obj);
+
 	template <typename T>
 	void set_arg(int arg_index, T scalar_value);
 
@@ -75,62 +77,64 @@ public:
 	// 3.5.3.2 Parallel For invoke
 
 	template <class KernelType, int dimensions>
-	void parallel_for(range<dimensions> num_work_items, KernelType kernFunctor) {
-		parallel_for(num_work_items, id<dimensions>(), kernFunctor);
+	void parallel_for(range<dimensions> numWorkItems, KernelType kernFunctor) {
+		parallel_for(numWorkItems, id<dimensions>(), kernFunctor);
 	}
 
 	// This type of kernel can be invoked with a function accepting either an id or an item as parameter
 	template <class KernelType, int dimensions>
-	void parallel_for(range<dimensions> num_work_items, id<dimensions> work_item_offset, KernelType kernFunctor) {
+	void parallel_for(range<dimensions> numWorkItems, id<dimensions> workItemOffset, KernelType kernFunctor) {
 		detail::command::group_::check_scope();
 		auto src = detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(
-			kernFunctor, num_work_items, work_item_offset
+			kernFunctor, numWorkItems, workItemOffset
 		);
 		auto kern = src.compile();
 		debug() << "Compiled kernel:";
 		debug() << src.get_code();
 		src.write_buffers_to_device();
-		src.enqueue_range(kern, num_work_items, work_item_offset);
+		src.enqueue_range(kern, numWorkItems, workItemOffset);
 		src.read_buffers_from_device();
 	}
 
 	template <class KernelType, int dimensions>
-	void parallel_for(nd_range<dimensions> execution_range, KernelType kernFunctor) {
+	void parallel_for(nd_range<dimensions> executionRange, KernelType kernFunctor) {
 		DSELF() << "not implemented";
 		detail::command::group_::check_scope();
 		auto src = detail::kernel_::constructor<nd_item<dimensions>>::get(
-			kernFunctor, execution_range
+			kernFunctor, executionRange
 		);
 		auto kern = src.compile();
 		debug() << "Compiled kernel:";
 		debug() << src.get_code();
 		src.write_buffers_to_device();
-		src.enqueue_nd_range(kern, execution_range);
+		src.enqueue_nd_range(kern, executionRange);
 		src.read_buffers_from_device();
 	}
+
+	// TODO: Why is the offset needed? It's already contained in the nd_range
+	template <class KernelType, int dimensions>
+	void parallel_for(nd_range<dimensions> numWorkItems, id<dimensions> workItemOffset, KernelType kernFunctor);
+
+
+	// 3.5.3.3 Parallel For hierarchical invoke
+
+	template <class WorkgroupFunctionType, int dimensions>
+	void parallel_for_work_group(range<dimensions> numWorkGroups, WorkgroupFunctionType kernFunctor);
+
+	template <class WorkgroupFunctionType, int dimensions>
+	void parallel_for_work_group(range<dimensions> numWorkGroups, range<dimensions> workGroupSize, WorkgroupFunctionType kernFunctor);
+
+
+	// OpenCL interoperability invoke
+
+	void single_task(kernel syclKernel);
+
+	template <int dimensions>
+	void parallel_for(range<dimensions> numWorkItems, kernel syclKernel);
+
+	template <int dimensions>
+	void parallel_for(nd_range<dimensions> ndRange, kernel syclKernel);
 };
-
-/*
-
-template <typename KernelName, class KernelType>
-void single_task(KernelType);
-
-template <typename KernelName, class KernelType, int dimensions>
-void parallel_for(range<dimensions> num_work_items, KernelType);
-
-template <typename KernelName, class KernelType, int dimensions>
-void parallel_for(range<dimensions> num_work_items, id<dimensions> work_item_offset, KernelType);
-
-template <typename KernelName, class KernelType, int dimensions>
-void parallel_for(nd_range<dimensions> execution_range, KernelType);
-
-template <class KernelName, class WorkgroupFunctionType, int dimensions>
-void parallel_for_work_group(range<dimensions> num_work_groups, WorkgroupFunctionType);
-
-template <class KernelType, int dimensions>
-void parallel_for_work_item(group num_work_items, KernelType);
-
-*/
 
 } // namespace sycl
 } // namespace cl
