@@ -20,12 +20,12 @@ bool test2() {
 		buffer<int> resultBuf(&result, 1);
 
 		// create some commands for our queue
-		myQueue.submit([&]() {
+		myQueue.submit([&](handler& cgh) {
 			// request access to our buffer
 			auto writeResult = resultBuf.get_access<access::write>();
 
 			// enqueue a single, simple task
-			single_task</*class simple_test*/>([=]() {
+			cgh.single_task</*class simple_test*/>([=]() {
 				writeResult[0] = expected;
 			});
 		}); // end of our commands for this queue

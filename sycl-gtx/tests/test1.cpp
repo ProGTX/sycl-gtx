@@ -31,14 +31,15 @@ bool test1() {
 		buffer<int> d_c(h_c);
 		buffer<int> d_r(h_r);
 		queue myQueue;
-		myQueue.submit([&]() {
+		myQueue.submit([&](handler& cgh) {
 			// Data accessors
 			auto a = d_a.get_access<access::read>();
 			auto b = d_b.get_access<access::read>();
 			auto c = d_c.get_access<access::read>();
 			auto r = d_r.get_access<access::write>();
+
 			// Kernel
-			parallel_for<>(range<1>(count), [=](id<> i) {
+			cgh.parallel_for<>(range<1>(count), [=](id<> i) {
 				r[i] = a[i] + b[i] + c[i];
 			});
 		});

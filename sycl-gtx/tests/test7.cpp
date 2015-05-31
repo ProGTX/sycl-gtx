@@ -21,18 +21,18 @@ bool test7() {
 		buffer<float, 2> c({ N, M });
 
 		// Launch a first asynchronous kernel to initialize a
-		myQueue.submit([&]() {
+		myQueue.submit([&](handler& cgh) {
 			// The kernel writes a, so get a write accessor on it
 			auto A = a.get_access<access::write>();
 
 			// Enqueue a parallel kernel iterating on a N*M 2D iteration space
-			parallel_for</*class init_a*/>(range<2>(N, M), [=](id<2> index) {
+			cgh.parallel_for</*class init_a*/>(range<2>(N, M), [=](id<2> index) {
 				A[index] = index[0] * 2 + index[1];
 			});
 		});
 
 		// Launch an asynchronous kernel to initialize b
-		myQueue.submit([&]() {
+		myQueue.submit([&](handler& cgh) {
 			// The kernel write b, so get a write accessor on it
 			auto B = b.get_access<access::write>();
 			// From the access pattern above,
@@ -40,13 +40,13 @@ bool test7() {
 			// and can be scheduled independently
 
 			// Enqueue a parallel kernel iterating on a N*M 2D iteration space
-			parallel_for</*class init_b*/>(range<2>(N, M), [=](id<2> index) {
+			cgh.parallel_for</*class init_b*/>(range<2>(N, M), [=](id<2> index) {
 				B[index] = index[0] * 2014 + index[1] * 42;
 			});
 		});
 
 		// Launch an asynchronous kernel to compute matrix addition c = a + b
-		myQueue.submit([&]() {
+		myQueue.submit([&](handler& cgh) {
 			// In the kernel a and b are read, but c is written
 			auto A = a.get_access<access::read>();
 			auto B = b.get_access<access::read>();
@@ -55,7 +55,7 @@ bool test7() {
 			// this kernel is run, the kernels computing a and b completed
 
 			// Enqueue a parallel kernel iterating on a N*M 2D iteration space
-			parallel_for</*class matrix_add*/>(range<2>(N, M), [=](id<2> index) {
+			cgh.parallel_for</*class matrix_add*/>(range<2>(N, M), [=](id<2> index) {
 				C[index] = A[index] + B[index];
 			});
 		});

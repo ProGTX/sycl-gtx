@@ -18,21 +18,21 @@ bool test6() {
 		auto Q = &pong;
 
 		// Init
-		myQueue.submit([&]() {
+		myQueue.submit([&](handler& cgh) {
 			auto p = P->get_access<access::write>();
 
-			parallel_for<>(range<1>(size), [=](id<1> index) {
+			cgh.parallel_for<>(range<1>(size), [=](id<1> index) {
 				p[index] = index;
 			});
 		});
 
 		for(unsigned int N = size / 2; N > 0; N /= 2 * group_size) {
-			myQueue.submit([&]() {
+			myQueue.submit([&](handler& cgh) {
 				auto input = P->get_access<access::read>();
 				auto output = Q->get_access<access::write>();
 				auto local = accessor<float, 1, access::read_write, access::local>(group_size);
 
-				parallel_for<>(nd_range<1>(N, group_size), [=](nd_item<1> index) {
+				cgh.parallel_for<>(nd_range<1>(N, group_size), [=](nd_item<1> index) {
 					auto gid = index.get_global_id(0);
 					auto lid = index.get_local_id(0);
 					uint1 N = index.get_global_range()[0];

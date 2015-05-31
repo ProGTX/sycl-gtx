@@ -25,12 +25,12 @@ bool test8() {
 		buffer<int, 1> resultBuf(data, size);
 
 		// create a command_group to issue commands to the queue
-		myQueue.submit([&]() {
+		myQueue.submit([&](handler& cgh) {
 			// request access to the buffer
 			auto writeResult = resultBuf.get_access<access::write>();
 
 			// enqueue a prallel_for task
-			parallel_for</*class simple_test*/>(range<1>(size), [=](id<1> idx) {
+			cgh.parallel_for</*class simple_test*/>(range<1>(size), [=](id<1> idx) {
 				writeResult[idx] = idx;
 			}); // end of the kernel function
 		}); // end of our commands for this queue

@@ -167,9 +167,6 @@
     <ClInclude Include="implementation\error_code.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\invoke.h">
-      <Filter>Header Files\specification</Filter>
-    </ClInclude>
     <ClInclude Include="implementation\gen_source.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -234,6 +231,9 @@
       <Filter>Header Files\specification</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\exception.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\specification\handler.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
   </ItemGroup>

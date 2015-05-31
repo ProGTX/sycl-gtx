@@ -158,7 +158,8 @@ public:
 	command_group(queue& primaryQueue, functorT lambda)
 		: q(&primaryQueue) {
 		enter();
-		lambda();
+		handler cgh;
+		lambda(cgh);
 		exit();
 	}
 

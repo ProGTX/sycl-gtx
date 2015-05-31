@@ -41,12 +41,12 @@ bool test5() {
 		buffer<int> buf(data, size);
 		int random_num = 0;
 
-		myQueue.submit([&]() {
+		myQueue.submit([&](handler& cgh) {
 			auto ptr = buf.get_access<access::read_write>();
 
 			auto functor = example_functor(ptr);
 
-			parallel_for(nd_range<1>(size, group_size),
+			cgh.parallel_for(nd_range<1>(size, group_size),
 				functor
 			);
 
