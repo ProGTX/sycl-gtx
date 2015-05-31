@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.6.4 Accessors
+// 3.4.6 Accessors
 
 #include "access.h"
 #include "../common.h"
@@ -22,6 +22,10 @@ class accessor_base {
 template <typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_core : public accessor_base {
 public:
+	using value_type = DataType;
+	using reference = value_type&;
+	using const_reference = const value_type&;
+
 	// Returns the size of the underlying buffer in number of elements.
 	size_t get_size() const;
 
