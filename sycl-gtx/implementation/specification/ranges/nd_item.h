@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.7.1.5 nd_item class
+// 3.5.1.5 nd_item class
 
 #include "../access.h"
 #include "../../data_ref.h"
@@ -9,11 +9,11 @@ namespace cl {
 namespace sycl {
 
 // Forward declarations
-template <int dims>
+template <int dimensions>
 struct id;
-template <int dims>
+template <int dimensions>
 struct range;
-template <int dims>
+template <int dimensions>
 struct nd_range;
 
 namespace detail {
@@ -23,65 +23,71 @@ namespace kernel_ {
 }
 }
 
-template <int dims = 1>
-struct nd_item : public item<dims> {
-public:
-	// Remains of the item class
-	size_t get(int dimension) const = delete;
-	size_t& operator[](int dimension) = delete;
-
+template <int dimensions = 1>
+struct nd_item {
 protected:
-	friend struct detail::kernel_::constructor<nd_item<dims>>;
+	friend struct detail::kernel_::constructor<nd_item<dimensions>>;
 
-	item<dims> local_item;
+	item<dimensions> global_item;
+	item<dimensions> local_item;
 
-	nd_item(item<dims> global_item, item<dims> local_item)
-		: item(global_item), local_item(local_item) {}
+	nd_item(item<dimensions> global_item, item<dimensions> local_item)
+		: global_item(global_item), local_item(local_item) {}
 
 	// A bit of a hack - to the outside it appears to conform to the specification
 	using size_t = detail::id_ref;
 
 public:
-	id<dims> get_global_id() const {
-		return item::get_global_id();
-	}
-	size_t get_global_id(int dimension) const {
-		return get_global_id()[dimension];
+	operator item<dimensions>() {
+		return global_item;
 	}
 
-	id<dims> get_local_id() const {
-		return local_item.get_global_id();
+	id<dimensions> get_global() const {
+		return global_item.get();
 	}
-	size_t get_local_id(int dimension) const {
-		return get_local_id()[dimension];
+	size_t get_global(int dimension) const {
+		return get_global()[dimension];
+	}
+	size_t get_global_linear_id() const {
+		return global_item.get_linear_id();
 	}
 
-	id<dims> get_group_id() const {
+	id<dimensions> get_local() const {
+		return local_item.get();
+	}
+	size_t get_local(int dimension) const {
+		return get_local()[dimension];
+	}
+	size_t get_local_linear_id() const {
+		return local_item.get_linear_id();
+	}
+
+	id<dimensions> get_group() const {
+		// TODO
 		return local_item.get_offset();
 	}
-	size_t get_group_id(int dimension) const {
-		return get_group_id()[dimension];
+	size_t get_group(int dimension) const {
+		return get_group()[dimension];
+	}
+	size_t get_group_linear_id() const {
+		// TODO
 	}
 
-	const range<dims>& get_global_range() const {
-		return item::get_global_range();
-	}
-	::size_t get_global_size(int dimension) const {
-		return get_global_range()[dimension];
-	}
+	// TODO
+	id<dimensions> get_num_groups() const;
+	int get_num_groups(int) const;
 
-	const range<dims>& get_local_range() const {
-		return local_item.get_global_range();
+	const range<dimensions>& get_global_range() const {
+		return global_item.get_range();
 	}
-	::size_t get_local_size(int dimension) const {
-		return get_local_range()[dimension];
+	const range<dimensions>& get_local_range() const {
+		return local_item.get_range();
 	}
-
-	id<dims> get_offset() const {
-		return item::get_offset();
+	id<dimensions> get_offset() const {
+		return global_item.get_offset();
 	}
-	nd_range<dims> get_nd_range() const {
-		return nd_range<dims>(get_global_range(), get_local_range(), get_offset());
+	nd_range<dimensions> get_nd_range() const {
+		return nd_range<dimensions>(get_global_range(), get_local_range(), get_offset());
 	}
 
 	void barrier(access::fence_space flag = access::fence_space::global_and_local) const {

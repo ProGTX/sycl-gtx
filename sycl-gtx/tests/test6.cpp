@@ -33,9 +33,9 @@ bool test6() {
 				auto local = accessor<float, 1, access::read_write, access::local>(group_size);
 
 				cgh.parallel_for<>(nd_range<1>(N, group_size), [=](nd_item<1> index) {
-					auto gid = index.get_global_id(0);
-					auto lid = index.get_local_id(0);
-					uint1 N = index.get_global_range()[0];
+					auto gid = index.get_global(0);
+					auto lid = index.get_local(0);
+					uint1 N = index.get_global_range().get(0);
 					uint1 second = gid + N;
 
 					SYCL_IF(second < 2 * N)
@@ -45,7 +45,7 @@ bool test6() {
 
 					index.barrier(access::fence_space::local);
 
-					N = min(N, (uint1)index.get_local_range()[0]);
+					N = min(N, (uint1)index.get_local_range().get(0));
 
 					uint1 stride = N / 2;
 					SYCL_WHILE(stride > 0)

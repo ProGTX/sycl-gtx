@@ -101,15 +101,15 @@ struct constructor<nd_item<dimensions>> {
 		source::enter(src);
 
 		item<dimensions> global_item(
-			constructor<id<dimensions>>::generate_global_id_code(execution_range.get_global_range()),
-			execution_range.get_global_range(),
+			constructor<id<dimensions>>::generate_global_id_code(execution_range.get_global()),
+			execution_range.get_global(),
 			execution_range.get_offset()
 		);
 
 		// TODO: Store group ID into offset of local_item
 		item<dimensions> local_item(
 			generate_local_id_code(),
-			execution_range.get_local_range(),
+			execution_range.get_local(),
 			execution_range.get_offset()
 		);
 

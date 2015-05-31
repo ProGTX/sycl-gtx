@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.7.1.1 Range class
+// 3.5.1.1 Range class
 
 #include "../../common.h"
 #include <initializer_list>
@@ -29,17 +29,15 @@ protected:
 	range_(const range_&) = default;
 
 public:
-	size_t& operator[](size_t n) {
-		return dims[n];
-	}
-	size_t operator[](size_t n) const {
-		return dims[n];
-	}
 
 	// Return the value of the specified dimension of the range.
-	// TODO: Operator[] should take care of this
 	size_t get(int dimension) const {
-		return dims[n];
+		return dims[dimension];
+	}
+
+	// Return the l-value of the specified dimension of the range.
+	size_t& operator[](size_t dimension) {
+		return dims[dimension];
 	}
 };
 
@@ -57,6 +55,7 @@ struct range;
 		return c;									\
 	}
 
+// TODO: More operators
 #define sycl_range_operators(dimensions)	\
 	sycl_range_op(*, dimensions)			\
 	sycl_range_op(/, dimensions)			\

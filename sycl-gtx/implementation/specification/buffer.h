@@ -111,7 +111,7 @@ public:
 	// If the type of the buffer has the const qualifier,
 	// then the default allocator will remove the qualifier to allow host access to the data.
 	buffer_(const range<dimensions>& range)
-		:	host_data(ptr_t(new DataType[ range[0]*range[1]*range[2] ])),
+		:	host_data(ptr_t(new DataType[ detail::get_size(range) ])),
 			rang(range),
 			is_read_only(false),
 			is_blocking(false) {}
@@ -149,9 +149,9 @@ public:
 
 	// Total number of elements in the buffer
 	size_t get_count() const {
-		size_t count = rang[0];
+		size_t count = rang.get(0);
 		for(int i = 1; i < dimensions; ++i) {
-			count *= rang[i];
+			count *= rang.get(i);
 		}
 		return count;
 	}

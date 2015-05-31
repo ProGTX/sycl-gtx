@@ -26,7 +26,7 @@ protected:
 	range<dimensions> allocationSize;
 
 	size_t access_buffer_range(int n) const {
-		return allocationSize[n];
+		return allocationSize.get(n);
 	}
 
 	virtual void* resource() const override {

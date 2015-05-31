@@ -1,16 +1,16 @@
 #pragma once
 
-// 3.7.1.4 Item class
+// 3.5.1.4 Item class
 
 namespace cl {
 namespace sycl {
 
 // Forward declarations
-template <int dims>
+template <int dimensions>
 struct id;
-template <int dims>
+template <int dimensions>
 struct range;
-template <int dims>
+template <int dimensions>
 struct nd_item;
 
 namespace detail {
@@ -20,32 +20,46 @@ namespace kernel_ {
 }
 }
 
-template <int dims = 1>
+template <int dimensions = 1>
 struct item {
 private:
-	id<dims> index;
-	range<dims> rang;
-	id<dims> offset;
+	id<dimensions> index;
+	range<dimensions> rang;
+	id<dimensions> offset;
 
 protected:
-	friend struct detail::kernel_::constructor<item<dims>>;
-	friend struct detail::kernel_::constructor<nd_item<dims>>;
+	friend struct detail::kernel_::constructor<item<dimensions>>;
+	friend struct detail::kernel_::constructor<nd_item<dimensions>>;
 
-	item(id<dims> global_id, range<dims> global_range, id<dims> offset = id<dims>())
+	item(id<dimensions> global_id, range<dimensions> global_range, id<dimensions> offset = id<dimensions>())
 		: index(global_id), rang(global_range), offset(offset) {}
 public:
-	id<dims> get_global_id() const {
+	id<dimensions> get() const {
 		return index;
 	}
-	range<dims> get_global_range() const {
+	range<dimensions> get_range() const {
 		return rang;
 	}
-	id<dims> get_offset() const {
+	id<dimensions> get_offset() const {
 		return offset;
 	}
 
-	size_t get(int dimension) const;
-	size_t& operator[](int dimension);
+	size_t get(int dimension) const {
+		return index.get(dimension);
+	}
+	size_t& operator[](int dimension) {
+		return index[dimension];
+	}
+
+	// TODO: Return the linearized ID in the item's range.
+	// Computed as the flatted ID after the offset is subtracted.
+	size_t get_linear_id() const {
+		return 0;
+	}
+
+	operator id<dimensions>() {
+		return index;
+	}
 };
 
 } // namespace sycl

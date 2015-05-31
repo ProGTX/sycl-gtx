@@ -56,15 +56,15 @@ public:
 	void operator()(cl::sycl::nd_item<1> index) {
 		using namespace cl::sycl;
 
-		uint1 GID = 2 * index.get_global_id(0);
-		uint1 LID = 2 * index.get_local_id(0);
+		uint1 GID = 2 * index.get_global(0);
+		uint1 LID = 2 * index.get_local(0);
 
 		localBlock[LID] = input[GID];
 		localBlock[LID + 1] = input[GID + 1];
 
 		index.barrier(access::fence_space::local);
 
-		uint1 N = 2 * index.get_local_size(0);
+		uint1 N = 2 * index.get_local(0);
 		uint1 first;
 		uint1 second;
 
@@ -142,8 +142,8 @@ public:
 
 	void operator()(cl::sycl::nd_item<1> index) {
 		using namespace cl::sycl;
-		int1 GID = index.get_global_id(0);
-		int1 N = 2 * index.get_local_size(0);
+		int1 GID = index.get_global(0);
+		int1 N = 2 * index.get_local(0);
 		SYCL_IF(GID >= N)
 		SYCL_THEN({
 			data[GID] += higher_level[GID / N - 1];

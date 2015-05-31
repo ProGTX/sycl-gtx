@@ -20,7 +20,7 @@ public:
 	}
 
 	void operator()(item<1> item) {
-		ptr[item.get_global_id()] = random_num;
+		ptr[item.get()] = random_num;
 	}
 
 	int get_random() {

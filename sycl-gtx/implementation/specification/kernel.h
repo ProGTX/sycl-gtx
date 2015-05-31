@@ -121,11 +121,11 @@ private:
 
 	template <int dimensions>
 	void enqueue_nd_range(queue* q, nd_range<dimensions> execution_range) const {
-		size_t* local_work_size = &execution_range.get_local_range()[0];
+		size_t* local_work_size = &execution_range.get_local()[0];
 		size_t* offst = &((size_t&)execution_range.get_offset()[0]);
 
 		size_t global_work_size[dimensions];
-		size_t* start = &execution_range.get_global_range()[0];
+		size_t* start = &execution_range.get_global()[0];
 		std::copy(start, start + dimensions, global_work_size);
 
 		// Adjust global work size

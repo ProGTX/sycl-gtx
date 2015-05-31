@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.7.1.2 nd_range class
+// 3.5.1.2 nd_range class
 
 #include "id.h"
 #include "range.h"
@@ -25,16 +25,16 @@ public:
 	)
 		: global_size(global_size), local_size(local_size), offset(offset) {}
 
-	range<dims> get_global_range() const {
+	range<dims> get_global() const {
 		return global_size;
 	}
 	
-	range<dims> get_local_range() const {
+	range<dims> get_local() const {
 		return local_size;
 	}
 
 	// Return a range representing the number of groups in each dimension.
-	range<dims> get_group_range() const {
+	range<dims> get_group() const {
 		return global_size / local_size;
 	}
 
