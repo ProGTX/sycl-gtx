@@ -39,20 +39,6 @@ namespace kernel_ {
 	class source;
 }
 
-template <access::mode mode>
-struct use_mode;
-
-#define SYCL_ADD_ACCESS_MODE_HELPER(mode, flag_, check_write_)	\
-	template <>													\
-	struct use_mode<mode> {										\
-		static const cl_mem_flags flag = flag_;					\
-		static const bool check_write = check_write_;			\
-	};
-
-SYCL_ADD_ACCESS_MODE_HELPER(access::read, CL_MEM_READ_ONLY, false)
-SYCL_ADD_ACCESS_MODE_HELPER(access::write, CL_MEM_WRITE_ONLY, true)
-SYCL_ADD_ACCESS_MODE_HELPER(access::read_write, CL_MEM_READ_WRITE, true)
-
 #undef SYCL_ADD_ACCESS_MODE_HELPER
 
 
@@ -184,23 +170,23 @@ public:
 	}
 
 private:
-	template<cl_mem_flags FLAGS>
 	static void create(queue* q, buffer_* buffer) {
 		cl_int error_code;
-		const cl_mem_flags all_flags = FLAGS | ((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR);
+		const cl_mem_flags all_flags =
+			((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR)	|
+			(buffer->is_read_only ? CL_MEM_READ_ONLY : CL_MEM_READ_WRITE);
 		buffer->device_data = clCreateBuffer(q->get_context().get(), all_flags, buffer->get_size(), buffer->host_data.get(), &error_code);
 		detail::error::report(error_code);
 	}
 
-	template<cl_mem_flags FLAGS>
 	void init() {
 		if(!is_initialized) {
-			command::group_::add(create<FLAGS>, __func__, this);
+			command::group_::add(create, __func__, this);
 			is_initialized = true;
 		}
 	}
 
-	void check_write() {
+	void check_read_only() {
 		if(is_read_only) {
 			detail::error::report(error::code::TRYING_TO_WRITE_READ_ONLY_BUFFER);
 		}
@@ -219,18 +205,18 @@ private:
 	template <int mode, int target, class = typename std::enable_if<target == access::global_buffer>::type>
 	acc_return_t<mode, target> get_access_device(handler& cgh) {
 		command::group_::check_scope();
-		if(use_mode<(access::mode)mode>::check_write) {
-			check_write();
+		if(mode != access::read) {
+			check_read_only();
 		}
-		init<use_mode<(access::mode)mode>::flag>();
+		init();
 		command::group_::add(buffer_access{ this, (access::mode)mode, (access::target)target }, __func__);
 		return acc_return_t<mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)), &cgh);
 	}
 
 	template <int mode, int target, class = typename std::enable_if<target == access::host_buffer>::type>
 	acc_return_t<mode, target> get_access_host() {
-		if(use_mode<(access::mode)mode>::check_write) {
-			check_write();
+		if(mode != access::read) {
+			check_read_only();
 		}
 		return acc_return_t<mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
 	}
