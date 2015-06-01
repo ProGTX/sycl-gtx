@@ -16,12 +16,17 @@ namespace detail {
 	using acc_t = accessor_<DataType, dimensions, mode, access::host_buffer>;	\
 	friend class acc_t;															\
 	friend class accessor_host_ref;												\
-	acc_t* acc;																	\
+	const acc_t* parent;														\
 	range<3> rang;																\
-	accessor_host_ref(acc_t* acc, range<3> range)								\
-		: acc(acc), rang(range) {}												\
-	accessor_host_ref()															\
-		: accessor_host_ref(nullptr, empty_range<3>()) {}
+	accessor_host_ref(const acc_t* parent, range<3> range)						\
+		: parent(parent), rang(range) {}										\
+	accessor_host_ref(const acc_t* parent, const accessor_host_ref& copy)		\
+		: parent(parent), rang(copy.rang) {}									\
+	accessor_host_ref(const acc_t* parent, accessor_host_ref&& move)			\
+		: parent(parent), rang(std::move(move.rang)) {}							\
+	friend void swap(accessor_host_ref& first, accessor_host_ref& second) {		\
+		std::swap(first.rang, second.rang);										\
+	}
 
 template <int level, typename DataType, int dimensions, access::mode mode>
 class accessor_host_ref {
@@ -32,7 +37,7 @@ public:
 	Lower operator[](int index) {
 		auto rang_copy = rang;
 		rang_copy[dimensions - level] = index;
-		return Lower(acc, rang_copy);
+		return Lower(parent, rang_copy);
 	}
 };
 
@@ -48,9 +53,9 @@ public:
 		int multiplier = 1;
 		for(int i = 0; i < dimensions; ++i) {
 			index += rang[i] * multiplier;
-			multiplier *= acc->access_buffer_range(i);
+			multiplier *= parent->access_buffer_range(i);
 		}
-		return acc->access_host_data()[index];
+		return parent->access_host_data()[index];
 	}
 };
 
@@ -65,15 +70,28 @@ public:
 		buffer<DataType, dimensions>& bufferRef,
 		range<dimensions> offset,
 		range<dimensions> range
-	) : accessor_buffer(bufferRef, nullptr, offset, range) {
-		acc = this;
-	}
+	)	:	accessor_buffer(bufferRef, nullptr, offset, range),
+			accessor_host_ref(this, empty_range<3>())
+	{}
 	accessor_(buffer<DataType, dimensions>& bufferRef)
 		: accessor_(
 			bufferRef,
 			detail::empty_range<dimensions>(),
 			bufferRef.get_range()
 		) {}
+	accessor_(const accessor_& copy)
+		:	accessor_buffer((const accessor_buffer<DataType, dimensions>&)copy),
+			accessor_host_ref(this, copy)
+	{}
+	accessor_(accessor_&& move)
+		:	accessor_buffer(std::move((accessor_buffer<DataType, dimensions>)move)),
+			accessor_host_ref(
+				this,
+				std::move(
+					(accessor_host_ref<dimensions, DataType, dimensions, (access::mode)mode>)move
+				)
+			)
+	{}
 };
 
 } // namespace detail

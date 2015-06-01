@@ -39,8 +39,8 @@ protected:
 
 public:
 	accessor_(range<dimensions> allocationSize)
-		: allocationSize(allocationSize) {
-		acc = this;
+		:	accessor_device_ref(this, {}),
+			allocationSize(allocationSize) {
 		// TODO
 		if(command::group_::in_scope()) {
 			command::group_::add(

@@ -31,9 +31,9 @@ public:
 		handler* commandGroupHandler,
 		range<dimensions> offset,
 		range<dimensions> range
-	) : accessor_buffer(bufferRef, commandGroupHandler, offset, range) {
-		acc = this;
-	}
+	)	:	accessor_buffer(bufferRef, commandGroupHandler, offset, range),
+			accessor_device_ref(this, {})
+	{}
 	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef, handler* commandGroupHandler)
 		: accessor_(
 			bufferRef,
@@ -41,6 +41,19 @@ public:
 			detail::empty_range<dimensions>(),
 			bufferRef.get_range()
 		) {}
+	accessor_(const accessor_& copy)
+		:	accessor_buffer((const accessor_buffer<DataType, dimensions>&)copy),
+			accessor_device_ref(this, copy)
+	{}
+	accessor_(accessor_&& move)
+		:	accessor_buffer(std::move((accessor_buffer<DataType, dimensions>)move)),
+			accessor_device_ref(
+				this,
+				std::move(
+					(accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>)move
+				)
+			)
+	{}
 
 	virtual cl_mem get_cl_mem_object() const override {
 		return get_buffer_object();

@@ -23,17 +23,22 @@ struct subscript_helper<1, DataType, dimensions, mode, target> {
 	using type = data_ref;
 };
 
-#define SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR()							\
-	using acc_t = accessor_<DataType, dimensions, mode, target>;		\
-	friend class acc_t;													\
-	friend class accessor_device_ref;									\
-	acc_t* acc;															\
-	vector_class<string_class> rang;									\
-	accessor_device_ref(acc_t* acc, vector_class<string_class> range)	\
-		: acc(acc), rang(range) {}										\
-	accessor_device_ref()												\
-		: accessor_device_ref(nullptr, {}) {							\
-		rang.resize(3);													\
+#define SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR()									\
+	using acc_t = accessor_<DataType, dimensions, mode, target>;				\
+	friend class acc_t;															\
+	friend class accessor_device_ref;											\
+	const acc_t* parent;														\
+	vector_class<string_class> rang;											\
+	accessor_device_ref(const acc_t* parent, vector_class<string_class> range)	\
+		: parent(parent), rang(range) {											\
+		rang.resize(3);															\
+	}																			\
+	accessor_device_ref(const acc_t* parent, const accessor_device_ref& copy)	\
+		: parent(parent), rang(copy.rang) {}									\
+	accessor_device_ref(const acc_t* parent, accessor_device_ref&& move)		\
+		: parent(parent), rang(std::move(move.rang)) {}							\
+	friend void swap(accessor_device_ref& first, accessor_device_ref& second) {	\
+		std::swap(first.rang, second.rang);										\
 	}
 
 #define SYCL_DEVICE_REF_SUBSCRIPT_OP(type)				\
@@ -54,7 +59,7 @@ protected:
 	subscript_return_t subscript(T index) const {
 		auto rang_copy = rang;
 		rang_copy[dimensions - level] = data_ref::get_name(index);
-		return subscript_return_t(acc, rang_copy);
+		return subscript_return_t(parent, rang_copy);
 	}
 public:
 	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS();
@@ -72,12 +77,12 @@ protected:
 		auto rang_copy = rang;
 		rang_copy[dimensions - 1] = data_ref::get_name(index);
 		string_class ind(std::move(rang_copy[0]));
-		auto multiplier = acc->access_buffer_range(0);
+		auto multiplier = parent->access_buffer_range(0);
 		for(int i = 1; i < dimensions; ++i) {
 			ind += string_class(" + ") + std::move(rang_copy[i]) + " * " + std::to_string(multiplier);
-			multiplier *= acc->access_buffer_range(i);
+			multiplier *= parent->access_buffer_range(i);
 		}
-		auto resource_name = kernel_::source::register_resource(*acc);
+		auto resource_name = kernel_::source::register_resource(*parent);
 		return data_ref(
 			resource_name + "[" + ind + "]"
 		);
