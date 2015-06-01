@@ -10,7 +10,7 @@ int main() {
 	debug() << "SYCL Provisional Specification.";
 	
 	std::map<std::string, bool(*)()> tests{
-		{ "test1", test1 },
+		//{ "test1", test1 },
 		{ "test2", test2 },
 		{ "test3", test3 },
 		{ "test4", test4 },
@@ -31,10 +31,10 @@ int main() {
 			result = test.second();
 		}
 		catch(cl::sycl::exception& e) {
-			debug() << "cl::sycl::exception while testing" << test.first;
+			debug() << "cl::sycl::exception while testing" << test.first << e.what();
 		}
 		catch(std::exception& e) {
-			debug() << "std::exception while testing" << test.first;
+			debug() << "std::exception while testing" << test.first << e.what();
 		}
 		debug();
 		debug() << test.first << (result ? "successful" : "failed");
