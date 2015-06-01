@@ -42,16 +42,20 @@ struct prefix_sum_kernel {
 protected:
 	using mode = cl::sycl::access::mode;
 	using target = cl::sycl::access::target;
+	using buffer = cl::sycl::buffer<T>;
 
 	// Global memory
 	cl::sycl::accessor<T> input;
+	cl::sycl::accessor<T, 1, mode::write> higher_level;
 
 	// Local memory
 	cl::sycl::accessor<T, 1, mode::read_write, target::local> localBlock;
 
 public:
-	prefix_sum_kernel(cl::sycl::buffer<T>& data, size_t group_size)
-		: input(data.get_access<mode::read_write>()), localBlock(group_size) {}
+	prefix_sum_kernel(cl::sycl::handler& cgh, buffer& data, buffer& higher_level, size_t group_size)
+		: input(data.get_access<mode::read_write>(cgh)),
+		higher_level(higher_level.get_access<mode::write>(cgh)),
+		localBlock(group_size) {}
 
 	void operator()(cl::sycl::nd_item<1> index) {
 		using namespace cl::sycl;
@@ -131,14 +135,10 @@ protected:
 	cl::sycl::accessor<T> data;
 	cl::sycl::accessor<T, 1, mode::read> higher_level;
 
-	// Local memory
-	cl::sycl::accessor<T, 1, mode::read_write, target::local> localBlock;
-
 public:
-	prefix_sum_join_kernel(buffer& data, buffer& higher_level, size_t group_size)
-		: data(data.get_access<mode::read_write>()),
-		higher_level(higher_level.get_access<mode::read>())
-		localBlock(group_size) {}
+	prefix_sum_join_kernel(cl::sycl::handler& cgh, buffer& data, buffer& higher_level)
+		: data(data.get_access<mode::read_write>(cgh)),
+		higher_level(higher_level.get_access<mode::read>(cgh)) {}
 
 	void operator()(cl::sycl::nd_item<1> index) {
 		using namespace cl::sycl;
@@ -192,10 +192,9 @@ bool test9() {
 		myQueue.submit([&](handler& cgh) {
 			N = size;
 
-			parallel_for<>(
 			cgh.parallel_for<>(
 				nd_range<1>(N / 2, group_size),
-				prefix_sum_kernel<type>(data[0], group_size)
+				prefix_sum_kernel<type>(cgh, data[0], data[1], 2*group_size)
 			);
 
 			if(N <= group_size * 2) {

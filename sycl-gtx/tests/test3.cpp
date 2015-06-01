@@ -18,14 +18,14 @@ bool test3() {
 		auto ah = A.get_access<access::read_write, access::host_buffer>();
 		for(int i = 0; i < N; ++i) {
 			for(int j = 0; j < N; ++j) {
-				ah[i][j] = i + j * N;
+				ah[i][j] = (float)(i + j * N);
 			}
 		}
 
 		// Rotate A and store result to B
 		myQueue.submit([&](handler& cgh) {
-			auto a = A.get_access<access::read>();
-			auto b = B.get_access<access::write>();
+			auto a = A.get_access<access::read>(cgh);
+			auto b = B.get_access<access::write>(cgh);
 
 			cgh.parallel_for<>(range<2>(N, N), [=](id<2> i) {
 				b[N - i[1] - 1][i[0]] = a[i];

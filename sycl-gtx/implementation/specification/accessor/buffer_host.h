@@ -65,15 +65,15 @@ public:
 		buffer<DataType, dimensions>& bufferRef,
 		range<dimensions> offset,
 		range<dimensions> range
-	) : accessor_buffer(bufferRef, offset, range) {
+	) : accessor_buffer(bufferRef, nullptr, offset, range) {
 		acc = this;
 	}
 	accessor_(buffer<DataType, dimensions>& bufferRef)
 		: accessor_(
-		bufferRef,
-		detail::empty_range<dimensions>(),
-		bufferRef.get_range()
-	) {}
+			bufferRef,
+			detail::empty_range<dimensions>(),
+			bufferRef.get_range()
+		) {}
 };
 
 } // namespace detail

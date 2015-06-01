@@ -13,7 +13,7 @@ bool test4() {
 		buffer<int> V(N);
 
 		myQueue.submit([&](handler& cgh) {
-			auto v = V.get_access<access::read_write>();
+			auto v = V.get_access<access::read_write>(cgh);
 
 			// Init
 			cgh.parallel_for<>(range<1>(N), [=](id<1> index) {

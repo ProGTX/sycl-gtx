@@ -33,10 +33,10 @@ bool test1() {
 		queue myQueue;
 		myQueue.submit([&](handler& cgh) {
 			// Data accessors
-			auto a = d_a.get_access<access::read>();
-			auto b = d_b.get_access<access::read>();
-			auto c = d_c.get_access<access::read>();
-			auto r = d_r.get_access<access::write>();
+			auto a = d_a.get_access<access::read>(cgh);
+			auto b = d_b.get_access<access::read>(cgh);
+			auto c = d_c.get_access<access::read>(cgh);
+			auto r = d_r.get_access<access::write>(cgh);
 
 			// Kernel
 			cgh.parallel_for<>(range<1>(count), [=](id<> i) {

@@ -1,6 +1,7 @@
 #pragma once
 
 // Device buffer accessors
+// 3.4.6 Accessors and 3.4.6.4 Buffer accessors
 
 #include "buffer_base.h"
 #include "device_reference.h"
@@ -27,17 +28,19 @@ SYCL_ACCESSOR_CLASS(
 public:
 	accessor_(
 		cl::sycl::buffer<DataType, dimensions>& bufferRef,
+		handler* commandGroupHandler,
 		range<dimensions> offset,
 		range<dimensions> range
-	) : accessor_buffer(bufferRef, offset, range) {
+	) : accessor_buffer(bufferRef, commandGroupHandler, offset, range) {
 		acc = this;
 	}
-	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef)
+	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef, handler* commandGroupHandler)
 		: accessor_(
-		bufferRef,
-		detail::empty_range<dimensions>(),
-		bufferRef.get_range()
-	) {}
+			bufferRef,
+			commandGroupHandler,
+			detail::empty_range<dimensions>(),
+			bufferRef.get_range()
+		) {}
 
 	virtual cl_mem get_cl_mem_object() const override {
 		return get_buffer_object();

@@ -42,7 +42,7 @@ bool test5() {
 		int random_num = 0;
 
 		myQueue.submit([&](handler& cgh) {
-			auto ptr = buf.get_access<access::read_write>();
+			auto ptr = buf.get_access<access::read_write>(cgh);
 
 			auto functor = example_functor(ptr);
 

@@ -23,16 +23,38 @@ class accessor;
 template <typename DataType, int dimensions = 1>
 struct buffer;
 class command_group;
+class handler;
 class queue;
 
 namespace detail {
 
 // Forward declarations
+#if MSVC_LOW
+template <typename DataType, int dimensions, int mode, int target, typename>
+class accessor_;
+#endif
 template <typename DataType, int dimensions>
 class accessor_buffer;
 namespace kernel_ {
 	class source;
 }
+
+template <access::mode mode>
+struct use_mode;
+
+#define SYCL_ADD_ACCESS_MODE_HELPER(mode, flag_, check_write_)	\
+	template <>													\
+	struct use_mode<mode> {										\
+		static const cl_mem_flags flag = flag_;					\
+		static const bool check_write = check_write_;			\
+	};
+
+SYCL_ADD_ACCESS_MODE_HELPER(access::read, CL_MEM_READ_ONLY, false)
+SYCL_ADD_ACCESS_MODE_HELPER(access::write, CL_MEM_WRITE_ONLY, true)
+SYCL_ADD_ACCESS_MODE_HELPER(access::read_write, CL_MEM_READ_WRITE, true)
+
+#undef SYCL_ADD_ACCESS_MODE_HELPER
+
 
 class buffer_base {
 protected:
@@ -184,44 +206,45 @@ private:
 		}
 	}
 
-	template<access::mode mode, access::target target>
-	accessor<DataType, dimensions, mode, target> create_accessor() {
-		if(command::group_::in_scope()) {
-			command::group_::add(buffer_access{ this, mode, target }, __func__);
+#if MSVC_LOW
+	// Indirection required because MSVC2013 fails on enum parameter SFINAE
+	// The final accessor class also needs a move constructor from base type: accessor(accessor_&&)
+	template <int mode, int target>
+	using acc_return_t = accessor_<DataType, dimensions, mode, target>;
+#else
+	template <access::mode mode, access::target target>
+	using acc_return_t = accessor<DataType, dimensions, mode, target>;
+#endif
+
+	template <int mode, int target, class = typename std::enable_if<target == access::global_buffer>::type>
+	acc_return_t<mode, target> get_access_device(handler& cgh) {
+		command::group_::check_scope();
+		if(use_mode<(access::mode)mode>::check_write) {
+			check_write();
 		}
-		return accessor<DataType, dimensions, mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
+		init<use_mode<(access::mode)mode>::flag>();
+		command::group_::add(buffer_access{ this, (access::mode)mode, (access::target)target }, __func__);
+		return acc_return_t<mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)), &cgh);
+	}
+
+	template <int mode, int target, class = typename std::enable_if<target == access::host_buffer>::type>
+	acc_return_t<mode, target> get_access_host() {
+		if(use_mode<(access::mode)mode>::check_write) {
+			check_write();
+		}
+		return acc_return_t<mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
 	}
 
 public:
-	// Default access is read-only
-	template<access::mode mode, access::target target = access::global_buffer>
+	template <access::mode mode, access::target target = access::global_buffer>
+	accessor<DataType, dimensions, mode, target> get_access(handler& cgh) {
+		return get_access_device<mode, target>(cgh);
+	}
+
+	template <access::mode mode, access::target target>
 	accessor<DataType, dimensions, mode, target> get_access() {
-		if(target != access::host_buffer) {
-			command::group_::check_scope();
-			init<CL_MEM_READ_ONLY>();
-		}
-		return create_accessor<mode, target>();
+		return get_access_host<mode, target>();
 	}
-
-	// TODO: Handle multiple access requests
-#define SYCL_GET_ACCESS(mode, target, flags, code)				\
-	template<>													\
-	accessor<DataType, dimensions, mode, target> get_access() {	\
-		if(target != access::host_buffer) {						\
-			command::group_::check_scope();						\
-		}														\
-		code;													\
-		if(target != access::host_buffer) {						\
-			init<flags>();										\
-		}														\
-		return create_accessor<mode, target>();					\
-	}
-
-	// TODO: Implement other combinations
-	SYCL_GET_ACCESS(access::write, access::global_buffer, CL_MEM_WRITE_ONLY, check_write());
-	SYCL_GET_ACCESS(access::read_write, access::global_buffer, CL_MEM_READ_WRITE, check_write());
-
-#undef SYCL_GET_ACCESS
 
 private:
 	// TODO

@@ -19,7 +19,7 @@ bool test6() {
 
 		// Init
 		myQueue.submit([&](handler& cgh) {
-			auto p = P->get_access<access::write>();
+			auto p = P->get_access<access::write>(cgh);
 
 			cgh.parallel_for<>(range<1>(size), [=](id<1> index) {
 				p[index] = index;
@@ -28,8 +28,8 @@ bool test6() {
 
 		for(unsigned int N = size / 2; N > 0; N /= 2 * group_size) {
 			myQueue.submit([&](handler& cgh) {
-				auto input = P->get_access<access::read>();
-				auto output = Q->get_access<access::write>();
+				auto input = P->get_access<access::read>(cgh);
+				auto output = Q->get_access<access::write>(cgh);
 				auto local = accessor<float, 1, access::read_write, access::local>(group_size);
 
 				cgh.parallel_for<>(nd_range<1>(N, group_size), [=](nd_item<1> index) {
