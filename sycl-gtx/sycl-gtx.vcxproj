@@ -202,6 +202,7 @@
     <ClInclude Include="implementation\specification\handler.h" />
     <ClInclude Include="implementation\specification\kernel.h" />
     <ClInclude Include="implementation\specification\param_traits.h" />
+    <ClInclude Include="implementation\specification\param_traits2.h" />
     <ClInclude Include="implementation\specification\platform.h" />
     <ClInclude Include="implementation\specification\program.h" />
     <ClInclude Include="implementation\specification\queue.h" />

@@ -18,10 +18,11 @@ enum class platform : unsigned int {
 };
 
 // C.2 Context Information Descriptors
-using gl_context_interop = bool;
+using gl_context_interop = cl_bool;
 enum class context : int {
 	reference_count,
 	num_devices,
+	devices,
 	gl_interop
 };
 
