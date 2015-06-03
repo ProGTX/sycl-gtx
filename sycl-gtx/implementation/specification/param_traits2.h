@@ -57,6 +57,15 @@ SYCL_ADD_PLATFORM_TRAIT(info::platform::extensions)
 #undef SYCL_ADD_PLATFORM_TRAIT
 
 
+// 3.3.4.2 Device information descriptors
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetDeviceInfo.html
+
+#define SYCL_ADD_DEVICE_TRAIT(Value, ReturnType)	\
+	SYCL_ADD_TRAIT(info::device, Value, ReturnType, cl_device_info)
+
+#undef SYCL_ADD_DEVICE_TRAIT
+
+
 #undef SYCL_ADD_TRAIT
 
 } // namespace sycl
