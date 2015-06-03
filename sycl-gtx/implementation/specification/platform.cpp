@@ -1,5 +1,6 @@
 #include "platform.h"
 #include "device.h"
+#include "info.h"
 
 #include <utility>
 #include "../debug.h"
@@ -45,6 +46,6 @@ bool platform::is_host() const {
 	return false;
 }
 
-bool platform::has_extension(const string_class extension_name) const {
-	return detail::has_extension<CL_PLATFORM_EXTENSIONS>(this, extension_name);
+bool platform::has_extension(string_class extension_name) const {
+	return detail::has_extension<info::platform, info::platform::extensions>(this, extension_name);
 }

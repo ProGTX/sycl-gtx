@@ -21,9 +21,9 @@ template <typename EnumClass, EnumClass Value>
 struct param_traits2;
 
 #define SYCL_ADD_TRAIT(EnumClass, Value, ReturnType, CLType)	\
-template <>																	\
-struct param_traits2<EnumClass, Value>										\
-	: detail::param_traits2<												\
+template <>														\
+struct param_traits2<EnumClass, Value>							\
+	: detail::param_traits2<									\
 		EnumClass, Value, ReturnType, CLType					\
 	> {};
 
@@ -40,6 +40,22 @@ SYCL_ADD_CONTEXT_TRAIT(info::context::devices,			vector_class<cl_device_id>)
 SYCL_ADD_CONTEXT_TRAIT(info::context::gl_interop,		info::gl_context_interop)
 
 #undef SYCL_ADD_CONTEXT_TRAIT
+
+
+// 3.3.2.1 Platform information descriptors
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetPlatformInfo.html
+
+#define SYCL_ADD_PLATFORM_TRAIT(Value)	\
+	SYCL_ADD_TRAIT(info::platform, Value, string_class, cl_platform_info)
+
+SYCL_ADD_PLATFORM_TRAIT(info::platform::profile)
+SYCL_ADD_PLATFORM_TRAIT(info::platform::version)
+SYCL_ADD_PLATFORM_TRAIT(info::platform::name)
+SYCL_ADD_PLATFORM_TRAIT(info::platform::vendor)
+SYCL_ADD_PLATFORM_TRAIT(info::platform::extensions)
+
+#undef SYCL_ADD_PLATFORM_TRAIT
+
 
 #undef SYCL_ADD_TRAIT
 

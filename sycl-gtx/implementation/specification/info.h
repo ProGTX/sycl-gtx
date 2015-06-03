@@ -10,11 +10,11 @@ namespace info {
 
 // C.1 Platform Information Descriptors
 enum class platform : unsigned int {
-	profile,
-	version,
-	name,
-	vendor,
-	extensions
+	profile		= CL_PLATFORM_PROFILE,
+	version		= CL_PLATFORM_VERSION,
+	name		= CL_PLATFORM_NAME,
+	vendor		= CL_PLATFORM_VENDOR,
+	extensions	= CL_PLATFORM_EXTENSIONS
 };
 
 // C.2 Context Information Descriptors

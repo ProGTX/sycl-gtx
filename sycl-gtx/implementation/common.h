@@ -101,12 +101,10 @@ vector_class<To> transform_vector(vector_class<From> array) {
 	return vector_class<To>(array.data(), array.data() + array.size());
 }
 
-template<cl_uint extension_macro, class T>
-bool has_extension(T* sycl_class, const string_class extension_name) {
+template <typename EnumClass, EnumClass Value, class T>
+bool has_extension(T* sycl_class, const string_class& extension_name) {
 	// TODO: Maybe add caching
-	auto extensions = sycl_class->get_info<extension_macro>();
-	string_class ext_str(extensions);
-	return ext_str.find(extension_name) != string_class::npos;
+	return sycl_class->get_info<Value>().find(extension_name) != string_class::npos;
 }
 
 template <class T>

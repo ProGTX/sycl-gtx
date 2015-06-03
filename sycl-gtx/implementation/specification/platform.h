@@ -3,10 +3,10 @@
 // 3.3.2 Platform class
 
 #include "device_selector.h"
-#include "info.h"
-#include "refc.h"
 #include "error_handler.h"
-#include "param_traits.h"
+#include "info.h"
+#include "param_traits2.h"
+#include "refc.h"
 #include "../common.h"
 
 namespace cl {
@@ -44,12 +44,16 @@ public:
 	vector_class<device> get_devices(info::device_type = info::device_type::all) const;
 
 	// Returns the corresponding descriptor information for all SYCL platforms (OpenCL and host)
-	template<cl_int name>
-	typename string_class get_info() const {
+	template <info::platform param>
+	typename param_traits2<info::platform, param>::type
+	get_info() const {
+		// Small optimization, knowing the return type is always string_class
 		static const int BUFFER_SIZE = 8192;
 		char buffer[BUFFER_SIZE];
 		auto pid = platform_id.get();
-		auto error_code = clGetPlatformInfo(pid, name, BUFFER_SIZE, buffer, nullptr);
+		auto error_code = clGetPlatformInfo(
+			pid, (typename param_traits2<info::platform, param>::cl_type)param, BUFFER_SIZE, buffer, nullptr
+		);
 		detail::error::report(error_code);
 		return string_class(buffer);
 	}
@@ -57,8 +61,8 @@ public:
 	// True if the platform is host
 	bool is_host() const;
 
-	// Returns the available extensions for all SYCL platforms( OpenCL and host)
-	bool has_extension(const string_class extension_name) const;
+	// Returns the available extensions for all SYCL platforms (OpenCL and host)
+	bool has_extension(string_class extension_name) const;
 };
 
 } // namespace sycl
