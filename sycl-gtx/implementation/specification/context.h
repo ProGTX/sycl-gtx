@@ -7,7 +7,7 @@
 #include "device_selector.h"
 #include "error_handler.h"
 #include "info.h"
-#include "param_traits.h"
+#include "param_traits2.h"
 #include "../common.h"
 #include "../debug.h"
 
@@ -89,39 +89,44 @@ public:
 	vector_class<device> get_devices() const;
 
 private:
-	template<class return_type, cl_int name>
-	struct hidden {
-		using real_return = return_type;
-		static real_return get_info(const context* contex) {
+	template <info::context param>
+	using trait = param_traits2<info::context, param>;
+
+	template <class return_type, info::context param>
+	struct traits {
+		static return_type get(const context* contex) {
 			auto c = contex->ctx.get();
-			real_return param_value;
-			auto error_code = clGetContextInfo(c, name, sizeof(real_return),& param_value, nullptr);
+			return_type param_value;
+			auto error_code = clGetContextInfo(
+				c, trait<param>::cl_flag, sizeof(return_type), &param_value, nullptr
+			);
 			detail::error::report(error_code);
 			return param_value;
 		}
 	};
-	template<class return_type, cl_int name>
-	struct hidden<return_type[], name> {
-		using real_return = vector_class<return_type>;
-		static real_return get_info(const context* contex) {
+	template <typename Contained, info::context param>
+	struct traits<vector_class<Contained>, param> {
+		using return_t = vector_class<Contained>;
+		static return_t get(const context* contex) {
 			auto c = contex->ctx.get();
 			static const int BUFFER_SIZE = 1024;
-			return_type param_value[BUFFER_SIZE];
-			std::size_t actual_size;
-			std::size_t type_size = sizeof(return_type);
-			auto error_code = clGetContextInfo(c, name, BUFFER_SIZE * type_size, param_value, &actual_size);
+			Contained param_value[BUFFER_SIZE];
+			auto type_size = sizeof(Contained);
+			decltype(type_size) actual_size;
+			auto error_code = clGetContextInfo(
+				c, trait<param>::cl_flag, BUFFER_SIZE * type_size, param_value, &actual_size
+			);
 			detail::error::report(error_code);
-			return real_return(param_value, param_value + actual_size / type_size);
+			return return_t(param_value, param_value + actual_size / type_size);
 		}
 	};
-	template<cl_int name>
-	using param = typename param_traits<cl_context_info, name>::param_type;
-public:
 
-	// Queries OpenCL information for the underlying cl_context.
-	template<cl_int name>
-	typename hidden<param<name>, name>::real_return get_info() const {
-		return hidden<param<name>, name>::get_info(this);
+public:
+	// Queries OpenCL information for the underlying cl_context
+	template <info::context param>
+	typename param_traits2<info::context, param>::type
+	get_info() const {
+		return traits<typename trait<param>::type, param>::get(this);
 	}
 };
 

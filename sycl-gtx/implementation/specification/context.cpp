@@ -67,5 +67,5 @@ cl_context context::get() const {
 }
 
 vector_class<device> context::get_devices() const {
-	return detail::transform_vector<device>(get_info<CL_CONTEXT_DEVICES>());
+	return detail::transform_vector<device>(get_info<info::context::devices>());
 }

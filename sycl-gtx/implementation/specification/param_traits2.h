@@ -31,6 +31,7 @@ struct param_traits2<EnumClass, Value>										\
 
 // 3.3.3.2 Context information descriptors
 // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetContextInfo.html
+
 #define SYCL_ADD_CONTEXT_TRAIT(Value, ReturnType, CLFlag)	\
 	SYCL_ADD_TRAIT(info::context, Value, ReturnType, cl_context_info, CLFlag)
 
