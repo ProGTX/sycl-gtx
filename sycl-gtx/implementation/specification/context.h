@@ -91,6 +91,8 @@ public:
 private:
 	template <info::context param>
 	using trait = param_traits2<info::context, param>;
+	template <info::context param>
+	using cl_type = typename trait<param>::cl_type;
 
 	template <class return_type, info::context param>
 	struct traits {
@@ -98,7 +100,7 @@ private:
 			auto c = contex->ctx.get();
 			return_type param_value;
 			auto error_code = clGetContextInfo(
-				c, trait<param>::cl_flag, sizeof(return_type), &param_value, nullptr
+				c, (cl_type<param>)param, sizeof(return_type), &param_value, nullptr
 			);
 			detail::error::report(error_code);
 			return param_value;
@@ -114,7 +116,7 @@ private:
 			auto type_size = sizeof(Contained);
 			decltype(type_size) actual_size;
 			auto error_code = clGetContextInfo(
-				c, trait<param>::cl_flag, BUFFER_SIZE * type_size, param_value, &actual_size
+				c, (cl_type<param>)param, BUFFER_SIZE * type_size, param_value, &actual_size
 			);
 			detail::error::report(error_code);
 			return return_t(param_value, param_value + actual_size / type_size);
