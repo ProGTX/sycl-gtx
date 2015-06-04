@@ -25,20 +25,34 @@ struct traits {
 	static const int BUFFER_SIZE = 1024;
 	static const size_t type_size = sizeof(Contained);
 };
+template <>
+struct traits<string_class> {
+	using return_t = string_class;
+	static const int BUFFER_SIZE = 8192;
+	static const size_t type_size = sizeof(char);
+};
 
 template <typename cl_input_t>
-using get_cl_info_f = cl_int(CL_API_CALL*)(cl_input_t, cl_uint, size_t, void*, size_t*);
+using opencl_info_f = cl_int(CL_API_CALL*)(cl_input_t, cl_uint, size_t, void*, size_t*);
 
-template <typename EnumClass, typename cl_input_t>
-struct function {
-	static const get_cl_info_f<cl_input_t> get;
+template <typename cl_input_t, opencl_info_f<cl_input_t> F>
+struct info_function_helper {
+	template <class... Args>
+	static cl_int get(Args... args) {
+		return F(args...);
+	}
 };
+
+template <typename EnumClass>
+struct info_function;
 template <>
-const get_cl_info_f<cl_context> function<info::context, cl_context>::get = clGetContextInfo;
+struct info_function<info::context> : info_function_helper<cl_context, clGetContextInfo>{};
+template <>
+struct info_function<info::device> : info_function_helper<cl_device_id, clGetDeviceInfo>{};
 
 template <typename EnumClass, EnumClass param, size_t size, typename cl_input_t>
 static void get_cl_info(cl_input_t data_ptr, void* param_value, size_t* actual_size = nullptr) {
-	auto error_code = function<EnumClass, cl_input_t>::get(
+	auto error_code = info_function<EnumClass>::get(
 		data_ptr, (param_traits2<EnumClass, param>::cl_type)param, size, param_value, actual_size
 	);
 	detail::error::report(error_code);

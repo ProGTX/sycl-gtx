@@ -8,7 +8,6 @@ namespace cl {
 namespace sycl {
 namespace info {
 
-
 // C.1 Platform Information Descriptors
 enum class platform : unsigned int {
 	profile		= CL_PLATFORM_PROFILE,
