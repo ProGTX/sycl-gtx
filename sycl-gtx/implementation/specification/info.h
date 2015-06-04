@@ -30,11 +30,11 @@ enum class context : unsigned int {
 
 // C.3 Device Information Descriptors
 
-using device_fp_config = unsigned int;
-using device_exec_capabilities = unsigned int;
-using device_queue_properties = unsigned int;
+using device_fp_config = cl_device_fp_config;
+using device_exec_capabilities = cl_device_exec_capabilities;
+using device_queue_properties = cl_command_queue_properties;
 
-enum class device_type : unsigned int {
+enum class device_type : cl_device_type {
 	cpu			= CL_DEVICE_TYPE_CPU,
 	gpu			= CL_DEVICE_TYPE_GPU,
 	accelerator	= CL_DEVICE_TYPE_ACCELERATOR,
@@ -44,7 +44,7 @@ enum class device_type : unsigned int {
 	all			= CL_DEVICE_TYPE_ALL
 };
 
-enum class device : unsigned int {
+enum class device : cl_device_info {
 	device_type							= CL_DEVICE_TYPE,
 	vendor_id							= CL_DEVICE_VENDOR_ID,
 	max_compute_units					= CL_DEVICE_MAX_COMPUTE_UNITS,
@@ -119,15 +119,15 @@ enum class device : unsigned int {
 	reference_count						= CL_DEVICE_REFERENCE_COUNT
 };
 
-enum class device_partition_property : int {
+enum class device_partition_property : cl_device_partition_property {
 	unsupported,
-	partition_equally,
-	partition_by_counts,
-	partition_by_affinity_domain,
+	partition_equally								= CL_DEVICE_PARTITION_EQUALLY,
+	partition_by_counts								= CL_DEVICE_PARTITION_BY_COUNTS,
+	partition_by_affinity_domain					= CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN,
 	partition_affinity_domain_next_partitionable
 };
 
-enum class device_affinity_domain : int {
+enum class device_affinity_domain : cl_device_affinity_domain {
 	unsupported,
 	numa,
 	L4_cache,
@@ -136,7 +136,7 @@ enum class device_affinity_domain : int {
 	next_partitionable
 };
 
-enum class device_partition_type : int {
+enum class device_partition_type : cl_device_partition_property {
 	no_partition,
 	numa,
 	L4_cache,
@@ -145,30 +145,30 @@ enum class device_partition_type : int {
 	L1_cache
 };
 
-enum class local_mem_type : int {
-	none,
-	local,
-	global
+enum class local_mem_type : cl_device_local_mem_type {
+	none	= CL_NONE,
+	local	= CL_LOCAL,
+	global	= CL_GLOBAL
 };
 
-enum class fp_config : int {
-	denorm,
-	inf_nan,
-	round_to_nearest,
-	round_to_zero,
-	round_to_inf,
-	fma,
-	correctly_rounded_divide_sqrt,
-	soft_float
+enum class fp_config : cl_device_fp_config {
+	denorm							= CL_FP_DENORM,
+	inf_nan							= CL_FP_INF_NAN,
+	round_to_nearest				= CL_FP_ROUND_TO_NEAREST,
+	round_to_zero					= CL_FP_ROUND_TO_ZERO,
+	round_to_inf					= CL_FP_ROUND_TO_INF,
+	fma								= CL_FP_FMA,
+	correctly_rounded_divide_sqrt	= CL_FP_CORRECTLY_ROUNDED_DIVIDE_SQRT,
+	soft_float						= CL_FP_SOFT_FLOAT
 };
 
-enum class global_mem_cache_type : int {
+enum class global_mem_cache_type : cl_device_mem_cache_type {
 	none,
 	read_only,
 	write_only
 };
 
-enum class device_execution_capabilities : unsigned int {
+enum class device_execution_capabilities : cl_device_exec_capabilities {
 	exec_kernel,
 	exec_native_kernel
 };

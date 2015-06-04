@@ -13,11 +13,10 @@ struct param_traits2;
 
 namespace detail {
 
-template <typename EnumClass, EnumClass Value, typename ReturnType, typename CLType, typename CLReturnType = ReturnType>
+template <typename EnumClass, EnumClass Value, typename ReturnType, typename CLType>
 struct param_traits_helper {
 	using type = ReturnType;
 	using cl_flag_type = CLType;
-	using cl_return_type = CLReturnType;
 };
 
 template <typename Contained>
@@ -62,15 +61,13 @@ static void get_cl_info(cl_input_t data_ptr, void* param_value, size_t* actual_s
 } // namespace detail
 
 
-#define SYCL_ADD_TRAIT_DIFF_RET(EnumClass, Value, ReturnType, CLType, CLReturnType)	\
-template <>																					\
-struct param_traits2<EnumClass, Value>														\
-	: detail::param_traits_helper<															\
-		EnumClass, Value, ReturnType, CLType, CLReturnType									\
+#define SYCL_ADD_TRAIT(EnumClass, Value, ReturnType, CLType)	\
+template <>																\
+struct param_traits2<EnumClass, Value>									\
+	: detail::param_traits_helper<										\
+		EnumClass, Value, ReturnType, CLType							\
 	> {};
 
-#define SYCL_ADD_TRAIT(EnumClass, Value, ReturnType, CLType)	\
-	SYCL_ADD_TRAIT_DIFF_RET(EnumClass, Value, ReturnType, CLType, ReturnType)
 
 // 3.3.3.2 Context information descriptors
 // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetContextInfo.html
@@ -104,8 +101,6 @@ SYCL_ADD_PLATFORM_TRAIT(info::platform::extensions)
 // 3.3.4.2 Device information descriptors
 // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetDeviceInfo.html
 
-#define SYCL_ADD_DEVICE_TRAIT_DIFF_RET(Value, ReturnType, CLReturnType)	\
-	SYCL_ADD_TRAIT_DIFF_RET(info::device, Value, ReturnType, cl_device_info, CLReturnType)
 #define SYCL_ADD_DEVICE_TRAIT(Value, ReturnType)	\
 	SYCL_ADD_TRAIT(info::device, Value, ReturnType, cl_device_info)
 
@@ -113,12 +108,12 @@ SYCL_ADD_PLATFORM_TRAIT(info::platform::extensions)
 template <int dimensions>
 struct id;
 
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::device_type,				info::device_type, cl_device_type)
+SYCL_ADD_DEVICE_TRAIT(info::device::device_type,						info::device_type)
 SYCL_ADD_DEVICE_TRAIT(info::device::vendor_id,							cl_uint)
 
 SYCL_ADD_DEVICE_TRAIT(info::device::max_compute_units,					cl_uint)
 SYCL_ADD_DEVICE_TRAIT(info::device::max_work_item_dimensions,			cl_uint)
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::max_work_item_sizes,		id<3>, size_t[])
+SYCL_ADD_DEVICE_TRAIT(info::device::max_work_item_sizes,				id<3>)
 SYCL_ADD_DEVICE_TRAIT(info::device::max_work_group_size,				size_t)
 
 SYCL_ADD_DEVICE_TRAIT(info::device::preferred_vector_width_char,		cl_uint)
@@ -156,16 +151,16 @@ SYCL_ADD_DEVICE_TRAIT(info::device::max_samplers,						cl_uint)
 SYCL_ADD_DEVICE_TRAIT(info::device::max_parameter_size,					size_t)
 SYCL_ADD_DEVICE_TRAIT(info::device::mem_base_addr_align,				cl_uint)
 
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::single_fp_config,			info::device_fp_config, cl_device_fp_config)
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::double_fp_config,			info::device_fp_config, cl_device_fp_config)
+SYCL_ADD_DEVICE_TRAIT(info::device::single_fp_config,					info::device_fp_config)
+SYCL_ADD_DEVICE_TRAIT(info::device::double_fp_config,					info::device_fp_config)
 
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::global_mem_cache_type,		info::global_mem_cache_type, cl_device_mem_cache_type)
+SYCL_ADD_DEVICE_TRAIT(info::device::global_mem_cache_type,				info::global_mem_cache_type)
 SYCL_ADD_DEVICE_TRAIT(info::device::global_mem_cache_line_size,			cl_uint)
 SYCL_ADD_DEVICE_TRAIT(info::device::global_mem_cache_size,				cl_ulong)
 SYCL_ADD_DEVICE_TRAIT(info::device::global_mem_size,					cl_ulong)
 SYCL_ADD_DEVICE_TRAIT(info::device::max_constant_buffer_size,			cl_ulong)
 SYCL_ADD_DEVICE_TRAIT(info::device::max_constant_args,					cl_uint)
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::local_mem_type,			info::local_mem_type, cl_device_local_mem_type)
+SYCL_ADD_DEVICE_TRAIT(info::device::local_mem_type,						info::local_mem_type)
 SYCL_ADD_DEVICE_TRAIT(info::device::local_mem_size,						cl_ulong)
 
 SYCL_ADD_DEVICE_TRAIT(info::device::error_correction_support,			cl_bool)
@@ -176,8 +171,8 @@ SYCL_ADD_DEVICE_TRAIT(info::device::is_available,						cl_bool)
 SYCL_ADD_DEVICE_TRAIT(info::device::is_compiler_available,				cl_bool)
 SYCL_ADD_DEVICE_TRAIT(info::device::is_linker_available,				cl_bool)
 
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::execution_capabilities,	info::device_exec_capabilities, cl_device_exec_capabilities)
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::queue_properties,			vector_class<info::device_queue_properties>, cl_command_queue_properties)
+SYCL_ADD_DEVICE_TRAIT(info::device::execution_capabilities,				info::device_exec_capabilities)
+SYCL_ADD_DEVICE_TRAIT(info::device::queue_properties,					info::device_queue_properties)
 SYCL_ADD_DEVICE_TRAIT(info::device::built_in_kernels,					string_class)
 SYCL_ADD_DEVICE_TRAIT(info::device::platform,							cl_platform_id)
 SYCL_ADD_DEVICE_TRAIT(info::device::name,								string_class)
@@ -192,9 +187,9 @@ SYCL_ADD_DEVICE_TRAIT(info::device::printf_buffer_size,					size_t)
 SYCL_ADD_DEVICE_TRAIT(info::device::preferred_interop_user_sync,		cl_bool)
 SYCL_ADD_DEVICE_TRAIT(info::device::parent_device,						cl_device_id)
 SYCL_ADD_DEVICE_TRAIT(info::device::partition_max_sub_devices,			cl_uint)
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::partition_properties,		vector_class<info::device_partition_property>, cl_device_partition_property[])
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::partition_affinity_domain,	info::device_affinity_domain, cl_device_affinity_domain)
-SYCL_ADD_DEVICE_TRAIT_DIFF_RET(info::device::partition_type,			vector_class<info::device_partition_type>, cl_device_partition_property[])
+SYCL_ADD_DEVICE_TRAIT(info::device::partition_properties,				vector_class<info::device_partition_property>)
+SYCL_ADD_DEVICE_TRAIT(info::device::partition_affinity_domain,			info::device_affinity_domain)
+SYCL_ADD_DEVICE_TRAIT(info::device::partition_type,						vector_class<info::device_partition_type>)
 SYCL_ADD_DEVICE_TRAIT(info::device::reference_count,					cl_uint)
 
 #undef SYCL_ADD_DEVICE_TRAIT
