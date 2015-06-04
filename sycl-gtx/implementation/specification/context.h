@@ -94,31 +94,29 @@ private:
 	template <info::context param>
 	using cl_type = typename trait<param>::cl_type;
 
-	template <class return_type, info::context param>
+	template <info::context param, size_t size, typename cl_return_t>
+	static void get_cl_info(const context* contex, cl_return_t* param_value, size_t* actual_size = nullptr) {
+		auto c = contex->ctx.get();
+		auto error_code = clGetContextInfo(
+			c, (cl_type<param>)param, size, param_value, actual_size
+		);
+		detail::error::report(error_code);
+	}
+
+	template <class return_t, info::context param>
 	struct traits {
-		static return_type get(const context* contex) {
-			auto c = contex->ctx.get();
-			return_type param_value;
-			auto error_code = clGetContextInfo(
-				c, (cl_type<param>)param, sizeof(return_type), &param_value, nullptr
-			);
-			detail::error::report(error_code);
+		static return_t get(const context* contex) {
+			return_t param_value;
+			get_cl_info<param, sizeof(return_t)>(contex, &param_value);
 			return param_value;
 		}
 	};
 	template <typename Contained, info::context param>
-	struct traits<vector_class<Contained>, param> {
-		using return_t = vector_class<Contained>;
+	struct traits<vector_class<Contained>, param> : detail::traits<Contained> {
 		static return_t get(const context* contex) {
-			auto c = contex->ctx.get();
-			static const int BUFFER_SIZE = 1024;
 			Contained param_value[BUFFER_SIZE];
-			auto type_size = sizeof(Contained);
-			decltype(type_size) actual_size;
-			auto error_code = clGetContextInfo(
-				c, (cl_type<param>)param, BUFFER_SIZE * type_size, param_value, &actual_size
-			);
-			detail::error::report(error_code);
+			size_t actual_size;
+			get_cl_info<param, BUFFER_SIZE * type_size>(contex, param_value, &actual_size);
 			return return_t(param_value, param_value + actual_size / type_size);
 		}
 	};

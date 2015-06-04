@@ -15,6 +15,13 @@ struct param_traits2 {
 	using cl_type = CLType;
 };
 
+template <typename Contained>
+struct traits {
+	using return_t = vector_class<Contained>;
+	static const int BUFFER_SIZE = 1024;
+	static const size_t type_size = sizeof(Contained);
+};
+
 } // namespace detail
 
 template <typename EnumClass, EnumClass Value>
