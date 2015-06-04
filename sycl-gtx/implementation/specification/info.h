@@ -8,6 +8,7 @@ namespace cl {
 namespace sycl {
 namespace info {
 
+
 // C.1 Platform Information Descriptors
 enum class platform : unsigned int {
 	profile		= CL_PLATFORM_PROFILE,
@@ -16,6 +17,7 @@ enum class platform : unsigned int {
 	vendor		= CL_PLATFORM_VENDOR,
 	extensions	= CL_PLATFORM_EXTENSIONS
 };
+
 
 // C.2 Context Information Descriptors
 using gl_context_interop = cl_bool;
@@ -26,7 +28,12 @@ enum class context : unsigned int {
 	gl_interop		= CL_CONTEXT_INTEROP_USER_SYNC	// TODO: Not sure
 };
 
-// TODO: C.3 Device Information Descriptors
+
+// C.3 Device Information Descriptors
+
+using device_fp_config = unsigned int;
+using device_exec_capabilities = unsigned int;
+using device_queue_properties = unsigned int;
 
 enum class device_type : unsigned int {
 	cpu			= CL_DEVICE_TYPE_CPU,
@@ -67,8 +74,8 @@ enum class device : unsigned int {
 	max_write_image_args				= CL_DEVICE_MAX_WRITE_IMAGE_ARGS,
 	image2d_max_height					= CL_DEVICE_IMAGE2D_MAX_HEIGHT,
 	image2d_max_width					= CL_DEVICE_IMAGE2D_MAX_WIDTH,
-	image3d_max_height					= CL_DEVICE_IMAGE2D_MAX_HEIGHT,
-	image3d_max_width					= CL_DEVICE_IMAGE2D_MAX_WIDTH,
+	image3d_max_height					= CL_DEVICE_IMAGE3D_MAX_HEIGHT,
+	image3d_max_width					= CL_DEVICE_IMAGE3D_MAX_WIDTH,
 	image3d_max_depth					= CL_DEVICE_IMAGE3D_MAX_DEPTH,
 	image_max_buffer_size				= CL_DEVICE_IMAGE_MAX_BUFFER_SIZE,
 	image_max_array_size				= CL_DEVICE_IMAGE_MAX_ARRAY_SIZE,
@@ -139,6 +146,35 @@ enum class device_partition_type : int {
 	L1_cache
 };
 
+enum class local_mem_type : int {
+	none,
+	local,
+	global
+};
+
+enum class fp_config : int {
+	denorm,
+	inf_nan,
+	round_to_nearest,
+	round_to_zero,
+	round_to_inf,
+	fma,
+	correctly_rounded_divide_sqrt,
+	soft_float
+};
+
+enum class global_mem_cache_type : int {
+	none,
+	read_only,
+	write_only
+};
+
+enum class device_execution_capabilities : unsigned int {
+	exec_kernel,
+	exec_native_kernel
+};
+
+
 // C.4 Queue Information Descriptors
 using queue_profiling = cl_command_queue_properties;
 enum class queue : int {
@@ -148,12 +184,14 @@ enum class queue : int {
 	properties
 };
 
+
 // C.7 Event Information Descriptors
 enum class event : int {
 	command_type,
 	command_execution_status,
 	reference_count
 };
+
 enum class event_profiling : int {
 	command_queued,
 	command_submit,
