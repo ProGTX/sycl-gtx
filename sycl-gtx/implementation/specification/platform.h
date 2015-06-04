@@ -52,7 +52,7 @@ public:
 		char buffer[BUFFER_SIZE];
 		auto pid = platform_id.get();
 		auto error_code = clGetPlatformInfo(
-			pid, (typename param_traits2<info::platform, param>::cl_type)param, BUFFER_SIZE, buffer, nullptr
+			pid, (typename param_traits2<info::platform, param>::cl_flag_type)param, BUFFER_SIZE, buffer, nullptr
 		);
 		detail::error::report(error_code);
 		return string_class(buffer);
