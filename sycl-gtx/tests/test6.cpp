@@ -8,7 +8,7 @@ bool test6() {
 	{
 		queue myQueue;
 
-		const auto group_size = myQueue.get_device().get_info<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
+		const auto group_size = myQueue.get_device().get_info<info::device::max_work_group_size>();
 		const auto size = group_size * 16;
 
 		buffer<float> ping(size);

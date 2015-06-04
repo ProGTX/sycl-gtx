@@ -5,11 +5,11 @@ using namespace cl::sycl;
 void queue::display_device_info() const {
 	debug();
 	debug() << "Queue device information:";
-	debug() << dev.get_info<CL_DEVICE_NAME>();
-	debug() << dev.get_info<CL_DEVICE_OPENCL_C_VERSION>();
-	debug() << dev.get_info<CL_DEVICE_PROFILE>();
-	debug() << dev.get_info<CL_DEVICE_VERSION>();
-	debug() << dev.get_info<CL_DRIVER_VERSION>();
+	debug() << dev.get_info<info::device::name>();
+	debug() << dev.get_info<info::device::opencl_version>();
+	debug() << dev.get_info<info::device::profile>();
+	debug() << dev.get_info<info::device::device_version>();
+	debug() << dev.get_info<info::device::driver_version>();
 	debug();
 }
 

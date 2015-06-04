@@ -157,7 +157,7 @@ bool test9() {
 	{
 		queue myQueue;
 
-		const auto group_size = myQueue.get_device().get_info<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
+		const auto group_size = myQueue.get_device().get_info<info::device::max_work_group_size>();
 		const auto size = group_size * 2;
 		size_t N = size;
 		using type = double;
@@ -181,7 +181,7 @@ bool test9() {
 
 		// Init
 		myQueue.submit([&](handler& cgh) {
-			auto d = data[0].get_access<access::write>();
+			auto d = data[0].get_access<access::write>(cgh);
 
 			parallel_for<>(range<1>(size), [=](id<1> index) {
 				d[index] = index;

@@ -9,6 +9,7 @@
 #include "specification\context.h"
 #include "specification\device.h"
 #include "specification\handler.h"
+#include "specification\info.h"
 #include "specification\kernel.h"
 #include "specification\platform.h"
 #include "specification\program.h"

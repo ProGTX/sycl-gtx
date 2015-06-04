@@ -6,7 +6,7 @@
 #include "device_selector.h"
 #include "error_handler.h"
 #include "info.h"
-#include "param_traits.h"
+#include "param_traits2.h"
 #include "platform.h"
 #include "../debug.h"
 #include "../common.h"
@@ -49,7 +49,8 @@ public:
 	cl_device_id get() const;
 
 private:
-	bool is_type(info::device_type type) const;
+	template <info::device_type type>
+	bool is_type() const;
 
 public:
 	bool is_host() const;
@@ -62,7 +63,7 @@ public:
 	// Returns all the available OpenCL devices and the SYCL host device
 	static vector_class<device> get_devices(info::device_type deviceType = info::device_type::all);
 
-	bool has_extension(const string_class extension_name);
+	bool has_extension(const string_class& extension_name);
 
 	// Partition device
 	vector_class<device> create_sub_devices(
@@ -72,49 +73,46 @@ public:
 	) const;
 
 private:
-	template<class return_type, cl_int name>
-	struct hidden {
-		using real_return = return_type;
-		static real_return get_info(const device* dev) {
-			auto did = dev->device_id.get();
-			real_return param_value;
-			auto error_code = clGetDeviceInfo(did, name, sizeof(real_return), &param_value, nullptr);
-			detail::error::report(error_code);
+	template <class return_t, info::device param>
+	struct traits {
+		static return_t get(const device* dev) {
+			return_t param_value;
+			detail::get_cl_info<info::device, param, sizeof(return_t)>(
+				dev->device_id.get(), &param_value
+			);
 			return param_value;
 		}
 	};
-	template<class return_type, cl_int name>
-	struct hidden<return_type[], name> {
-		using real_return = vector_class<return_type>;
-		static real_return get_info(const device* dev) {
-			auto did = dev->device_id.get();
-			static const int BUFFER_SIZE = 1024;
-			return_type param_value[BUFFER_SIZE];
-			std::size_t actual_size;
-			std::size_t type_size = sizeof(return_type);
-			auto error_code = clGetDeviceInfo(did, name, BUFFER_SIZE * type_size, param_value, &actual_size);
-			detail::error::report(error_code);
-			return real_return(param_value, param_value + actual_size / type_size);
+	
+	// TODO: Vectors of special types
+	template <typename Contained, info::device param>
+	struct traits<vector_class<Contained>, param> : detail::traits<Contained> {
+		static return_t get(const device* dev) {
+			Contained param_value[BUFFER_SIZE];
+			size_t actual_size;
+			detail::get_cl_info<info::device, param, BUFFER_SIZE * type_size>(
+				dev->device_id.get(), param_value, &actual_size
+			);
+			return return_t(param_value, param_value + actual_size / type_size);
 		}
 	};
-	template<cl_int name>
-	struct hidden<char[], name> {
-		using real_return = string_class;
-		static real_return get_info(const device* dev) {
-			auto did = dev->device_id.get();
-			static const int BUFFER_SIZE = 8192;
+
+	template <info::device param>
+	struct traits<string_class, param> : detail::traits<string_class>{
+		static string_class get(const device* dev) {
 			char param_value[BUFFER_SIZE];
-			auto error_code = clGetDeviceInfo(did, name, BUFFER_SIZE * sizeof(char), param_value, nullptr);
-			detail::error::report(error_code);
-			return real_return(param_value);
+			detail::get_cl_info<info::device, param, BUFFER_SIZE * type_size>(
+				dev->device_id.get(), param_value
+				);
+			return string_class(param_value);
 		}
 	};
-	template<cl_int name>
-	using param = typename param_traits<cl_device_info, name>::param_type;
+
 public:
-	template<cl_int name>
-	typename hidden<param<name>, name>::real_return get_info() const {
-		return hidden<param<name>, name>::get_info(this);
+	template <info::device param>
+	typename param_traits2<info::device, param>::type
+	get_info() const {
+		return traits<typename param_traits2<info::device, param>::type, param>::get(this);
 	}
 };
 

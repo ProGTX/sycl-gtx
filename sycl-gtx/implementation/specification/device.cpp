@@ -33,17 +33,19 @@ bool device::is_host() const {
 	return false;
 }
 
-bool device::is_type(info::device_type type) const {
-	return get_info<CL_DEVICE_TYPE>() == (cl_device_type)type;
+template <info::device_type type>
+bool device::is_type() const {
+	return get_info<info::device::device_type>() == type;
 }
+
 bool device::is_cpu() const {
-	return is_type(info::device_type::cpu);
+	return is_type<info::device_type::cpu>();
 }
 bool device::is_gpu() const {
-	return is_type(info::device_type::gpu);
+	return is_type<info::device_type::gpu>();
 }
 bool device::is_accelerator() const {
-	return is_type(info::device_type::accelerator);
+	return is_type<info::device_type::accelerator>();
 }
 
 platform device::get_platform() const {
@@ -55,8 +57,8 @@ vector_class<device> device::get_devices(info::device_type deviceType) {
 	return detail::get_devices((cl_device_type)deviceType, nullptr);
 }
 
-bool device::has_extension(const string_class extension_name) {
-	return detail::has_extension<CL_DEVICE_EXTENSIONS>(this, extension_name);
+bool device::has_extension(const string_class& extension_name) {
+	return detail::has_extension<info::device, info::device::extensions>(this, extension_name);
 }
 
 // TODO
