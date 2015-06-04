@@ -7,10 +7,14 @@
 namespace cl {
 namespace sycl {
 
+// Forward declaration
+template <typename EnumClass, EnumClass Value>
+struct param_traits2;
+
 namespace detail {
 
 template <typename EnumClass, EnumClass Value, typename ReturnType, typename CLType>
-struct param_traits2 {
+struct param_traits_helper {
 	using type = ReturnType;
 	using cl_type = CLType;
 };
@@ -22,15 +26,31 @@ struct traits {
 	static const size_t type_size = sizeof(Contained);
 };
 
+template <typename cl_input_t>
+using get_cl_info_f = cl_int(CL_API_CALL*)(cl_input_t, cl_uint, size_t, void*, size_t*);
+
+template <typename EnumClass, typename cl_input_t>
+struct function {
+	static const get_cl_info_f<cl_input_t> get;
+};
+template <>
+const get_cl_info_f<cl_context> function<info::context, cl_context>::get = clGetContextInfo;
+
+template <typename EnumClass, EnumClass param, size_t size, typename cl_input_t>
+static void get_cl_info(cl_input_t data_ptr, void* param_value, size_t* actual_size = nullptr) {
+	auto error_code = function<EnumClass, cl_input_t>::get(
+		data_ptr, (param_traits2<EnumClass, param>::cl_type)param, size, param_value, actual_size
+	);
+	detail::error::report(error_code);
+}
+
 } // namespace detail
 
-template <typename EnumClass, EnumClass Value>
-struct param_traits2;
 
 #define SYCL_ADD_TRAIT(EnumClass, Value, ReturnType, CLType)	\
 template <>														\
 struct param_traits2<EnumClass, Value>							\
-	: detail::param_traits2<									\
+	: detail::param_traits_helper<								\
 		EnumClass, Value, ReturnType, CLType					\
 	> {};
 
