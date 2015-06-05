@@ -8,6 +8,7 @@
 #include "info.h"
 #include "param_traits2.h"
 #include "platform.h"
+#include "ranges\id.h"
 #include "../debug.h"
 #include "../common.h"
 
@@ -73,8 +74,23 @@ public:
 	) const;
 
 private:
+	template <class Contained_, info::device param>
+	struct array_traits : detail::traits<Contained_> {
+		using Base = array_traits<Contained, param>;
+		static SYCL_THREAD_LOCAL Contained param_value[BUFFER_SIZE];
+		static SYCL_THREAD_LOCAL size_t actual_size;
+		static void get(const device* dev) {
+			detail::get_cl_info<info::device, param, BUFFER_SIZE * type_size>(
+				dev->device_id.get(), param_value, &actual_size
+			);
+		}
+	};
+
+	template <class return_t, info::device param, class = typename std::is_enum<return_t>::type>
+	struct traits;
+
 	template <class return_t, info::device param>
-	struct traits {
+	struct traits<return_t, param, typename std::enable_if<std::is_integral<return_t>::value, typename std::false_type::type>::type> {
 		static return_t get(const device* dev) {
 			return_t param_value;
 			detail::get_cl_info<info::device, param, sizeof(return_t)>(
@@ -83,28 +99,46 @@ private:
 			return param_value;
 		}
 	};
-	
-	// TODO: Vectors of special types
-	template <typename Contained, info::device param>
-	struct traits<vector_class<Contained>, param> : detail::traits<Contained> {
-		static return_t get(const device* dev) {
-			Contained param_value[BUFFER_SIZE];
-			size_t actual_size;
-			detail::get_cl_info<info::device, param, BUFFER_SIZE * type_size>(
-				dev->device_id.get(), param_value, &actual_size
-			);
-			return return_t(param_value, param_value + actual_size / type_size);
+
+	template <class EnumClass, info::device param>
+	struct traits<EnumClass, param, typename std::true_type::type> {
+		static EnumClass get(const device* dev) {
+			return (EnumClass)traits<typename std::underlying_type<EnumClass>::type, param>::get(dev);
+		}
+	};
+
+	template <typename EnumClass, info::device param>
+	struct traits<vector_class<EnumClass>, param>
+		: array_traits<typename std::underlying_type<EnumClass>::type, param> {
+		using real_return_t = vector_class<EnumClass>;
+		static real_return_t get(const device* dev) {
+			Base::get(dev);
+			real_return_t ret;
+			auto size = actual_size / type_size;
+			ret.reserve(size);
+			for(size_t i = 0; i < size; ++i) {
+				ret.push_back((EnumClass)param_value[i]);
+			}
+			return ret;
 		}
 	};
 
 	template <info::device param>
-	struct traits<string_class, param> : detail::traits<string_class>{
+	struct traits<string_class, param> : detail::traits<string_class> {
 		static string_class get(const device* dev) {
 			char param_value[BUFFER_SIZE];
 			detail::get_cl_info<info::device, param, BUFFER_SIZE * type_size>(
 				dev->device_id.get(), param_value
-				);
+			);
 			return string_class(param_value);
+		}
+	};
+
+	template <info::device param>
+	struct traits<id<3>, param> : array_traits<size_t, param> {
+		static id<3> get(const device* dev) {
+			Base::get(dev);
+			return id<3>(param_value[0], param_value[1], param_value[2]);
 		}
 	};
 
@@ -115,6 +149,12 @@ public:
 		return traits<typename param_traits2<info::device, param>::type, param>::get(this);
 	}
 };
+
+template <class Contained, info::device param>
+Contained device::array_traits<Contained, param>::param_value[device::array_traits<Contained, param>::BUFFER_SIZE];
+
+template <class Contained, info::device param>
+size_t device::array_traits<Contained, param>::actual_size = 0;
 
 namespace detail {
 

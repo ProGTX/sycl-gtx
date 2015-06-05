@@ -19,8 +19,9 @@ struct param_traits_helper {
 	using cl_flag_type = CLType;
 };
 
-template <typename Contained>
+template <typename Contained_>
 struct traits {
+	using Contained = Contained_;
 	using return_t = vector_class<Contained>;
 	static const int BUFFER_SIZE = 1024;
 	static const size_t type_size = sizeof(Contained);
