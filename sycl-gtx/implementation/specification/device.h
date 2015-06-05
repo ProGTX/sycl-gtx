@@ -74,8 +74,8 @@ public:
 	) const;
 
 private:
-	template <class Contained_, info::device param>
-	struct array_traits : detail::traits<Contained_> {
+	template <class Contained_, info::device param, size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
+	struct array_traits : detail::traits<Contained_, BufferSize> {
 		using Base = array_traits<Contained, param>;
 		static SYCL_THREAD_LOCAL Contained param_value[BUFFER_SIZE];
 		static SYCL_THREAD_LOCAL size_t actual_size;
@@ -135,7 +135,7 @@ private:
 	};
 
 	template <info::device param>
-	struct traits<id<3>, param> : array_traits<size_t, param> {
+	struct traits<id<3>, param> : array_traits<size_t, param, 3> {
 		static id<3> get(const device* dev) {
 			Base::get(dev);
 			return id<3>(param_value[0], param_value[1], param_value[2]);
@@ -150,11 +150,11 @@ public:
 	}
 };
 
-template <class Contained, info::device param>
-Contained device::array_traits<Contained, param>::param_value[device::array_traits<Contained, param>::BUFFER_SIZE];
+template <class Contained, info::device param, size_t BufferSize>
+Contained device::array_traits<Contained, param, BufferSize>::param_value[BufferSize];
 
-template <class Contained, info::device param>
-size_t device::array_traits<Contained, param>::actual_size = 0;
+template <class Contained, info::device param, size_t BufferSize>
+size_t device::array_traits<Contained, param, BufferSize>::actual_size = 0;
 
 namespace detail {
 
