@@ -54,8 +54,8 @@ queue::queue(cl_command_queue clQueue, const async_handler& asyncHandler)
 	auto error_code = clRetainCommandQueue(clQueue);
 	detail::error::report(error_code);
 
-	ctx = context(get_info<CL_QUEUE_CONTEXT>(), asyncHandler);
-	dev = device(get_info<CL_QUEUE_DEVICE>());
+	ctx = context(get_info<info::queue::context>(), asyncHandler);
+	dev = device(get_info<info::queue::device>());
 }
 
 queue::~queue() {

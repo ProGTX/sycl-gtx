@@ -6,7 +6,8 @@
 #include "device.h"
 #include "error_handler.h"
 #include "event.h"
-#include "param_traits.h"
+#include "info.h"
+#include "param_traits2.h"
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
@@ -83,18 +84,19 @@ public:
 	// Returns the SYCL device the queue is associated with.
 	device get_device() const;
 
+private:
+	template <class return_t, info::queue param>
+	struct traits : detail::array_traits<return_t, info::queue, param, 1> {
+		static return_t get(const queue* q) {
+			Base::get(q->command_q.get());
+			return param_value[0];
+		}
+	};
 
-	template<cl_command_queue_info name>
-	using parameter_t = typename param_traits<cl_command_queue_info, name>::param_type;
-	
-	// Queries the platform for cl_command_queue info.
-	template<cl_command_queue_info name>
-	parameter_t<name> get_info() const {
-		parameter_t<name> param_value;
-		auto q = command_q.get();
-		auto error_code = clGetCommandQueueInfo(q, name, sizeof(parameter_t<name>),& param_value, nullptr);
-		detail::error::report(error_code);
-		return param_value;
+public:
+	template <info::queue param>
+	typename param_traits2<info::queue, param>::type get_info() const {
+		return traits<typename param_traits2<info::queue, param>::type, param>::get(this);
 	}
 
 	// Checks to see if any asynchronous errors have been produced by the queue

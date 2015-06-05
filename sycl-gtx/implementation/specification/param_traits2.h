@@ -52,6 +52,8 @@ template <>
 struct info_function<info::device> : info_function_helper<cl_device_id, clGetDeviceInfo>{};
 template <>
 struct info_function<info::platform> : info_function_helper<cl_platform_id, clGetPlatformInfo>{};
+template <>
+struct info_function<info::queue> : info_function_helper<cl_command_queue, clGetCommandQueueInfo>{};
 
 template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize = traits<Contained_>::BUFFER_SIZE>
 struct array_traits : traits<Contained_, BufferSize> {
@@ -205,11 +207,25 @@ SYCL_ADD_DEVICE_TRAIT(info::device::parent_device,						cl_device_id)
 SYCL_ADD_DEVICE_TRAIT(info::device::partition_max_sub_devices,			cl_uint)
 SYCL_ADD_DEVICE_TRAIT(info::device::partition_properties,				vector_class<info::device_partition_property>)
 SYCL_ADD_DEVICE_TRAIT(info::device::partition_affinity_domain,			info::device_affinity_domain)
-SYCL_ADD_DEVICE_TRAIT(info::device::partition_type,						vector_class<info::device_partition_type>)
+SYCL_ADD_DEVICE_TRAIT(info::device::partition_type,						vector_class<info::device_partition_type>)	// TODO
 SYCL_ADD_DEVICE_TRAIT(info::device::reference_count,					cl_uint)
 
 #undef SYCL_ADD_DEVICE_TRAIT
 
+
+
+// 3.3.5.2 Queue information descriptors
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetCommandQueueInfo.html
+
+#define SYCL_ADD_QUEUE_TRAIT(Value, ReturnType)	\
+	SYCL_ADD_TRAIT(info::queue, Value, ReturnType, cl_command_queue_info)
+
+SYCL_ADD_QUEUE_TRAIT(info::queue::context,			cl_context)
+SYCL_ADD_QUEUE_TRAIT(info::queue::device,			cl_device_id)
+SYCL_ADD_QUEUE_TRAIT(info::queue::reference_count,	cl_uint)
+SYCL_ADD_QUEUE_TRAIT(info::queue::properties,		info::queue_profiling)
+
+#undef SYCL_ADD_QUEUE_TRAIT
 
 #undef SYCL_ADD_TRAIT
 
