@@ -101,11 +101,10 @@ private:
 	};
 
 	template <typename EnumClass, info::device param>
-	struct traits<vector_class<EnumClass>, param>
-		: array_traits<typename std::underlying_type<EnumClass>::type, param>{
+	struct traits<vector_class<EnumClass>, param, typename std::true_type::type>
+		: array_traits<typename std::underlying_type<EnumClass>::type, param> {
 		using return_t = vector_class<EnumClass>;
-		static return_t get(const device* dev) {
-			get_info(dev);
+		static return_t convert() {
 			return_t ret;
 			auto size = actual_size / type_size;
 			ret.reserve(size);
@@ -114,11 +113,15 @@ private:
 			}
 			return ret;
 		}
+		static return_t get(const device* dev) {
+			get_info(dev);
+			return convert();
+		}
 	};
 
 	template <info::device param>
 	struct traits<string_class, param>
-		: array_traits<string_class, param>{
+		: array_traits<string_class, param> {
 		static string_class get(const device* dev) {
 			get_info(dev);
 			return string_class(param_value);
@@ -127,10 +130,26 @@ private:
 
 	template <info::device param>
 	struct traits<id<3>, param>
-		: array_traits<size_t, param, 3>{
+		: array_traits<size_t, param, 3> {
 		static id<3> get(const device* dev) {
 			get_info(dev);
 			return id<3>(param_value[0], param_value[1], param_value[2]);
+		}
+	};
+
+	template <class Contained_>
+	struct traits<vector_class<Contained_>, info::device::partition_type, typename std::false_type::type>
+		: traits<vector_class<Contained_>, info::device::partition_type, typename std::true_type::type> {
+		using return_t = vector_class<Contained_>;	// TODO: Why isn't return_t inherited? May be a bug.
+		static return_t get(const device* dev) {
+			// TODO: I have no idea how to handle this case
+			get_info(dev);
+			if(actual_size == 0) {
+				return_t ret;
+				ret.push_back(info::device_partition_type::no_partition);
+				return ret;
+			}
+			return convert();
 		}
 	};
 
