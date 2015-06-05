@@ -190,6 +190,19 @@ enum class queue : cl_command_queue_info {
 };
 
 
+// C.5 Kernel Information Descriptors
+enum class kernel : cl_kernel_info {
+	function_name	= CL_KERNEL_FUNCTION_NAME,
+	num_args		= CL_KERNEL_NUM_ARGS,
+	reference_count	= CL_KERNEL_REFERENCE_COUNT,
+	attributes		= CL_KERNEL_ATTRIBUTES,
+
+	// Not part of the specification
+	context			= CL_KERNEL_CONTEXT,
+	program			= CL_KERNEL_PROGRAM
+};
+
+
 // C.7 Event Information Descriptors
 enum class event : int {
 	command_type,

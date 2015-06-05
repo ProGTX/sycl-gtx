@@ -5,6 +5,8 @@
 
 #include "context.h"
 #include "error_handler.h"
+#include "info.h"
+#include "param_traits2.h"
 #include "program.h"
 #include "ranges.h"
 #include "refc.h"
@@ -59,47 +61,26 @@ public:
 		return prog;
 	}
 
-private:
-	template <class return_type, cl_int name>
-	struct hidden {
-		using real_return = return_type;
-		static real_return get_info(const kernel* kern) {
-			auto k = kern->get();
-			real_return param_value;
-			auto error_code = clGetKernelInfo(k, name, sizeof(cl_uint), &param_value, nullptr);
-			detail::error::report(error_code);
-			return param_value;
-		}
-	};
-	template <cl_int name>
-	struct hidden<char[], name> {
-		using real_return = string_class;
-		static real_return get_info(const kernel* kern) {
-			auto k = kern->get();
-			static const int BUFFER_SIZE = 8192;
-			char param_value[BUFFER_SIZE];
-			auto error_code = clGetKernelInfo(k, name, sizeof(char) * BUFFER_SIZE, param_value, nullptr);
-			detail::error::report(error_code);
-			return real_return(param_value);
-		}
-	};
-	template <cl_int name>
-	using param = typename param_traits<cl_kernel_info, name>::param_type;
-
-public:
-	template <cl_int name>
-	typename hidden<param<name>, name>::real_return get_info() const {
-		return hidden<param<name>, name>::get_info(this);
+	template <info::kernel param>
+	typename param_traits2<info::kernel, param>::type
+	get_info() const {
+		using return_t = param_traits2_t<info::kernel, param>;
+		return detail::array_traits<
+			return_t,
+			info::kernel,
+			param,
+			detail::traits_buffer_default<return_t>::size
+		>::get(kern.get());
 	}
 
 	// Return the name of the kernel function
 	string_class get_kernel_attributes() const {
-		return get_info<CL_KERNEL_ATTRIBUTES>();
+		return get_info<info::kernel::attributes>();
 	}
 
 	// Return the name of the kernel function
 	string_class get_function_name() {
-		return get_info<CL_KERNEL_FUNCTION_NAME>();
+		return get_info<info::kernel::function_name>();
 	}
 
 private:

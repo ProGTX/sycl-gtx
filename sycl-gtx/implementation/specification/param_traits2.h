@@ -64,9 +64,13 @@ struct info_function_helper {
 template <typename EnumClass>
 struct info_function;
 template <>
+struct info_function<info::detail::buffer> : info_function_helper<cl_mem, clGetMemObjectInfo>{};
+template <>
 struct info_function<info::context> : info_function_helper<cl_context, clGetContextInfo>{};
 template <>
 struct info_function<info::device> : info_function_helper<cl_device_id, clGetDeviceInfo>{};
+template <>
+struct info_function<info::kernel> : info_function_helper<cl_kernel, clGetKernelInfo>{};
 template <>
 struct info_function<info::platform> : info_function_helper<cl_platform_id, clGetPlatformInfo>{};
 template <>
@@ -75,7 +79,6 @@ struct info_function<info::queue> : info_function_helper<cl_command_queue, clGet
 template <bool IsSingleValue>
 struct trait_return;
 template <>
-struct info_function<info::detail::buffer> : info_function_helper<cl_mem, clGetMemObjectInfo>{};
 struct trait_return<false> {
 	template <class Contained>
 	static Contained* get(Contained* value) {
@@ -279,6 +282,22 @@ SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::associated_memory_object,	cl_mem)
 SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::offset,						size_t)
 
 #undef SYCL_ADD_BUFFER_TRAIT
+
+
+// Table 3.62: Kernel class information descriptors.
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetKernelInfo.html
+
+#define SYCL_ADD_KERNEL_TRAIT(Value, ReturnType)	\
+	SYCL_ADD_TRAIT(info::kernel, Value, ReturnType, cl_kernel_info)
+
+SYCL_ADD_KERNEL_TRAIT(info::kernel::function_name,		string_class)
+SYCL_ADD_KERNEL_TRAIT(info::kernel::num_args,			cl_uint)
+SYCL_ADD_KERNEL_TRAIT(info::kernel::reference_count,	cl_uint)
+SYCL_ADD_KERNEL_TRAIT(info::kernel::attributes,			string_class)
+SYCL_ADD_KERNEL_TRAIT(info::kernel::context,			cl_context)
+SYCL_ADD_KERNEL_TRAIT(info::kernel::program,			cl_program)
+
+#undef SYCL_ADD_KERNEL_TRAIT
 
 
 #undef SYCL_ADD_TRAIT
