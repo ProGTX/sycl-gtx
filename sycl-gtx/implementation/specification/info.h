@@ -3,6 +3,7 @@
 // C. Interface of Memory Object Information Descriptors
 
 #include <CL/cl.h>
+#include <type_traits>
 
 namespace cl {
 namespace sycl {
@@ -29,12 +30,12 @@ enum class context : cl_context_info {
 
 
 // C.3 Device Information Descriptors
-// TODO: Add remaining OpenCL values and deal with cases without corresponding OpenCL values
 
-using device_fp_config = cl_device_fp_config;
-using device_exec_capabilities = cl_device_exec_capabilities;
-using device_queue_properties = cl_command_queue_properties;
+using device_fp_config			= cl_device_fp_config;
+using device_exec_capabilities	= cl_device_exec_capabilities;
+using device_queue_properties	= cl_command_queue_properties;
 
+// TODO: Host
 enum class device_type : cl_device_type {
 	cpu			= CL_DEVICE_TYPE_CPU,
 	gpu			= CL_DEVICE_TYPE_GPU,
@@ -121,29 +122,33 @@ enum class device : cl_device_info {
 };
 
 enum class device_partition_property : cl_device_partition_property {
-	unsupported,
-	partition_equally								= CL_DEVICE_PARTITION_EQUALLY,
-	partition_by_counts								= CL_DEVICE_PARTITION_BY_COUNTS,
-	partition_by_affinity_domain					= CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN,
-	partition_affinity_domain_next_partitionable
+	unsupported						= 0,
+	partition_equally				= CL_DEVICE_PARTITION_EQUALLY,
+	partition_by_counts				= CL_DEVICE_PARTITION_BY_COUNTS,
+	partition_by_affinity_domain	= CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN
 };
 
 enum class device_affinity_domain : cl_device_affinity_domain {
-	unsupported,
-	numa,
-	L4_cache,
-	L3_cache,
-	L2_cache,
-	next_partitionable
+	unsupported			= 0,
+	numa				= CL_DEVICE_AFFINITY_DOMAIN_NUMA,
+	L4_cache			= CL_DEVICE_AFFINITY_DOMAIN_L4_CACHE,
+	L3_cache			= CL_DEVICE_AFFINITY_DOMAIN_L3_CACHE,
+	L2_cache			= CL_DEVICE_AFFINITY_DOMAIN_L2_CACHE,
+	L1_cache			= CL_DEVICE_AFFINITY_DOMAIN_L1_CACHE,
+	next_partitionable	= CL_DEVICE_AFFINITY_DOMAIN_NEXT_PARTITIONABLE
 };
 
-enum class device_partition_type : cl_device_partition_property {
-	no_partition,
-	numa,
-	L4_cache,
-	L3_cache,
-	L2_cache,
-	L1_cache
+namespace detail {
+using aff_domain_t = std::underlying_type<device_affinity_domain>::type;
+}
+
+enum class device_partition_type : detail::aff_domain_t {
+	no_partition	= 0,
+	numa			= (detail::aff_domain_t)device_affinity_domain::numa,
+	L4_cache		= (detail::aff_domain_t)device_affinity_domain::L4_cache,
+	L3_cache		= (detail::aff_domain_t)device_affinity_domain::L3_cache,
+	L2_cache		= (detail::aff_domain_t)device_affinity_domain::L2_cache,
+	L1_cache		= (detail::aff_domain_t)device_affinity_domain::L1_cache
 };
 
 enum class local_mem_type : cl_device_local_mem_type {
@@ -164,14 +169,14 @@ enum class fp_config : cl_device_fp_config {
 };
 
 enum class global_mem_cache_type : cl_device_mem_cache_type {
-	none,
-	read_only,
-	write_only
+	none		= CL_NONE,
+	read_only	= CL_READ_ONLY_CACHE,
+	write_only	= CL_READ_WRITE_CACHE
 };
 
 enum class device_execution_capabilities : cl_device_exec_capabilities {
-	exec_kernel,
-	exec_native_kernel
+	exec_kernel			= CL_EXEC_KERNEL,
+	exec_native_kernel	= CL_EXEC_NATIVE_KERNEL
 };
 
 
