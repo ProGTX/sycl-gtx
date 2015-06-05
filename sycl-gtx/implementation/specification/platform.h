@@ -43,22 +43,14 @@ public:
 	// Returns the devices available in this platform
 	vector_class<device> get_devices(info::device_type = info::device_type::all) const;
 
-private:
-	template <info::platform param>
-	struct string_traits : detail::array_traits<string_class, info::platform, param, 8192> {
-		static string_class get(const platform* platfrm) {
-			Base::get(platfrm->platform_id.get());
-			return param_value;
-		}
-	};
-
-public:
 	// Returns the corresponding descriptor information for all SYCL platforms (OpenCL and host)
 	template <info::platform param>
 	typename param_traits2<info::platform, param>::type
 	get_info() const {
 		// Small optimization, knowing the return type is always string_class
-		return string_traits<param>::get(this);
+		return detail::array_traits<
+			string_class, info::platform, param, 8192
+		>::get(platform_id.get());
 	}
 
 	// True if the platform is host

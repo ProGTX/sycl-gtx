@@ -11,6 +11,10 @@ namespace sycl {
 template <typename EnumClass, EnumClass Value>
 struct param_traits2;
 
+// Not in the specification, but is a nice addition
+template <typename EnumClass, EnumClass Value>
+using param_traits2_t = typename param_traits2<EnumClass, Value>::type;
+
 namespace detail {
 
 template <typename EnumClass, EnumClass Value, typename ReturnType, typename CLType>
@@ -62,11 +66,12 @@ struct array_traits : traits<Contained_, BufferSize> {
 	static SYCL_THREAD_LOCAL size_t actual_size;
 
 	template <typename cl_input_t>
-	static void get(cl_input_t data_ptr) {
+	static Contained* get(cl_input_t data_ptr) {
 		auto error_code = info_function<EnumClass>::get(
 			data_ptr, (param_traits2<EnumClass, param>::cl_flag_type)param, BUFFER_SIZE * type_size, param_value, &actual_size
 		);
 		error::report(error_code);
+		return param_value;
 	}
 };
 
@@ -211,7 +216,6 @@ SYCL_ADD_DEVICE_TRAIT(info::device::partition_type,						vector_class<info::devi
 SYCL_ADD_DEVICE_TRAIT(info::device::reference_count,					cl_uint)
 
 #undef SYCL_ADD_DEVICE_TRAIT
-
 
 
 // 3.3.5.2 Queue information descriptors

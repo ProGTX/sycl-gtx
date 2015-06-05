@@ -84,19 +84,14 @@ public:
 	// Returns the SYCL device the queue is associated with.
 	device get_device() const;
 
-private:
-	template <class return_t, info::queue param>
-	struct traits : detail::array_traits<return_t, info::queue, param, 1> {
-		static return_t get(const queue* q) {
-			Base::get(q->command_q.get());
-			return param_value[0];
-		}
-	};
-
-public:
 	template <info::queue param>
 	typename param_traits2<info::queue, param>::type get_info() const {
-		return traits<typename param_traits2<info::queue, param>::type, param>::get(this);
+		return detail::array_traits<
+			param_traits2_t<info::queue, param>,
+			info::queue,
+			param,
+			1
+		>::get(command_q.get())[0];
 	}
 
 	// Checks to see if any asynchronous errors have been produced by the queue
