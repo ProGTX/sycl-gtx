@@ -89,24 +89,26 @@ public:
 	vector_class<device> get_devices() const;
 
 private:
+	template <class Contained_, info::context param, size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
+	struct array_traits : detail::array_traits<Contained_, info::context, param, BufferSize> {
+		static void get_info(const context* ctx) {
+			Base::get(ctx->ctx.get());
+		}
+	};
+
 	template <class return_t, info::context param>
-	struct traits {
-		static return_t get(const context* contex) {
-			return_t param_value;
-			detail::get_cl_info<info::context, param, sizeof(return_t)>(
-				contex->ctx.get(), &param_value
-			);
-			return param_value;
+	struct traits
+		: array_traits<return_t, param, 1> {
+		static return_t get(const context* ctx) {
+			get_info(ctx);
+			return param_value[0];
 		}
 	};
 	template <typename Contained, info::context param>
-	struct traits<vector_class<Contained>, param> : detail::traits<Contained> {
-		static Container get(const context* contex) {
-			Contained param_value[BUFFER_SIZE];
-			size_t actual_size;
-			detail::get_cl_info<info::context, param, BUFFER_SIZE * type_size>(
-				contex->ctx.get(), param_value, &actual_size
-			);
+	struct traits<vector_class<Contained>, param>
+		: array_traits<Contained, param> {
+		static Container get(const context* ctx) {
+			get_info(ctx);
 			return Container(param_value, param_value + actual_size / type_size);
 		}
 	};

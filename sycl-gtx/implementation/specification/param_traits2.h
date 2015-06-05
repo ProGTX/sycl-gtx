@@ -50,6 +50,8 @@ template <>
 struct info_function<info::context> : info_function_helper<cl_context, clGetContextInfo>{};
 template <>
 struct info_function<info::device> : info_function_helper<cl_device_id, clGetDeviceInfo>{};
+template <>
+struct info_function<info::platform> : info_function_helper<cl_platform_id, clGetPlatformInfo>{};
 
 template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize = traits<Contained_>::BUFFER_SIZE>
 struct array_traits : traits<Contained_, BufferSize> {
@@ -71,14 +73,6 @@ typename traits<Contained_, BufferSize>::Contained array_traits<Contained_, Enum
 
 template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize>
 size_t array_traits<Contained_, EnumClass, param, BufferSize>::actual_size = 0;
-
-template <typename EnumClass, EnumClass param, size_t size, typename cl_input_t>
-static void get_cl_info(cl_input_t data_ptr, void* param_value, size_t* actual_size = nullptr) {
-	auto error_code = info_function<EnumClass>::get(
-		data_ptr, (param_traits2<EnumClass, param>::cl_flag_type)param, size, param_value, actual_size
-	);
-	error::report(error_code);
-}
 
 } // namespace detail
 

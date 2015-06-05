@@ -9,7 +9,7 @@ namespace sycl {
 namespace info {
 
 // C.1 Platform Information Descriptors
-enum class platform : unsigned int {
+enum class platform : cl_platform_info {
 	profile		= CL_PLATFORM_PROFILE,
 	version		= CL_PLATFORM_VERSION,
 	name		= CL_PLATFORM_NAME,
@@ -20,7 +20,7 @@ enum class platform : unsigned int {
 
 // C.2 Context Information Descriptors
 using gl_context_interop = cl_bool;
-enum class context : unsigned int {
+enum class context : cl_context_info {
 	reference_count	= CL_CONTEXT_REFERENCE_COUNT,
 	num_devices		= CL_CONTEXT_NUM_DEVICES,
 	devices			= CL_CONTEXT_DEVICES,
@@ -29,6 +29,7 @@ enum class context : unsigned int {
 
 
 // C.3 Device Information Descriptors
+// TODO: Add remaining OpenCL values and deal with cases without corresponding OpenCL values
 
 using device_fp_config = cl_device_fp_config;
 using device_exec_capabilities = cl_device_exec_capabilities;
