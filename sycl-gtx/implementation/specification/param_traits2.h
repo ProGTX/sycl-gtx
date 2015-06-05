@@ -23,6 +23,19 @@ struct param_traits_helper {
 	using cl_flag_type = CLType;
 };
 
+template <typename ReturnType>
+struct traits_buffer_default {
+	static const size_t size = 1;
+};
+template <typename Contained>
+struct traits_buffer_default<vector_class<Contained>> {
+	static const size_t size = 1024;
+};
+template <>
+struct traits_buffer_default<string_class> {
+	static const size_t size = 8192;
+};
+
 template <typename Contained_, size_t BufferSize, class Container_ = vector_class<Contained_>>
 struct traits_helper {
 	using Container = Container_;
@@ -31,7 +44,7 @@ struct traits_helper {
 	static const size_t type_size = sizeof(Contained);
 };
 
-template <typename Contained_, size_t BufferSize = 1024>
+template <typename Contained_, size_t BufferSize = traits_buffer_default<vector_class<Contained_>>::size>
 struct traits : traits_helper<Contained_, BufferSize> {};
 
 template <size_t BufferSize>
@@ -58,8 +71,24 @@ template <>
 struct info_function<info::platform> : info_function_helper<cl_platform_id, clGetPlatformInfo>{};
 template <>
 struct info_function<info::queue> : info_function_helper<cl_command_queue, clGetCommandQueueInfo>{};
+
+template <bool IsSingleValue>
+struct trait_return;
 template <>
 struct info_function<info::detail::buffer> : info_function_helper<cl_mem, clGetMemObjectInfo>{};
+struct trait_return<false> {
+	template <class Contained>
+	static Contained* get(Contained* value) {
+		return value;
+	}
+};
+template <>
+struct trait_return<true> {
+	template <class Contained>
+	static Contained get(Contained* value) {
+		return value[0];
+	}
+};
 
 template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize = traits<Contained_>::BUFFER_SIZE>
 struct array_traits : traits<Contained_, BufferSize> {
@@ -68,12 +97,12 @@ struct array_traits : traits<Contained_, BufferSize> {
 	static SYCL_THREAD_LOCAL size_t actual_size;
 
 	template <typename cl_input_t>
-	static Contained* get(cl_input_t data_ptr) {
+	static typename std::conditional<BufferSize == 1, Contained, Contained*>::type get(cl_input_t data_ptr) {
 		auto error_code = info_function<EnumClass>::get(
 			data_ptr, (param_traits2<EnumClass, param>::cl_flag_type)param, BUFFER_SIZE * type_size, param_value, &actual_size
 		);
 		error::report(error_code);
-		return param_value;
+		return trait_return<BufferSize == 1>::get(param_value);
 	}
 };
 

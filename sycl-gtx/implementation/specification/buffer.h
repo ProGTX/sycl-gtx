@@ -258,7 +258,7 @@ protected:
 			info::detail::buffer,
 			param,
 			1
-		>::get(device_data.get())[0];
+		>::get(device_data.get());
 	}
 
 public:
