@@ -204,6 +204,23 @@ enum class event_profiling : int {
 	command_end
 };
 
+namespace detail {
+
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetMemObjectInfo.html
+enum class buffer : cl_mem_info {
+	type						= CL_MEM_TYPE,
+	flags						= CL_MEM_FLAGS,
+	size						= CL_MEM_SIZE,
+	host_pointer				= CL_MEM_HOST_PTR,
+	map_count					= CL_MEM_MAP_COUNT,
+	reference_count				= CL_MEM_REFERENCE_COUNT,
+	context						= CL_MEM_CONTEXT,
+	associated_memory_object	= CL_MEM_ASSOCIATED_MEMOBJECT,
+	offset						= CL_MEM_OFFSET
+};
+
+} // namespace detail
+
 } // namespace info
 } // namespace sycl
 } // namespace cl

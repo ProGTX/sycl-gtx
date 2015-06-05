@@ -5,7 +5,8 @@
 #include "access.h"
 #include "error_handler.h"
 #include "event.h"
-#include "param_traits.h"
+#include "info.h"
+#include "param_traits2.h"
 #include "ranges.h"
 #include "refc.h"
 #include "../common.h"
@@ -249,16 +250,15 @@ private:
 	}
 
 protected:
-	template<cl_mem_info name>
-	using parameter_t = typename param_traits<cl_mem_info, name>::param_type;
-
-	template<cl_mem_info name>
-	parameter_t<name> get_info() const {
-		parameter_t<name> param_value;
-		auto mem = device_data.get();
-		auto error_code = clGetMemObjectInfo(mem, name, sizeof(parameter_t<name>), &param_value, nullptr);
-		detail::error::report(error_code);
-		return param_value;
+	template <info::detail::buffer param>
+	param_traits2_t<info::detail::buffer, param>
+	get_info() const {
+		return detail::array_traits<
+			param_traits2_t<info::detail::buffer, param>,
+			info::detail::buffer,
+			param,
+			1
+		>::get(device_data.get())[0];
 	}
 
 public:

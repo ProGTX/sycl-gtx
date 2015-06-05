@@ -58,6 +58,8 @@ template <>
 struct info_function<info::platform> : info_function_helper<cl_platform_id, clGetPlatformInfo>{};
 template <>
 struct info_function<info::queue> : info_function_helper<cl_command_queue, clGetCommandQueueInfo>{};
+template <>
+struct info_function<info::detail::buffer> : info_function_helper<cl_mem, clGetMemObjectInfo>{};
 
 template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize = traits<Contained_>::BUFFER_SIZE>
 struct array_traits : traits<Contained_, BufferSize> {
@@ -230,6 +232,25 @@ SYCL_ADD_QUEUE_TRAIT(info::queue::reference_count,	cl_uint)
 SYCL_ADD_QUEUE_TRAIT(info::queue::properties,		info::queue_profiling)
 
 #undef SYCL_ADD_QUEUE_TRAIT
+
+
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetMemObjectInfo.html
+
+#define SYCL_ADD_BUFFER_TRAIT(Value, ReturnType)	\
+	SYCL_ADD_TRAIT(info::detail::buffer, Value, ReturnType, cl_mem_info)
+
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::type,						cl_mem_object_type)
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::flags,						cl_mem_flags)
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::size,						size_t)
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::host_pointer,				void*)
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::map_count,					cl_uint)
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::reference_count,			cl_uint)
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::context,					cl_context)
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::associated_memory_object,	cl_mem)
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::offset,						size_t)
+
+#undef SYCL_ADD_BUFFER_TRAIT
+
 
 #undef SYCL_ADD_TRAIT
 
