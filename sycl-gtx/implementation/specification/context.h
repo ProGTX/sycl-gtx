@@ -101,13 +101,13 @@ private:
 	};
 	template <typename Contained, info::context param>
 	struct traits<vector_class<Contained>, param> : detail::traits<Contained> {
-		static return_t get(const context* contex) {
+		static Container get(const context* contex) {
 			Contained param_value[BUFFER_SIZE];
 			size_t actual_size;
 			detail::get_cl_info<info::context, param, BUFFER_SIZE * type_size>(
 				contex->ctx.get(), param_value, &actual_size
 			);
-			return return_t(param_value, param_value + actual_size / type_size);
+			return Container(param_value, param_value + actual_size / type_size);
 		}
 	};
 

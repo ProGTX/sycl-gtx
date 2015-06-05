@@ -19,10 +19,10 @@ struct param_traits_helper {
 	using cl_flag_type = CLType;
 };
 
-template <typename Contained_, size_t BufferSize, class ReturnType = vector_class<Contained_>>
+template <typename Contained_, size_t BufferSize, class Container_ = vector_class<Contained_>>
 struct traits_helper {
+	using Container = Container_;
 	using Contained = Contained_;
-	using return_t = ReturnType;
 	static const int BUFFER_SIZE = BufferSize;
 	static const size_t type_size = sizeof(Contained);
 };
@@ -30,8 +30,8 @@ struct traits_helper {
 template <typename Contained_, size_t BufferSize = 1024>
 struct traits : traits_helper<Contained_, BufferSize> {};
 
-template <>
-struct traits<string_class> : traits_helper<char, 8192, string_class>{};
+template <size_t BufferSize>
+struct traits<string_class, BufferSize> : traits_helper<char, BufferSize, string_class>{};
 
 template <typename cl_input_t>
 using opencl_info_f = cl_int(CL_API_CALL*)(cl_input_t, cl_uint, size_t, void*, size_t*);

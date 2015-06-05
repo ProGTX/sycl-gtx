@@ -76,7 +76,7 @@ public:
 private:
 	template <class Contained_, info::device param, size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
 	struct array_traits : detail::traits<Contained_, BufferSize> {
-		using Base = array_traits<Contained, param>;
+		using Base = array_traits<Contained_, param, BufferSize>;
 		static SYCL_THREAD_LOCAL Contained param_value[BUFFER_SIZE];
 		static SYCL_THREAD_LOCAL size_t actual_size;
 		static void get(const device* dev) {
@@ -90,13 +90,11 @@ private:
 	struct traits;
 
 	template <class return_t, info::device param>
-	struct traits<return_t, param, typename std::enable_if<std::is_integral<return_t>::value, typename std::false_type::type>::type> {
+	struct traits<return_t, param, typename std::enable_if<std::is_integral<return_t>::value, typename std::false_type::type>::type>
+		: array_traits<return_t, param, 1> {
 		static return_t get(const device* dev) {
-			return_t param_value;
-			detail::get_cl_info<info::device, param, sizeof(return_t)>(
-				dev->device_id.get(), &param_value
-			);
-			return param_value;
+			Base::get(dev);
+			return param_value[0];
 		}
 	};
 
@@ -110,10 +108,10 @@ private:
 	template <typename EnumClass, info::device param>
 	struct traits<vector_class<EnumClass>, param>
 		: array_traits<typename std::underlying_type<EnumClass>::type, param> {
-		using real_return_t = vector_class<EnumClass>;
-		static real_return_t get(const device* dev) {
+		using return_t = vector_class<EnumClass>;
+		static return_t get(const device* dev) {
 			Base::get(dev);
-			real_return_t ret;
+			return_t ret;
 			auto size = actual_size / type_size;
 			ret.reserve(size);
 			for(size_t i = 0; i < size; ++i) {
@@ -124,18 +122,17 @@ private:
 	};
 
 	template <info::device param>
-	struct traits<string_class, param> : detail::traits<string_class> {
+	struct traits<string_class, param>
+		: array_traits<string_class, param> {
 		static string_class get(const device* dev) {
-			char param_value[BUFFER_SIZE];
-			detail::get_cl_info<info::device, param, BUFFER_SIZE * type_size>(
-				dev->device_id.get(), param_value
-			);
+			Base::get(dev);
 			return string_class(param_value);
 		}
 	};
 
 	template <info::device param>
-	struct traits<id<3>, param> : array_traits<size_t, param, 3> {
+	struct traits<id<3>, param>
+		: array_traits<size_t, param, 3> {
 		static id<3> get(const device* dev) {
 			Base::get(dev);
 			return id<3>(param_value[0], param_value[1], param_value[2]);
@@ -150,11 +147,11 @@ public:
 	}
 };
 
-template <class Contained, info::device param, size_t BufferSize>
-Contained device::array_traits<Contained, param, BufferSize>::param_value[BufferSize];
+template <class Contained_, info::device param, size_t BufferSize>
+typename detail::traits<Contained_, BufferSize>::Contained device::array_traits<Contained_, param, BufferSize>::param_value[BufferSize];
 
-template <class Contained, info::device param, size_t BufferSize>
-size_t device::array_traits<Contained, param, BufferSize>::actual_size = 0;
+template <class Contained_, info::device param, size_t BufferSize>
+size_t device::array_traits<Contained_, param, BufferSize>::actual_size = 0;
 
 namespace detail {
 
