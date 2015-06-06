@@ -32,15 +32,23 @@ public:
 		: Base(nullptr, release) {}
 	
 	refc(CL_Type data)
-		: Base(data, release) {}
-
-	refc(const refc& copy)
-		: Base((const Base&)copy) {
-		retain(get());
+		: Base(data, release) {
+		retain(data);
 	}
 
+	refc(const refc& copy) = default;
 	refc(refc&& move)
 		: Base(std::move(move)) {}
+
+	void reset(CL_Type data) {
+		Base::reset(data, release);
+		retain(data);
+	}
+
+	refc& operator=(CL_Type data) {
+		reset(data);
+		return *this;
+	}
 };
 
 } // namespace detail
