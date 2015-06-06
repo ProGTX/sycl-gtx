@@ -62,9 +62,54 @@ public:
 	bool is_linked() const {
 		return linked;
 	}
-	
+
+private:
+	template <typename ReturnType, info::program param>
+	struct traits
+		: detail::array_traits<
+			ReturnType,
+			info::program,
+			param,
+			detail::traits_buffer_default<ReturnType>::size
+		> {
+		return_t get_info(const program* p) {
+			return get(p->prog.get());
+		}
+	};
+
+	template <typename Contained_, info::program param>
+	struct traits<vector_class<Contained_>, param>
+		: detail::array_traits<Contained_, info::program, param> {
+		Container get_info(const program* p) {
+			get(p->prog.get());
+			return Container(param_value, param_value + actual_size / type_size);
+		}
+	};
+
+	template <class Contained_>
+	struct traits<vector_class<vector_class<Contained_>>, info::program::binaries>
+		: detail::array_traits<Contained_*, info::program, info::program::binaries> {
+		using DoubleContainer = vector_class<vector_class<Contained_>>;
+		DoubleContainer get_info(const program* p) {
+			auto binary_sizes = p->get_info<info::program::binary_sizes>();
+			get(p->prog.get());
+
+			DoubleContainer ret;
+			static const auto inner_type_size = sizeof(Contained_);
+			size_t i = 0;
+			for(auto bin_size : binary_sizes) {
+				ret.emplace_back(param_value[i], param_value[i] + bin_size / inner_type_size);
+				++i;
+			}
+			return ret;
+		}
+	};
+
+public:
 	template <info::program param>
-	typename param_traits2<info::program, param>::type get_info() const;
+	typename param_traits2<info::program, param>::type get_info() const {
+		return traits<param_traits2_t<info::program, param>, param>().get_info(this);
+	}
 
 	vector_class<vector_class<unsigned char>> get_binaries() const;
 	vector_class<size_t> get_binary_sizes() const;

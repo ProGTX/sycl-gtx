@@ -205,6 +205,17 @@ enum class kernel : cl_kernel_info {
 
 // C.6 Program Information Descriptors
 enum class program : cl_program_info {
+	reference_count	= CL_PROGRAM_REFERENCE_COUNT,
+	context			= CL_PROGRAM_CONTEXT,
+	devices			= CL_PROGRAM_DEVICES,
+
+	// Not part of the SYCL specification
+	num_devices		= CL_PROGRAM_NUM_DEVICES,
+	source			= CL_PROGRAM_SOURCE,
+	binary_sizes	= CL_PROGRAM_BINARY_SIZES,
+	binaries		= CL_PROGRAM_BINARIES,
+	num_kernels		= CL_PROGRAM_NUM_KERNELS,
+	kernel_names	= CL_PROGRAM_KERNEL_NAMES
 };
 
 

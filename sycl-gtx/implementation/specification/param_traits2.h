@@ -74,6 +74,8 @@ struct info_function<info::kernel> : info_function_helper<cl_kernel, clGetKernel
 template <>
 struct info_function<info::platform> : info_function_helper<cl_platform_id, clGetPlatformInfo>{};
 template <>
+struct info_function<info::program> : info_function_helper<cl_program, clGetProgramInfo>{};
+template <>
 struct info_function<info::queue> : info_function_helper<cl_command_queue, clGetCommandQueueInfo>{};
 
 template <bool IsSingleValue>
@@ -293,6 +295,27 @@ SYCL_ADD_KERNEL_TRAIT(info::kernel::context,			cl_context)
 SYCL_ADD_KERNEL_TRAIT(info::kernel::program,			cl_program)
 
 #undef SYCL_ADD_KERNEL_TRAIT
+
+
+// Table 3.65: Program class information descriptors
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetProgramInfo.html
+
+#define SYCL_ADD_PROGRAM_TRAIT(Value, ReturnType)	\
+	SYCL_ADD_TRAIT(info::program, Value, ReturnType, cl_program_info)
+
+SYCL_ADD_PROGRAM_TRAIT(info::program::reference_count,	cl_uint)
+SYCL_ADD_PROGRAM_TRAIT(info::program::context,			cl_context)
+SYCL_ADD_PROGRAM_TRAIT(info::program::devices,			vector_class<cl_device_id>)
+
+// Not part of the SYCL specification
+SYCL_ADD_PROGRAM_TRAIT(info::program::num_devices,		cl_uint)
+SYCL_ADD_PROGRAM_TRAIT(info::program::source,			string_class)
+SYCL_ADD_PROGRAM_TRAIT(info::program::binary_sizes,		vector_class<size_t>)
+SYCL_ADD_PROGRAM_TRAIT(info::program::binaries,			vector_class<vector_class<unsigned char>>)
+SYCL_ADD_PROGRAM_TRAIT(info::program::num_kernels,		size_t)
+SYCL_ADD_PROGRAM_TRAIT(info::program::kernel_names,		string_class)
+
+#undef SYCL_ADD_PROGRAM_TRAIT
 
 
 #undef SYCL_ADD_TRAIT
