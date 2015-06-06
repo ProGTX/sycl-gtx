@@ -7,7 +7,7 @@
 #include "error_handler.h"
 #include "event.h"
 #include "info.h"
-#include "param_traits2.h"
+#include "param_traits.h"
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
@@ -85,9 +85,9 @@ public:
 	device get_device() const;
 
 	template <info::queue param>
-	typename param_traits2<info::queue, param>::type get_info() const {
+	typename param_traits<info::queue, param>::type get_info() const {
 		return detail::array_traits<
-			param_traits2_t<info::queue, param>,
+			param_traits_t<info::queue, param>,
 			info::queue,
 			param,
 			1

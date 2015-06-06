@@ -5,7 +5,7 @@
 #include "device_selector.h"
 #include "error_handler.h"
 #include "info.h"
-#include "param_traits2.h"
+#include "param_traits.h"
 #include "refc.h"
 #include "../common.h"
 
@@ -45,7 +45,7 @@ public:
 
 	// Returns the corresponding descriptor information for all SYCL platforms (OpenCL and host)
 	template <info::platform param>
-	typename param_traits2<info::platform, param>::type
+	typename param_traits<info::platform, param>::type
 	get_info() const {
 		// Small optimization, knowing the return type is always string_class
 		return detail::array_traits<

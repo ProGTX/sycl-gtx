@@ -7,7 +7,7 @@
 #include "device_selector.h"
 #include "error_handler.h"
 #include "info.h"
-#include "param_traits2.h"
+#include "param_traits.h"
 #include "../common.h"
 #include "../debug.h"
 
@@ -116,9 +116,9 @@ private:
 public:
 	// Queries OpenCL information for the underlying cl_context
 	template <info::context param>
-	typename param_traits2<info::context, param>::type
+	typename param_traits<info::context, param>::type
 	get_info() const {
-		return traits<typename param_traits2<info::context, param>::type, param>().get(this);
+		return traits<typename param_traits<info::context, param>::type, param>().get(this);
 	}
 };
 

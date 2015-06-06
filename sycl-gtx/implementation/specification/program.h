@@ -4,7 +4,7 @@
 
 #include "error_handler.h"
 #include "info.h"
-#include "param_traits2.h"
+#include "param_traits.h"
 #include "refc.h"
 #include "../common.h"
 
@@ -107,8 +107,8 @@ private:
 
 public:
 	template <info::program param>
-	typename param_traits2<info::program, param>::type get_info() const {
-		return traits<param_traits2_t<info::program, param>, param>().get_info(this);
+	typename param_traits<info::program, param>::type get_info() const {
+		return traits<param_traits_t<info::program, param>, param>().get_info(this);
 	}
 
 	vector_class<vector_class<unsigned char>> get_binaries() const;

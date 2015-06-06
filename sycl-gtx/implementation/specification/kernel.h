@@ -5,7 +5,7 @@
 #include "context.h"
 #include "error_handler.h"
 #include "info.h"
-#include "param_traits2.h"
+#include "param_traits.h"
 #include "program.h"
 #include "ranges.h"
 #include "refc.h"
@@ -58,9 +58,9 @@ public:
 	}
 
 	template <info::kernel param>
-	typename param_traits2<info::kernel, param>::type
+	typename param_traits<info::kernel, param>::type
 	get_info() const {
-		using return_t = param_traits2_t<info::kernel, param>;
+		using return_t = param_traits_t<info::kernel, param>;
 		return detail::array_traits<
 			return_t,
 			info::kernel,

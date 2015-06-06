@@ -6,7 +6,7 @@
 #include "device_selector.h"
 #include "error_handler.h"
 #include "info.h"
-#include "param_traits2.h"
+#include "param_traits.h"
 #include "platform.h"
 #include "ranges\id.h"
 #include "../debug.h"
@@ -155,9 +155,9 @@ private:
 
 public:
 	template <info::device param>
-	typename param_traits2<info::device, param>::type
+	typename param_traits<info::device, param>::type
 	get_info() const {
-		return traits<typename param_traits2<info::device, param>::type, param>().get(this);
+		return traits<typename param_traits<info::device, param>::type, param>().get(this);
 	}
 };
 

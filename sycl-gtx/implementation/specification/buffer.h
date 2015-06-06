@@ -6,7 +6,7 @@
 #include "error_handler.h"
 #include "event.h"
 #include "info.h"
-#include "param_traits2.h"
+#include "param_traits.h"
 #include "ranges.h"
 #include "refc.h"
 #include "../common.h"
@@ -251,10 +251,10 @@ private:
 
 protected:
 	template <info::detail::buffer param>
-	param_traits2_t<info::detail::buffer, param>
+	param_traits_t<info::detail::buffer, param>
 	get_info() const {
 		return detail::array_traits<
-			param_traits2_t<info::detail::buffer, param>,
+			param_traits_t<info::detail::buffer, param>,
 			info::detail::buffer,
 			param,
 			1
