@@ -203,6 +203,11 @@ enum class kernel : cl_kernel_info {
 };
 
 
+// C.6 Program Information Descriptors
+enum class program : cl_program_info {
+};
+
+
 // C.7 Event Information Descriptors
 enum class event : int {
 	command_type,

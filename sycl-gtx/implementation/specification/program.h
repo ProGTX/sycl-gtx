@@ -1,9 +1,10 @@
 #pragma once
 
-// 3.7.2.6 Program class
+// 3.5.5 Program class
 
 #include "error_handler.h"
-#include "param_traits.h"
+#include "info.h"
+#include "param_traits2.h"
 #include "refc.h"
 #include "../common.h"
 
@@ -28,38 +29,45 @@ protected:
 	friend class detail::kernel_::source;
 
 	detail::refc<cl_program, clRetainProgram, clReleaseProgram> prog;
+	bool linked = false;
 
 	program(string_class source, queue* q);
 public:
 	// Creates an empty program object for all devices associated with context
-	program(const context& context) {}
+	explicit program(const context& context) {}
 	
-	// Creates an empty program object devices in list associated with the context
-	program(const context& context, vector_class<device> device_list);
+	// Creates an empty program object for all devices in list associated with the context
+	program(const context& context, vector_class<device> deviceList);
 
 	// Creates a program object from a cl_program object
 	program(const context& context, cl_program clProgram) {}
 
 	// Creates a program by linking a list of other programs
-	program(vector_class<program> program_list, string_class link_options = "");
+	program(vector_class<program> programList, string_class linkOptions = "");
+
+	// TODO: Somehow provide the ability to compile and build programs
 
 	// Obtains a SYCL program object from a SYCL kernel name and compiles it ready-to-link
-	template<typename kernelT>
+	template <typename kernelT>
 	void compile_from_kernel_name(string_class compile_options = "");
-	
 	// Obtains a SYCL program object from a SYCL kernel name and builds it ready-to-run
-	template<typename kernelT>
+	template <typename kernelT>
 	void build_from_kernel_name(string_class compile_options = "");
-	
 	// Gets a kernel from a given name (Functor)
-	template<typename kernelT>
+	template <typename kernelT>
 	kernel get_kernel() const;
-	
-	template<cl_int name> typename
-	param_traits<cl_program_info, name>::param_type get_info() const;
 
-	vector_class<vector_class<char>> get_binaries() const;
-	vector_class<::size_t> get_binary_sizes() const;
+	void link(string_class linking_options = "");
+
+	bool is_linked() const {
+		return linked;
+	}
+	
+	template <info::program param>
+	typename param_traits2<info::program, param>::type get_info() const;
+
+	vector_class<vector_class<unsigned char>> get_binaries() const;
+	vector_class<size_t> get_binary_sizes() const;
 	vector_class<device> get_devices() const;
 	string_class get_build_options() const;
 
