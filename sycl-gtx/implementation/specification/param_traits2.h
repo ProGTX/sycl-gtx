@@ -96,11 +96,12 @@ struct trait_return<true> {
 template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize = traits<Contained_>::BUFFER_SIZE>
 struct array_traits : traits<Contained_, BufferSize> {
 	using Base = array_traits<Contained_, EnumClass, param, BufferSize>;
-	static SYCL_THREAD_LOCAL Contained param_value[BUFFER_SIZE];
-	static SYCL_THREAD_LOCAL size_t actual_size;
+	using return_t = typename std::conditional<BufferSize == 1, Contained, Contained*>::type;
+	Contained param_value[BUFFER_SIZE];
+	size_t actual_size = 0;
 
 	template <typename cl_input_t>
-	static typename std::conditional<BufferSize == 1, Contained, Contained*>::type get(cl_input_t data_ptr) {
+	return_t get(cl_input_t data_ptr) {
 		auto error_code = info_function<EnumClass>::get(
 			data_ptr, (param_traits2<EnumClass, param>::cl_flag_type)param, BUFFER_SIZE * type_size, param_value, &actual_size
 		);
@@ -108,12 +109,6 @@ struct array_traits : traits<Contained_, BufferSize> {
 		return trait_return<BufferSize == 1>::get(param_value);
 	}
 };
-
-template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize>
-typename traits<Contained_, BufferSize>::Contained array_traits<Contained_, EnumClass, param, BufferSize>::param_value[BufferSize];
-
-template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize>
-size_t array_traits<Contained_, EnumClass, param, BufferSize>::actual_size = 0;
 
 } // namespace detail
 

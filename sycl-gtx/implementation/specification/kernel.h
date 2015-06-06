@@ -70,7 +70,7 @@ public:
 			info::kernel,
 			param,
 			detail::traits_buffer_default<return_t>::size
-		>::get(kern.get());
+		>().get(kern.get());
 	}
 
 	// Return the name of the kernel function

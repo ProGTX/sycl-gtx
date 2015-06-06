@@ -49,8 +49,11 @@ public:
 	get_info() const {
 		// Small optimization, knowing the return type is always string_class
 		return detail::array_traits<
-			string_class, info::platform, param, 8192
-		>::get(platform_id.get());
+			string_class,
+			info::platform,
+			param,
+			detail::traits_buffer_default<string_class>::size
+		>().get(platform_id.get());
 	}
 
 	// True if the platform is host

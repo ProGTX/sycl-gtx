@@ -91,7 +91,7 @@ public:
 			info::queue,
 			param,
 			1
-		>::get(command_q.get());
+		>().get(command_q.get());
 	}
 
 	// Checks to see if any asynchronous errors have been produced by the queue

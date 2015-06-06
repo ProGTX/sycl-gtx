@@ -91,7 +91,7 @@ public:
 private:
 	template <class Contained_, info::context param, size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
 	struct array_traits : detail::array_traits<Contained_, info::context, param, BufferSize> {
-		static void get_info(const context* ctx) {
+		void get_info(const context* ctx) {
 			Base::get(ctx->ctx.get());
 		}
 	};
@@ -99,7 +99,7 @@ private:
 	template <class return_t, info::context param>
 	struct traits
 		: array_traits<return_t, param, 1> {
-		static return_t get(const context* ctx) {
+		return_t get(const context* ctx) {
 			get_info(ctx);
 			return param_value[0];
 		}
@@ -107,7 +107,7 @@ private:
 	template <typename Contained, info::context param>
 	struct traits<vector_class<Contained>, param>
 		: array_traits<Contained, param> {
-		static Container get(const context* ctx) {
+		Container get(const context* ctx) {
 			get_info(ctx);
 			return Container(param_value, param_value + actual_size / type_size);
 		}
@@ -118,7 +118,7 @@ public:
 	template <info::context param>
 	typename param_traits2<info::context, param>::type
 	get_info() const {
-		return traits<typename param_traits2<info::context, param>::type, param>::get(this);
+		return traits<typename param_traits2<info::context, param>::type, param>().get(this);
 	}
 };
 

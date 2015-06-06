@@ -76,7 +76,7 @@ public:
 private:
 	template <class Contained_, info::device param, size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
 	struct array_traits : detail::array_traits<Contained_, info::device, param, BufferSize> {
-		static void get_info(const device* dev) {
+		void get_info(const device* dev) {
 			Base::get(dev->device_id.get());
 		}
 	};
@@ -87,7 +87,7 @@ private:
 	template <class return_t, info::device param>
 	struct traits<return_t, param, typename std::enable_if<std::is_integral<return_t>::value, typename std::false_type::type>::type>
 		: array_traits<return_t, param, 1> {
-		static return_t get(const device* dev) {
+		return_t get(const device* dev) {
 			get_info(dev);
 			return param_value[0];
 		}
@@ -95,8 +95,8 @@ private:
 
 	template <class EnumClass, info::device param>
 	struct traits<EnumClass, param, typename std::true_type::type> {
-		static EnumClass get(const device* dev) {
-			return (EnumClass)traits<typename std::underlying_type<EnumClass>::type, param>::get(dev);
+		EnumClass get(const device* dev) {
+			return (EnumClass)traits<typename std::underlying_type<EnumClass>::type, param>().get(dev);
 		}
 	};
 
@@ -104,7 +104,7 @@ private:
 	struct traits<vector_class<EnumClass>, param, typename std::true_type::type>
 		: array_traits<typename std::underlying_type<EnumClass>::type, param> {
 		using return_t = vector_class<EnumClass>;
-		static return_t convert() {
+		return_t convert() {
 			return_t ret;
 			auto size = actual_size / type_size;
 			ret.reserve(size);
@@ -113,7 +113,7 @@ private:
 			}
 			return ret;
 		}
-		static return_t get(const device* dev) {
+		return_t get(const device* dev) {
 			get_info(dev);
 			return convert();
 		}
@@ -122,7 +122,7 @@ private:
 	template <info::device param>
 	struct traits<string_class, param>
 		: array_traits<string_class, param> {
-		static string_class get(const device* dev) {
+		string_class get(const device* dev) {
 			get_info(dev);
 			return string_class(param_value);
 		}
@@ -131,7 +131,7 @@ private:
 	template <info::device param>
 	struct traits<id<3>, param>
 		: array_traits<size_t, param, 3> {
-		static id<3> get(const device* dev) {
+		id<3> get(const device* dev) {
 			get_info(dev);
 			return id<3>(param_value[0], param_value[1], param_value[2]);
 		}
@@ -141,7 +141,7 @@ private:
 	struct traits<vector_class<Contained_>, info::device::partition_type, typename std::false_type::type>
 		: traits<vector_class<Contained_>, info::device::partition_type, typename std::true_type::type> {
 		using return_t = vector_class<Contained_>;	// TODO: Why isn't return_t inherited? May be a bug.
-		static return_t get(const device* dev) {
+		return_t get(const device* dev) {
 			// TODO: I have no idea how to handle this case
 			get_info(dev);
 			if(actual_size == 0) {
@@ -157,7 +157,7 @@ public:
 	template <info::device param>
 	typename param_traits2<info::device, param>::type
 	get_info() const {
-		return traits<typename param_traits2<info::device, param>::type, param>::get(this);
+		return traits<typename param_traits2<info::device, param>::type, param>().get(this);
 	}
 };
 
