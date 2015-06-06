@@ -1,7 +1,6 @@
 #pragma once
 
-// 3.7 Expressing parallelism through kernels
-// 3.7.1 is not included here, but rather in ranges.h
+// 3.5.4 Kernel class
 
 #include "context.h"
 #include "error_handler.h"
@@ -27,8 +26,6 @@ namespace kernel_ {
 }
 }
 
-// 3.7.2.5 Kernel class
-
 class kernel {
 private:
 	detail::refc<cl_kernel, clRetainKernel, clReleaseKernel> kern;
@@ -38,8 +35,7 @@ private:
 	friend class detail::kernel_::source;
 
 public:
-	// The default object is not valid because there is no
-	// program or cl_kernel associated with it
+	// The default object is not valid because there is no program or cl_kernel associated with it
 	kernel() = delete;
 	kernel(nullptr_t) = delete;
 

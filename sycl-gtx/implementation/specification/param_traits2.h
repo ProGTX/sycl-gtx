@@ -291,6 +291,8 @@ SYCL_ADD_KERNEL_TRAIT(info::kernel::function_name,		string_class)
 SYCL_ADD_KERNEL_TRAIT(info::kernel::num_args,			cl_uint)
 SYCL_ADD_KERNEL_TRAIT(info::kernel::reference_count,	cl_uint)
 SYCL_ADD_KERNEL_TRAIT(info::kernel::attributes,			string_class)
+
+// Not part of the SYCL specification
 SYCL_ADD_KERNEL_TRAIT(info::kernel::context,			cl_context)
 SYCL_ADD_KERNEL_TRAIT(info::kernel::program,			cl_program)
 

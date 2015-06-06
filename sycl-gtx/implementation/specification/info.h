@@ -197,7 +197,7 @@ enum class kernel : cl_kernel_info {
 	reference_count	= CL_KERNEL_REFERENCE_COUNT,
 	attributes		= CL_KERNEL_ATTRIBUTES,
 
-	// Not part of the specification
+	// Not part of the SYCL specification
 	context			= CL_KERNEL_CONTEXT,
 	program			= CL_KERNEL_PROGRAM
 };
@@ -220,13 +220,13 @@ enum class program : cl_program_info {
 
 
 // C.7 Event Information Descriptors
-enum class event : int {
-	command_type,
-	command_execution_status,
-	reference_count
+enum class event : cl_event_info {
+	command_type				= CL_EVENT_COMMAND_TYPE,
+	command_execution_status	= CL_EVENT_COMMAND_EXECUTION_STATUS,
+	reference_count				= CL_EVENT_REFERENCE_COUNT
 };
 
-enum class event_profiling : int {
+enum class event_profiling : cl_event_info {
 	command_queued,
 	command_submit,
 	command_start,
