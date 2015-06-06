@@ -220,18 +220,24 @@ enum class program : cl_program_info {
 
 
 // C.7 Event Information Descriptors
+
 enum class event : cl_event_info {
 	command_type				= CL_EVENT_COMMAND_TYPE,
 	command_execution_status	= CL_EVENT_COMMAND_EXECUTION_STATUS,
-	reference_count				= CL_EVENT_REFERENCE_COUNT
+	reference_count				= CL_EVENT_REFERENCE_COUNT,
+
+	// Not part of the SYCL specification
+	command_queue				= CL_EVENT_COMMAND_QUEUE,
+	context						= CL_EVENT_CONTEXT
 };
 
-enum class event_profiling : cl_event_info {
-	command_queued,
-	command_submit,
-	command_start,
-	command_end
+enum class event_profiling : cl_profiling_info {
+	command_queued	= CL_PROFILING_COMMAND_QUEUED,
+	command_submit	= CL_PROFILING_COMMAND_SUBMIT,
+	command_start	= CL_PROFILING_COMMAND_START,
+	command_end		= CL_PROFILING_COMMAND_END,
 };
+
 
 namespace detail {
 

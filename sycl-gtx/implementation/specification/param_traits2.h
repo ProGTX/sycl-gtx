@@ -70,6 +70,10 @@ struct info_function<info::context> : info_function_helper<cl_context, clGetCont
 template <>
 struct info_function<info::device> : info_function_helper<cl_device_id, clGetDeviceInfo>{};
 template <>
+struct info_function<info::event> : info_function_helper<cl_event, clGetEventInfo>{};
+template <>
+struct info_function<info::event_profiling> : info_function_helper<cl_event, clGetEventProfilingInfo>{};
+template <>
 struct info_function<info::kernel> : info_function_helper<cl_kernel, clGetKernelInfo>{};
 template <>
 struct info_function<info::platform> : info_function_helper<cl_platform_id, clGetPlatformInfo>{};
@@ -318,6 +322,34 @@ SYCL_ADD_PROGRAM_TRAIT(info::program::num_kernels,		size_t)
 SYCL_ADD_PROGRAM_TRAIT(info::program::kernel_names,		string_class)
 
 #undef SYCL_ADD_PROGRAM_TRAIT
+
+
+// 3.3.6.1 Event information and profiling descriptors
+
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetEventInfo.html
+#define SYCL_ADD_EVENT_TRAIT(Value, ReturnType)	\
+	SYCL_ADD_TRAIT(info::event, Value, ReturnType, cl_event_info)
+
+SYCL_ADD_EVENT_TRAIT(info::event::command_type,				cl_command_type)
+SYCL_ADD_EVENT_TRAIT(info::event::command_execution_status, cl_int)
+SYCL_ADD_EVENT_TRAIT(info::event::reference_count,			cl_int)
+
+// Not part of the SYCL specification
+SYCL_ADD_EVENT_TRAIT(info::event::command_queue,			cl_command_queue)
+SYCL_ADD_EVENT_TRAIT(info::event::context,					cl_context)
+
+#undef SYCL_ADD_EVENT_TRAIT
+
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetEventProfilingInfo.html
+#define SYCL_ADD_EVENT_PROFILING_TRAIT(Value, ReturnType)	\
+	SYCL_ADD_TRAIT(info::event_profiling, Value, ReturnType, cl_profiling_info)
+
+SYCL_ADD_EVENT_PROFILING_TRAIT(info::event_profiling::command_queued,	cl_ulong)
+SYCL_ADD_EVENT_PROFILING_TRAIT(info::event_profiling::command_submit,	cl_ulong)
+SYCL_ADD_EVENT_PROFILING_TRAIT(info::event_profiling::command_start,	cl_ulong)
+SYCL_ADD_EVENT_PROFILING_TRAIT(info::event_profiling::command_end,		cl_ulong)
+
+#undef SYCL_ADD_EVENT_PROFILING_TRAIT
 
 
 #undef SYCL_ADD_TRAIT
