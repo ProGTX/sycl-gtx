@@ -3,6 +3,7 @@
 // 2.5.8 Managing object lifetimes
 // "All OpenCL objects encapsulated in SYCL objects will be reference-counted and destroyed once all references have been released."
 
+#include "error_handler.h"
 #include "../common.h"
 #include <CL/cl.h>
 
@@ -27,13 +28,20 @@ class refc : public refc_ptr<CL_Type> {
 private:
 	using Base = refc_ptr<CL_Type>;
 
+	static void retain_helper(CL_Type data) {
+		if(data != nullptr) {
+			auto error_code = retain(data);
+			error::report(error_code);
+		}
+	}
+
 public:
 	refc()
 		: Base(nullptr, release) {}
 	
 	refc(CL_Type data)
 		: Base(data, release) {
-		retain(data);
+		retain_helper(data);
 	}
 
 	refc(const refc& copy) = default;
@@ -42,7 +50,7 @@ public:
 
 	void reset(CL_Type data) {
 		Base::reset(data, release);
-		retain(data);
+		retain_helper(data);
 	}
 
 	refc& operator=(CL_Type data) {

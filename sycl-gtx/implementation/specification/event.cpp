@@ -3,10 +3,7 @@
 using namespace cl::sycl;
 
 event::event(cl_event clEvent)
-	: evnt(clEvent) {
-	auto error_code = clRetainEvent(clEvent);
-	detail::error::report(error_code);
-}
+	: evnt(clEvent) {}
 
 cl_event event::get() {
 	return evnt.get();

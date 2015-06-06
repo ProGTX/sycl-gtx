@@ -32,10 +32,6 @@ context::context(
 		detail::error::report(error_code);
 		ctx = c;
 	}
-	else {
-		auto error_code = clRetainContext(c);
-		detail::error::report(error_code);
-	}
 }
 
 context::context()

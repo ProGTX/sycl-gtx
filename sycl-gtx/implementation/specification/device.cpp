@@ -6,11 +6,7 @@ using namespace cl::sycl;
 
 device::device(cl_device_id device_id, device_selector* dev_sel)
 	: device_id(device_id), platfrm(*dev_sel) {
-	if(device_id != nullptr) {
-		auto error_code = clRetainDevice(device_id);
-		detail::error::report(error_code);
-	}
-	else {
+	if(device_id == nullptr) {
 		*this = dev_sel->select_device();
 	}
 }
