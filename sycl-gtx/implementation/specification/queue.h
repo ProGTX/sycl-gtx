@@ -86,8 +86,7 @@ public:
 
 	template <info::queue param>
 	typename param_traits<info::queue, param>::type get_info() const {
-		return detail::array_traits<
-			param_traits_t<info::queue, param>,
+		return detail::non_vector_traits<
 			info::queue,
 			param,
 			1

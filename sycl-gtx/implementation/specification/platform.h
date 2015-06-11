@@ -48,8 +48,7 @@ public:
 	typename param_traits<info::platform, param>::type
 	get_info() const {
 		// Small optimization, knowing the return type is always string_class
-		return detail::array_traits<
-			string_class,
+		return detail::non_vector_traits<
 			info::platform,
 			param,
 			detail::traits_buffer_default<string_class>::size

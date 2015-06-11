@@ -61,8 +61,7 @@ public:
 	typename param_traits<info::kernel, param>::type
 	get_info() const {
 		using return_t = param_traits_t<info::kernel, param>;
-		return detail::array_traits<
-			return_t,
+		return detail::non_vector_traits<
 			info::kernel,
 			param,
 			detail::traits_buffer_default<return_t>::size

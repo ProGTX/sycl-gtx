@@ -116,6 +116,11 @@ struct array_traits : traits<Contained_, BufferSize> {
 	}
 };
 
+// Meant for scalar and string cases
+template <class EnumClass, EnumClass param, size_t BufferSize = traits<param_traits_t<EnumClass, param>>::BUFFER_SIZE>
+struct non_vector_traits
+	: array_traits<param_traits_t<EnumClass, param>, EnumClass, param, BufferSize> {};
+
 } // namespace detail
 
 

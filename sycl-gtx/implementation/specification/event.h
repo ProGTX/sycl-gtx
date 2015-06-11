@@ -39,8 +39,7 @@ public:
 
 	template <info::event param>
 	typename param_traits<info::event, param>::type get_info() const {
-		return detail::array_traits<
-			param_traits_t<info::event, param>,
+		return detail::non_vector_traits<
 			info::event,
 			param,
 			1
@@ -49,8 +48,7 @@ public:
 
 	template <info::event_profiling param>
 	typename param_traits<info::event_profiling, param>::type get_profiling_info() const {
-		return detail::array_traits<
-			param_traits_t<info::event_profiling, param>,
+		return detail::non_vector_traits<
 			info::event_profiling,
 			param,
 			1

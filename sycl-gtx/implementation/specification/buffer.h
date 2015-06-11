@@ -253,8 +253,7 @@ protected:
 	template <info::detail::buffer param>
 	param_traits_t<info::detail::buffer, param>
 	get_info() const {
-		return detail::array_traits<
-			param_traits_t<info::detail::buffer, param>,
+		return detail::non_vector_traits<
 			info::detail::buffer,
 			param,
 			1
