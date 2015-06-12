@@ -236,5 +236,8 @@
     <ClInclude Include="implementation\specification\param_traits.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\function_traits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

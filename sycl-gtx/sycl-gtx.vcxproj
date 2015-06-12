@@ -178,6 +178,7 @@
     <ClInclude Include="implementation\debug.h" />
     <ClInclude Include="implementation\error_code.h" />
     <ClInclude Include="implementation\flow_control.h" />
+    <ClInclude Include="implementation\function_traits.h" />
     <ClInclude Include="implementation\gen_source.h" />
     <ClInclude Include="implementation\invoke_source.h" />
     <ClInclude Include="implementation\specification\accessor.h" />
