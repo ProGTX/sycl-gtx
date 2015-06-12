@@ -60,12 +60,6 @@ protected:
 	}
 };
 
-struct buffer_access {
-	buffer_base* data;
-	access::mode mode;
-	access::target target;
-};
-
 template <typename DataType, int dimensions>
 class buffer_ : public buffer_base {
 protected:

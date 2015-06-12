@@ -91,5 +91,19 @@ static debug& operator<<(debug& d, target t) {
 }
 
 } // namespace access
+
+namespace detail {
+
+// Forward declaration
+class buffer_base;
+
+struct buffer_access {
+	buffer_base* data;
+	access::mode mode;
+	access::target target;
+};
+
+} // namespace detail
+
 } // namespace sycl
 } // namespace cl

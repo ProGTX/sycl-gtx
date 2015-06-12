@@ -2,14 +2,17 @@
 
 // 3.5.6 Command group class
 
-#include "buffer.h"
-#include "event.h"
-#include "queue.h"
+#include "access.h"
 #include "../common.h"
 #include "../debug.h"
 
 namespace cl {
 namespace sycl {
+
+// Forward declarations
+class command_group;
+class event;
+class queue;
 
 namespace detail {
 namespace command {
@@ -174,23 +177,14 @@ public:
 	~command_group();
 
 	// Return the event object that the command group waits on to begin execution.
-	event start_event() {
-		DSELF() << "not implemented";
-		return event();
-	}
+	event start_event();
 
 	// Return the event representing completion of the command group's kernel.
-	event kernel_event() {
-		DSELF() << "not implemented";
-		return event();
-	}
+	event kernel_event();
 
 	// Return the event representing completion of the entire command group
 	// including any required data movement commands.
-	event complete_event() {
-		DSELF() << "not implemented";
-		return event();
-	}
+	event complete_event();
 };
 
 } // namespace sycl

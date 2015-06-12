@@ -1,4 +1,5 @@
 #include "accessor.h"
+#include "buffer.h"
 #include "command_group.h"
 #include <unordered_map>
 #include <unordered_set>
