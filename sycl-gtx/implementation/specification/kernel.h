@@ -2,6 +2,7 @@
 
 // 3.5.4 Kernel class
 
+#include "command_group.h"
 #include "context.h"
 #include "error_handler.h"
 #include "info.h"
@@ -31,6 +32,7 @@ private:
 	detail::refc<cl_kernel, clRetainKernel, clReleaseKernel> kern;
 	context ctx;
 	program prog;
+	command_group cg;
 
 	friend class detail::kernel_::source;
 
@@ -41,6 +43,8 @@ public:
 
 	// Constructs from a valid, initialized OpenCL kernel
 	kernel(cl_kernel openclKernelObject);
+
+	~kernel();
 
 	// Return the OpenCL kernel object for this kernel.
 	cl_kernel get() const {

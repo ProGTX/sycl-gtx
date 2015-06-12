@@ -143,6 +143,7 @@ public:
 // for queued data transfers that it needs in order for its execution to be successful.
 class command_group {
 private:
+	friend class kernel;
 	friend class detail::command::group_;
 	using command_f = detail::command::group_::command_f;
 	using command_t = detail::command::info;
@@ -154,6 +155,15 @@ private:
 	void exit();
 	void optimize();
 	void flush();
+
+	template <typename functorT>
+	command_group(functorT lambda)
+		: q(nullptr) {
+		enter();
+		handler cgh;
+		lambda(cgh);
+		exit();
+	}
 public:
 	// Constructs a command group with the queue the group will enqueue its commands to
 	// and a lambda function or function object containing the body of commands to enqueue.
