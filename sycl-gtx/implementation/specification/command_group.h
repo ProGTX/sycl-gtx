@@ -90,7 +90,7 @@ private:
 
 public:
 	// Add generic command
-	template<class... Args>
+	template <class... Args>
 	static void add(
 		fn<Args...> function,
 		string_class name,
@@ -104,7 +104,7 @@ public:
 	}
 
 	// Add buffer access command
-	template<bool = true>
+	template <bool = true>
 	static void add(
 		buffer_access buf_acc,
 		string_class name
@@ -160,6 +160,7 @@ private:
 	void optimize();
 	void flush();
 
+public:
 	template <typename functorT>
 	command_group(functorT lambda)
 		: q(nullptr) {
@@ -168,7 +169,7 @@ private:
 		lambda(cgh);
 		exit();
 	}
-public:
+
 	// Constructs a command group with the queue the group will enqueue its commands to
 	// and a lambda function or function object containing the body of commands to enqueue.
 	template <typename functorT>
@@ -189,16 +190,6 @@ public:
 	command_group(queue& primaryQueue, queue& secondaryQueue, functorT lambda);
 
 	~command_group();
-
-	// Return the event object that the command group waits on to begin execution.
-	event start_event();
-
-	// Return the event representing completion of the command group's kernel.
-	event kernel_event();
-
-	// Return the event representing completion of the entire command group
-	// including any required data movement commands.
-	event complete_event();
 };
 
 } // namespace detail
