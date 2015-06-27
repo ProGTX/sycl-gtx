@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gen_source.h"
+#include "kernel_source.h"
 #include "specification\ranges.h"
 #include "common.h"
 #include "debug.h"

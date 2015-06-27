@@ -7,6 +7,7 @@
 #include "param_traits.h"
 #include "refc.h"
 #include "../common.h"
+#include "../kernel_source.h"
 
 namespace cl {
 namespace sycl {
@@ -53,6 +54,7 @@ public:
 	// Obtains a SYCL program object from a SYCL kernel name and builds it ready-to-run
 	template <typename kernelT>
 	void build_from_kernel_name(string_class compile_options = "");
+
 	// Gets a kernel from a given name (Functor)
 	template <typename kernelT>
 	kernel get_kernel() const;

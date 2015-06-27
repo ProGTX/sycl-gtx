@@ -1,4 +1,4 @@
-#include "gen_source.h"
+#include "kernel_source.h"
 
 #include "specification\accessor\buffer.h"
 #include "specification\buffer.h"
