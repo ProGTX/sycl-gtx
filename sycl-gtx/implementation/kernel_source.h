@@ -89,7 +89,7 @@ public:
 	template <int dimensions>
 	static void enqueue_nd_range_command(
 		queue* q, detail::shared_unique<kernel> kern, nd_range<dimensions> execution_range
-		) {
+	) {
 		(*kern)->enqueue_nd_range(q, execution_range);
 	}
 	template <int dimensions>

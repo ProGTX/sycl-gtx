@@ -5,6 +5,7 @@
 #include <unordered_set>
 
 using namespace cl::sycl;
+using namespace detail;
 
 void command_group::enter() {
 	detail::command::group_::last = this;

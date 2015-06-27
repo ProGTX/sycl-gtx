@@ -32,7 +32,7 @@ private:
 	detail::refc<cl_kernel, clRetainKernel, clReleaseKernel> kern;
 	context ctx;
 	program prog;
-	command_group cg;
+	detail::command_group cg;
 
 	friend class detail::kernel_::source;
 

@@ -108,7 +108,7 @@ public:
 	// TODO
 	template <typename T>
 	handler_event submit(T cgf) {
-		command_group(*this, cgf);
+		detail::command_group(*this, cgf);
 		return handler_event();
 	}
 

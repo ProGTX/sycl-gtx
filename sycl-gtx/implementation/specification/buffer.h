@@ -23,7 +23,6 @@ template <typename DataType, int dimensions, access::mode mode, access::target t
 class accessor;
 template <typename DataType, int dimensions = 1>
 struct buffer;
-class command_group;
 class handler;
 class queue;
 
@@ -36,6 +35,7 @@ class accessor_;
 #endif
 template <typename DataType, int dimensions>
 class accessor_buffer;
+class command_group;
 namespace kernel_ {
 	class source;
 }

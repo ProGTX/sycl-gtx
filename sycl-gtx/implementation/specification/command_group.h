@@ -10,11 +10,15 @@ namespace cl {
 namespace sycl {
 
 // Forward declarations
-class command_group;
 class event;
+class kernel;
 class queue;
 
 namespace detail {
+
+// Forward declaration
+class command_group;
+
 namespace command {
 
 enum class type_t {
@@ -76,7 +80,7 @@ struct info {
 
 class group_ {
 private:
-	friend class ::cl::sycl::command_group;
+	friend class command_group;
 
 	// TODO: Need to deal better with threads
 	SYCL_THREAD_LOCAL static command_group* last;
@@ -137,16 +141,16 @@ public:
 };
 
 } // namespace command
-} // namespace detail
+
 
 // A command group in SYCL as it is defined in 2.3.1 includes a kernel to be enqueued along with all the commands
 // for queued data transfers that it needs in order for its execution to be successful.
 class command_group {
 private:
 	friend class kernel;
-	friend class detail::command::group_;
-	using command_f = detail::command::group_::command_f;
-	using command_t = detail::command::info;
+	friend class command::group_;
+	using command_f = command::group_::command_f;
+	using command_t = command::info;
 
 	vector_class<command_t> commands;
 	queue* q;
@@ -196,6 +200,8 @@ public:
 	// including any required data movement commands.
 	event complete_event();
 };
+
+} // namespace detail
 
 } // namespace sycl
 } // namespace cl

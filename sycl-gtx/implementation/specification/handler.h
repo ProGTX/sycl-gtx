@@ -16,7 +16,7 @@ namespace sycl {
 // 3.5.3.4 Command group handler class
 class handler {
 private:
-	friend class command_group;
+	friend class detail::command_group;
 	// TODO: Implementation defined constructor
 	handler() {}
 
