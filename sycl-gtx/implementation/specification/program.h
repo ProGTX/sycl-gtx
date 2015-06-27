@@ -2,6 +2,8 @@
 
 // 3.5.5 Program class
 
+#include "context.h"
+#include "device.h"
 #include "error_handler.h"
 #include "info.h"
 #include "param_traits.h"
@@ -14,15 +16,7 @@ namespace sycl {
 
 // Forward declarations
 class kernel;
-class context;
-class device;
 class queue;
-
-namespace detail {
-namespace kernel_ {
-	class source;
-}
-}
 
 
 class program {
@@ -32,21 +26,44 @@ protected:
 	detail::refc<cl_program, clRetainProgram, clReleaseProgram> prog;
 	bool linked = false;
 
-	program(string_class source, queue* q);
+	context ctx;
+	vector_class<device> devices;
+	vector_class<detail::kernel_::source> kernels;
+
+	program(cl_program clProgram, const context& context, vector_class<device> deviceList);
+
+	void compile(string_class compile_options);
+	void report_compile_error(device& dev);
+
 public:
 	// Creates an empty program object for all devices associated with context
-	explicit program(const context& context) {}
+	explicit program(const context& context);
 	
 	// Creates an empty program object for all devices in list associated with the context
 	program(const context& context, vector_class<device> deviceList);
 
 	// Creates a program object from a cl_program object
-	program(const context& context, cl_program clProgram) {}
+	program(const context& context, cl_program clProgram);
 
 	// Creates a program by linking a list of other programs
 	program(vector_class<program> programList, string_class linkOptions = "");
 
-	// TODO: Somehow provide the ability to compile and build programs
+	template <class KernelType>
+	void compile(KernelType kernFunctor, string_class compile_options = "") {
+		kernels.push_back(
+			detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(kernFunctor)
+		);
+		compile(compile_options);
+	}
+
+	template <class KernelType>
+	void build(KernelType kernFunctor, string_class compile_options = "") {
+		compile(kernFunctor, compile_options);
+		link();
+	}
+
+	// Link all compiled programs that are added in the program class
+	void link(string_class linking_options = "");
 
 	// Obtains a SYCL program object from a SYCL kernel name and compiles it ready-to-link
 	template <typename kernelT>
@@ -58,8 +75,6 @@ public:
 	// Gets a kernel from a given name (Functor)
 	template <typename kernelT>
 	kernel get_kernel() const;
-
-	void link(string_class linking_options = "");
 
 	bool is_linked() const {
 		return linked;

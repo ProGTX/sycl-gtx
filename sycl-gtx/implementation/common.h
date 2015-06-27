@@ -96,9 +96,19 @@ namespace sycl {
 
 namespace detail {
 
-template<class To, class From>
+template <class To, class From>
 vector_class<To> transform_vector(vector_class<From> array) {
 	return vector_class<To>(array.data(), array.data() + array.size());
+}
+
+template <class From>
+auto get_cl_array(vector_class<From> array) -> vector_class<decltype(array[0].get())> {
+	vector_class<decltype(array[0].get())> transformed;
+	transformed.reserve(array.size());
+	for(auto& e : array) {
+		transformed.push_back(e.get());
+	}
+	return transformed;
 }
 
 template <typename EnumClass, EnumClass Value, class T>

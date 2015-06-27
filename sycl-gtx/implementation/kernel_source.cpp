@@ -31,19 +31,16 @@ source source::exit(source& src) {
 }
 
 // Creates kernel source
-string_class source::get_code() {
-	if(!final_code.empty()) {
-		return final_code;
-	}
+string_class source::get_code() const {
+	// TODO: Caching?
 
 	static const char newline = '\n';
 
-	final_code = string_class("__kernel void ") + kernel_name + "(" + generate_accessor_list() + ") {" + newline;
+	string_class final_code = string_class("__kernel void ") + kernel_name + "(" + generate_accessor_list() + ") {" + newline;
 
 	for(auto& line : lines) {
-		final_code += std::move(line) + newline;
+		final_code += line + newline;
 	}
-	lines.clear();
 
 	final_code = final_code + "}" + newline;
 
@@ -84,14 +81,19 @@ string_class source::get_name(access::target target) {
 }
 
 void source::compile_command(queue* q, source src, detail::shared_unique<kernel> kern) {
-	program p(src.get_code(), q);
+}
+
+// Note: MSVC2013 editor reports errors on command::group_::add, but the code compiles and links
+
+void source::compile(program& p) {
+	kern = detail::shared_unique<kernel>(new unique_ptr_class<kernel>());
 
 	cl_int error_code;
-	cl_kernel k = clCreateKernel(p.get(), src.kernel_name.c_str(), &error_code);
+	cl_kernel k = clCreateKernel(p.get(), kernel_name.c_str(), &error_code);
 	detail::error::report(error_code);
 
 	int i = 0;
-	for(auto& acc : src.resources) {
+	for(auto& acc : resources) {
 		if(acc.second.acc.target == access::local) {
 			error_code = clSetKernelArg(k, i, acc.second.size, nullptr);
 			detail::error::report(error_code);
@@ -106,20 +108,14 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 
 	*kern = unique_ptr_class<kernel>(new kernel(k));
 
-	// Kernel constructor performs a retain
+	// Kernel constructor performed a retain
 	clReleaseKernel(k);
 }
 
-// Note: MSVC2013 editor reports errors on command::group_::add, but the code compiles and links
+void source::write_buffers_to_device(program& p) {
+	auto& src = p.kernels.back();
 
-detail::shared_unique<kernel> source::compile() const {
-	auto kern = detail::shared_unique<kernel>(new unique_ptr_class<kernel>());
-	command::group_::add(compile_command, __func__, *this, kern);
-	return kern;
-}
-
-void source::write_buffers_to_device() const {
-	for(auto& acc : resources) {
+	for(auto& acc : src.resources) {
 		auto mode = acc.second.acc.mode;
 		if(
 			mode == access::write				||
@@ -145,12 +141,14 @@ void source::enqueue_task_command(queue* q, detail::shared_unique<kernel> kern) 
 	(*kern)->enqueue_task(q);
 }
 
-void source::enqueue_task(detail::shared_unique<kernel> kern) const {
-	command::group_::add(enqueue_task_command, __func__, kern);
+void source::enqueue_task(program& p) {
+	command::group_::add(enqueue_task_command, __func__, p.kernels[0].kern);
 }
 
-void source::read_buffers_from_device() const {
-	for(auto& acc : resources) {
+void source::read_buffers_from_device(program& p) {
+	auto& src = p.kernels.back();
+
+	for(auto& acc : src.resources) {
 		if(
 			acc.second.acc.mode == access::read	||
 			acc.second.acc.target == access::local

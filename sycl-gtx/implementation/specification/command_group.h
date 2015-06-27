@@ -165,7 +165,7 @@ public:
 	command_group(functorT lambda)
 		: q(nullptr) {
 		enter();
-		handler cgh;
+		handler cgh(q);
 		lambda(cgh);
 		exit();
 	}
@@ -176,7 +176,7 @@ public:
 	command_group(queue& primaryQueue, functorT lambda)
 		: q(&primaryQueue) {
 		enter();
-		handler cgh;
+		handler cgh(q);
 		lambda(cgh);
 		exit();
 	}

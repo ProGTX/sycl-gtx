@@ -5,40 +5,71 @@
 
 using namespace cl::sycl;
 
-program::program(string_class source, queue* q) {
-	const char* src = source.c_str();
-	size_t length = source.size();
+program::program(cl_program clProgram, const context& context, vector_class<device> deviceList)
+	: prog(clProgram), ctx(context), devices(deviceList) {}
+
+program::program(const context& context)
+	: program(context, context.get_devices()) {}
+
+program::program(const context& context, vector_class<device> deviceList)
+	: program(nullptr, context, deviceList) {}
+
+program::program(const context& context, cl_program clProgram)
+	: program(clProgram, context, context.get_devices()) {}
+
+
+void program::compile(string_class compile_options) {
+	auto& src = kernels.back();
+	src.compile(*this);
+	auto code = src.get_code();
+
+	debug() << "Compiled kernel:";
+	debug() << code;
+
+	const char* code_p = code.c_str();
+	size_t length = code.size();
 	cl_int error_code;
 
-	auto Context = q->get_context().get();
-	auto Device = q->get_device().get();
-
-	cl_program p = clCreateProgramWithSource(Context, 1, &src, &length, &error_code);
+	prog = clCreateProgramWithSource(ctx.get(), 1, &code_p, &length, &error_code);
 	detail::error::report(error_code);
 
-	prog = p;
+	auto device_pointers = detail::get_cl_array(devices);
 
-	error_code = clBuildProgram(p, 1, &Device, nullptr, nullptr, nullptr);
+	error_code = clCompileProgram(
+		prog.get(), devices.size(), device_pointers.data(), compile_options.c_str(),
+		0, nullptr, nullptr, nullptr, nullptr
+	);
+
 	try {
 		detail::error::report(error_code);
 	}
 	catch(::cl::sycl::exception& e) {
-		// http://stackoverflow.com/a/9467325/793006
-
-		// Determine the size of the log
-		size_t log_size;
-		clGetProgramBuildInfo(p, Device, CL_PROGRAM_BUILD_LOG, 0, nullptr, &log_size);
-
-		// Allocate memory for the log
-		auto log = new char[log_size];
-
-		// Get the log
-		clGetProgramBuildInfo(p, Device, CL_PROGRAM_BUILD_LOG, log_size, log, nullptr);
-
-		debug() << "Error while compiling program:\n" << log;
-
-		delete[] log;
-
+		for(auto& d : devices) {
+			report_compile_error(d);
+		}
 		throw e;
 	}
+}
+
+void program::report_compile_error(device& dev) {
+	// http://stackoverflow.com/a/9467325/793006
+
+	// Determine the size of the log
+	size_t log_size;
+	clGetProgramBuildInfo(prog.get(), dev.get(), CL_PROGRAM_BUILD_LOG, 0, nullptr, &log_size);
+
+	// Allocate memory for the log
+	auto log = new char[log_size];
+
+	// Get the log
+	clGetProgramBuildInfo(prog.get(), dev.get(), CL_PROGRAM_BUILD_LOG, log_size, log, nullptr);
+
+	debug() << "Error while compiling program for device" << dev.get_info<info::device::name>() << "\n" << log;
+
+	delete[] log;
+}
+
+void program::link(string_class linking_options) {
+	auto device_pointers = detail::get_cl_array(devices);
+	//auto error_code = clLinkProgram(ctx.get(), device_pointers.size(), device_pointers.data(), linking_options.c_str(), )
 }

@@ -30,7 +30,7 @@ struct constructor<void> {
 // Parallel For with range and kernel parameter id
 template <int dimensions>
 struct constructor<id<dimensions>> {
-	static id<dimensions> generate_global_id_code(range<dimensions>& num_work_items) {
+	static id<dimensions> generate_global_id_code() {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
@@ -39,24 +39,17 @@ struct constructor<id<dimensions>> {
 			);
 		}
 
-		if(dimensions == 2) {
-			source::add(
-				string_class("const int ") + id_global_all_name + " = " +
-				id_global_name + "1 * " + std::to_string(num_work_items[0]) + " + " + id_global_name + "0"
-			);
-		}
-
-		// TODO: 3d
+		// TODO: 2d and 3d
 
 		return id<dimensions>{0, 0, 0};
 	}
 
-	static source get(function_class<void(id<dimensions>)> kern, range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
+	static source get(function_class<void(id<dimensions>)> kern) {
 		source src;
 		source::enter(src);
 
-		auto index = generate_global_id_code(num_work_items);
-		kern(index);
+		// TODO: num_work_items, work_item_offset
+		kern(generate_global_id_code());
 
 		return source::exit(src);
 	}
@@ -65,11 +58,12 @@ struct constructor<id<dimensions>> {
 // Parallel For with range and kernel parameter item
 template <int dimensions>
 struct constructor<item<dimensions>> {
-	static source get(function_class<void(item<dimensions>)> kern, range<dimensions>& num_work_items, id<dimensions>& work_item_offset) {
+	static source get(function_class<void(item<dimensions>)> kern) {
 		source src;
 		source::enter(src);
 
-		auto index = constructor<id<dimensions>>::generate_global_id_code(num_work_items);
+		auto index = constructor<id<dimensions>>::generate_global_id_code();
+		// TODO: num_work_items, work_item_offset
 		item<dimensions> it(index, num_work_items, work_item_offset);
 		kern(it);
 
@@ -96,12 +90,16 @@ struct constructor<nd_item<dimensions>> {
 		return i;
 	}
 
-	static source get(function_class<void(nd_item<dimensions>)> kern, nd_range<dimensions>& execution_range) {
+	static source get(function_class<void(nd_item<dimensions>)> kern) {
 		source src;
 		source::enter(src);
 
+		// TODO: execution_range
+		auto r = detail::empty_range<dimensions>();
+		nd_range<dimensions> execution_range(r, r);
+
 		item<dimensions> global_item(
-			constructor<id<dimensions>>::generate_global_id_code(execution_range.get_global()),
+			constructor<id<dimensions>>::generate_global_id_code(),
 			execution_range.get_global(),
 			execution_range.get_offset()
 		);

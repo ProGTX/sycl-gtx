@@ -13,12 +13,28 @@
 namespace cl {
 namespace sycl {
 
+// Forward declaration
+class queue;
+
 // 3.5.3.4 Command group handler class
 class handler {
 private:
 	friend class detail::command_group;
+	queue* q;
+
 	// TODO: Implementation defined constructor
-	handler() {}
+	handler(queue* q)
+		: q(q) {}
+
+	template <class KernelType>
+	program build(KernelType kernFunctor) {
+		detail::command::group_::check_scope();
+		program prog(q->get_context());
+		prog.build(kernFunctor, "");
+		return prog;
+	}
+
+	using src = detail::kernel_::source;
 
 public:
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
@@ -33,14 +49,10 @@ public:
 	// 3.5.3.1 Single Task invoke
 	template <class KernelType>
 	void single_task(KernelType kernFunctor) {
-		detail::command::group_::check_scope();
-		auto src = detail::kernel_::constructor<void>::get(kernFunctor);
-		auto kern = src.compile();
-		debug() << "Compiled kernel:";
-		debug() << src.get_code();
-		src.write_buffers_to_device();
-		src.enqueue_task(kern);
-		src.read_buffers_from_device();
+		auto prog = build(kernFunctor);
+		src::write_buffers_to_device(prog);
+		src::enqueue_task(prog);
+		src::read_buffers_from_device(prog);
 	}
 
 
@@ -54,31 +66,31 @@ public:
 	// This type of kernel can be invoked with a function accepting either an id or an item as parameter
 	template <class KernelType, int dimensions>
 	void parallel_for(range<dimensions> numWorkItems, id<dimensions> workItemOffset, KernelType kernFunctor) {
+		/*
 		detail::command::group_::check_scope();
-		auto src = detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(
-			kernFunctor, numWorkItems, workItemOffset
-		);
+		auto src = detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(kernFunctor);
 		auto kern = src.compile();
 		debug() << "Compiled kernel:";
 		debug() << src.get_code();
 		src.write_buffers_to_device();
 		src.enqueue_range(kern, numWorkItems, workItemOffset);
 		src.read_buffers_from_device();
+		*/
 	}
 
 	template <class KernelType, int dimensions>
 	void parallel_for(nd_range<dimensions> executionRange, KernelType kernFunctor) {
+		/*
 		DSELF() << "not implemented";
 		detail::command::group_::check_scope();
-		auto src = detail::kernel_::constructor<nd_item<dimensions>>::get(
-			kernFunctor, executionRange
-		);
+		auto src = detail::kernel_::constructor<nd_item<dimensions>>::get(kernFunctor);
 		auto kern = src.compile();
 		debug() << "Compiled kernel:";
 		debug() << src.get_code();
 		src.write_buffers_to_device();
 		src.enqueue_nd_range(kern, executionRange);
 		src.read_buffers_from_device();
+		*/
 	}
 
 	// TODO: Why is the offset needed? It's already contained in the nd_range

@@ -13,6 +13,7 @@ namespace sycl {
 
 // Forward declarations
 class kernel;
+class program;
 class queue;
 
 namespace detail {
@@ -41,9 +42,9 @@ private:
 	static int num_kernels;
 	int kernel_id;
 
+	shared_unique<kernel> kern;
 	string_class kernel_name;
 	vector_class<string_class> lines;
-	string_class final_code;
 	std::unordered_map<void*, buf_info> resources;
 
 	// TODO: Multithreading support
@@ -68,12 +69,12 @@ private:
 public:
 	static bool in_scope();
 
-	string_class get_code();
-	shared_unique<kernel> compile() const;
-	void write_buffers_to_device() const;
-	void read_buffers_from_device() const;
+	string_class get_code() const;
+	void compile(program& p);
+	static void write_buffers_to_device(program& p);
+	static void read_buffers_from_device(program& p);
 
-	void enqueue_task(shared_unique<kernel> kern) const;
+	static void enqueue_task(program& p);
 
 	template <int dimensions>
 	static void enqueue_range_command(
