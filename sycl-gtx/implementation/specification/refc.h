@@ -15,15 +15,15 @@ namespace detail {
 template <class CL_Type>
 using cl_resource_f = cl_int(CL_API_CALL*)(CL_Type);
 
-template<class CL_Type>
+template <class CL_Type>
 cl_int CL_API_CALL cl_do_nothing(CL_Type) {
 	return CL_SUCCESS;
 }
 
-template<class CL_Type>
+template <class CL_Type>
 using refc_ptr = shared_ptr_class<typename std::remove_pointer<CL_Type>::type>;
 
-template <class CL_Type, cl_resource_f<CL_Type> retain = cl_do_nothing<CL_Type>, cl_resource_f<CL_Type> release = &cl_do_nothing<CL_Type>>
+template <class CL_Type, cl_resource_f<CL_Type> retain = &cl_do_nothing<CL_Type>, cl_resource_f<CL_Type> release = &cl_do_nothing<CL_Type>>
 class refc : public refc_ptr<CL_Type> {
 private:
 	using Base = refc_ptr<CL_Type>;

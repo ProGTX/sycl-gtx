@@ -105,6 +105,9 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 	}
 
 	*kern = unique_ptr_class<kernel>(new kernel(k));
+
+	// Kernel constructor performs a retain
+	clReleaseKernel(k);
 }
 
 // Note: MSVC2013 editor reports errors on command::group_::add, but the code compiles and links
