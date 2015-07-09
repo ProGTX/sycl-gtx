@@ -183,9 +183,8 @@ bool test9() {
 		myQueue.submit([&](handler& cgh) {
 			auto d = data[0].get_access<access::write>(cgh);
 
-			parallel_for<>(range<1>(size), [=](id<1> index) {
-				d[index] = index;
 			cgh.parallel_for<>(range<1>(size), [=](id<1> index) {
+				d[index] = index;
 			});
 		});
 
