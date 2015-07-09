@@ -20,7 +20,6 @@ program::program(const context& context, cl_program clProgram)
 
 void program::compile(string_class compile_options) {
 	auto& src = kernels.back();
-	src.compile(*this);
 	auto code = src.get_code();
 
 	debug() << "Compiled kernel:";
@@ -70,6 +69,26 @@ void program::report_compile_error(device& dev) {
 }
 
 void program::link(string_class linking_options) {
+	if(linked) {
+		// TODO: Error?
+	}
+
 	auto device_pointers = detail::get_cl_array(devices);
-	//auto error_code = clLinkProgram(ctx.get(), device_pointers.size(), device_pointers.data(), linking_options.c_str(), )
+	auto p = prog.get();
+	cl_int error_code;
+
+	prog = clLinkProgram(
+		ctx.get(),
+		device_pointers.size(),
+		device_pointers.data(),
+		linking_options.c_str(),
+		1,
+		&p,
+		nullptr,
+		nullptr,
+		&error_code
+	);
+	detail::error::report(error_code);
+
+	linked = true;
 }

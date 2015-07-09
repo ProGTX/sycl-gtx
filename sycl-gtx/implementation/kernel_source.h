@@ -70,7 +70,7 @@ public:
 	static bool in_scope();
 
 	string_class get_code() const;
-	void compile(program& p);
+	void create_kernel(program& p);
 	static void write_buffers_to_device(program& p);
 	static void read_buffers_from_device(program& p);
 

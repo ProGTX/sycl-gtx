@@ -85,7 +85,7 @@ void source::compile_command(queue* q, source src, detail::shared_unique<kernel>
 
 // Note: MSVC2013 editor reports errors on command::group_::add, but the code compiles and links
 
-void source::compile(program& p) {
+void source::create_kernel(program& p) {
 	kern = detail::shared_unique<kernel>(new unique_ptr_class<kernel>());
 
 	cl_int error_code;
