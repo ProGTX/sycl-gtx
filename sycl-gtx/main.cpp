@@ -6,6 +6,8 @@
 #include <map>
 #include <Windows.h>
 
+#define TRY_CATCH_ERRORS 1
+
 int main() {
 	debug() << "SYCL Provisional Specification.";
 	
@@ -27,8 +29,11 @@ int main() {
 		debug();
 		debug() << "starting" << test.first;
 		debug();
+#if TRY_CATCH_ERRORS
 		try {
+#endif
 			result = test.second();
+#if TRY_CATCH_ERRORS
 		}
 		catch(cl::sycl::exception& e) {
 			debug() << "cl::sycl::exception while testing" << test.first << e.what();
@@ -36,6 +41,7 @@ int main() {
 		catch(std::exception& e) {
 			debug() << "std::exception while testing" << test.first << e.what();
 		}
+#endif
 		debug();
 		debug() << test.first << (result ? "successful" : "failed");
 	}
