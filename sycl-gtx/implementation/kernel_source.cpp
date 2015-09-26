@@ -113,7 +113,7 @@ void source::create_kernel(program& p) {
 }
 
 void source::write_buffers_to_device(program& p) {
-	auto& src = p.kernels.back();
+	auto& src = p.kernel_sources.back();
 
 	for(auto& acc : src.resources) {
 		auto mode = acc.second.acc.mode;
@@ -142,11 +142,11 @@ void source::enqueue_task_command(queue* q, detail::shared_unique<kernel> kern) 
 }
 
 void source::enqueue_task(program& p) {
-	command::group_::add(enqueue_task_command, __func__, p.kernels[0].kern);
+	command::group_::add(enqueue_task_command, __func__, p.kernel_sources[0].kern);
 }
 
 void source::read_buffers_from_device(program& p) {
-	auto& src = p.kernels.back();
+	auto& src = p.kernel_sources.back();
 
 	for(auto& acc : src.resources) {
 		if(

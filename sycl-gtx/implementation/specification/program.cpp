@@ -19,7 +19,7 @@ program::program(const context& context, cl_program clProgram)
 
 
 void program::compile(string_class compile_options) {
-	auto& src = kernels.back();
+	auto& src = kernel_sources.back();
 	auto code = src.get_code();
 
 	debug() << "Compiled kernel:";

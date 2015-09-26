@@ -28,7 +28,7 @@ protected:
 
 	context ctx;
 	vector_class<device> devices;
-	vector_class<detail::kernel_::source> kernels;
+	vector_class<detail::kernel_::source> kernel_sources;
 
 	program(cl_program clProgram, const context& context, vector_class<device> deviceList);
 
@@ -50,7 +50,7 @@ public:
 
 	template <class KernelType>
 	void compile(KernelType kernFunctor, string_class compile_options = "") {
-		kernels.push_back(
+		kernel_sources.push_back(
 			detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(kernFunctor)
 		);
 		compile(compile_options);
