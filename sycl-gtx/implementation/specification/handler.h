@@ -7,8 +7,8 @@
 #include "ranges.h"
 #include "../common.h"
 #include "../function_traits.h"
-#include "../invoke_source.h"
-#include "../kernel_source.h"
+#include "../src_handlers/invoke_source.h"
+#include "../src_handlers/kernel_source.h"
 
 namespace cl {
 namespace sycl {

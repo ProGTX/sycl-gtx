@@ -149,7 +149,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="implementation\data_ref.cpp" />
-    <ClCompile Include="implementation\kernel_source.cpp" />
     <ClCompile Include="implementation\specification\command_group.cpp" />
     <ClCompile Include="implementation\specification\context.cpp" />
     <ClCompile Include="implementation\specification\device.cpp" />
@@ -160,6 +159,7 @@
     <ClCompile Include="implementation\specification\program.cpp" />
     <ClCompile Include="implementation\specification\queue.cpp" />
     <ClCompile Include="implementation\specification\ranges\id.cpp" />
+    <ClCompile Include="implementation\src_handlers\kernel_source.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tests\test1.cpp" />
     <ClCompile Include="tests\test2.cpp" />
@@ -179,8 +179,6 @@
     <ClInclude Include="implementation\error_code.h" />
     <ClInclude Include="implementation\flow_control.h" />
     <ClInclude Include="implementation\function_traits.h" />
-    <ClInclude Include="implementation\kernel_source.h" />
-    <ClInclude Include="implementation\invoke_source.h" />
     <ClInclude Include="implementation\specification\accessor.h" />
     <ClInclude Include="implementation\specification\access.h" />
     <ClInclude Include="implementation\specification\accessor\buffer.h" />
@@ -215,6 +213,8 @@
     <ClInclude Include="implementation\specification\refc.h" />
     <ClInclude Include="implementation\specification\types.h" />
     <ClInclude Include="implementation\specification\workitem_functions.h" />
+    <ClInclude Include="implementation\src_handlers\invoke_source.h" />
+    <ClInclude Include="implementation\src_handlers\kernel_source.h" />
     <ClInclude Include="implementation\sycl.hpp" />
     <ClInclude Include="tests\tests.h" />
   </ItemGroup>

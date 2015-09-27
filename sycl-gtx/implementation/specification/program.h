@@ -9,7 +9,7 @@
 #include "param_traits.h"
 #include "refc.h"
 #include "../common.h"
-#include "../kernel_source.h"
+#include "../src_handlers/kernel_source.h"
 
 namespace cl {
 namespace sycl {

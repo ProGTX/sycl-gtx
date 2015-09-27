@@ -1,6 +1,6 @@
 #include "specification\ranges\id.h"
 #include "data_ref.h"
-#include "kernel_source.h"
+#include "src_handlers\kernel_source.h"
 
 using namespace cl::sycl;
 using detail::data_ref;

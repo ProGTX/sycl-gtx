@@ -34,6 +34,12 @@
     <Filter Include="Header Files\specification\functions">
       <UniqueIdentifier>{f1ecb52e-fda3-4a1f-821b-bcd65b73091b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\src_handlers">
+      <UniqueIdentifier>{fa02df96-db83-4d24-87d2-154d4b7aa477}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src_handlers">
+      <UniqueIdentifier>{792b8cac-84c1-430a-95fe-78a80a268675}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -99,8 +105,8 @@
     <ClCompile Include="implementation\specification\event.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\kernel_source.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="implementation\src_handlers\kernel_source.cpp">
+      <Filter>Source Files\src_handlers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -200,9 +206,6 @@
     <ClInclude Include="implementation\specification\ranges\nd_item.h">
       <Filter>Header Files\specification\ranges</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\invoke_source.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="implementation\specification\accessor\local.h">
       <Filter>Header Files\specification\accessor</Filter>
     </ClInclude>
@@ -236,8 +239,11 @@
     <ClInclude Include="implementation\function_traits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\kernel_source.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="implementation\src_handlers\invoke_source.h">
+      <Filter>Header Files\src_handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\src_handlers\kernel_source.h">
+      <Filter>Header Files\src_handlers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
