@@ -56,7 +56,7 @@ private:
 	string_class generate_accessor_list() const;
 
 	static void compile_command(queue* q, source src, shared_unique<kernel> kern);
-	static void enqueue_task_command(queue* q, shared_unique<kernel> kern);
+	static void enqueue_task_command(queue* q, shared_unique<kernel> kern, decltype(resources) resources);
 
 	static void enter(source& src);
 	static source exit(source& src);
@@ -71,6 +71,7 @@ public:
 
 	string_class get_code() const;
 	void create_kernel(program& p);
+	static void prepare_kernel(detail::shared_unique<kernel> kern, decltype(resources) resources);
 	static void write_buffers_to_device(program& p);
 	static void read_buffers_from_device(program& p);
 

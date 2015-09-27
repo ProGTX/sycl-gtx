@@ -90,5 +90,8 @@ void program::link(string_class linking_options) {
 	);
 	detail::error::report(error_code);
 
+	auto& src = kernel_sources.back();
+	src.create_kernel(*this);
+
 	linked = true;
 }

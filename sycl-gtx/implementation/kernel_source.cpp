@@ -92,6 +92,15 @@ void source::create_kernel(program& p) {
 	cl_kernel k = clCreateKernel(p.get(), kernel_name.c_str(), &error_code);
 	detail::error::report(error_code);
 
+	*kern = unique_ptr_class<kernel>(new kernel(k));
+
+	// Kernel constructor performed a retain
+	clReleaseKernel(k);
+}
+
+void source::prepare_kernel(detail::shared_unique<kernel> kern, decltype(source::resources) resources) {
+	auto k = kern->get()->get();
+	cl_int error_code;
 	int i = 0;
 	for(auto& acc : resources) {
 		if(acc.second.acc.target == access::local) {
@@ -105,11 +114,6 @@ void source::create_kernel(program& p) {
 		}
 		++i;
 	}
-
-	*kern = unique_ptr_class<kernel>(new kernel(k));
-
-	// Kernel constructor performed a retain
-	clReleaseKernel(k);
 }
 
 void source::write_buffers_to_device(program& p) {
@@ -137,12 +141,13 @@ void source::write_buffers_to_device(program& p) {
 	}
 }
 
-void source::enqueue_task_command(queue* q, detail::shared_unique<kernel> kern) {
+void source::enqueue_task_command(queue* q, detail::shared_unique<kernel> kern, decltype(source::resources) resources) {
+	prepare_kernel(kern, resources);
 	(*kern)->enqueue_task(q);
 }
 
 void source::enqueue_task(program& p) {
-	command::group_::add(enqueue_task_command, __func__, p.kernel_sources[0].kern);
+	command::group_::add(enqueue_task_command, __func__, p.kernel_sources[0].kern, p.kernel_sources[0].resources);
 }
 
 void source::read_buffers_from_device(program& p) {
