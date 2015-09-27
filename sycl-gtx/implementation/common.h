@@ -117,9 +117,6 @@ bool has_extension(T* sycl_class, const string_class& extension_name) {
 	return sycl_class->get_info<Value>().find(extension_name) != string_class::npos;
 }
 
-template <class T>
-using shared_unique = shared_ptr_class<unique_ptr_class<T>>;
-
 template <typename DataType>
 static string_class type_string();
 

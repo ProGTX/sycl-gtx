@@ -80,26 +80,24 @@ string_class source::get_name(access::target target) {
 	}
 }
 
-void source::compile_command(queue* q, source src, detail::shared_unique<kernel> kern) {
+void source::compile_command(queue* q, source src, shared_ptr_class<kernel> kern) {
 }
 
 // Note: MSVC2013 editor reports errors on command::group_::add, but the code compiles and links
 
 void source::create_kernel(program& p) {
-	kern = detail::shared_unique<kernel>(new unique_ptr_class<kernel>());
-
 	cl_int error_code;
 	cl_kernel k = clCreateKernel(p.get(), kernel_name.c_str(), &error_code);
 	detail::error::report(error_code);
 
-	*kern = unique_ptr_class<kernel>(new kernel(k));
+	kern = shared_ptr_class<kernel>(new kernel(k));
 
 	// Kernel constructor performed a retain
 	clReleaseKernel(k);
 }
 
-void source::prepare_kernel(detail::shared_unique<kernel> kern, decltype(source::resources) resources) {
-	auto k = kern->get()->get();
+void source::prepare_kernel(shared_ptr_class<kernel> kern, decltype(source::resources) resources) {
+	auto k = kern->get();
 	cl_int error_code;
 	int i = 0;
 	for(auto& acc : resources) {
@@ -141,9 +139,9 @@ void source::write_buffers_to_device(program& p) {
 	}
 }
 
-void source::enqueue_task_command(queue* q, detail::shared_unique<kernel> kern, decltype(source::resources) resources) {
+void source::enqueue_task_command(queue* q, shared_ptr_class<kernel> kern, decltype(source::resources) resources) {
 	prepare_kernel(kern, resources);
-	(*kern)->enqueue_task(q);
+	kern->enqueue_task(q);
 }
 
 void source::enqueue_task(program& p) {

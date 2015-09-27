@@ -42,7 +42,7 @@ private:
 	static int num_kernels;
 	int kernel_id;
 
-	shared_unique<kernel> kern;
+	shared_ptr_class<kernel> kern;
 	string_class kernel_name;
 	vector_class<string_class> lines;
 	std::unordered_map<void*, buf_info> resources;
@@ -55,8 +55,8 @@ private:
 
 	string_class generate_accessor_list() const;
 
-	static void compile_command(queue* q, source src, shared_unique<kernel> kern);
-	static void enqueue_task_command(queue* q, shared_unique<kernel> kern, decltype(resources) resources);
+	static void compile_command(queue* q, source src, shared_ptr_class<kernel> kern);
+	static void enqueue_task_command(queue* q, shared_ptr_class<kernel> kern, decltype(resources) resources);
 
 	static void enter(source& src);
 	static source exit(source& src);
@@ -71,7 +71,7 @@ public:
 
 	string_class get_code() const;
 	void create_kernel(program& p);
-	static void prepare_kernel(detail::shared_unique<kernel> kern, decltype(resources) resources);
+	static void prepare_kernel(shared_ptr_class<kernel> kern, decltype(resources) resources);
 	static void write_buffers_to_device(program& p);
 	static void read_buffers_from_device(program& p);
 
@@ -79,23 +79,23 @@ public:
 
 	template <int dimensions>
 	static void enqueue_range_command(
-		queue* q, detail::shared_unique<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset
+		queue* q, shared_ptr_class<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset
 	) {
 		(*kern)->enqueue_range(q, num_work_items, offset);
 	}
 	template <int dimensions>
-	void enqueue_range(shared_unique<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset) const {
+	void enqueue_range(shared_ptr_class<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset) const {
 		command::group_::add(enqueue_range_command, __func__, kern, num_work_items, offset);
 	}
 
 	template <int dimensions>
 	static void enqueue_nd_range_command(
-		queue* q, detail::shared_unique<kernel> kern, nd_range<dimensions> execution_range
+		queue* q, shared_ptr_class<kernel> kern, nd_range<dimensions> execution_range
 	) {
 		(*kern)->enqueue_nd_range(q, execution_range);
 	}
 	template <int dimensions>
-	void enqueue_nd_range(shared_unique<kernel> kern, nd_range<dimensions> execution_range) const {
+	void enqueue_nd_range(shared_ptr_class<kernel> kern, nd_range<dimensions> execution_range) const {
 		command::group_::add(enqueue_nd_range_command, __func__, kern, execution_range);
 	}
 
