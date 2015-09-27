@@ -28,12 +28,13 @@ protected:
 
 	context ctx;
 	vector_class<device> devices;
-	vector_class<detail::kernel_::source> kernel_sources;
+	vector_class<shared_ptr_class<kernel>> kernels;
 
 	program(cl_program clProgram, const context& context, vector_class<device> deviceList);
 
 	void compile(string_class compile_options);
 	void report_compile_error(device& dev);
+	void init_kernels();
 
 public:
 	// Creates an empty program object for all devices associated with context
@@ -50,9 +51,10 @@ public:
 
 	template <class KernelType>
 	void compile(KernelType kernFunctor, string_class compile_options = "") {
-		kernel_sources.push_back(
-			detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(kernFunctor)
-		);
+		auto src = detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(kernFunctor);
+		auto kern = shared_ptr_class<kernel>(new kernel(true));
+		kern->src = std::move(src);
+		kernels.push_back(kern);
 		compile(compile_options);
 	}
 

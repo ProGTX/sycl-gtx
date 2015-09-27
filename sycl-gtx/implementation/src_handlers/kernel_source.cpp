@@ -85,22 +85,24 @@ void source::compile_command(queue* q, source src, shared_ptr_class<kernel> kern
 
 // Note: MSVC2013 editor reports errors on command::group_::add, but the code compiles and links
 
-void source::create_kernel(program& p) {
+shared_ptr_class<kernel> source::init_kernel(program& p) {
 	cl_int error_code;
 	cl_kernel k = clCreateKernel(p.get(), kernel_name.c_str(), &error_code);
 	detail::error::report(error_code);
 
-	kern = shared_ptr_class<kernel>(new kernel(k));
+	auto kern = shared_ptr_class<kernel>(new kernel(k));
 
 	// Kernel constructor performed a retain
 	clReleaseKernel(k);
+
+	return kern;
 }
 
-void source::prepare_kernel(shared_ptr_class<kernel> kern, decltype(source::resources) resources) {
+void source::prepare_kernel(shared_ptr_class<kernel> kern) {
 	auto k = kern->get();
 	cl_int error_code;
 	int i = 0;
-	for(auto& acc : resources) {
+	for(auto& acc : kern->src.resources) {
 		if(acc.second.acc.target == access::local) {
 			error_code = clSetKernelArg(k, i, acc.second.size, nullptr);
 			detail::error::report(error_code);
@@ -115,9 +117,9 @@ void source::prepare_kernel(shared_ptr_class<kernel> kern, decltype(source::reso
 }
 
 void source::write_buffers_to_device(program& p) {
-	auto& src = p.kernel_sources.back();
+	auto& kern = p.kernels.back();
 
-	for(auto& acc : src.resources) {
+	for(auto& acc : kern->src.resources) {
 		auto mode = acc.second.acc.mode;
 		if(
 			mode == access::write				||
@@ -139,19 +141,20 @@ void source::write_buffers_to_device(program& p) {
 	}
 }
 
-void source::enqueue_task_command(queue* q, shared_ptr_class<kernel> kern, decltype(source::resources) resources) {
-	prepare_kernel(kern, resources);
+void source::enqueue_task_command(queue* q, shared_ptr_class<kernel> kern) {
+	prepare_kernel(kern);
 	kern->enqueue_task(q);
 }
 
 void source::enqueue_task(program& p) {
-	command::group_::add(enqueue_task_command, __func__, p.kernel_sources[0].kern, p.kernel_sources[0].resources);
+	// TODO: Don't take the zero one
+	command::group_::add(enqueue_task_command, __func__, p.kernels[0]);
 }
 
 void source::read_buffers_from_device(program& p) {
-	auto& src = p.kernel_sources.back();
+	auto& kern = p.kernels.back();
 
-	for(auto& acc : src.resources) {
+	for(auto& acc : kern->src.resources) {
 		if(
 			acc.second.acc.mode == access::read	||
 			acc.second.acc.target == access::local

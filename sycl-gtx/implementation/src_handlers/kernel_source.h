@@ -42,7 +42,6 @@ private:
 	static int num_kernels;
 	int kernel_id;
 
-	shared_ptr_class<kernel> kern;
 	string_class kernel_name;
 	vector_class<string_class> lines;
 	std::unordered_map<void*, buf_info> resources;
@@ -56,7 +55,7 @@ private:
 	string_class generate_accessor_list() const;
 
 	static void compile_command(queue* q, source src, shared_ptr_class<kernel> kern);
-	static void enqueue_task_command(queue* q, shared_ptr_class<kernel> kern, decltype(resources) resources);
+	static void enqueue_task_command(queue* q, shared_ptr_class<kernel> kern);
 
 	static void enter(source& src);
 	static source exit(source& src);
@@ -70,8 +69,8 @@ public:
 	static bool in_scope();
 
 	string_class get_code() const;
-	void create_kernel(program& p);
-	static void prepare_kernel(shared_ptr_class<kernel> kern, decltype(resources) resources);
+	shared_ptr_class<kernel> init_kernel(program& p);
+	static void prepare_kernel(shared_ptr_class<kernel> kern);
 	static void write_buffers_to_device(program& p);
 	static void read_buffers_from_device(program& p);
 

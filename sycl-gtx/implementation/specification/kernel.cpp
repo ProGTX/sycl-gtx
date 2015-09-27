@@ -3,6 +3,9 @@
 
 using namespace cl::sycl;
 
+kernel::kernel(bool)
+	:	prog(ctx) {}
+
 kernel::kernel(cl_kernel k)
 	:	kern(k),
 		ctx(get_info<info::kernel::context>()),

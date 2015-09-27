@@ -27,10 +27,16 @@ private:
 	context ctx;
 	program prog;
 
+	friend class program;
 	friend class detail::kernel_::source;
-	detail::kernel_::source src;
+
+	// Special stub constructor, meant only for program class
+	kernel(bool);
 
 public:
+	// TODO: Make private
+	detail::kernel_::source src;
+
 	// The default object is not valid because there is no program or cl_kernel associated with it
 	kernel() = delete;
 	kernel(nullptr_t) = delete;

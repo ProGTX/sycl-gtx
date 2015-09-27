@@ -1,5 +1,6 @@
 #include "program.h"
 
+#include "kernel.h"
 #include "queue.h"
 #include "../debug.h"
 
@@ -19,7 +20,7 @@ program::program(const context& context, cl_program clProgram)
 
 
 void program::compile(string_class compile_options) {
-	auto& src = kernel_sources.back();
+	auto& src = kernels.back()->src;
 	auto code = src.get_code();
 
 	debug() << "Compiled kernel:";
@@ -68,9 +69,19 @@ void program::report_compile_error(device& dev) {
 	delete[] log;
 }
 
+void program::init_kernels() {
+	for(size_t i = 0; i < kernels.size(); ++i) {
+		auto kern = kernels[i]->src.init_kernel(*this);
+		// All of this moving is required because of complex dependencies between kernel and program
+		std::swap(kern, kernels[i]);
+		std::swap(kern->src, kernels[i]->src);
+	}
+}
+
 void program::link(string_class linking_options) {
 	if(linked) {
 		// TODO: Error?
+		return;
 	}
 
 	auto device_pointers = detail::get_cl_array(devices);
@@ -90,8 +101,8 @@ void program::link(string_class linking_options) {
 	);
 	detail::error::report(error_code);
 
-	auto& src = kernel_sources.back();
-	src.create_kernel(*this);
+	// Can only initialize after program successfully built
+	init_kernels();
 
 	linked = true;
 }
