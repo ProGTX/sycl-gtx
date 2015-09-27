@@ -61,12 +61,12 @@ private:
 	static void enter(source& src);
 	static source exit(source& src);
 
-	source()
-		:	tab_offset("\t"),
-			kernel_id(++num_kernels),
-			kernel_name(string_class("_sycl_kernel_") + std::to_string(kernel_id)) {}
-
 public:
+	source()
+		: tab_offset("\t"),
+		kernel_id(++num_kernels),
+		kernel_name(string_class("_sycl_kernel_") + std::to_string(kernel_id)) {}
+
 	static bool in_scope();
 
 	string_class get_code() const;

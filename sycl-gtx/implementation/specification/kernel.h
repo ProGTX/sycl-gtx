@@ -11,6 +11,7 @@
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
+#include "../src_handlers/kernel_source.h"
 #include <algorithm>
 
 namespace cl {
@@ -20,12 +21,6 @@ namespace sycl {
 class context;
 class queue;
 
-namespace detail {
-namespace kernel_ {
-	class source;
-}
-}
-
 class kernel {
 private:
 	detail::refc<cl_kernel, clRetainKernel, clReleaseKernel> kern;
@@ -33,6 +28,7 @@ private:
 	program prog;
 
 	friend class detail::kernel_::source;
+	detail::kernel_::source src;
 
 public:
 	// The default object is not valid because there is no program or cl_kernel associated with it
