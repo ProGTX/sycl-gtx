@@ -70,11 +70,9 @@ void program::report_compile_error(device& dev) {
 }
 
 void program::init_kernels() {
-	for(size_t i = 0; i < kernels.size(); ++i) {
-		auto kern = kernels[i]->src.init_kernel(*this);
-		// All of this moving is required because of complex dependencies between kernel and program
-		std::swap(kern, kernels[i]);
-		std::swap(kern->src, kernels[i]->src);
+	for(auto& kern : kernels) {
+		// The extra kernel parameter is required because of complex dependencies
+		kern->src.init_kernel(*this, kern);
 	}
 }
 

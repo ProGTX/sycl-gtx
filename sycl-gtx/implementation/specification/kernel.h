@@ -31,7 +31,9 @@ private:
 	friend class detail::kernel_::source;
 
 	// Special stub constructor, meant only for program class
-	kernel(bool);
+	kernel(program& p);
+
+	void set(cl_kernel openclKernelObject);
 
 public:
 	// TODO: Make private

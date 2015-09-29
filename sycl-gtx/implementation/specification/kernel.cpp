@@ -1,10 +1,13 @@
 #include "kernel.h"
+#include "program.h"
 #include "queue.h"
 
 using namespace cl::sycl;
 
-kernel::kernel(bool)
-	:	prog(ctx) {}
+kernel::kernel(program& p)
+	:	ctx(p.ctx),
+		prog(p)
+{}
 
 kernel::kernel(cl_kernel k)
 	:	kern(k),
@@ -19,4 +22,9 @@ void kernel::enqueue_task(queue* q) const {
 		0, nullptr, nullptr
 	);
 	detail::error::report(error_code);
+}
+
+void kernel::set(cl_kernel openclKernelObject) {
+	kern = openclKernelObject;
+	clReleaseKernel(openclKernelObject);
 }

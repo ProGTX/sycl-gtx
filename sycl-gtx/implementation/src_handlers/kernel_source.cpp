@@ -85,17 +85,11 @@ void source::compile_command(queue* q, source src, shared_ptr_class<kernel> kern
 
 // Note: MSVC2013 editor reports errors on command::group_::add, but the code compiles and links
 
-shared_ptr_class<kernel> source::init_kernel(program& p) {
+void source::init_kernel(program& p, shared_ptr_class<kernel> kern) {
 	cl_int error_code;
 	cl_kernel k = clCreateKernel(p.get(), kernel_name.c_str(), &error_code);
 	detail::error::report(error_code);
-
-	auto kern = shared_ptr_class<kernel>(new kernel(k));
-
-	// Kernel constructor performed a retain
-	clReleaseKernel(k);
-
-	return kern;
+	kern->set(k);
 }
 
 void source::prepare_kernel(shared_ptr_class<kernel> kern) {

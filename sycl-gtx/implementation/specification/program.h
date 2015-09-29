@@ -21,6 +21,7 @@ class queue;
 
 class program {
 protected:
+	friend class kernel;
 	friend class detail::kernel_::source;
 
 	detail::refc<cl_program, clRetainProgram, clReleaseProgram> prog;
@@ -52,7 +53,7 @@ public:
 	template <class KernelType>
 	void compile(KernelType kernFunctor, string_class compile_options = "") {
 		auto src = detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(kernFunctor);
-		auto kern = shared_ptr_class<kernel>(new kernel(true));
+		auto kern = shared_ptr_class<kernel>(new kernel(*this));
 		kern->src = std::move(src);
 		kernels.push_back(kern);
 		compile(compile_options);
