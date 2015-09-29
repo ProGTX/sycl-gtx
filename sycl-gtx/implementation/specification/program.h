@@ -36,6 +36,7 @@ protected:
 	void compile(string_class compile_options, shared_ptr_class<kernel> kern);
 	void report_compile_error(shared_ptr_class<kernel> kern, device& dev) const;
 	void init_kernels();
+	vector_class<cl_program> get_program_pointers() const;
 
 public:
 	// Creates an empty program object for all devices associated with context

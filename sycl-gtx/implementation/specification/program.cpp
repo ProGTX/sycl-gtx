@@ -78,6 +78,17 @@ void program::init_kernels() {
 	}
 }
 
+vector_class<cl_program> program::get_program_pointers() const {
+	vector_class<cl_program> program_pointers;
+	program_pointers.reserve(kernels.size());
+
+	for(auto& kern : kernels) {
+		program_pointers.push_back(kern->prog.get());
+	}
+
+	return program_pointers;
+}
+
 void program::link(string_class linking_options) {
 	if(linked) {
 		// TODO: Error?
@@ -85,7 +96,7 @@ void program::link(string_class linking_options) {
 	}
 
 	auto device_pointers = detail::get_cl_array(devices);
-	auto p = prog.get();
+	auto program_pointers = get_program_pointers();
 	cl_int error_code;
 
 	prog = clLinkProgram(
@@ -93,8 +104,8 @@ void program::link(string_class linking_options) {
 		device_pointers.size(),
 		device_pointers.data(),
 		linking_options.c_str(),
-		1,
-		&p,
+		program_pointers.size(),
+		program_pointers.data(),
 		nullptr,
 		nullptr,
 		&error_code
