@@ -33,8 +33,8 @@ protected:
 
 	program(cl_program clProgram, const context& context, vector_class<device> deviceList);
 
-	void compile(string_class compile_options);
-	void report_compile_error(device& dev);
+	void compile(string_class compile_options, shared_ptr_class<kernel> kern);
+	void report_compile_error(shared_ptr_class<kernel> kern, device& dev) const;
 	void init_kernels();
 
 public:
@@ -55,8 +55,7 @@ public:
 		auto src = detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(kernFunctor);
 		auto kern = shared_ptr_class<kernel>(new kernel(true));
 		kern->src = std::move(src);
-		kernels.push_back(kern);
-		compile(compile_options);
+		compile(compile_options, kern);
 	}
 
 	template <class KernelType>
