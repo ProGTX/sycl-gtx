@@ -4,10 +4,8 @@
 
 using namespace cl::sycl;
 
-kernel::kernel(program& p)
-	:	ctx(p.ctx),
-		prog(p)
-{}
+kernel::kernel(bool)
+	:	prog(ctx) {}
 
 kernel::kernel(cl_kernel k)
 	:	kern(k),
@@ -27,4 +25,9 @@ void kernel::enqueue_task(queue* q) const {
 void kernel::set(cl_kernel openclKernelObject) {
 	kern = openclKernelObject;
 	clReleaseKernel(openclKernelObject);
+}
+
+void kernel::set(const context& context, cl_program validProgram) {
+	ctx = context;
+	prog = program(context, validProgram);
 }

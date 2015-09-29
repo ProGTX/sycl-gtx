@@ -30,10 +30,10 @@ private:
 	friend class program;
 	friend class detail::kernel_::source;
 
-	// Special stub constructor, meant only for program class
-	kernel(program& p);
-
+	// These are meant only for program class
+	kernel(bool);
 	void set(cl_kernel openclKernelObject);
+	void set(const context& context, cl_program validProgram);
 
 public:
 	// TODO: Make private
