@@ -28,20 +28,25 @@ class refc : public refc_ptr<CL_Type> {
 private:
 	using Base = refc_ptr<CL_Type>;
 
-	static void retain_helper(CL_Type data) {
+public:
+	static void call_release(CL_Type data) {
+		auto error_code = release(data);
+		error::report(error_code);
+	}
+
+	static void call_retain(CL_Type data) {
 		if(data != nullptr) {
 			auto error_code = retain(data);
 			error::report(error_code);
 		}
 	}
 
-public:
 	refc()
 		: Base(nullptr, release) {}
 	
 	refc(CL_Type data)
 		: Base(data, release) {
-		retain_helper(data);
+		call_retain(data);
 	}
 
 	refc(const refc& copy) = default;
@@ -50,7 +55,7 @@ public:
 
 	void reset(CL_Type data) {
 		Base::reset(data, release);
-		retain_helper(data);
+		call_retain(data);
 	}
 
 	refc& operator=(CL_Type data) {
