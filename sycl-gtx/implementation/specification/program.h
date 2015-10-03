@@ -9,6 +9,7 @@
 #include "param_traits.h"
 #include "refc.h"
 #include "../common.h"
+#include "../src_handlers/invoke_source.h"
 #include "../src_handlers/kernel_source.h"
 
 namespace cl {

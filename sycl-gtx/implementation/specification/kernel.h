@@ -24,6 +24,7 @@ class queue;
 class kernel {
 private:
 	friend class program;
+	friend class detail::issue_command;
 	friend class detail::kernel_::source;
 
 	detail::refc<cl_kernel, clRetainKernel, clReleaseKernel> kern;

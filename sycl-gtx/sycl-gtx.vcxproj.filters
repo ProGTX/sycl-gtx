@@ -108,6 +108,9 @@
     <ClCompile Include="implementation\src_handlers\kernel_source.cpp">
       <Filter>Source Files\src_handlers</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\src_handlers\issue_command.cpp">
+      <Filter>Source Files\src_handlers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">
@@ -243,6 +246,9 @@
       <Filter>Header Files\src_handlers</Filter>
     </ClInclude>
     <ClInclude Include="implementation\src_handlers\kernel_source.h">
+      <Filter>Header Files\src_handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="implementation\src_handlers\issue_command.h">
       <Filter>Header Files\src_handlers</Filter>
     </ClInclude>
   </ItemGroup>

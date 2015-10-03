@@ -5,10 +5,9 @@
 #include "access.h"
 #include "kernel.h"
 #include "ranges.h"
+#include "../src_handlers/issue_command.h"
 #include "../common.h"
 #include "../function_traits.h"
-#include "../src_handlers/invoke_source.h"
-#include "../src_handlers/kernel_source.h"
 
 namespace cl {
 namespace sycl {
@@ -36,7 +35,7 @@ private:
 		return prog.kernels.back();
 	}
 
-	using src = detail::kernel_::source;
+	using issue = detail::issue_command;
 
 public:
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
@@ -52,9 +51,9 @@ public:
 	template <class KernelType>
 	void single_task(KernelType kernFunctor) {
 		auto kern = build(kernFunctor);
-		src::write_buffers_to_device(kern);
-		src::enqueue_task(kern);
-		src::read_buffers_from_device(kern);
+		issue::write_buffers_to_device(kern);
+		issue::enqueue_task(kern);
+		issue::read_buffers_from_device(kern);
 	}
 
 
@@ -69,17 +68,17 @@ public:
 	template <class KernelType, int dimensions>
 	void parallel_for(range<dimensions> numWorkItems, id<dimensions> workItemOffset, KernelType kernFunctor) {
 		auto kern = build(kernFunctor);
-		src::write_buffers_to_device(kern);
-		src::enqueue_range(kern, numWorkItems, workItemOffset);
-		src::read_buffers_from_device(kern);
+		issue::write_buffers_to_device(kern);
+		issue::enqueue_range(kern, numWorkItems, workItemOffset);
+		issue::read_buffers_from_device(kern);
 	}
 
 	template <class KernelType, int dimensions>
 	void parallel_for(nd_range<dimensions> executionRange, KernelType kernFunctor) {
 		auto kern = build(kernFunctor);
-		src::write_buffers_to_device(kern);
-		src::enqueue_nd_range(kern, executionRange);
-		src::read_buffers_from_device(kern);
+		issue::write_buffers_to_device(kern);
+		issue::enqueue_nd_range(kern, executionRange);
+		issue::read_buffers_from_device(kern);
 	}
 
 	// TODO: Why is the offset needed? It's already contained in the nd_range

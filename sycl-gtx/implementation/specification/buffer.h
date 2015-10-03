@@ -36,16 +36,14 @@ class accessor_;
 template <typename DataType, int dimensions>
 class accessor_buffer;
 class command_group;
-namespace kernel_ {
-	class source;
-}
+class issue_command;
 
 #undef SYCL_ADD_ACCESS_MODE_HELPER
 
 
 class buffer_base {
 protected:
-	friend class kernel_::source;
+	friend class issue_command;
 
 	detail::refc<cl_mem, clRetainMemObject, clReleaseMemObject> device_data;
 

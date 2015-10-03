@@ -159,6 +159,7 @@
     <ClCompile Include="implementation\specification\program.cpp" />
     <ClCompile Include="implementation\specification\queue.cpp" />
     <ClCompile Include="implementation\specification\ranges\id.cpp" />
+    <ClCompile Include="implementation\src_handlers\issue_command.cpp" />
     <ClCompile Include="implementation\src_handlers\kernel_source.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tests\test1.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="implementation\specification\types.h" />
     <ClInclude Include="implementation\specification\workitem_functions.h" />
     <ClInclude Include="implementation\src_handlers\invoke_source.h" />
+    <ClInclude Include="implementation\src_handlers\issue_command.h" />
     <ClInclude Include="implementation\src_handlers\kernel_source.h" />
     <ClInclude Include="implementation\sycl.hpp" />
     <ClInclude Include="tests\tests.h" />

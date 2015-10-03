@@ -1,6 +1,5 @@
 #pragma once
 
-#include "specification\access.h"
 #include "specification\accessor\buffer.h"
 #include "specification\command_group.h"
 #include "common.h"
@@ -17,6 +16,9 @@ class program;
 class queue;
 
 namespace detail {
+
+// Forward declaration
+class issue_command;
 
 namespace kernel_ {
 
@@ -51,11 +53,9 @@ private:
 
 	template<class Input>
 	friend struct constructor;
+	friend class ::cl::sycl::detail::issue_command;
 
 	string_class generate_accessor_list() const;
-
-	static void compile_command(queue* q, source src, shared_ptr_class<kernel> kern);
-	static void enqueue_task_command(queue* q, shared_ptr_class<kernel> kern);
 
 	static void enter(source& src);
 	static source exit(source& src);
@@ -72,36 +72,6 @@ public:
 	string_class get_kernel_name() const;
 	
 	void init_kernel(program& p, shared_ptr_class<kernel> kern);
-	static void prepare_kernel(shared_ptr_class<kernel> kern);
-	static void write_buffers_to_device(shared_ptr_class<kernel> kern);
-	static void read_buffers_from_device(shared_ptr_class<kernel> kern);
-
-	static void enqueue_task(shared_ptr_class<kernel> kern);
-
-	template <int dimensions>
-	static void enqueue_range_command(
-		queue* q, shared_ptr_class<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset
-	) {
-		prepare_kernel(kern);
-		kern->enqueue_range(q, num_work_items, offset);
-	}
-	template <int dimensions>
-	static void enqueue_range(shared_ptr_class<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset) {
-		command::group_::add(enqueue_range_command, __func__, kern, num_work_items, offset);
-	}
-
-	template <int dimensions>
-	static void enqueue_nd_range_command(
-		queue* q, shared_ptr_class<kernel> kern, nd_range<dimensions> execution_range
-	) {
-		prepare_kernel(kern);
-		kern->enqueue_nd_range(q, execution_range);
-	}
-	template <int dimensions>
-	static void enqueue_nd_range(shared_ptr_class<kernel> kern, nd_range<dimensions> execution_range) {
-		command::group_::add(enqueue_nd_range_command, __func__, kern, execution_range);
-	}
-
 
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
 	static string_class register_resource(const accessor_core<DataType, dimensions, mode, target>& acc) {

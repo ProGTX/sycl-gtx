@@ -32,16 +32,14 @@ void command_group::optimize() {
 
 			auto ptr = command.data.buf_acc.data;
 
-			{
-				// Reset reads
+			{ // Reset reads
 				auto it = last_read.find(ptr);
 				if(it != last_read.end()) {
 					last_read.erase(it);
 				}
 			}
 
-			{
-				// Reset writes
+			{ // Reset writes
 				auto it = was_written.find(ptr);
 				if(it != was_written.end()) {
 					was_written.erase(it);
