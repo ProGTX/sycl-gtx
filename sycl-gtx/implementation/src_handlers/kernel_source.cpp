@@ -110,9 +110,7 @@ void source::prepare_kernel(shared_ptr_class<kernel> kern) {
 	}
 }
 
-void source::write_buffers_to_device(program& p) {
-	auto& kern = p.kernels.back();
-
+void source::write_buffers_to_device(shared_ptr_class<kernel> kern) {
 	for(auto& acc : kern->src.resources) {
 		auto mode = acc.second.acc.mode;
 		if(
@@ -140,14 +138,11 @@ void source::enqueue_task_command(queue* q, shared_ptr_class<kernel> kern) {
 	kern->enqueue_task(q);
 }
 
-void source::enqueue_task(program& p) {
-	// TODO: Don't take the zero one
-	command::group_::add(enqueue_task_command, __func__, p.kernels[0]);
+void source::enqueue_task(shared_ptr_class<kernel> kern) {
+	command::group_::add(enqueue_task_command, __func__, kern);
 }
 
-void source::read_buffers_from_device(program& p) {
-	auto& kern = p.kernels.back();
-
+void source::read_buffers_from_device(shared_ptr_class<kernel> kern) {
 	for(auto& acc : kern->src.resources) {
 		if(
 			acc.second.acc.mode == access::read	||

@@ -21,6 +21,7 @@ class queue;
 
 class program {
 protected:
+	friend class handler;
 	friend class kernel;
 	friend class detail::kernel_::source;
 

@@ -27,11 +27,13 @@ private:
 		: q(q) {}
 
 	template <class KernelType>
-	program build(KernelType kernFunctor) {
+	shared_ptr_class<kernel> build(KernelType kernFunctor) {
 		detail::command::group_::check_scope();
 		program prog(q->get_context());
 		prog.build(kernFunctor, "");
-		return prog;
+
+		// We know here the program only contains one kernel
+		return prog.kernels.back();
 	}
 
 	using src = detail::kernel_::source;
@@ -49,10 +51,10 @@ public:
 	// 3.5.3.1 Single Task invoke
 	template <class KernelType>
 	void single_task(KernelType kernFunctor) {
-		auto prog = build(kernFunctor);
-		src::write_buffers_to_device(prog);
-		src::enqueue_task(prog);
-		src::read_buffers_from_device(prog);
+		auto kern = build(kernFunctor);
+		src::write_buffers_to_device(kern);
+		src::enqueue_task(kern);
+		src::read_buffers_from_device(kern);
 	}
 
 

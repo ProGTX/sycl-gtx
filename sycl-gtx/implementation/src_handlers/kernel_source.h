@@ -72,10 +72,10 @@ public:
 	
 	void init_kernel(program& p, shared_ptr_class<kernel> kern);
 	static void prepare_kernel(shared_ptr_class<kernel> kern);
-	static void write_buffers_to_device(program& p);
-	static void read_buffers_from_device(program& p);
+	static void write_buffers_to_device(shared_ptr_class<kernel> kern);
+	static void read_buffers_from_device(shared_ptr_class<kernel> kern);
 
-	static void enqueue_task(program& p);
+	static void enqueue_task(shared_ptr_class<kernel> kern);
 
 	template <int dimensions>
 	static void enqueue_range_command(
