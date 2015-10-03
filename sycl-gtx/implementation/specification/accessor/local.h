@@ -16,7 +16,7 @@ namespace sycl {
 namespace detail {
 
 SYCL_ACCESSOR_CLASS(target == access::local),
-	public counter<accessor_<DataType, dimensions, mode, target>>,
+	protected counter<accessor_<DataType, dimensions, mode, target>>,
 	public accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>
 {
 protected:
@@ -30,7 +30,7 @@ protected:
 	}
 
 	virtual void* resource() const override {
-		return reinterpret_cast<void*>(counter_id);
+		return reinterpret_cast<void*>(get_count_id());
 	}
 
 	virtual size_t argument_size() const override {

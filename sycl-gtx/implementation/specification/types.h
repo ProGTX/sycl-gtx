@@ -14,14 +14,14 @@ namespace sycl {
 namespace detail {
 
 template <typename dataT, int numElements>
-class vec_base : public detail::counter<vec_base<dataT, numElements>>, public detail::data_ref {
+class vec_base : protected detail::counter<vec_base<dataT, numElements>>, public detail::data_ref {
 private:
 	static string_class type_name() {
 		return detail::type_string<dataT>() + (numElements == 1 ? "" : std::to_string(numElements));
 	}
 
 	string_class generate_name() const {
-		return '_' + type_name() + '_' + std::to_string(counter_id);
+		return '_' + type_name() + '_' + std::to_string(get_count_id());
 	}
 
 public:
