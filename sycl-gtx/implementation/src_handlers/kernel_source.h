@@ -3,6 +3,7 @@
 #include "../specification/accessor/buffer.h"
 #include "../specification/command_group.h"
 #include "../common.h"
+#include "../counter.h"
 #include "../debug.h"
 #include <unordered_map>
 
@@ -27,7 +28,7 @@ template<class Input>
 struct constructor;
 
 
-class source {
+class source : protected counter<source> {
 private:
 	struct buf_info {
 		buffer_access acc;
@@ -40,9 +41,6 @@ private:
 	SYCL_THREAD_LOCAL static int num_resources;
 
 	string_class tab_offset;
-
-	static int num_kernels;
-	int kernel_id;
 
 	string_class kernel_name;
 	vector_class<string_class> lines;
@@ -63,8 +61,7 @@ private:
 public:
 	source()
 		: tab_offset("\t"),
-		kernel_id(++num_kernels),
-		kernel_name(string_class("_sycl_kernel_") + std::to_string(kernel_id)) {}
+		kernel_name(string_class("_sycl_kernel_") + std::to_string(get_count_id())) {}
 
 	static bool in_scope();
 

@@ -10,7 +10,6 @@ using namespace detail::kernel_;
 
 const string_class source::resource_name_root = "_sycl_buf";
 int source::num_resources = 0;
-int source::num_kernels = 0;
 source* source::scope = nullptr;
 
 bool source::in_scope() {
