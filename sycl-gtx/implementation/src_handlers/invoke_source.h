@@ -9,6 +9,36 @@ namespace cl {
 namespace sycl {
 
 namespace detail {
+
+using kernel_::source;
+
+template <int dimensions>
+struct generate_id_code {
+	static void global() {
+		for(int i = 0; i < dimensions; ++i) {
+			auto id_s = std::to_string(i);
+			source::add(
+				string_class("const int ") + id_global_name + id_s +
+				" = get_global_id(" + id_s + ")"
+			);
+		}
+
+		// TODO: 2d and 3d
+	}
+
+	static void local() {
+		for(int i = 0; i < dimensions; ++i) {
+			auto id_s = std::to_string(i);
+			source::add(
+				string_class("const int ") + id_local_name + id_s +
+				" = get_local_id(" + id_s + ")"
+			);
+		}
+
+		// TODO: 2d and 3d
+	}
+};
+
 namespace kernel_ {
 
 template <class Input>
@@ -21,7 +51,7 @@ struct constructor<void> {
 		source src;
 		source::enter(src);
 
-		kern(); // MSVC2013 complains about this, but compiles and links.
+		kern();
 
 		return source::exit(src);
 	}
@@ -30,17 +60,7 @@ struct constructor<void> {
 // Parallel For with range and kernel parameter id
 template <int dimensions>
 struct constructor<id<dimensions>> {
-	static id<dimensions> generate_global_id_code() {
-		for(int i = 0; i < dimensions; ++i) {
-			auto id_s = std::to_string(i);
-			source::add(
-				string_class("const int ") + id_global_name + id_s +
-				" = get_global_id(" + id_s + ")"
-			);
-		}
-
-		// TODO: 2d and 3d
-
+	static id<dimensions> global_id() {
 		return id<dimensions>{0, 0, 0};
 	}
 
@@ -49,7 +69,8 @@ struct constructor<id<dimensions>> {
 		source::enter(src);
 
 		// TODO: num_work_items, work_item_offset
-		kern(generate_global_id_code());
+		generate_id_code<dimensions>::global();
+		kern(global_id());
 
 		return source::exit(src);
 	}
@@ -62,7 +83,8 @@ struct constructor<item<dimensions>> {
 		source src;
 		source::enter(src);
 
-		auto index = constructor<id<dimensions>>::generate_global_id_code();
+		generate_id_code<dimensions>::global();
+		auto index = constructor<id<dimensions>>::global_id();
 		// TODO: num_work_items, work_item_offset
 		//item<dimensions> it(index, num_work_items, work_item_offset);
 		item<dimensions> it(index, detail::empty_range<dimensions>());
@@ -75,17 +97,7 @@ struct constructor<item<dimensions>> {
 // Parallel For with nd_range
 template <int dimensions>
 struct constructor<nd_item<dimensions>> {
-	static id<dimensions> generate_local_id_code() {
-		for(int i = 0; i < dimensions; ++i) {
-			auto id_s = std::to_string(i);
-			source::add(
-				string_class("const int ") + id_local_name + id_s +
-				" = get_local_id(" + id_s + ")"
-			);
-		}
-
-		// TODO: 2d and 3d
-
+	static id<dimensions> local_id() {
 		auto i = id<dimensions>{0, 0, 0};
 		i.type = id_ref::type::local;
 		return i;
@@ -99,15 +111,20 @@ struct constructor<nd_item<dimensions>> {
 		auto r = detail::empty_range<dimensions>();
 		nd_range<dimensions> execution_range(r, r);
 
+		generate_id_code<dimensions>::global();
+		auto global_id = constructor<id<dimensions>>::global_id();
+
 		item<dimensions> global_item(
-			constructor<id<dimensions>>::generate_global_id_code(),
+			global_id,
 			execution_range.get_global(),
 			execution_range.get_offset()
 		);
 
+		generate_id_code<dimensions>::local();
+
 		// TODO: Store group ID into offset of local_item
 		item<dimensions> local_item(
-			generate_local_id_code(),
+			local_id(),
 			execution_range.get_local(),
 			execution_range.get_offset()
 		);
