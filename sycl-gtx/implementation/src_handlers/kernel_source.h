@@ -69,6 +69,7 @@ public:
 	static bool in_scope();
 
 	string_class get_code() const;
+	string_class get_kernel_name() const;
 	
 	void init_kernel(program& p, shared_ptr_class<kernel> kern);
 	static void prepare_kernel(shared_ptr_class<kernel> kern);

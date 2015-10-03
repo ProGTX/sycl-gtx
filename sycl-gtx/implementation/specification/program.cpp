@@ -46,6 +46,7 @@ void program::compile(string_class compile_options, shared_ptr_class<kernel> ker
 		detail::error::report(error_code);
 	}
 	catch(::cl::sycl::exception& e) {
+		debug() << "Error while compiling kernel" << kern->src.get_kernel_name();
 		for(auto& d : devices) {
 			report_compile_error(kern, d);
 		}

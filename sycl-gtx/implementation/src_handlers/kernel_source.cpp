@@ -47,6 +47,11 @@ string_class source::get_code() const {
 	return final_code;
 }
 
+
+string_class source::get_kernel_name() const {
+	return kernel_name;
+}
+
 string_class source::generate_accessor_list() const {
 	string_class list;
 	if(resources.empty()) {
@@ -93,6 +98,7 @@ void source::init_kernel(program& p, shared_ptr_class<kernel> kern) {
 }
 
 void source::prepare_kernel(shared_ptr_class<kernel> kern) {
+	DSELF() << kern->src.kernel_name;
 	auto k = kern->get();
 	cl_int error_code;
 	int i = 0;
