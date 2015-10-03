@@ -23,12 +23,13 @@ class queue;
 
 class kernel {
 private:
+	friend class program;
+	friend class detail::kernel_::source;
+
 	detail::refc<cl_kernel, clRetainKernel, clReleaseKernel> kern;
 	context ctx;
 	program prog;
-
-	friend class program;
-	friend class detail::kernel_::source;
+	detail::kernel_::source src;
 
 	// These are meant only for program class
 	kernel(bool);
@@ -36,9 +37,6 @@ private:
 	void set(const context& context, cl_program validProgram);
 
 public:
-	// TODO: Make private
-	detail::kernel_::source src;
-
 	// The default object is not valid because there is no program or cl_kernel associated with it
 	kernel() = delete;
 	kernel(nullptr_t) = delete;
