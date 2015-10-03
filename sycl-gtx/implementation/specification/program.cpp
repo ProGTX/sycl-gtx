@@ -46,7 +46,7 @@ void program::compile(string_class compile_options, shared_ptr_class<kernel> ker
 		detail::error::report(error_code);
 	}
 	catch(::cl::sycl::exception& e) {
-		debug() << "Error while compiling kernel" << kern->src.get_kernel_name();
+		debug() << "Error while compiling kernel" << kern->src.get_kernel_name() << "->";
 		for(auto& d : devices) {
 			report_compile_error(kern, d);
 		}
@@ -67,7 +67,7 @@ void program::report_compile_error(shared_ptr_class<kernel> kern, device& dev) c
 	// Get the log
 	clGetProgramBuildInfo(kern->prog.get(), dev.get(), CL_PROGRAM_BUILD_LOG, log_size, log, nullptr);
 
-	debug() << "Error while compiling program for device" << dev.get_info<info::device::name>() << "\n" << log;
+	debug() << "\tWhile compiling for device" << dev.get_info<info::device::name>() << "->\n" << log;
 
 	delete[] log;
 }

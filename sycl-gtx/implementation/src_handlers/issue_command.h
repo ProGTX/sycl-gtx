@@ -28,7 +28,7 @@ public:
 	template <int dimensions>
 	static void enqueue_range_command(
 		queue* q, shared_ptr_class<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset
-		) {
+	) {
 		prepare_kernel(kern);
 		kern->enqueue_range(q, num_work_items, offset);
 	}
@@ -40,7 +40,7 @@ public:
 	template <int dimensions>
 	static void enqueue_nd_range_command(
 		queue* q, shared_ptr_class<kernel> kern, nd_range<dimensions> execution_range
-		) {
+	) {
 		prepare_kernel(kern);
 		kern->enqueue_nd_range(q, execution_range);
 	}
