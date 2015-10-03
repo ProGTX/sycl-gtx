@@ -64,7 +64,8 @@ struct constructor<item<dimensions>> {
 
 		auto index = constructor<id<dimensions>>::generate_global_id_code();
 		// TODO: num_work_items, work_item_offset
-		item<dimensions> it(index, num_work_items, work_item_offset);
+		//item<dimensions> it(index, num_work_items, work_item_offset);
+		item<dimensions> it(index, detail::empty_range<dimensions>());
 		kern(it);
 
 		return source::exit(src);

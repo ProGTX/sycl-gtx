@@ -82,10 +82,11 @@ public:
 	static void enqueue_range_command(
 		queue* q, shared_ptr_class<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset
 	) {
-		(*kern)->enqueue_range(q, num_work_items, offset);
+		prepare_kernel(kern);
+		kern->enqueue_range(q, num_work_items, offset);
 	}
 	template <int dimensions>
-	void enqueue_range(shared_ptr_class<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset) const {
+	static void enqueue_range(shared_ptr_class<kernel> kern, range<dimensions> num_work_items, id<dimensions> offset) {
 		command::group_::add(enqueue_range_command, __func__, kern, num_work_items, offset);
 	}
 
@@ -93,10 +94,11 @@ public:
 	static void enqueue_nd_range_command(
 		queue* q, shared_ptr_class<kernel> kern, nd_range<dimensions> execution_range
 	) {
-		(*kern)->enqueue_nd_range(q, execution_range);
+		prepare_kernel(kern);
+		kern->enqueue_nd_range(q, execution_range);
 	}
 	template <int dimensions>
-	void enqueue_nd_range(shared_ptr_class<kernel> kern, nd_range<dimensions> execution_range) const {
+	static void enqueue_nd_range(shared_ptr_class<kernel> kern, nd_range<dimensions> execution_range) {
 		command::group_::add(enqueue_nd_range_command, __func__, kern, execution_range);
 	}
 
