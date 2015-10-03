@@ -1,9 +1,9 @@
 #include "kernel_source.h"
 
-#include "specification\access.h"
-#include "specification\command_group.h"
-#include "specification\error_handler.h"
-#include "specification\kernel.h"
+#include "../specification/access.h"
+#include "../specification/command_group.h"
+#include "../specification/error_handler.h"
+#include "../specification/kernel.h"
 
 using namespace cl::sycl;
 using namespace detail::kernel_;

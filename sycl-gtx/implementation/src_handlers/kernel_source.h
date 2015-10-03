@@ -1,9 +1,9 @@
 #pragma once
 
-#include "specification\accessor\buffer.h"
-#include "specification\command_group.h"
-#include "common.h"
-#include "debug.h"
+#include "../specification/accessor/buffer.h"
+#include "../specification/command_group.h"
+#include "../common.h"
+#include "../debug.h"
 #include <unordered_map>
 
 

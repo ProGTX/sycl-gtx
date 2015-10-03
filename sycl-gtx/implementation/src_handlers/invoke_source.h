@@ -1,9 +1,9 @@
 #pragma once
 
 #include "kernel_source.h"
-#include "specification\ranges.h"
-#include "common.h"
-#include "debug.h"
+#include "../specification/ranges.h"
+#include "../common.h"
+#include "../debug.h"
 
 namespace cl {
 namespace sycl {
