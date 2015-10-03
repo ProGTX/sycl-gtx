@@ -27,6 +27,7 @@ namespace kernel_ {
 static const string_class id_global_name		= "_sycl_id_";
 static const string_class id_global_all_name	= "_sycl_id_d";
 static const string_class id_local_name			= "_sycl_id_local_";
+static const string_class id_local_all_name		= "_sycl_id_local_d";
 
 
 template <int dimensions>

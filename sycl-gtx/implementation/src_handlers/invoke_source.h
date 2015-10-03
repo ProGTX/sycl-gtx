@@ -23,7 +23,14 @@ struct generate_id_code {
 			);
 		}
 
-		// TODO: 2d and 3d
+		if(dimensions == 2) {
+			source::add(
+				string_class("const int ") + id_global_all_name +
+				" = " + id_global_name + "1 * get_global_size(0) + " + id_global_name + "0"
+			);
+		}
+
+		// TODO: 3d
 	}
 
 	static void local() {
@@ -35,7 +42,14 @@ struct generate_id_code {
 			);
 		}
 
-		// TODO: 2d and 3d
+		if(dimensions == 2) {
+			source::add(
+				string_class("const int ") + id_local_all_name +
+				" = " + id_local_name + "1 * get_local_size(0) + " + id_local_name + "0"
+			);
+		}
+
+		// TODO: 3d
 	}
 };
 
