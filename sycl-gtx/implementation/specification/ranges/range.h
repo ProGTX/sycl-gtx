@@ -11,7 +11,7 @@ template <int dimensions = 1>
 struct range;
 
 template <>
-struct range<1> : detail::point<1, true>{
+struct range<1> : detail::point<1, true> {
 	range(size_t x) {
 		values[0] = x;
 	}
@@ -21,7 +21,7 @@ struct range<1> : detail::point<1, true>{
 };
 
 template <>
-struct range<2> : detail::point<2, true>{
+struct range<2> : detail::point<2, true> {
 	range(size_t x, size_t y) {
 		values[0] = x;
 		values[1] = y;
@@ -32,7 +32,7 @@ struct range<2> : detail::point<2, true>{
 };
 
 template <>
-struct range<3> : detail::point<3, true>{
+struct range<3> : detail::point<3, true> {
 	range(size_t x, size_t y, size_t z) {
 		values[0] = x;
 		values[1] = y;

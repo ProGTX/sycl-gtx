@@ -21,6 +21,7 @@ protected:
 	size_t values[dimensions];
 
 	void set(point_base& rhs) {
+		type = rhs.type;
 		SYCL_POINT_OP_EQ(this->, );
 	}
 };
@@ -33,6 +34,9 @@ template <size_t dimensions>
 struct point<dimensions, true>
 	: public point_base<dimensions>
 {
+	template <size_t dimensions, bool is_numeric>
+	friend struct point;
+
 	point& operator+=(const point& rhs) {
 		SYCL_POINT_OP_EQ(this->, +);
 		return *this;
@@ -45,11 +49,20 @@ struct point<dimensions, true>
 		return lhs;
 	}
 
-	size_t get(int dimension) const {
-		return values[dimension];
+	template <bool defer = true>
+	point<1, true> get(int dimension) const {
+		point<1, true> value;
+		value.type = type;
+		value.values[0] = values[dimension];
+		return value;
 	}
 	size_t& operator[](int dimension) {
 		return values[dimension];
+	}
+
+	template <class one_dim = std::enable_if<dimensions == 1>::type>
+	operator size_t() {
+		return values[0];
 	}
 };
 
