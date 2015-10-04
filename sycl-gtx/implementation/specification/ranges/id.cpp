@@ -12,7 +12,7 @@ template struct id_<3>;
 
 template <int dimensions>
 id_<dimensions>::id_(size_t first, size_t second, size_t third)
-	: type(id_ref::type::global)
+	: type(id_ref::type_t::id_global)
 #if MSVC_LOW
 {
 	values[0] = first;

@@ -19,8 +19,17 @@ void kernel_add(string_class line);
 
 class data_ref {
 public:
+	enum class type_t {
+		general,
+		id_global,
+		id_local,
+		range_global,
+		range_local
+	};
+
 	static const string_class open_parenthesis;
 	string_class name;
+	type_t type;
 
 	static string_class get_name(id<1> index);
 	static string_class get_name(id<2> index);
@@ -113,16 +122,10 @@ public:
 };
 
 class id_ref : public data_ref {
-public:
-	enum class type {
-		global,
-		local
-	};
-
 protected:
 	size_t* value;
 public:
-	id_ref(int n, size_t* value, type access_type = type::global);
+	id_ref(int n, size_t* value, type_t access_type = type_t::id_global);
 
 	operator size_t&() {
 		return *value;
