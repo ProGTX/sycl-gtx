@@ -251,5 +251,8 @@
     <ClInclude Include="implementation\src_handlers\issue_command.h">
       <Filter>Header Files\src_handlers</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\ranges\point.h">
+      <Filter>Header Files\specification\ranges</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
