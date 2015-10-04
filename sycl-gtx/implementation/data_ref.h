@@ -15,7 +15,10 @@ struct id;
 
 namespace detail {
 
+// Forward declarations
 void kernel_add(string_class line);
+template <size_t dimensions, bool is_numeric>
+struct point;
 
 class data_ref {
 public:
@@ -119,6 +122,33 @@ public:
 
 #undef SYCL_DATA_REF_OPERATOR
 
+};
+
+class point_ref : public data_ref {
+protected:
+	size_t* values;
+public:
+	template <size_t dimensions>
+	point_ref(point<dimensions, false>* p) : data_ref("") {
+		type = p->type;
+
+		switch(type) {
+			case type_t::id_global:
+				name = id_global_name;
+				break;
+			case type_t::id_local:
+				name = id_local_name;
+				break;
+		}
+	}
+
+	operator size_t&() {
+		return *values;
+	}
+
+	operator size_t() const {
+		return *values;
+	}
 };
 
 class id_ref : public data_ref {

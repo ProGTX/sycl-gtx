@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../data_ref.h"
+#include "../../common.h"
 
 namespace cl {
 namespace sycl {
@@ -14,7 +15,7 @@ namespace detail {
 template <size_t dimensions>
 struct point_base {
 protected:
-	friend class data_ref;
+	friend class point_ref;
 
 	data_ref::type_t type = data_ref::type_t::general;
 	size_t values[dimensions];
@@ -60,11 +61,8 @@ struct point<dimensions, false>
 		SYCL_POINT_OP_EQ(lhs., +);
 		return lhs;
 	}
-	data_ref operator+(const point& rhs) const {
-		point lhs;
-		lhs.set(*this);
-		SYCL_POINT_OP_EQ(lhs., +);
-		return data_ref(lhs, type) + rhs;
+	point_ref operator+(const point& rhs) const {
+		return point_ref(this) + rhs;
 	}
 };
 
