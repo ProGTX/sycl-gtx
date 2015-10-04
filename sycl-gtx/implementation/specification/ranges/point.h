@@ -44,6 +44,13 @@ struct point<dimensions, true>
 		SYCL_POINT_OP_EQ(lhs., +);
 		return lhs;
 	}
+
+	size_t get(int dimension) const {
+		return values[dimension];
+	}
+	size_t& operator[](int dimension) {
+		return values[dimension];
+	}
 };
 
 // Non-numeric points
