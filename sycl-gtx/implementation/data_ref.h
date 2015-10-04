@@ -131,8 +131,9 @@ class point_ref : public data_ref {
 protected:
 	size_t* values;
 public:
-	template <size_t dimensions>
-	point_ref(point<dimensions, false>* p) : data_ref("") {
+	template <size_t dimensions, bool is_numeric>
+	point_ref(point<dimensions, is_numeric>* p)
+		: data_ref(""), values(p->values) {
 		type = p->type;
 
 		switch(type) {
@@ -150,6 +151,11 @@ public:
 				break;
 		}
 	}
+
+	// Use with caution
+	template <bool defer = true>
+	point_ref(point<1, true> p)
+		: point_ref(&p) {}
 
 	operator size_t&() {
 		return *values;
