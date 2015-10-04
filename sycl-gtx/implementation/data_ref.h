@@ -17,6 +17,7 @@ namespace detail {
 
 // Forward declarations
 void kernel_add(string_class line);
+class point_ref;
 template <size_t dimensions, bool is_numeric>
 struct point;
 
@@ -37,6 +38,10 @@ public:
 	static string_class get_name(id<1> index);
 	static string_class get_name(id<2> index);
 	static string_class get_name(id<3> index);
+	template <int dimensions, bool is_numeric>
+	static string_class get_name(point<dimensions, is_numeric> index) {
+		return point_ref(&index).name;
+	}
 
 	static string_class get_name(const data_ref& dref) {
 		return dref.name;
