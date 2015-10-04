@@ -113,7 +113,7 @@ template <int dimensions>
 struct constructor<nd_item<dimensions>> {
 	static id<dimensions> local_id() {
 		auto i = id<dimensions>{0, 0, 0};
-		i.type = id_ref::type_t::id_local;
+		i.type = data_ref::type_t::id_local;
 		return i;
 	}
 

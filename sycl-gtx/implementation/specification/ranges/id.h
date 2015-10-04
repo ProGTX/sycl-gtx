@@ -37,7 +37,7 @@ protected:
 	friend struct kernel_::constructor<nd_item<dimensions>>;
 	friend class kernel_::source;
 
-	id_ref::type_t type;
+	data_ref::type_t type;
 	size_t values[3];
 
 	id_(size_t first, size_t second, size_t third);

@@ -13,7 +13,7 @@ void detail::kernel_add(string_class line) {
 const string_class data_ref::open_parenthesis = "(";
 
 string_class data_ref::get_name(id<1> index) {
-	return (index.type == id_ref::type_t::id_global ? id_global_name : id_local_name) + "0";
+	return (index.type == data_ref::type_t::id_global ? id_global_name : id_local_name) + "0";
 }
 
 // TODO: local id
