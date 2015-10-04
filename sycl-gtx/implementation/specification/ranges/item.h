@@ -14,7 +14,9 @@ template <int dimensions>
 struct nd_item;
 
 namespace detail {
+
 namespace kernel_ {
+	// Forward declaration
 	template <class Input>
 	struct constructor;
 }

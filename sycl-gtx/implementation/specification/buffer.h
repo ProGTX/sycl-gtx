@@ -133,7 +133,7 @@ public:
 	// b is the buffer with the real data.
 	// baseIndex specifies the origin of the sub-buffer inside the buffer b.
 	// subRange specifies the size of the sub-buffer.
-	buffer_(buffer_& b, const index<dimensions>& baseIndex, const range<dimensions>& subRange);
+	buffer_(buffer_& b, const id<dimensions>& baseIndex, const range<dimensions>& subRange);
 
 	// Creates a buffer from an existing OpenCL memory object associated to a context
 	// after waiting for an event signaling the availability of the OpenCL data.
@@ -270,7 +270,7 @@ public:
 		: Base(hostData, bufferRange, m) {}																\
 	buffer(unique_ptr_class<void>&& hostData, const range<dimensions>& bufferRange)						\
 		: Base(hostData, bufferRange) {}																\
-	buffer(buffer& b, const index<dimensions>& baseIndex, const range<dimensions>& subRange)			\
+	buffer(buffer& b, const id<dimensions>& baseIndex, const range<dimensions>& subRange)			\
 		: Base(b, baseIndex, subRange) {}																\
 	buffer(cl_mem mem_object, queue& from_queue, event available_event = {})							\
 		: Base(mem_object, from_queue, available_event) {}

@@ -75,7 +75,9 @@ struct constructor<void> {
 template <int dimensions>
 struct constructor<id<dimensions>> {
 	static id<dimensions> global_id() {
-		return id<dimensions>{0, 0, 0};
+		auto i = id<dimensions>();
+		i.type = data_ref::type_t::id_global;
+		return i;
 	}
 
 	static source get(function_class<void(id<dimensions>)> kern) {
@@ -112,7 +114,7 @@ struct constructor<item<dimensions>> {
 template <int dimensions>
 struct constructor<nd_item<dimensions>> {
 	static id<dimensions> local_id() {
-		auto i = id<dimensions>{0, 0, 0};
+		auto i = id<dimensions>();
 		i.type = data_ref::type_t::id_local;
 		return i;
 	}

@@ -2,8 +2,9 @@
 
 // 3.5.1.3 ID class
 
-#include "range.h"
 #include "item.h"
+#include "range.h"
+#include "point.h"
 #include "../../common.h"
 #include "../../data_ref.h"
 #include <initializer_list>
@@ -20,7 +21,7 @@ namespace detail {
 // Forward declarations
 namespace kernel_ {
 	class source;
-	template<class Input>
+	template <class Input>
 	struct constructor;
 }
 
@@ -65,52 +66,65 @@ public:
 
 } // namespace detail
 
+
 template <int dimensions = 1>
 struct id;
 
-// TODO
-template <int dimensions = 1>
-using index = id<dimensions>;
-
 template <>
-struct id<1> : detail::id_<1> {
-	id(size_t size = 0)
-		: detail::id_<1>(size, 1, 1) {}
-	id(std::initializer_list<size_t> list)
-		: id(*(list.begin())) {}
+struct id<1> : detail::point<1, true> {
+	template <class Input>
+	friend struct detail::kernel_::constructor;
+	friend class detail::data_ref;
+
+	id(size_t x = 0) {
+		values[0] = x;
+	}
 	id(const range<1>& rangeSize)
 		: id(rangeSize.get(0)) {}
-	id(const item<1>& it)
-		: id(it.get(0)) {}
-	operator size_t() {
+	id(const item<1>& rhs)
+		: id(rhs.get()) {}
+	size_t size() const {
 		return values[0];
 	}
 };
+
 template <>
-struct id<2> : detail::id_<2>{
-	id(size_t sizeX, size_t sizeY)
-		: detail::id_<2>(sizeX, sizeY, 1) {}
-	id()
-		: id(0, 0) {}
-	id(std::initializer_list<size_t> list)
-		: id(*(list.begin()), *(list.begin() + 1)) {}
+struct id<2> : detail::point<2, true> {
+	template <class Input>
+	friend struct detail::kernel_::constructor;
+	friend class detail::data_ref;
+
+	id(size_t x = 0, size_t y = 0) {
+		values[0] = x;
+		values[1] = y;
+	}
 	id(const range<2>& rangeSize)
 		: id(rangeSize.get(0), rangeSize.get(1)) {}
-	id(const item<2>& it)
-		: id(it.get(0), it.get(1)) {}
+	id(const item<2>& rhs)
+		: id(rhs.get()) {}
+	size_t size() const {
+		return values[0] * values[1];
+	}
 };
+
 template <>
-struct id<3> : detail::id_<3>{
-	id(size_t sizeX, size_t sizeY, size_t sizeZ)
-		: detail::id_<3>(sizeX, sizeY, sizeZ) {}
-	id()
-		: id(0, 0, 0) {}
-	id(std::initializer_list<size_t> list)
-		: id(*(list.begin()), *(list.begin() + 1), *(list.begin() + 2)) {}
+struct id<3> : detail::point<3, true> {
+	template <class Input>
+	friend struct detail::kernel_::constructor;
+	friend class detail::data_ref;
+
+	id(size_t x = 0, size_t y = 0, size_t z = 0) {
+		values[0] = x;
+		values[1] = y;
+		values[2] = z;
+	}
 	id(const range<3>& rangeSize)
 		: id(rangeSize.get(0), rangeSize.get(1), rangeSize.get(2)) {}
-	id(const item<3>& it)
-		: id(it.get(0), it.get(1), it.get(2)) {}
+	id(const item<3>& rhs)
+		: id(rhs.get()) {}
+	size_t size() const {
+		return values[0] * values[1] * values[2];
+	}
 };
 
 } // namespace sycl

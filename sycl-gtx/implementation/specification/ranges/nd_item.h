@@ -35,34 +35,34 @@ protected:
 		: global_item(global_item), local_item(local_item) {}
 
 	// A bit of a hack - to the outside it appears to conform to the specification
-	using size_t = detail::id_ref;
+	using size_t = detail::point_ref;
 
 public:
 	operator item<dimensions>() {
 		return global_item;
 	}
 
-	id<dimensions> get_global() const {
+	const id<dimensions>& get_global() const {
 		return global_item.get();
 	}
 	size_t get_global(int dimension) const {
-		return get_global()[dimension];
+		return get_global().get(dimension);
 	}
 	size_t get_global_linear_id() const {
 		return global_item.get_linear_id();
 	}
 
-	id<dimensions> get_local() const {
+	const id<dimensions>& get_local() const {
 		return local_item.get();
 	}
 	size_t get_local(int dimension) const {
-		return get_local()[dimension];
+		return get_local().get(dimension);
 	}
 	size_t get_local_linear_id() const {
 		return local_item.get_linear_id();
 	}
 
-	id<dimensions> get_group() const {
+	const id<dimensions>& get_group() const {
 		// TODO
 		return local_item.get_offset();
 	}
