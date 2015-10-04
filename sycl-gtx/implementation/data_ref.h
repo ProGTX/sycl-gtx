@@ -137,10 +137,16 @@ public:
 
 		switch(type) {
 			case type_t::id_global:
-				name = id_global_name;
+				name = point_names::id_global;
 				break;
 			case type_t::id_local:
-				name = id_local_name;
+				name = point_names::id_local;
+				break;
+			case type_t::range_global:
+				name = point_names::range_global;
+				break;
+			case type_t::range_local:
+				name = point_names::range_local;
 				break;
 		}
 	}

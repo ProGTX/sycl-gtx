@@ -159,6 +159,7 @@
     <ClCompile Include="implementation\specification\program.cpp" />
     <ClCompile Include="implementation\specification\queue.cpp" />
     <ClCompile Include="implementation\specification\ranges\id.cpp" />
+    <ClCompile Include="implementation\specification\ranges\point.cpp" />
     <ClCompile Include="implementation\src_handlers\issue_command.cpp" />
     <ClCompile Include="implementation\src_handlers\kernel_source.cpp" />
     <ClCompile Include="main.cpp" />

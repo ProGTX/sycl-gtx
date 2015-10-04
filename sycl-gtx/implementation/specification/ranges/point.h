@@ -68,6 +68,16 @@ struct point<dimensions, false>
 
 #undef SYCL_POINT_OP_EQ
 
+struct point_names {
+	static const string_class all_suffix;
+
+	static const string_class id_global;
+	static const string_class range_global;
+	
+	static const string_class id_local;
+	static const string_class range_local;
+};
+
 } // namespace detail
 } // namespace sycl
 } // namespace cl
