@@ -112,7 +112,7 @@ public:
 	// If the type of the buffer has the const qualifier,
 	// then the default allocator will remove the qualifier to allow host access to the data.
 	buffer_(const range<dimensions>& range)
-		:	host_data(ptr_t(new DataType[ detail::get_size(range) ])),
+		:	host_data(ptr_t(new DataType[ range.size() ])),
 			rang(range),
 			is_read_only(false),
 			is_blocking(false) {}

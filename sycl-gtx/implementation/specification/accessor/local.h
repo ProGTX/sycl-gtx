@@ -34,7 +34,7 @@ protected:
 	}
 
 	virtual size_t argument_size() const override {
-		return sizeof(DataType) * detail::get_size(allocationSize);
+		return sizeof(DataType) * allocationSize.size();
 	}
 
 public:

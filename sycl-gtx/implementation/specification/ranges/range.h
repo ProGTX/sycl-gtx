@@ -2,123 +2,66 @@
 
 // 3.5.1.1 Range class
 
-#include "../../common.h"
-#include <initializer_list>
+#include "point.h"
 
 namespace cl {
 namespace sycl {
 
-namespace detail {
-
-template <int dimensions>
-struct range_ {
-protected:
-	size_t dims[3];
-
-	range_(size_t first, size_t second, size_t third)
-#if MSVC_LOW
-	{
-		dims[0] = first;
-		dims[1] = second;
-		dims[2] = third;
-#else
-		: dims{ first, second, third } {
-#endif
-	}
-
-	range_(const range_&) = default;
-
-public:
-
-	// Return the value of the specified dimension of the range.
-	size_t get(int dimension) const {
-		return dims[dimension];
-	}
-
-	// Return the l-value of the specified dimension of the range.
-	size_t& operator[](size_t dimension) {
-		return dims[dimension];
-	}
-};
-
-} // namespace detail
-
 template <int dimensions = 1>
 struct range;
 
-#define sycl_range_op(op, dimensions)				\
-	range operator op(range b) {					\
-		range c((const range&)(*this));				\
-		for(::size_t i = 0; i < dimensions; ++i) {	\
-			c.dims[i] op= b.dims[i];				\
-		}											\
-		return c;									\
+template <>
+struct range<1> : detail::point<1, true>{
+	range(size_t x) {
+		values[0] = x;
 	}
-
-// TODO: More operators
-#define sycl_range_operators(dimensions)	\
-	sycl_range_op(*, dimensions)			\
-	sycl_range_op(/, dimensions)			\
-	sycl_range_op(+, dimensions)			\
-	sycl_range_op(-, dimensions)
-
-template <>
-struct range<1> : detail::range_<1> {
-	range(size_t size)
-		: detail::range_<1>(size, 1, 1) {}
-	range(size_t size[1])
-		: range(size[0]) {}
-	sycl_range_operators(1);
-};
-template <>
-struct range<2> : detail::range_<2>{
-	range(size_t sizeX, size_t sizeY)
-		: detail::range_<2>(sizeX, sizeY, 1) {}
-	range(size_t size[2])
-		: range(size[0], size[1]) {}
-	sycl_range_operators(2);
-};
-template <>
-struct range<3> : detail::range_<3>{
-	range(size_t sizeX, size_t sizeY, size_t sizeZ)
-		: detail::range_<3>(sizeX, sizeY, sizeZ) {}
-	range(size_t size[3])
-		: range(size[0], size[1], size[2]) {}
-	sycl_range_operators(3);
+	size_t size() const {
+		return values[0];
+	}
 };
 
-#define sycl_static_range_ops(op)						\
-template <int dims>										\
-range<dims> operator op(range<dims> a, range<dims> b) {	\
-	return a op b;										\
-}
+template <>
+struct range<2> : detail::point<2, true>{
+	range(size_t x, size_t y) {
+		values[0] = x;
+		values[1] = y;
+	}
+	size_t size() const {
+		return values[0] * values[1];
+	}
+};
 
-sycl_static_range_ops(*);
-sycl_static_range_ops(/);
-sycl_static_range_ops(+);
-sycl_static_range_ops(-);
+template <>
+struct range<3> : detail::point<3, true>{
+	range(size_t x, size_t y, size_t z) {
+		values[0] = x;
+		values[1] = y;
+		values[2] = z;
+	}
+	size_t size() const {
+		return values[0] * values[1] * values[2];
+	}
+};
+
 
 namespace detail {
 
 template <int dimensions>
-static range<dimensions> empty_range() {
-	return range<dimensions>(vector_class<size_t>(dimensions, 0).data());
-};
-
-template <int dimensions>
-static size_t get_size(range<dimensions> rang) {
-	size_t size = rang[0];
-	for(int i = 1; i < dimensions; ++i) {
-		size *= rang[i];
-	}
-	return size;
+static range<dimensions> empty_range();
+template <>
+static range<1> empty_range() {
+	return range<1>(0);
+}
+template <>
+static range<2> empty_range() {
+	return range<2>(0, 0);
+}
+template <>
+static range<3> empty_range() {
+	return range<3>(0, 0, 0);
 }
 
 } // namespace detail
 
 } // namespace sycl
 } // namespace cl
-
-#undef sycl_range_op
-#undef sycl_range_operators
-#undef sycl_static_range_ops
