@@ -24,6 +24,12 @@ protected:
 		type = rhs.type;
 		SYCL_POINT_OP_EQ(this->, );
 	}
+
+	void set(size_t value) {
+		for(size_t i = 0; i < dimensions; ++i) {
+			values[i] = value;
+		}
+	}
 };
 
 template <size_t dimensions, bool is_numeric = true>
