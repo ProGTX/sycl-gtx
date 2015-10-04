@@ -49,6 +49,9 @@ public:
 	data_ref(string_class name)
 		: name(name) {}
 
+	data_ref(const char* name)
+		: name(name) {}
+
 	template <class T>
 	data_ref(T type)
 		: name(get_name(type)) {}
