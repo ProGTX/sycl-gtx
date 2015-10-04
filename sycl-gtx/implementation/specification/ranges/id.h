@@ -83,9 +83,6 @@ struct id<1> : detail::point<1, true> {
 		: id(rangeSize.get(0)) {}
 	id(const item<1>& rhs)
 		: id(rhs.get()) {}
-	size_t size() const {
-		return values[0];
-	}
 };
 
 template <>
@@ -102,9 +99,6 @@ struct id<2> : detail::point<2, true> {
 		: id(rangeSize.get(0), rangeSize.get(1)) {}
 	id(const item<2>& rhs)
 		: id(rhs.get()) {}
-	size_t size() const {
-		return values[0] * values[1];
-	}
 };
 
 template <>
@@ -122,9 +116,6 @@ struct id<3> : detail::point<3, true> {
 		: id(rangeSize.get(0), rangeSize.get(1), rangeSize.get(2)) {}
 	id(const item<3>& rhs)
 		: id(rhs.get()) {}
-	size_t size() const {
-		return values[0] * values[1] * values[2];
-	}
 };
 
 } // namespace sycl
