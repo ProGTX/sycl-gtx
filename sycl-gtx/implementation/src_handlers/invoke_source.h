@@ -18,15 +18,15 @@ struct generate_id_code {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
-				string_class("const int ") + id_global_name + id_s +
+				string_class("const int ") + point_names::id_global + id_s +
 				" = get_global_id(" + id_s + ")"
 			);
 		}
 
 		if(dimensions == 2) {
 			source::add(
-				string_class("const int ") + id_global_all_name +
-				" = " + id_global_name + "1 * get_global_size(0) + " + id_global_name + "0"
+				string_class("const int ") + point_names::id_global + point_names::all_suffix +
+				" = " + point_names::id_global + "1 * get_global_size(0) + " + point_names::id_global + "0"
 			);
 		}
 
@@ -37,15 +37,15 @@ struct generate_id_code {
 		for(int i = 0; i < dimensions; ++i) {
 			auto id_s = std::to_string(i);
 			source::add(
-				string_class("const int ") + id_local_name + id_s +
+				string_class("const int ") + point_names::id_local + id_s +
 				" = get_local_id(" + id_s + ")"
 			);
 		}
 
 		if(dimensions == 2) {
 			source::add(
-				string_class("const int ") + id_local_all_name +
-				" = " + id_local_name + "1 * get_local_size(0) + " + id_local_name + "0"
+				string_class("const int ") + point_names::id_local + point_names::all_suffix +
+				" = " + point_names::id_local + "1 * get_local_size(0) + " + point_names::id_local + "0"
 			);
 		}
 
