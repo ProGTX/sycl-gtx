@@ -25,7 +25,7 @@ struct generate_id_code {
 
 		if(dimensions == 2) {
 			source::add(
-				string_class("const int ") + point_names::id_global + point_names::all_suffix +
+				string_class("const int ") + point_names::id_global +
 				" = " + point_names::id_global + "1 * get_global_size(0) + " + point_names::id_global + "0"
 			);
 		}
@@ -44,7 +44,7 @@ struct generate_id_code {
 
 		if(dimensions == 2) {
 			source::add(
-				string_class("const int ") + point_names::id_local + point_names::all_suffix +
+				string_class("const int ") + point_names::id_local +
 				" = " + point_names::id_local + "1 * get_local_size(0) + " + point_names::id_local + "0"
 			);
 		}

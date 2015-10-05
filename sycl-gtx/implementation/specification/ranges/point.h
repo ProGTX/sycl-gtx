@@ -8,8 +8,6 @@ namespace sycl {
 namespace detail {
 
 struct point_names {
-	static const string_class all_suffix;
-
 	static const string_class id_global;
 	static const string_class range_global;
 
