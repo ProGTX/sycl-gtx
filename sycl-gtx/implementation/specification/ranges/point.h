@@ -88,6 +88,10 @@ public:
 		}
 	}
 
+	point& operator+=(const data_ref& rhs) {
+		set(type_t::general);
+		return data_ref::operator+=(rhs);
+	}
 	point& operator+=(const point& rhs) {
 		if(type == type_t::numeric && rhs.type == type_t::numeric) {
 			SYCL_POINT_OP_EQ(this->, +);
@@ -96,13 +100,8 @@ public:
 			}
 		}
 		else {
-			set(type_t::general);
-			data_ref::operator+=(rhs);
+			return operator+=((data_ref)rhs);
 		}
-	}
-	point& operator+=(const data_ref& rhs) const {
-		set(type_t::general);
-		return data_ref::operator+=(rhs);
 	}
 
 	point operator+(const point& rhs) const {
