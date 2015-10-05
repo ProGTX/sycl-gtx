@@ -111,9 +111,9 @@ struct constructor<nd_item<dimensions>> {
 		source src;
 		source::enter(src);
 
-		// TODO: execution_range
-		auto r = empty_range<dimensions>();
-		nd_range<dimensions> execution_range(r, r);
+		auto grange = get_special_range<dimensions>::global();
+		auto lrange = get_special_range<dimensions>::local();
+		nd_range<dimensions> execution_range(grange, lrange);
 
 		generate_id_code<dimensions>::global();
 		auto global_id = get_special_id<dimensions>::global();

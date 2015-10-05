@@ -58,12 +58,12 @@ static range<3> empty_range() {
 template <int dimensions>
 struct get_special_range {
 	static range<dimensions> global() {
-		auto r = range<dimensions>();
+		auto r = empty_range<dimensions>();
 		r.set(data_ref::type_t::range_global);
 		return r;
 	}
 	static range<dimensions> local() {
-		auto r = range<dimensions>();
+		auto r = empty_range<dimensions>();
 		r.set(data_ref::type_t::range_local);
 		return r;
 	}
