@@ -71,7 +71,7 @@ template <int dimensions = 1>
 struct id;
 
 template <>
-struct id<1> : detail::point<1, true> {
+struct id<1> : detail::point<1> {
 	template <class Input>
 	friend struct detail::kernel_::constructor;
 	friend class detail::data_ref;
@@ -86,7 +86,7 @@ struct id<1> : detail::point<1, true> {
 };
 
 template <>
-struct id<2> : detail::point<2, true> {
+struct id<2> : detail::point<2> {
 	template <class Input>
 	friend struct detail::kernel_::constructor;
 	friend class detail::data_ref;
@@ -102,7 +102,7 @@ struct id<2> : detail::point<2, true> {
 };
 
 template <>
-struct id<3> : detail::point<3, true> {
+struct id<3> : detail::point<3> {
 	template <class Input>
 	friend struct detail::kernel_::constructor;
 	friend class detail::data_ref;

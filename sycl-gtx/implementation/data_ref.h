@@ -17,14 +17,14 @@ namespace detail {
 
 // Forward declarations
 void kernel_add(string_class line);
-class point_ref;
-template <size_t dimensions, bool is_numeric>
+template <size_t dimensions>
 struct point;
 
 class data_ref {
 public:
 	enum class type_t {
 		general,
+		numeric,
 		id_global,
 		id_local,
 		range_global,
@@ -38,10 +38,6 @@ public:
 	static string_class get_name(id<1> index);
 	static string_class get_name(id<2> index);
 	static string_class get_name(id<3> index);
-	template <int dimensions, bool is_numeric>
-	static string_class get_name(point<dimensions, is_numeric> index) {
-		return point_ref(&index).name;
-	}
 
 	static string_class get_name(const data_ref& dref) {
 		return dref.name;
@@ -130,45 +126,6 @@ public:
 
 #undef SYCL_DATA_REF_OPERATOR
 
-};
-
-class point_ref : public data_ref {
-protected:
-	size_t* values;
-public:
-	template <size_t dimensions, bool is_numeric>
-	point_ref(point<dimensions, is_numeric>* p)
-		: data_ref(""), values(p->values) {
-		type = p->type;
-
-		switch(type) {
-			case type_t::id_global:
-				name = point_names::id_global;
-				break;
-			case type_t::id_local:
-				name = point_names::id_local;
-				break;
-			case type_t::range_global:
-				name = point_names::range_global;
-				break;
-			case type_t::range_local:
-				name = point_names::range_local;
-				break;
-		}
-	}
-
-	// Use with caution
-	template <bool defer = true>
-	point_ref(point<1, true> p)
-		: point_ref(&p) {}
-
-	operator size_t&() {
-		return *values;
-	}
-
-	operator size_t() const {
-		return *values;
-	}
 };
 
 class id_ref : public data_ref {

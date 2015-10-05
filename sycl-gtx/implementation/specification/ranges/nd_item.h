@@ -2,6 +2,7 @@
 
 // 3.5.1.5 nd_item class
 
+#include "point.h"
 #include "../access.h"
 #include "../../data_ref.h"
 
@@ -35,14 +36,14 @@ protected:
 		: global_item(global_item), local_item(local_item) {}
 
 	// A bit of a hack - to the outside it appears to conform to the specification
-	using size_t = detail::point_ref;
+	using size_t = detail::point<1>;
 
 public:
 	operator item<dimensions>() {
 		return global_item;
 	}
 
-	const id<dimensions>& get_global() const {
+	id<dimensions> get_global() const {
 		return global_item.get();
 	}
 	size_t get_global(int dimension) const {
@@ -52,7 +53,7 @@ public:
 		return global_item.get_linear_id();
 	}
 
-	const id<dimensions>& get_local() const {
+	id<dimensions> get_local() const {
 		return local_item.get();
 	}
 	size_t get_local(int dimension) const {
@@ -62,7 +63,7 @@ public:
 		return local_item.get_linear_id();
 	}
 
-	const id<dimensions>& get_group() const {
+	id<dimensions> get_group() const {
 		// TODO
 		return local_item.get_offset();
 	}
@@ -77,10 +78,10 @@ public:
 	id<dimensions> get_num_groups() const;
 	int get_num_groups(int) const;
 
-	const range<dimensions>& get_global_range() const {
+	range<dimensions> get_global_range() const {
 		return global_item.get_range();
 	}
-	const range<dimensions>& get_local_range() const {
+	range<dimensions> get_local_range() const {
 		return local_item.get_range();
 	}
 	id<dimensions> get_offset() const {
