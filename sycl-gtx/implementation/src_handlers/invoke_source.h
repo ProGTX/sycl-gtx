@@ -74,19 +74,13 @@ struct constructor<void> {
 // Parallel For with range and kernel parameter id
 template <int dimensions>
 struct constructor<id<dimensions>> {
-	static id<dimensions> global_id() {
-		auto i = id<dimensions>();
-		i.set(data_ref::type_t::id_global);
-		return i;
-	}
-
 	static source get(function_class<void(id<dimensions>)> kern) {
 		source src;
 		source::enter(src);
 
 		// TODO: num_work_items, work_item_offset
 		generate_id_code<dimensions>::global();
-		kern(global_id());
+		kern(get_special_id<dimensions>::global());
 
 		return source::exit(src);
 	}
@@ -100,10 +94,10 @@ struct constructor<item<dimensions>> {
 		source::enter(src);
 
 		generate_id_code<dimensions>::global();
-		auto index = constructor<id<dimensions>>::global_id();
+		auto index = get_special_id<dimensions>::global();
 		// TODO: num_work_items, work_item_offset
 		//item<dimensions> it(index, num_work_items, work_item_offset);
-		item<dimensions> it(index, detail::empty_range<dimensions>());
+		item<dimensions> it(index, empty_range<dimensions>());
 		kern(it);
 
 		return source::exit(src);
@@ -113,22 +107,16 @@ struct constructor<item<dimensions>> {
 // Parallel For with nd_range
 template <int dimensions>
 struct constructor<nd_item<dimensions>> {
-	static id<dimensions> local_id() {
-		auto i = id<dimensions>();
-		i.set(data_ref::type_t::id_local);
-		return i;
-	}
-
 	static source get(function_class<void(nd_item<dimensions>)> kern) {
 		source src;
 		source::enter(src);
 
 		// TODO: execution_range
-		auto r = detail::empty_range<dimensions>();
+		auto r = empty_range<dimensions>();
 		nd_range<dimensions> execution_range(r, r);
 
 		generate_id_code<dimensions>::global();
-		auto global_id = constructor<id<dimensions>>::global_id();
+		auto global_id = get_special_id<dimensions>::global();
 
 		item<dimensions> global_item(
 			global_id,
@@ -140,7 +128,7 @@ struct constructor<nd_item<dimensions>> {
 
 		// TODO: Store group ID into offset of local_item
 		item<dimensions> local_item(
-			local_id(),
+			get_special_id<dimensions>::local(),
 			execution_range.get_local(),
 			execution_range.get_offset()
 		);

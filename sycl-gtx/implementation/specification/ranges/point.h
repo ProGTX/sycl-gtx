@@ -27,6 +27,8 @@ struct point : data_ref {
 protected:
 	template <size_t dimensions>
 	friend struct point;
+	template <int dimensions>
+	friend struct get_special_id;
 
 	size_t values[dimensions];
 

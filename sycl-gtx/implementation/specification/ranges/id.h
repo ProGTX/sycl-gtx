@@ -73,5 +73,24 @@ struct id<3> : detail::point<3> {
 		: id(rhs.get()) {}
 };
 
+
+namespace detail {
+
+template <int dimensions>
+struct get_special_id {
+	static id<dimensions> global() {
+		auto i = id<dimensions>();
+		i.set(data_ref::type_t::id_global);
+		return i;
+	}
+	static id<dimensions> local() {
+		auto i = id<dimensions>();
+		i.set(data_ref::type_t::id_local);
+		return i;
+	}
+};
+
+} // namespace detail
+
 } // namespace sycl
 } // namespace cl
