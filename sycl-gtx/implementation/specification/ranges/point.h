@@ -29,6 +29,8 @@ protected:
 	friend struct point;
 	template <int dimensions>
 	friend struct get_special_id;
+	template <int dimensions>
+	friend struct get_special_range;
 
 	size_t values[dimensions];
 

@@ -55,6 +55,20 @@ static range<3> empty_range() {
 	return range<3>(0, 0, 0);
 }
 
+template <int dimensions>
+struct get_special_range {
+	static range<dimensions> global() {
+		auto r = range<dimensions>();
+		r.set(data_ref::type_t::range_global);
+		return r;
+	}
+	static range<dimensions> local() {
+		auto r = range<dimensions>();
+		r.set(data_ref::type_t::range_local);
+		return r;
+	}
+};
+
 } // namespace detail
 
 } // namespace sycl
