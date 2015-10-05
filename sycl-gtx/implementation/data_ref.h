@@ -35,13 +35,19 @@ public:
 	string_class name;
 	type_t type;
 
-	static string_class get_name(id<1> index);
-	static string_class get_name(id<2> index);
-	static string_class get_name(id<3> index);
-
 	static string_class get_name(const data_ref& dref) {
 		return dref.name;
 	}
+
+	template <size_t dimensions>
+	static string_class get_name(const point<dimensions>& p) {
+		auto name = p.name;
+		if(p.is_identifier()) {
+			name += "0";
+		}
+		return name;
+	}
+
 	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
 	static string_class get_name(T n) {
 		return std::to_string(n);

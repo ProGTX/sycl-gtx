@@ -70,12 +70,30 @@ protected:
 				values[2] = z;
 			}
 		}
+		else {
+			name = std::to_string(x);
+		}
 	}
 
 public:
+	bool is_identifier() const {
+		switch(type) {
+			case type_t::id_global:
+			case type_t::id_local:
+			case type_t::range_global:
+			case type_t::range_local:
+				return true;
+			default:
+				return false;
+		}
+	}
+
 	point& operator+=(const point& rhs) {
 		if(type == type_t::numeric && rhs.type == type_t::numeric) {
 			SYCL_POINT_OP_EQ(this->, +);
+			if(dimensions == 1) {
+				name = std::to_string(values[0]);
+			}
 		}
 		else {
 			set(type_t::general);

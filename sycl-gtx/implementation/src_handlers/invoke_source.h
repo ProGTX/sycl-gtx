@@ -76,7 +76,7 @@ template <int dimensions>
 struct constructor<id<dimensions>> {
 	static id<dimensions> global_id() {
 		auto i = id<dimensions>();
-		i.type = data_ref::type_t::id_global;
+		i.set(data_ref::type_t::id_global);
 		return i;
 	}
 
@@ -115,7 +115,7 @@ template <int dimensions>
 struct constructor<nd_item<dimensions>> {
 	static id<dimensions> local_id() {
 		auto i = id<dimensions>();
-		i.type = data_ref::type_t::id_local;
+		i.set(data_ref::type_t::id_local);
 		return i;
 	}
 
