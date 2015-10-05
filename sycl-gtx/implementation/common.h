@@ -96,6 +96,16 @@ namespace sycl {
 
 namespace detail {
 
+// http://stackoverflow.com/a/3418285
+static bool string_replace_one(string_class& str, const string_class& from, const string_class& to) {
+	size_t start_pos = str.find(from);
+	if(start_pos == string_class::npos) {
+		return false;
+	}
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
 template <class To, class From>
 vector_class<To> transform_vector(vector_class<From> array) {
 	return vector_class<To>(array.data(), array.data() + array.size());
