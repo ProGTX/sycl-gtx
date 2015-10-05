@@ -22,9 +22,3 @@ string_class data_ref::get_name(id<2> index) {
 string_class data_ref::get_name(id<3> index) {
 	return point_names::id_global + point_names::all_suffix;
 }
-
-id_ref::id_ref(int n, size_t* value, type_t access_type)
-	:	data_ref(
-			(access_type == type_t::id_global ? point_names::id_global : point_names::id_local) + std::to_string(n)
-		),
-		value(value) {}

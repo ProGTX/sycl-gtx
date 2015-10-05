@@ -128,21 +128,6 @@ public:
 
 };
 
-class id_ref : public data_ref {
-protected:
-	size_t* value;
-public:
-	id_ref(int n, size_t* value, type_t access_type = type_t::id_global);
-
-	operator size_t&() {
-		return *value;
-	}
-
-	operator size_t() const {
-		return *value;
-	}
-};
-
 } // namespace detail
 
 } // namespace sycl

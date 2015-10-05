@@ -25,45 +25,6 @@ namespace kernel_ {
 	struct constructor;
 }
 
-template <int dimensions>
-struct id_ {
-protected:
-	friend class data_ref;
-	friend struct kernel_::constructor<nd_item<dimensions>>;
-	friend class kernel_::source;
-
-	data_ref::type_t type;
-	size_t values[3];
-
-	id_(size_t first, size_t second, size_t third);
-
-public:
-	data_ref operator+(size_t n) const;
-	data_ref operator-(size_t n) const;
-	data_ref operator*(size_t n) const;
-	data_ref operator/(size_t n) const;
-	data_ref operator%(size_t n) const;
-
-	data_ref operator>(size_t n) const;
-	data_ref operator<(size_t n) const;
-	data_ref operator>=(size_t n) const;
-	data_ref operator<=(size_t n) const;
-	data_ref operator==(size_t n) const;
-	data_ref operator!=(size_t n) const;
-
-	// TODO: More operators
-
-	friend data_ref operator*(size_t n, id_<dimensions> i) {
-		return i * n;
-	}
-
-	// Return the value of the specified dimension of the id
-	size_t get(int n) const {
-		return values[n];
-	}
-	id_ref operator[](size_t n);
-};
-
 } // namespace detail
 
 
