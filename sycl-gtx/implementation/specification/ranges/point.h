@@ -25,7 +25,6 @@ struct point_names {
 template <size_t dimensions>
 struct point : data_ref {
 protected:
-	friend class point_ref;
 	template <size_t dimensions>
 	friend struct point;
 
@@ -75,12 +74,32 @@ protected:
 
 public:
 	point& operator+=(const point& rhs) {
-		point lhs;
-		lhs.set(*this);
-		SYCL_POINT_OP_EQ(lhs., +);
+		if(type == type_t::numeric && rhs.type == type_t::numeric) {
+			SYCL_POINT_OP_EQ(this->, +);
+		}
+		else {
+			set(type_t::general);
+			data_ref::operator+=(rhs);
+		}
 	}
+	point& operator+=(const data_ref& rhs) const {
+		set(type_t::general);
+		return data_ref::operator+=(rhs);
+	}
+
 	point operator+(const point& rhs) const {
-		return point_ref(this) + rhs;
+		point lhs(*this);
+		if(type == type_t::numeric && rhs.type == type_t::numeric) {
+			SYCL_POINT_OP_EQ(lhs., +);
+		}
+		else {
+			lhs.set(type_t::general);
+			((data_ref)lhs).operator+=(rhs);
+		}
+		return lhs;
+	}
+	data_ref operator+(const data_ref& rhs) const {
+		return data_ref::operator+(rhs);
 	}
 
 	point<1> get(int dimension) const {
