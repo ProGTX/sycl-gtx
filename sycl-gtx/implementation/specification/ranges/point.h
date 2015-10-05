@@ -25,18 +25,20 @@ struct point_names {
 template <size_t dimensions>
 struct point : data_ref {
 protected:
+	friend class data_ref;
 	template <size_t dimensions>
 	friend struct point;
 	template <int dimensions>
 	friend struct get_special_id;
 	template <int dimensions>
 	friend struct get_special_range;
+	template <int dimensions, bool is_id>
+	friend struct identifier_code;
 
 	size_t values[dimensions];
 
-	void set(type_t type_) {
-		type = type_;
-
+	static string_class name_from_type(type_t type) {
+		string_class name = "";
 		switch(type) {
 			case type_t::id_global:
 				name = point_names::id_global;
@@ -51,6 +53,12 @@ protected:
 				name = point_names::range_local;
 				break;
 		}
+		return name;
+	}
+
+	void set(type_t type_) {
+		type = type_;
+		name = name_from_type(type);
 	}
 
 	void set(point& rhs) {
@@ -61,6 +69,18 @@ protected:
 	void set(size_t value) {
 		for(size_t i = 0; i < dimensions; ++i) {
 			values[i] = value;
+		}
+	}
+
+	bool is_identifier() const {
+		switch(type) {
+			case type_t::id_global:
+			case type_t::id_local:
+			case type_t::range_global:
+			case type_t::range_local:
+				return true;
+			default:
+				return false;
 		}
 	}
 
@@ -80,18 +100,6 @@ protected:
 	}
 
 public:
-	bool is_identifier() const {
-		switch(type) {
-			case type_t::id_global:
-			case type_t::id_local:
-			case type_t::range_global:
-			case type_t::range_local:
-				return true;
-			default:
-				return false;
-		}
-	}
-
 	point& operator+=(const data_ref& rhs) {
 		set(type_t::general);
 		return data_ref::operator+=(rhs);
