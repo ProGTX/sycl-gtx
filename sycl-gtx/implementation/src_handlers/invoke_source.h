@@ -12,44 +12,59 @@ namespace detail {
 
 using kernel_::source;
 
+template <int dimensions, bool is_id>
+struct identifier_code {
+	static string_class get_function_name(typename point<dimensions>::type_t type) {
+		using type_t = typename point<dimensions>::type_t;
+		string_class name = "";
+		switch(type) {
+			case type_t::id_global:
+				name = "get_global_id";
+				break;
+			case type_t::id_local:
+				name = "get_local_id";
+				break;
+			case type_t::range_global:
+				name = "get_global_range";
+				break;
+			case type_t::range_local:
+				name = "get_local_range";
+				break;
+		}
+		return name;
+	}
+	static void generate(typename point<dimensions>::type_t type) {
+		string_class name = point<dimensions>::name_from_type(type);
+		string_class function_name = get_function_name(type);
+
+		for(int i = 0; i < dimensions; ++i) {
+			auto id_s = std::to_string(i);
+			source::add(
+				string_class("const int ") + name + id_s + " = " + function_name + "(" + id_s + ")"
+			);
+		}
+
+		if(is_id) {
+			string_replace_one(function_name, "id", "size");
+
+			if(dimensions == 2) {
+				source::add(
+					string_class("const int ") + name + " = " + name + "1 * " + function_name + "(0) + " + name + "0"
+				);
+			}
+
+			// TODO: 3d
+		}
+	}
+};
+
 template <int dimensions>
 struct generate_id_code {
 	static void global() {
-		for(int i = 0; i < dimensions; ++i) {
-			auto id_s = std::to_string(i);
-			source::add(
-				string_class("const int ") + point_names::id_global + id_s +
-				" = get_global_id(" + id_s + ")"
-			);
-		}
-
-		if(dimensions == 2) {
-			source::add(
-				string_class("const int ") + point_names::id_global +
-				" = " + point_names::id_global + "1 * get_global_size(0) + " + point_names::id_global + "0"
-			);
-		}
-
-		// TODO: 3d
+		identifier_code<dimensions, true>::generate(point<dimensions>::type_t::id_global);
 	}
-
 	static void local() {
-		for(int i = 0; i < dimensions; ++i) {
-			auto id_s = std::to_string(i);
-			source::add(
-				string_class("const int ") + point_names::id_local + id_s +
-				" = get_local_id(" + id_s + ")"
-			);
-		}
-
-		if(dimensions == 2) {
-			source::add(
-				string_class("const int ") + point_names::id_local +
-				" = " + point_names::id_local + "1 * get_local_size(0) + " + point_names::id_local + "0"
-			);
-		}
-
-		// TODO: 3d
+		identifier_code<dimensions, true>::generate(point<dimensions>::type_t::id_local);
 	}
 };
 
