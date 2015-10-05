@@ -25,10 +25,10 @@ struct identifier_code {
 				name = "get_local_id";
 				break;
 			case type_t::range_global:
-				name = "get_global_range";
+				name = "get_global_size";
 				break;
 			case type_t::range_local:
-				name = "get_local_range";
+				name = "get_local_size";
 				break;
 		}
 		return name;
@@ -59,12 +59,22 @@ struct identifier_code {
 };
 
 template <int dimensions>
-struct generate_id_code {
+struct generate_id_refs {
 	static void global() {
 		identifier_code<dimensions, true>::generate(point<dimensions>::type_t::id_global);
 	}
 	static void local() {
 		identifier_code<dimensions, true>::generate(point<dimensions>::type_t::id_local);
+	}
+};
+
+template <int dimensions>
+struct generate_range_refs {
+	static void global() {
+		identifier_code<dimensions, true>::generate(point<dimensions>::type_t::range_global);
+	}
+	static void local() {
+		identifier_code<dimensions, true>::generate(point<dimensions>::type_t::range_local);
 	}
 };
 
@@ -94,7 +104,7 @@ struct constructor<id<dimensions>> {
 		source::enter(src);
 
 		// TODO: num_work_items, work_item_offset
-		generate_id_code<dimensions>::global();
+		generate_id_refs<dimensions>::global();
 		kern(get_special_id<dimensions>::global());
 
 		return source::exit(src);
@@ -108,7 +118,7 @@ struct constructor<item<dimensions>> {
 		source src;
 		source::enter(src);
 
-		generate_id_code<dimensions>::global();
+		generate_id_refs<dimensions>::global();
 		auto index = get_special_id<dimensions>::global();
 		// TODO: num_work_items, work_item_offset
 		//item<dimensions> it(index, num_work_items, work_item_offset);
@@ -126,11 +136,15 @@ struct constructor<nd_item<dimensions>> {
 		source src;
 		source::enter(src);
 
+		generate_id_refs<dimensions>::global();
+		generate_id_refs<dimensions>::local();
+		generate_range_refs<dimensions>::global();
+		generate_range_refs<dimensions>::local();
+
 		auto grange = get_special_range<dimensions>::global();
 		auto lrange = get_special_range<dimensions>::local();
 		nd_range<dimensions> execution_range(grange, lrange);
 
-		generate_id_code<dimensions>::global();
 		auto global_id = get_special_id<dimensions>::global();
 
 		item<dimensions> global_item(
@@ -138,8 +152,6 @@ struct constructor<nd_item<dimensions>> {
 			execution_range.get_global(),
 			execution_range.get_offset()
 		);
-
-		generate_id_code<dimensions>::local();
 
 		// TODO: Store group ID into offset of local_item
 		item<dimensions> local_item(
