@@ -9,10 +9,12 @@ bool test6() {
 		queue myQueue;
 
 		const auto group_size = myQueue.get_device().get_info<info::device::max_work_group_size>();
-		const auto size = group_size * 16;
+		const auto size = group_size * 2;	// TODO: Bigger data
 
-		buffer<float> ping(size);
-		buffer<float> pong(size);
+		using type_t = float;
+
+		buffer<type_t> ping(size);
+		buffer<type_t> pong(size);
 
 		auto P = &ping;
 		auto Q = &pong;
@@ -69,7 +71,7 @@ bool test6() {
 		}
 
 		auto p = P->get_access<access::read, access::host_buffer>();
-		int sum = ((uint64_t)size * (uint64_t)(size - 1)) / 2;
+		type_t sum = ((type_t)size / 2) * (type_t)(size - 1);
 
 		if(p[0] != sum) {
 			debug() << "wrong sum, should be" << sum << "- is" << p[0];
