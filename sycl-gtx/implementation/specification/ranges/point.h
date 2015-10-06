@@ -21,6 +21,17 @@ struct point_names {
 		lhs values[i] op= rhs.values[i];		\
 	}
 
+template <size_t dimensions>
+struct array_ptr : public shared_ptr_class<vector_class<size_t>> {
+	array_ptr()
+		: shared_ptr_class<vector_class<size_t>>(new vector_class<size_t>(dimensions)) {}
+	size_t& operator[](size_t dim) {
+		return get()->at(dim);
+	}
+	size_t operator[](size_t dim) const {
+		return get()->at(dim);
+	}
+};
 
 template <size_t dimensions>
 struct point : data_ref {
@@ -34,8 +45,6 @@ protected:
 	friend struct get_special_range;
 	template <int dimensions, bool is_id>
 	friend struct identifier_code;
-
-	size_t values[dimensions];
 
 	static string_class name_from_type(type_t type) {
 		string_class name = "";
@@ -55,6 +64,8 @@ protected:
 		}
 		return name;
 	}
+
+	array_ptr<dimensions> values;
 
 	void set(type_t type_) {
 		type = type_;
