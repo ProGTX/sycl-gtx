@@ -95,7 +95,7 @@ protected:
 		}
 	}
 
-	point(size_t x, size_t y = 0, size_t z = 0)
+	point(size_t x, size_t y, size_t z)
 		: data_ref("") {
 		type = type_t::numeric;
 		values[0] = x;
@@ -144,7 +144,7 @@ public:
 
 	point<1> get(int dimension) const {
 		auto value = values[dimension];
-		point<1> lhs(value);
+		point<1> lhs(value, 0, 0);
 		lhs.set(type);
 		switch(type) {
 			case type_t::id_global:

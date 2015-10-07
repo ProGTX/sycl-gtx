@@ -38,7 +38,7 @@ struct id<1> : detail::point<1> {
 	friend class detail::data_ref;
 
 	id(size_t x = 0)
-		: point<1>(x) {}
+		: point<1>(x, 0, 0) {}
 	id(const range<1>& rangeSize)
 		: id(rangeSize.get(0)) {}
 	id(const item<1>& rhs)
@@ -52,7 +52,7 @@ struct id<2> : detail::point<2> {
 	friend class detail::data_ref;
 
 	id(size_t x = 0, size_t y = 0)
-		: point<2>(x, y) {}
+		: point<2>(x, y, 0) {}
 	id(const range<2>& rangeSize)
 		: id(rangeSize.get(0), rangeSize.get(1)) {}
 	id(const item<2>& rhs)
