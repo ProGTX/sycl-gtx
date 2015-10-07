@@ -15,10 +15,8 @@ struct id;
 
 namespace detail {
 
-// Forward declarations
+// Forward declaration
 void kernel_add(string_class line);
-template <size_t dimensions>
-struct point;
 
 class data_ref {
 public:
@@ -37,15 +35,6 @@ public:
 
 	static string_class get_name(const data_ref& dref) {
 		return dref.name;
-	}
-
-	template <size_t dimensions>
-	static string_class get_name(const point<dimensions>& p) {
-		auto name = p.name;
-		if(p.is_identifier()) {
-			name += "0";
-		}
-		return name;
 	}
 
 	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>

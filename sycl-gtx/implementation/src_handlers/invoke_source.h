@@ -47,6 +47,11 @@ struct identifier_code {
 		if(is_id) {
 			string_replace_one(function_name, "id", "size");
 
+			if(dimensions == 1) {
+				source::add(
+					string_class("const int ") + name + " = " + name + "0"
+				);
+			}
 			if(dimensions == 2) {
 				source::add(
 					string_class("const int ") + name + " = " + name + "1 * " + function_name + "(0) + " + name + "0"
