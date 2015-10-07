@@ -22,18 +22,6 @@ struct point_names {
 	}
 
 template <size_t dimensions>
-struct array_ptr : public shared_ptr_class<vector_class<size_t>> {
-	array_ptr()
-		: shared_ptr_class<vector_class<size_t>>(new vector_class<size_t>(dimensions)) {}
-	size_t& operator[](size_t dim) {
-		return get()->at(dim);
-	}
-	size_t operator[](size_t dim) const {
-		return get()->at(dim);
-	}
-};
-
-template <size_t dimensions>
 struct point : data_ref {
 protected:
 	friend class data_ref;
@@ -65,7 +53,7 @@ protected:
 		return name;
 	}
 
-	array_ptr<dimensions> values;
+	size_t values[dimensions];
 
 	void set(type_t type_) {
 		type = type_;
@@ -164,7 +152,7 @@ public:
 	}
 
 	template <class one_dim = std::enable_if<dimensions == 1>::type>
-	operator size_t() {
+	operator size_t() const {
 		return values[0];
 	}
 };
