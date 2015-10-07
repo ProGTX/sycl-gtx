@@ -5,8 +5,10 @@
 using namespace cl::sycl;
 
 // Size of the matrices
+// Note: Checking results at end can be very slow
+// - this size is still manageable, if optimizations are on
 const size_t N = 2000;
-const size_t M = 3000;
+const size_t M = 1000;
 
 bool test7() {
 	{	// By including all the SYCL work in a {} block,
@@ -64,8 +66,8 @@ bool test7() {
 		// The SYCL runtime ensures that c is ready when the accessor is returned
 		auto C = c.get_access<access::read, access::host_buffer>();
 		debug() << "Result:";
-		for(size_t i = 0; i < N; i++) {
-			for(size_t j = 0; j < M; j++) {
+		for(size_t i = 0; i < N; ++i) {
+			for(size_t j = 0; j < M; ++j) {
 				// Compare the result to the analytic value
 				int expected = i*(2 + 2014) + j*(1 + 42);
 				if(C[i][j] != expected) {
