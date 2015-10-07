@@ -211,6 +211,7 @@
     <ClInclude Include="implementation\specification\ranges\item.h" />
     <ClInclude Include="implementation\specification\ranges\nd_item.h" />
     <ClInclude Include="implementation\specification\ranges\nd_range.h" />
+    <ClInclude Include="implementation\specification\ranges\point_ref.h" />
     <ClInclude Include="implementation\specification\ranges\range.h" />
     <ClInclude Include="implementation\specification\refc.h" />
     <ClInclude Include="implementation\specification\types.h" />
