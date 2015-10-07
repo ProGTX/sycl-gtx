@@ -36,7 +36,7 @@ protected:
 		: global_item(global_item), local_item(local_item) {}
 
 	// A bit of a hack - to the outside it appears to conform to the specification
-	using size_t = detail::point<1>;
+	using size_t = detail::point_ref<true>;
 
 public:
 	operator item<dimensions>() {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "point_ref.h"
 #include "../../data_ref.h"
 #include "../../common.h"
 
@@ -27,6 +28,7 @@ protected:
 	friend class data_ref;
 	template <size_t dimensions>
 	friend struct point;
+
 	template <int dimensions>
 	friend struct get_special_id;
 	template <int dimensions>
@@ -130,35 +132,28 @@ public:
 		return data_ref::operator+(rhs);
 	}
 
-	point<1> get(int dimension) const {
-		auto value = values[dimension];
-		point<1> lhs(value, 0, 0);
-		lhs.set(type);
-		switch(type) {
-			case type_t::id_global:
-			case type_t::id_local:
-			case type_t::range_global:
-			case type_t::range_local:
-				lhs.name += std::to_string(dimension);
-				lhs.type = type_t::general;
-				break;
+private:
+	template <bool is_const>
+	point_ref<is_const> get_ref(int dimension) {
+		auto name_ = name;
+		bool is_ident = is_identifier();
+		if(is_ident) {
+			name_ += std::to_string(dimension);
 		}
-		return lhs;
+		return point_ref<is_const>(values[dimension], name_, type);
 	}
 
-	// TODO: Not correct for non-numeric
-	size_t& operator[](int dimension) {
-		return values[dimension];
+public:
+	point_ref<true> get(int dimension) const {
+		// The const cast is ugly, but the get_ref method doesn't actually change the this pointer
+		return const_cast<point<dimensions>*>(this)->get_ref<true>(dimension);
 	}
-
-	template <class one_dim = std::enable_if<dimensions == 1>::type>
-	operator size_t() const {
-		return values[0];
+	point_ref<false> operator[](int dimension) {
+		return get_ref<false>(dimension);
 	}
 };
 
 #undef SYCL_POINT_OP_EQ
-
 
 } // namespace detail
 } // namespace sycl
