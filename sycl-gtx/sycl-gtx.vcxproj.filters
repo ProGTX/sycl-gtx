@@ -254,8 +254,8 @@
     <ClInclude Include="implementation\specification\ranges\point.h">
       <Filter>Header Files\specification\ranges</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\ranges\point_ref.h">
-      <Filter>Header Files\specification\ranges</Filter>
+    <ClInclude Include="implementation\point_ref.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

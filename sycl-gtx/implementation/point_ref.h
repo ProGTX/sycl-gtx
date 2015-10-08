@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../data_ref.h"
-#include "../../common.h"
+#include "data_ref.h"
+#include "common.h"
 
 namespace cl {
 namespace sycl {

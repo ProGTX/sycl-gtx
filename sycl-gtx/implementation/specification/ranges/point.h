@@ -1,7 +1,7 @@
 #pragma once
 
-#include "point_ref.h"
 #include "../../data_ref.h"
+#include "../../point_ref.h"
 #include "../../common.h"
 
 namespace cl {

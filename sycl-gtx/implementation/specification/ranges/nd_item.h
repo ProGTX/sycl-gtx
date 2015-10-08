@@ -5,6 +5,7 @@
 #include "point.h"
 #include "../access.h"
 #include "../../data_ref.h"
+#include "../../point_ref.h"
 
 namespace cl {
 namespace sycl {
