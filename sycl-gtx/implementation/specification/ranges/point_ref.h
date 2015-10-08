@@ -8,27 +8,29 @@ namespace sycl {
 namespace detail {
 
 template <bool is_const>
-struct shared_data {
-	using ptr_t = typename std::conditional<is_const, size_t* const, size_t*>::type;
-	using type = typename std::remove_pointer<ptr_t>::type;
+struct shared_data_base {
+	using uint_ptr = typename std::conditional<is_const, size_t* const, size_t*>::type;
+	using uint = typename std::remove_pointer<uint_ptr>::type;
 };
 
+// TODO: Also capture type
+// TODO: Consider specialization depending on ownership of data
 template <bool is_const>
-struct shared_uint : shared_ptr_class<size_t> {
+struct shared_point_data : shared_ptr_class<size_t> {
 private:
-	using type = typename shared_data<is_const>::type;
-	using Base = shared_ptr_class<type>;
+	using uint = typename shared_data_base<is_const>::uint;
+	using Base = shared_ptr_class<uint>;
 public:
-	shared_uint(size_t value, bool)
-		: Base(new type(value)) {}
-	shared_uint(type* ptr)
-		: Base(ptr, [](type* p) { /* Don't manage borrowed pointer */ }) {}
+	shared_point_data(uint value, bool)
+		: Base(new uint(value)) {}
+	shared_point_data(uint* ptr)
+		: Base(ptr, [](uint* p) { /* Don't manage borrowed pointer */ }) {}
 };
 
 template <bool is_const>
 struct point_ref : data_ref {
 protected:
-	using data_t = shared_uint<is_const>;
+	using data_t = shared_point_data<is_const>;
 	data_t data;
 
 	template <typename T>
@@ -96,7 +98,7 @@ public:
 		}
 	}
 
-	typename shared_data<is_const>::type* operator&() {
+	typename shared_data_base<is_const>::uint_ptr operator&() {
 		return data.get();
 	}
 };
