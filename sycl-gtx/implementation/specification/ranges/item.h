@@ -2,6 +2,8 @@
 
 // 3.5.1.4 Item class
 
+#include "../../point_ref.h"
+
 namespace cl {
 namespace sycl {
 
@@ -35,6 +37,10 @@ protected:
 
 	item(id<dimensions> global_id, range<dimensions> global_range, id<dimensions> offset = id<dimensions>())
 		: index(global_id), rang(global_range), offset(offset) {}
+
+	using size_t_cref = detail::point_ref<true>;
+	using size_t_ref = detail::point_ref<false>;
+
 public:
 	id<dimensions> get() const {
 		return index;
@@ -46,10 +52,10 @@ public:
 		return offset;
 	}
 
-	size_t get(int dimension) const {
+	size_t_cref get(int dimension) const {
 		return index.get(dimension);
 	}
-	size_t& operator[](int dimension) {
+	size_t_ref operator[](int dimension) {
 		return index[dimension];
 	}
 
