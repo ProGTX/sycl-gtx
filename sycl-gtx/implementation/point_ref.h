@@ -57,17 +57,15 @@ struct shared_data_base {
 };
 
 // TODO: Also capture type
-// TODO: Consider specialization depending on ownership of data
 template <bool is_const>
-struct shared_point_data : shared_ptr_class<size_t> {
-private:
-	using uint = typename shared_data_base<is_const>::uint;
-	using Base = shared_ptr_class<uint>;
+struct shared_point_data : shared_data_base<is_const> {
 public:
-	shared_point_data(uint value, bool)
-		: Base(new uint(value)) {}
+	ptr_or_val<uint> value;
+
+	shared_point_data(nullptr_t, uint val)
+		: value(nullptr, val) {}
 	shared_point_data(uint* ptr)
-		: Base(ptr, [](uint* p) { /* Don't manage borrowed pointer */ }) {}
+		: value(ptr) {}
 };
 
 template <bool is_const>
@@ -91,27 +89,27 @@ public:
 		type = type_;
 	}
 	point_ref(size_t value, type_t type_, bool)
-		: data_ref(std::to_string(value)), data(value, true) {
+		: data_ref(std::to_string(value)), data(nullptr, value) {
 		type = type_;
 	}
 	point_ref(string_class name, type_t type_, bool)
-		: data_ref(name), data(0, true) {
+		: data_ref(name), data(nullptr, 0) {
 		type = type_;
 	}
 
 	operator size_t() const {
-		return *data;
+		return data.value;
 	}
 	template <class = typename std::enable_if<!is_const>::type>
 	operator size_t&() {
-		return *data;
+		return data.value;
 	}
 
 	template <typename T, class = if_is_num_assignable<T>>
 	point_ref& operator=(T n) {
 		if(type == type_t::numeric) {
-			*data = n;
-			name = std::to_string(*data);
+			data.value = n;
+			name = std::to_string(data.value);
 		}
 		else {
 			data_ref::operator=(n);
@@ -121,8 +119,8 @@ public:
 	template <typename T, class = if_is_num_assignable<T>>
 	point_ref& operator+=(T n) {
 		if(type == type_t::numeric) {
-			*data += n;
-			name = std::to_string(*data);
+			data.value += n;
+			name = std::to_string(data.value);
 		}
 		else {
 			data_ref::operator+=(n);
@@ -133,7 +131,7 @@ public:
 	template <typename T, class = if_is_numeric<T>>
 	point_ref operator*(T n) const {
 		if(type == type_t::numeric) {
-			return point_ref((*data) * n, type, true);
+			return point_ref(data.value * n, type, true);
 		}
 		else {
 			auto lhs = data_ref::operator*(n);
@@ -141,8 +139,10 @@ public:
 		}
 	}
 
-	typename shared_data_base<is_const>::uint_ptr operator&() {
-		return data.get();
+	// TODO: enable_if causes here an internal MSVC error C1001
+	//template <class = typename std::enable_if<!is_const>::type>
+	ptr_or_val<typename shared_data_base<is_const>::uint_ptr> operator&() {
+		return &(data.value);
 	}
 };
 
