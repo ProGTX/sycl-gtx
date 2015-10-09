@@ -19,6 +19,16 @@ public:
 	ptr_or_val(T* ptr)
 		: is_owner(false), data(ptr) {}
 
+	ptr_or_val& operator=(T n) {
+		if(is_owner) {
+			data = reinterpret_cast<T*>(n);
+		}
+		else {
+			*data = n;
+		}
+		return *this;
+	}
+
 	operator T() const {
 		if(is_owner) {
 			return reinterpret_cast<T>(data);
@@ -36,17 +46,11 @@ public:
 		}
 	}
 
-	ptr_or_val& operator=(T n) {
-		if(is_owner) {
-			data = reinterpret_cast<T*>(n);
-		}
-		else {
-			*data = n;
-		}
-		return *this;
-	}
 	ptr_or_val<T*> operator&() {
 		return ptr_or_val<T*>(&data);
+	}
+	ptr_or_val<typename std::remove_pointer<T>::type> operator*() {
+		return ptr_or_val<typename std::remove_pointer<T>::type>(*data);
 	}
 };
 
