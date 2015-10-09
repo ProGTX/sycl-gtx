@@ -136,16 +136,20 @@ private:
 	template <bool is_const>
 	point_ref<is_const> get_ref(int dimension) {
 		auto name_ = name;
-		bool is_ident = is_identifier();
-		if(is_ident) {
+
+		if(is_identifier()) {
 			name_ += std::to_string(dimension);
 		}
+		else if(type == type_t::numeric && name.empty()) {
+			name_ = std::to_string(values[dimension]);
+		}
+		
 		return point_ref<is_const>(values[dimension], name_, type);
 	}
 
 public:
 	point_ref<true> get(int dimension) const {
-		// The const cast is ugly, but the get_ref method doesn't actually change the this pointer
+		// The const cast is ugly, but the get_ref method doesn't actually modify this class
 		return const_cast<point<dimensions>*>(this)->get_ref<true>(dimension);
 	}
 	point_ref<false> operator[](int dimension) {
