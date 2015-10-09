@@ -50,7 +50,7 @@ public:
 	}
 };
 
-template <bool is_const>
+template <bool is_const, typename data_basic_t = size_t>
 struct point_ref : data_ref {
 protected:
 	template <typename T>
@@ -62,17 +62,17 @@ protected:
 	template <typename T>
 	using if_is_numeric = typename std::enable_if<std::is_arithmetic<T>::value>::type;
 
-	using uint_ptr = typename std::conditional<is_const, size_t* const, size_t*>::type;
-	using uint = typename std::remove_pointer<uint_ptr>::type;
+	using data_ptr_t = typename std::conditional<is_const, data_basic_t* const, data_basic_t*>::type;
+	using data_t = typename std::remove_pointer<data_ptr_t>::type;
 
-	ptr_or_val<uint> data;
+	ptr_or_val<data_t> data;
 
 public:
-	point_ref(size_t& data, string_class name, type_t type_)
+	point_ref(data_basic_t& data, string_class name, type_t type_)
 		: data_ref(name), data(&data) {
 		type = type_;
 	}
-	point_ref(size_t value, type_t type_, bool)
+	point_ref(data_basic_t value, type_t type_, bool)
 		: data_ref(std::to_string(value)), data(nullptr, value) {
 		type = type_;
 	}
@@ -81,11 +81,11 @@ public:
 		type = type_;
 	}
 
-	operator size_t() const {
+	operator data_basic_t() const {
 		return data;
 	}
 	template <class = typename std::enable_if<!is_const>::type>
-	operator size_t&() {
+	operator data_basic_t&() {
 		return data;
 	}
 
@@ -125,7 +125,7 @@ public:
 
 	// TODO: enable_if causes here an internal MSVC error C1001
 	//template <class = typename std::enable_if<!is_const>::type>
-	ptr_or_val<uint_ptr> operator&() {
+	ptr_or_val<data_ptr_t> operator&() {
 		return &(data);
 	}
 };
