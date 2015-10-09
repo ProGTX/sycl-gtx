@@ -140,6 +140,19 @@ public:
 
 		return point_ref<is_const, data_basic_t*>(&data, name_, type);
 	}
+
+	// TODO: enable_if causes here an internal MSVC error C1001
+	//template <class = typename std::enable_if<std::is_pointer<data_basic_t>::value>::type>
+	point_ref<is_const, typename std::remove_pointer<data_basic_t>::type> operator*() {
+		string_class name_;
+		if(type == type_t::numeric) {
+			name_ = name;
+		}
+		else {
+			name_ = string_class("*(") + name + ")";
+		}
+
+		return point_ref<is_const, typename std::remove_pointer<data_basic_t>::type>(*data, name_, type);
 	}
 };
 
