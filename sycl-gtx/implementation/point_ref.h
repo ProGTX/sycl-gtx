@@ -69,6 +69,7 @@ protected:
 	using data_ptr_t = typename std::conditional<is_const, data_basic_t* const, data_basic_t*>::type;
 	using data_t = typename std::remove_pointer<data_ptr_t>::type;
 
+	// TODO: Need to also carry references to type and name
 	ptr_or_val<data_t> data;
 
 public:
@@ -122,12 +123,25 @@ public:
 			return point_ref(data * n, type, true);
 		}
 		else {
-			auto lhs = data_ref::operator*(n);
-			return point_ref(std::move(lhs.name), lhs.type, true);
+			auto ret = data_ref::operator*(n);
+			return point_ref(std::move(ret.name), ret.type, true);
+		}
+	}
+	template <typename T, class = if_is_num_assignable<T>>
+	friend point_ref operator-(T n, const point_ref& rhs) {
+		if(type == type_t::numeric) {
+			return point_ref(n - data, type, true);
+		}
+		else {
+			auto ret = data_ref::operator-(n, *this);
+			return point_ref(std::move(ret.name), ret.type, true);
 		}
 	}
 
+	// TODO: Other operators
+
 	// TODO: enable_if causes here an internal MSVC error C1001
+	// TODO: data_ref::operator&
 	//template <class = typename std::enable_if<!is_const>::type>
 	point_ref<is_const, data_basic_t*> operator&() {
 		string_class name_;
@@ -142,6 +156,7 @@ public:
 	}
 
 	// TODO: enable_if causes here an internal MSVC error C1001
+	// TODO: data_ref::operator*
 	//template <class = typename std::enable_if<std::is_pointer<data_basic_t>::value>::type>
 	point_ref<is_const, typename std::remove_pointer<data_basic_t>::type> operator*() {
 		string_class name_;
