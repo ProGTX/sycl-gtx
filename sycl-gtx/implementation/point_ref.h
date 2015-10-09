@@ -129,8 +129,17 @@ public:
 
 	// TODO: enable_if causes here an internal MSVC error C1001
 	//template <class = typename std::enable_if<!is_const>::type>
-	ptr_or_val<data_ptr_t> operator&() {
-		return &(data);
+	point_ref<is_const, data_basic_t*> operator&() {
+		string_class name_;
+		if(type == type_t::numeric) {
+			name_ = name;
+		}
+		else {
+			name_ = string_class("&(") + name + ")";
+		}
+
+		return point_ref<is_const, data_basic_t*>(&data, name_, type);
+	}
 	}
 };
 
