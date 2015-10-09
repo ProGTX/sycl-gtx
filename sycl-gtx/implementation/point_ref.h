@@ -51,29 +51,8 @@ public:
 };
 
 template <bool is_const>
-struct shared_data_base {
-	using uint_ptr = typename std::conditional<is_const, size_t* const, size_t*>::type;
-	using uint = typename std::remove_pointer<uint_ptr>::type;
-};
-
-// TODO: Also capture type
-template <bool is_const>
-struct shared_point_data : shared_data_base<is_const> {
-public:
-	ptr_or_val<uint> value;
-
-	shared_point_data(nullptr_t, uint val)
-		: value(nullptr, val) {}
-	shared_point_data(uint* ptr)
-		: value(ptr) {}
-};
-
-template <bool is_const>
 struct point_ref : data_ref {
 protected:
-	using data_t = shared_point_data<is_const>;
-	data_t data;
-
 	template <typename T>
 	struct is_computable {
 		static const bool value = !is_const && std::is_arithmetic<T>::value;
@@ -82,6 +61,11 @@ protected:
 	using if_is_num_assignable = typename std::enable_if<is_computable<T>::value>::type;
 	template <typename T>
 	using if_is_numeric = typename std::enable_if<std::is_arithmetic<T>::value>::type;
+
+	using uint_ptr = typename std::conditional<is_const, size_t* const, size_t*>::type;
+	using uint = typename std::remove_pointer<uint_ptr>::type;
+
+	ptr_or_val<uint> data;
 
 public:
 	point_ref(size_t& data, string_class name, type_t type_)
@@ -98,18 +82,18 @@ public:
 	}
 
 	operator size_t() const {
-		return data.value;
+		return data;
 	}
 	template <class = typename std::enable_if<!is_const>::type>
 	operator size_t&() {
-		return data.value;
+		return data;
 	}
 
 	template <typename T, class = if_is_num_assignable<T>>
 	point_ref& operator=(T n) {
 		if(type == type_t::numeric) {
-			data.value = n;
-			name = std::to_string(data.value);
+			data = n;
+			name = std::to_string(data);
 		}
 		else {
 			data_ref::operator=(n);
@@ -119,8 +103,8 @@ public:
 	template <typename T, class = if_is_num_assignable<T>>
 	point_ref& operator+=(T n) {
 		if(type == type_t::numeric) {
-			data.value += n;
-			name = std::to_string(data.value);
+			data += n;
+			name = std::to_string(data);
 		}
 		else {
 			data_ref::operator+=(n);
@@ -131,7 +115,7 @@ public:
 	template <typename T, class = if_is_numeric<T>>
 	point_ref operator*(T n) const {
 		if(type == type_t::numeric) {
-			return point_ref(data.value * n, type, true);
+			return point_ref(data * n, type, true);
 		}
 		else {
 			auto lhs = data_ref::operator*(n);
@@ -141,8 +125,8 @@ public:
 
 	// TODO: enable_if causes here an internal MSVC error C1001
 	//template <class = typename std::enable_if<!is_const>::type>
-	ptr_or_val<typename shared_data_base<is_const>::uint_ptr> operator&() {
-		return &(data.value);
+	ptr_or_val<uint_ptr> operator&() {
+		return &(data);
 	}
 };
 
