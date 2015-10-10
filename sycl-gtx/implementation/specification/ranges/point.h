@@ -101,36 +101,50 @@ protected:
 	}
 
 public:
-	point& operator+=(const data_ref& rhs) {
-		set(type_t::general);
-		return data_ref::operator+=(rhs);
-	}
-	point& operator+=(const point& rhs) {
-		if(type == type_t::numeric && rhs.type == type_t::numeric) {
-			SYCL_POINT_OP_EQ(this->, +);
-			if(dimensions == 1) {
-				name = std::to_string(values[0]);
-			}
-		}
-		else {
-			return operator+=((data_ref)rhs);
-		}
+
+#define SYCL_POINT_ARITH_OP(OP)											\
+	point& operator OP=(const data_ref& rhs) {							\
+		set(type_t::general);											\
+		return data_ref::operator OP=(rhs);								\
+	}																	\
+	point& operator OP=(const point& rhs) {								\
+		if(type == type_t::numeric && rhs.type == type_t::numeric) {	\
+			SYCL_POINT_OP_EQ(this->, OP);								\
+			if(dimensions == 1) {										\
+				name = std::to_string(values[0]);						\
+			}															\
+		}																\
+		else {															\
+			return operator OP=((data_ref)rhs);							\
+		}																\
+	}																	\
+	point operator OP(const point& rhs) const {							\
+		point lhs(*this);												\
+		if(type == type_t::numeric && rhs.type == type_t::numeric) {	\
+			SYCL_POINT_OP_EQ(lhs.,  OP);								\
+		}																\
+		else {															\
+			lhs.set(type_t::general);									\
+			((data_ref)lhs).operator OP=(rhs);							\
+		}																\
+		return lhs;														\
+	}																	\
+	data_ref operator OP(const data_ref& rhs) const {					\
+		return data_ref::operator OP(rhs);								\
 	}
 
-	point operator+(const point& rhs) const {
-		point lhs(*this);
-		if(type == type_t::numeric && rhs.type == type_t::numeric) {
-			SYCL_POINT_OP_EQ(lhs., +);
-		}
-		else {
-			lhs.set(type_t::general);
-			((data_ref)lhs).operator+=(rhs);
-		}
-		return lhs;
-	}
-	data_ref operator+(const data_ref& rhs) const {
-		return data_ref::operator+(rhs);
-	}
+	SYCL_POINT_ARITH_OP(+)
+	SYCL_POINT_ARITH_OP(-)
+	SYCL_POINT_ARITH_OP(*)
+	SYCL_POINT_ARITH_OP(/)
+	SYCL_POINT_ARITH_OP(%)
+	SYCL_POINT_ARITH_OP(>>)
+	SYCL_POINT_ARITH_OP(<<)
+	SYCL_POINT_ARITH_OP(&)
+	SYCL_POINT_ARITH_OP(^)
+	SYCL_POINT_ARITH_OP(|)
+
+#undef SYCL_POINT_ARITH_OP
 
 private:
 	template <bool is_const>
