@@ -8,9 +8,12 @@ namespace cl {
 namespace sycl {
 namespace detail {
 
-template <bool is_const, typename data_basic_t = size_t>
+template <bool is_const, typename data_basic_t = size_t, bool holds_pointer = true>
 struct point_ref : data_ref {
 protected:
+	template <bool, typename, bool>
+	friend struct point_ref;
+
 	template <typename T>
 	struct is_computable {
 		static const bool value = !is_const && std::is_arithmetic<T>::value;
@@ -22,21 +25,25 @@ protected:
 
 	using data_ptr_t = typename std::conditional<is_const, data_basic_t* const, data_basic_t*>::type;
 	using data_t = typename std::remove_pointer<data_ptr_t>::type;
+	using value_point_t = point_ref<is_const, data_basic_t, false>;
 
 	// TODO: Need to also carry references to type and name
-	ptr_or_val<data_t> data;
+	ptr_or_val<data_t, holds_pointer> data;
+
+	template <bool defer = true>
+	point_ref(data_basic_t value, type_t type_, bool)
+		: data_ref(std::to_string(value)), data(value) {
+		type = type_;
+	}
+	template <bool defer = true>
+	point_ref(string_class name, type_t type_, bool)
+		: data_ref(name), data(0) {
+		type = type_;
+	}
 
 public:
 	point_ref(data_basic_t& data, string_class name, type_t type_)
 		: data_ref(name), data(&data) {
-		type = type_;
-	}
-	point_ref(data_basic_t value, type_t type_, bool)
-		: data_ref(std::to_string(value)), data(nullptr, value) {
-		type = type_;
-	}
-	point_ref(string_class name, type_t type_, bool)
-		: data_ref(name), data(nullptr, 0) {
 		type = type_;
 	}
 
@@ -72,23 +79,23 @@ public:
 	}
 
 	template <typename T, class = if_is_numeric<T>>
-	point_ref operator*(T n) const {
+	value_point_t operator*(T n) const {
 		if(type == type_t::numeric) {
-			return point_ref(data * n, type, true);
+			return value_point_t(data * n, type, true);
 		}
 		else {
 			auto ret = data_ref::operator*(n);
-			return point_ref(std::move(ret.name), ret.type, true);
+			return value_point_t(std::move(ret.name), ret.type, true);
 		}
 	}
 	template <typename T, class = if_is_num_assignable<T>>
-	friend point_ref operator-(T n, const point_ref& rhs) {
+	friend value_point_t operator-(T n, const point_ref& rhs) {
 		if(type == type_t::numeric) {
-			return point_ref(n - data, type, true);
+			return value_point_t(n - data, type, true);
 		}
 		else {
 			auto ret = data_ref::operator-(n, *this);
-			return point_ref(std::move(ret.name), ret.type, true);
+			return value_point_t(std::move(ret.name), ret.type, true);
 		}
 	}
 
