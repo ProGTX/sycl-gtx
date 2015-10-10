@@ -7,6 +7,7 @@
 #include "../access.h"
 #include "../accessor.h"
 #include "../ranges.h"
+#include <array>
 
 namespace cl {
 namespace sycl {
@@ -17,9 +18,9 @@ namespace detail {
 	friend class acc_t;															\
 	friend class accessor_host_ref;												\
 	const acc_t* parent;														\
-	range<3> rang;																\
-	accessor_host_ref(const acc_t* parent, range<3> range)						\
-		: parent(parent), rang(range) {}										\
+	std::array<size_t, 3> rang;													\
+	accessor_host_ref(const acc_t* parent, std::array<size_t, 3> rang)			\
+		: parent(parent), rang(rang) {}											\
 	accessor_host_ref(const acc_t* parent, const accessor_host_ref& copy)		\
 		: parent(parent), rang(copy.rang) {}									\
 	accessor_host_ref(const acc_t* parent, accessor_host_ref&& move)			\
@@ -71,7 +72,7 @@ public:
 		range<dimensions> offset,
 		range<dimensions> range
 	)	:	accessor_buffer(bufferRef, nullptr, offset, range),
-			accessor_host_ref(this, empty_range<3>())
+			accessor_host_ref(this, std::array<size_t, 3> { 0, 0, 0 })
 	{}
 	accessor_(buffer<DataType, dimensions>& bufferRef)
 		: accessor_(
