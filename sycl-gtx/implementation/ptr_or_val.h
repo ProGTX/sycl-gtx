@@ -6,58 +6,71 @@ namespace cl {
 namespace sycl {
 namespace detail {
 
-template <typename T>
-struct ptr_or_val {
-private:
-	bool is_pointer;
-	void* data;
+template <typename T, bool holds_pointer = false>
+struct ptr_or_val;
 
-	T* get_ptr() const {
-		return reinterpret_cast<T*>(data);
-	}
+template <typename T>
+struct ptr_or_val<T, false> {
+private:
+	friend struct ptr_or_val<T, true>;
+	T data;
 
 public:
-	static_assert(sizeof(T) <= sizeof(void*), "Type T is too big to store as ptr_or_val");
-
-	ptr_or_val(nullptr_t, T value)
-		: is_pointer(false), data(*((void**)&value)) {}
-	ptr_or_val()
-		: ptr_or_val(nullptr, 0) {}
-	ptr_or_val(T* ptr)
-		: is_pointer(true), data(ptr) {}
+	ptr_or_val(T value = 0)
+		: data(value) {}
+	ptr_or_val(const ptr_or_val<T, true>& ptr)
+		: data(*(ptr.data)) {}
 
 	ptr_or_val& operator=(T n) {
-		if(!is_pointer) {
-			data = *((T**)&n);
-		}
-		else {
-			*get_ptr() = n;
-		}
+		data = n;
 		return *this;
 	}
 
 	operator T() const {
-		if(!is_pointer) {
-			return *((T*)&data);
-		}
-		else {
-			return *get_ptr();
-		}
+		return data;
 	}
 	operator T&() {
-		if(!is_pointer) {
-			return *((T*)&data);
-		}
-		else {
-			return *get_ptr();
-		}
+		return data;
 	}
 
-	ptr_or_val<T*> operator&() {
-		return ptr_or_val<T*>(reinterpret_cast<T**>(&data));
+	ptr_or_val<T, true> operator&() {
+		return ptr_or_val<T, true>(&data);
 	}
-	ptr_or_val<typename std::remove_pointer<T>::type> operator*() {
-		return ptr_or_val<typename std::remove_pointer<T>::type>(reinterpret_cast<T>(*data));
+	ptr_or_val<typename std::remove_pointer<T>::type, false> operator*() {
+		return ptr_or_val<typename std::remove_pointer<T>::type, false>(*data);
+	}
+};
+
+
+template <typename T>
+struct ptr_or_val<T, true> {
+private:
+	friend struct ptr_or_val<T, false>;
+	T* data;
+
+public:
+	ptr_or_val(T* ptr)
+		: data(ptr) {}
+	ptr_or_val(ptr_or_val<T, false>& value)
+		: data(&(value.data)) {}
+
+	ptr_or_val& operator=(T n) {
+		*data = n;
+		return *this;
+	}
+
+	operator T() const {
+		return *data;
+	}
+	operator T&() {
+		return *data;
+	}
+
+	ptr_or_val<T*, true> operator&() {
+		return ptr_or_val<T*, true>(&data);
+	}
+	ptr_or_val<typename std::remove_pointer<T>::type, false> operator*() {
+		return ptr_or_val<typename std::remove_pointer<T>::type, false>(*data);
 	}
 };
 
