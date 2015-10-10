@@ -20,7 +20,7 @@ public:
 	static_assert(sizeof(T) <= sizeof(void*), "Type T is too big to store as ptr_or_val");
 
 	ptr_or_val(nullptr_t, T value)
-		: is_owner(true), data(reinterpret_cast<void*>(value)) {}
+		: is_owner(true), data(*((void**)&value)) {}
 	ptr_or_val()
 		: ptr_or_val(nullptr, 0) {}
 	ptr_or_val(T* ptr)
@@ -28,7 +28,7 @@ public:
 
 	ptr_or_val& operator=(T n) {
 		if(is_owner) {
-			data = reinterpret_cast<T*>(n);
+			data = *((T**)&n);
 		}
 		else {
 			*get_ptr() = n;
@@ -38,7 +38,7 @@ public:
 
 	operator T() const {
 		if(is_owner) {
-			return reinterpret_cast<T>(data);
+			return *((T*)&data);
 		}
 		else {
 			return *get_ptr();
@@ -46,7 +46,7 @@ public:
 	}
 	operator T&() {
 		if(is_owner) {
-			return reinterpret_cast<T&>(data);
+			return *((T*)&data);
 		}
 		else {
 			return *get_ptr();
