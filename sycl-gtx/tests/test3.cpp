@@ -14,7 +14,7 @@ bool test3() {
 		buffer<float, 2> A({ N, N });
 		buffer<float, 2> B({ N, N });
 
-		// Init A
+		debug() << "Initializing buffer A";
 		auto ah = A.get_access<access::read_write, access::host_buffer>();
 		for(int i = 0; i < N; ++i) {
 			for(int j = 0; j < N; ++j) {
@@ -23,6 +23,7 @@ bool test3() {
 		}
 
 		// Rotate A and store result to B
+		debug() << "Submitting work";
 		myQueue.submit([&](handler& cgh) {
 			auto a = A.get_access<access::read>(cgh);
 			auto b = B.get_access<access::write>(cgh);
@@ -32,7 +33,7 @@ bool test3() {
 			});
 		});
 
-		// Check result
+		debug() << "Done, checking results";
 		auto bh = B.get_access<access::read, access::host_buffer>();
 		for(int i = 0; i < N; ++i) {
 			for(int j = 0; j < N; ++j) {

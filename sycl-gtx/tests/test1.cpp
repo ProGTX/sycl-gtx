@@ -17,6 +17,7 @@ bool test1() {
 	std::vector<int> h_r(LENGTH, 0xdeadbeef);	// d vector (result)
 
 	// Fill vectors a and b with random float values
+	debug() << "Initializing buffers";
 	int count = LENGTH;
 	for(int i = 0; i < count; i++) {
 		h_a[i] = (int)(rand() / (float)RAND_MAX);
@@ -31,6 +32,7 @@ bool test1() {
 		buffer<int> d_c(h_c);
 		buffer<int> d_r(h_r);
 		queue myQueue;
+		debug() << "Submitting work";
 		myQueue.submit([&](handler& cgh) {
 			// Data accessors
 			auto a = d_a.get_access<access::read>(cgh);
@@ -45,7 +47,7 @@ bool test1() {
 		});
 	}
 
-	// Test the results
+	debug() << "Done, checking results";
 	int correct = 0;
 	float tmp;
 	for(int i = 0; i < count; i++) {

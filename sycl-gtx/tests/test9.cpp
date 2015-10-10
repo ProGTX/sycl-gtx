@@ -203,6 +203,7 @@ bool test9() {
 			// TODO: Extend for large arrays
 		});
 
+		debug() << "Done, checking results";
 		return check_sum(data[0]);
 	}
 

@@ -29,6 +29,7 @@ bool test6() {
 		});
 
 		for(unsigned int N = size / 2; N > 0; N /= 2 * group_size) {
+			debug() << "Submitting work";
 			myQueue.submit([&](handler& cgh) {
 				auto input = P->get_access<access::read>(cgh);
 				auto output = Q->get_access<access::write>(cgh);
@@ -70,9 +71,9 @@ bool test6() {
 			std::swap(P, Q);
 		}
 
+		debug() << "Done, checking results";
 		auto p = P->get_access<access::read, access::host_buffer>();
 		type_t sum = ((type_t)size / 2) * (type_t)(size - 1);
-
 		if(p[0] != sum) {
 			debug() << "wrong sum, should be" << sum << "- is" << p[0];
 			return false;

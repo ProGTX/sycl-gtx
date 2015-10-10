@@ -62,10 +62,10 @@ bool test7() {
 			});
 		});
 
+		debug() << "Done, checking results";
 		// Ask for access to read c from the host-side.
 		// The SYCL runtime ensures that c is ready when the accessor is returned
 		auto C = c.get_access<access::read, access::host_buffer>();
-		debug() << "Result:";
 		for(size_t i = 0; i < N; ++i) {
 			for(size_t j = 0; j < M; ++j) {
 				// Compare the result to the analytic value
