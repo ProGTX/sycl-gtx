@@ -10,11 +10,19 @@ template <typename T>
 struct ptr_or_val {
 private:
 	bool is_owner;
-	T* data;
+	void* data;
+
+	T* get_ptr() const {
+		return reinterpret_cast<T*>(data);
+	}
 
 public:
+	static_assert(sizeof(T) <= sizeof(void*), "Type T is too big to store as ptr_or_val");
+
 	ptr_or_val(nullptr_t, T value)
-		: is_owner(true), data(reinterpret_cast<T*>(value)) {}
+		: is_owner(true), data(reinterpret_cast<void*>(value)) {}
+	ptr_or_val()
+		: ptr_or_val(nullptr, 0) {}
 	ptr_or_val(T* ptr)
 		: is_owner(false), data(ptr) {}
 
@@ -23,7 +31,7 @@ public:
 			data = reinterpret_cast<T*>(n);
 		}
 		else {
-			*data = n;
+			*get_ptr() = n;
 		}
 		return *this;
 	}
@@ -33,7 +41,7 @@ public:
 			return reinterpret_cast<T>(data);
 		}
 		else {
-			return *data;
+			return *get_ptr();
 		}
 	}
 	operator T&() {
@@ -41,15 +49,15 @@ public:
 			return reinterpret_cast<T&>(data);
 		}
 		else {
-			return *data;
+			return *get_ptr();
 		}
 	}
 
 	ptr_or_val<T*> operator&() {
-		return ptr_or_val<T*>(&data);
+		return ptr_or_val<T*>(reinterpret_cast<T**>(&data));
 	}
 	ptr_or_val<typename std::remove_pointer<T>::type> operator*() {
-		return ptr_or_val<typename std::remove_pointer<T>::type>(*data);
+		return ptr_or_val<typename std::remove_pointer<T>::type>(reinterpret_cast<T>(*data));
 	}
 };
 
