@@ -257,5 +257,8 @@
     <ClInclude Include="implementation\point_ref.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\ptr_or_val.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

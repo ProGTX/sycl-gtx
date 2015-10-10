@@ -181,6 +181,7 @@
     <ClInclude Include="implementation\flow_control.h" />
     <ClInclude Include="implementation\function_traits.h" />
     <ClInclude Include="implementation\point_ref.h" />
+    <ClInclude Include="implementation\ptr_or_val.h" />
     <ClInclude Include="implementation\specification\accessor.h" />
     <ClInclude Include="implementation\specification\access.h" />
     <ClInclude Include="implementation\specification\accessor\buffer.h" />
