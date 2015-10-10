@@ -9,7 +9,7 @@ namespace detail {
 template <typename T>
 struct ptr_or_val {
 private:
-	bool is_owner;
+	bool is_pointer;
 	void* data;
 
 	T* get_ptr() const {
@@ -20,14 +20,14 @@ public:
 	static_assert(sizeof(T) <= sizeof(void*), "Type T is too big to store as ptr_or_val");
 
 	ptr_or_val(nullptr_t, T value)
-		: is_owner(true), data(*((void**)&value)) {}
+		: is_pointer(false), data(*((void**)&value)) {}
 	ptr_or_val()
 		: ptr_or_val(nullptr, 0) {}
 	ptr_or_val(T* ptr)
-		: is_owner(false), data(ptr) {}
+		: is_pointer(true), data(ptr) {}
 
 	ptr_or_val& operator=(T n) {
-		if(is_owner) {
+		if(!is_pointer) {
 			data = *((T**)&n);
 		}
 		else {
@@ -37,7 +37,7 @@ public:
 	}
 
 	operator T() const {
-		if(is_owner) {
+		if(!is_pointer) {
 			return *((T*)&data);
 		}
 		else {
@@ -45,7 +45,7 @@ public:
 		}
 	}
 	operator T&() {
-		if(is_owner) {
+		if(!is_pointer) {
 			return *((T*)&data);
 		}
 		else {
