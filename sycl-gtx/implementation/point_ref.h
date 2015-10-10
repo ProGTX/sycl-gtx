@@ -66,40 +66,65 @@ public:
 		}
 		return *this;
 	}
-	template <typename T, class = if_is_num_assignable<T>>
-	point_ref& operator+=(T n) {
-		if(type == type_t::numeric) {
-			data += n;
-			name = std::to_string(data);
-		}
-		else {
-			data_ref::operator+=(n);
-		}
-		return *this;
+
+#define SYCL_POINT_REF_ARITH_OP(OP)																\
+	template <typename T, class = if_is_num_assignable<T>>										\
+	point_ref& operator OP=(T n) {																\
+		if(type == type_t::numeric) {															\
+			data OP= n;																			\
+			name = std::to_string(data);														\
+		}																						\
+		else {																					\
+			data_ref::operator OP=(n);															\
+		}																						\
+		return *this;																			\
+	}																							\
+	template <typename T, class = if_is_numeric<T>>												\
+	value_point_t operator OP(T n) const {														\
+		if(type == type_t::numeric) {															\
+			return value_point_t(data OP n, type, true);										\
+		}																						\
+		else {																					\
+			auto ret = data_ref::operator OP(n);												\
+			return value_point_t(std::move(ret.name), ret.type, true);							\
+		}																						\
+	}																							\
+	template <bool is_const, typename data_basic_t, bool holds_pointer>							\
+	value_point_t operator OP(point_ref<is_const, data_basic_t, holds_pointer> pref) const {	\
+		if(type == type_t::numeric && pref.type == type_t::numeric) {							\
+			return value_point_t(data OP pref.data, type, true);								\
+		}																						\
+		else {																					\
+			auto ret = data_ref::operator OP(pref);												\
+			return value_point_t(std::move(ret.name), ret.type, true);							\
+		}																						\
+	}																							\
+	data_ref operator OP(data_ref dref) const {													\
+		return data_ref::operator OP(dref);														\
+	}																							\
+	template <typename T, class = if_is_numeric<T>>												\
+	friend value_point_t operator OP(T n, const point_ref& rhs) {								\
+		if(type == type_t::numeric) {															\
+			return value_point_t(n OP data, type, true);										\
+		}																						\
+		else {																					\
+			auto ret = data_ref::operator OP(n, *this);											\
+			return value_point_t(std::move(ret.name), ret.type, true);							\
+		}																						\
 	}
 
-	template <typename T, class = if_is_numeric<T>>
-	value_point_t operator*(T n) const {
-		if(type == type_t::numeric) {
-			return value_point_t(data * n, type, true);
-		}
-		else {
-			auto ret = data_ref::operator*(n);
-			return value_point_t(std::move(ret.name), ret.type, true);
-		}
-	}
-	template <typename T, class = if_is_num_assignable<T>>
-	friend value_point_t operator-(T n, const point_ref& rhs) {
-		if(type == type_t::numeric) {
-			return value_point_t(n - data, type, true);
-		}
-		else {
-			auto ret = data_ref::operator-(n, *this);
-			return value_point_t(std::move(ret.name), ret.type, true);
-		}
-	}
+	SYCL_POINT_REF_ARITH_OP(+)
+	SYCL_POINT_REF_ARITH_OP(-)
+	SYCL_POINT_REF_ARITH_OP(*)
+	SYCL_POINT_REF_ARITH_OP(/)
+	SYCL_POINT_REF_ARITH_OP(%)
+	SYCL_POINT_REF_ARITH_OP(>>)
+	SYCL_POINT_REF_ARITH_OP(<<)
+	SYCL_POINT_REF_ARITH_OP(&)
+	SYCL_POINT_REF_ARITH_OP(^)
+	SYCL_POINT_REF_ARITH_OP(|)
 
-	// TODO: Other operators
+#undef SYCL_POINT_REF_ARITH_OP
 
 	// TODO: enable_if causes here an internal MSVC error C1001
 	// TODO: data_ref::operator&
