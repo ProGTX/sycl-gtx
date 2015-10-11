@@ -21,11 +21,15 @@ void event::wait() {
 }
 
 void event::wait(const vector_class<event>& event_list) {
-	vector_class<cl_event> events;
 	auto size = event_list.size();
+	if(size == 0) {
+		return;
+	}
+
+	vector_class<cl_event> events;
 	events.reserve(size);
 	for(auto& e : event_list) {
-		events.emplace_back(e.evnt.get());
+		events.push_back(e.evnt.get());
 	}
 
 	auto error_code = clWaitForEvents(size, events.data());
@@ -33,8 +37,10 @@ void event::wait(const vector_class<event>& event_list) {
 }
 
 void event::wait_and_throw() {
+	wait();
 	// TODO
 }
 void event::wait_and_throw(const vector_class<event>& event_list) {
+	wait(event_list);
 	// TODO
 }
