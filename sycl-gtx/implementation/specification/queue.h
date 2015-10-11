@@ -2,6 +2,7 @@
 
 // 3.3.5 Queue class
 
+#include "command_group.h"
 #include "context.h"
 #include "device.h"
 #include "error_handler.h"
@@ -30,6 +31,7 @@ private:
 	context ctx;
 	detail::refc<cl_command_queue, clRetainCommandQueue, clReleaseCommandQueue> command_q;
 	exception_list ex_list;
+	detail::command_group command_group;
 
 	void display_device_info() const;
 	cl_command_queue create_queue(info::queue_profiling properties = 0);
@@ -61,12 +63,19 @@ public:
 	queue(const queue&) = default;
 #if MSVC_LOW
 	queue(queue&& move)
-		: SYCL_MOVE_INIT(command_q), SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(dev) {}
+		:	SYCL_MOVE_INIT(command_q),
+			SYCL_MOVE_INIT(ctx),
+			SYCL_MOVE_INIT(dev),
+			SYCL_MOVE_INIT(ex_list),
+			SYCL_MOVE_INIT(command_group)
+	{}
 	friend void swap(queue& first, queue& second) {
 		using std::swap;
 		SYCL_SWAP(command_q);
 		SYCL_SWAP(ctx);
 		SYCL_SWAP(dev);
+		SYCL_SWAP(ex_list);
+		SYCL_SWAP(command_group);
 	}
 #else
 	queue(queue&&) = default;
@@ -108,7 +117,8 @@ public:
 	// TODO
 	template <typename T>
 	handler_event submit(T cgf) {
-		detail::command_group(*this, cgf);
+		detail::command_group group(*this, cgf);
+		//group.optimize_and_move(command_group);
 		return handler_event();
 	}
 

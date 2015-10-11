@@ -15,10 +15,12 @@ void command_group::exit() {
 }
 
 // TODO: Reschedules commands to achieve better performance
-void command_group::optimize() {
+void command_group::optimize_and_move(command_group& saveResults) {
 	DSELF();
 
-	std::unordered_map<command_t*, bool> keep(commands.size());
+	auto size_to_keep = commands.size();
+	std::unordered_map<command_t*, bool> keep;
+	keep.reserve(size_to_keep);
 	std::unordered_map<detail::buffer_base*, command_t*> last_read;
 	std::unordered_set<detail::buffer_base*> was_written;
 
@@ -55,6 +57,7 @@ void command_group::optimize() {
 				// Keep only the last read
 				if(it != last_read.end()) {
 					keep[it->second] = false;
+					--size_to_keep;
 				}
 
 				last_read[ptr] = &command;
@@ -68,28 +71,25 @@ void command_group::optimize() {
 				}
 				else {
 					keep[&command] = false;
+					--size_to_keep;
 				}
 			}
 		}
 	}
 
-	decltype(commands) new_commands;
-	new_commands.reserve(commands.size());
+	saveResults.commands.reserve(saveResults.commands.size() + size_to_keep);
 
 	for(auto& command : commands) {
 		if(keep[&command]) {
-			new_commands.push_back(std::move(command));
+			saveResults.commands.push_back(std::move(command));
 		}
 	}
-
-	commands = std::move(new_commands);
+	commands.clear();
 }
 
 // Executes all commands in queue and removes them
 void command_group::flush() {
 	DSELF();
-
-	optimize();
 
 	using detail::command::type_t;
 

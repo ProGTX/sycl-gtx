@@ -24,31 +24,31 @@ cl_command_queue queue::create_queue(info::queue_profiling properties) {
 
 
 queue::queue(const async_handler& asyncHandler)
-	: ctx(asyncHandler), command_q(create_queue()) {}
+	: ctx(asyncHandler), command_q(create_queue()), command_group(this) {}
 
 queue::queue(const device_selector& deviceSelector, const async_handler& asyncHandler)
 	// TODO: Specification requires const selector in queue and non-const in device
-	: dev(const_cast<device_selector&>(deviceSelector)), ctx(asyncHandler), command_q(create_queue()) {}
+	: dev(const_cast<device_selector&>(deviceSelector)), ctx(asyncHandler), command_q(create_queue()), command_group(this) {}
 
 queue::queue(const context& syclContext, const device_selector& deviceSelector, const async_handler& asyncHandler)
 	// TODO: Specification requires const selector in queue and non-const in device
-	: dev(const_cast<device_selector&>(deviceSelector)), ctx(syclContext.get(), asyncHandler), command_q(create_queue()) {}
+	: dev(const_cast<device_selector&>(deviceSelector)), ctx(syclContext.get(), asyncHandler), command_q(create_queue()), command_group(this) {}
 
 queue::queue(const context& syclContext, const device& syclDevice, const async_handler& asyncHandler)
 	: queue(syclContext, syclDevice, false, asyncHandler) {}
 
 // Chooses a device based on the provided device selector in the given context.
 queue::queue(const context& syclContext, const device& syclDevice, info::queue_profiling profilingFlag, const async_handler& asyncHandler)
-	: dev(syclDevice), ctx(syclContext.get(), asyncHandler), command_q(create_queue(profilingFlag)) {}
+	: dev(syclDevice), ctx(syclContext.get(), asyncHandler), command_q(create_queue(profilingFlag)), command_group(this) {}
 
 // Creates a queue for the provided device.
 queue::queue(const device& syclDevice, const async_handler& asyncHandler)
-	: dev(syclDevice), ctx(asyncHandler), command_q(create_queue()) {}
+	: dev(syclDevice), ctx(asyncHandler), command_q(create_queue()), command_group(this) {}
 
 // Creates a SYCL queue from an OpenCL queue.
 // At construction it does a retain on the queue memory object.
 queue::queue(cl_command_queue clQueue, const async_handler& asyncHandler)
-	: command_q(clQueue) {
+	: command_q(clQueue), command_group(this) {
 	display_device_info();
 
 	ctx = context(get_info<info::queue::context>(), asyncHandler);
@@ -56,6 +56,7 @@ queue::queue(cl_command_queue clQueue, const async_handler& asyncHandler)
 }
 
 queue::~queue() {
+	command_group.flush();
 	wait_and_throw();
 }
 

@@ -157,10 +157,11 @@ private:
 
 	void enter();
 	void exit();
-	void optimize();
-	void flush();
 
 public:
+	command_group(queue* q)
+		: q(q) {}
+
 	template <typename functorT>
 	command_group(functorT lambda)
 		: q(nullptr) {
@@ -190,6 +191,9 @@ public:
 	command_group(queue& primaryQueue, queue& secondaryQueue, functorT lambda);
 
 	~command_group();
+
+	void optimize_and_move(command_group& saveResults);
+	void flush();
 };
 
 } // namespace detail
