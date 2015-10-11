@@ -65,6 +65,7 @@ protected:
 
 	range<dimensions> rang;
 	ptr_t host_data;
+	vector_class<event> events;
 
 	bool is_read_only = false;
 	bool is_blocking = true;
@@ -141,6 +142,10 @@ public:
 	// from_queue is the queue associated to the memory object.
 	// available_event specifies the event to wait for if non null
 	buffer_(cl_mem mem_object, queue& from_queue, event available_event = {});
+
+	~buffer_() {
+		event::wait_and_throw(events);
+	}
 
 	// Return a range object representing the size of the buffer
 	// in terms of number of elements in each dimension as passed to the constructor.
@@ -228,6 +233,8 @@ public:
 private:
 	// TODO
 	virtual void enqueue(queue* q, clEnqueueBuffer_f clEnqueueBuffer) override {
+		cl_event evnt;
+
 		cl_int error_code = clEnqueueBuffer(
 			q->get(),
 			device_data.get(),
@@ -235,10 +242,14 @@ private:
 			true,
 			// TODO: Sub-buffer access
 			0, get_size(),
+			host_data.get(),
 			// TODO: Events
-			host_data.get(), 0, nullptr, nullptr
+			0, nullptr,
+			&evnt
 		);
 		detail::error::report(error_code);
+
+		events.emplace_back(evnt);
 	}
 
 protected:
