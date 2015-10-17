@@ -37,23 +37,11 @@ protected:
 
 	program(cl_program clProgram, const context& context, vector_class<device> deviceList);
 
-	void compile(string_class compile_options, size_t kernel_name_id, shared_ptr_class<kernel> kern);
-	void report_compile_error(shared_ptr_class<kernel> kern, device& dev) const;
 	void init_kernels();
 	vector_class<cl_program> get_program_pointers() const;
 
-public:
-	// Creates an empty program object for all devices associated with context
-	explicit program(const context& context);
-	
-	// Creates an empty program object for all devices in list associated with the context
-	program(const context& context, vector_class<device> deviceList);
-
-	// Creates a program object from a cl_program object
-	program(const context& context, cl_program clProgram);
-
-	// Creates a program by linking a list of other programs
-	program(vector_class<program> programList, string_class linkOptions = "");
+	void compile(string_class compile_options, size_t kernel_name_id, shared_ptr_class<kernel> kern);
+	void report_compile_error(shared_ptr_class<kernel> kern, device& dev) const;
 
 	template <class KernelType>
 	void compile(KernelType kernFunctor, string_class compile_options = "") {
@@ -68,20 +56,44 @@ public:
 		compile(kernFunctor, compile_options);
 		link();
 	}
+public:
+	// Creates an empty program object for all devices associated with context
+	explicit program(const context& context);
+	
+	// Creates an empty program object for all devices in list associated with the context
+	program(const context& context, vector_class<device> deviceList);
+
+	// Creates a program object from a cl_program object
+	program(const context& context, cl_program clProgram);
+
+	// Creates a program by linking a list of other programs
+	program(vector_class<program> programList, string_class linkOptions = "");
+
+	// Obtains a SYCL program object from a SYCL kernel name and compiles it ready-to-link
+	// TODO: Can only compile well-defined functors with a public default constructor
+	template <typename kernelT>
+	void compile_from_kernel_name(string_class compile_options = "") {
+		kernelT functor;
+		compile(functor, compile_options);
+	}
+
+	// Obtains a SYCL program object from a SYCL kernel name and builds it ready-to-run
+	template <typename kernelT>
+	void build_from_kernel_name(string_class compile_options = "") {
+		compile_from_kernel_name<kernelT>(compile_options);
+		link();
+	}
 
 	// Link all compiled programs that are added in the program class
 	void link(string_class linking_options = "");
 
-	// Obtains a SYCL program object from a SYCL kernel name and compiles it ready-to-link
-	template <typename kernelT>
-	void compile_from_kernel_name(string_class compile_options = "");
-	// Obtains a SYCL program object from a SYCL kernel name and builds it ready-to-run
-	template <typename kernelT>
-	void build_from_kernel_name(string_class compile_options = "");
-
 	// Gets a kernel from a given name (Functor)
+	// TODO: Resolve dependencies
 	template <typename kernelT>
 	kernel get_kernel() const;
+	/*{
+		return kernels.find(detail::kernel_name::get<kernelT>()).get();
+	}*/
 
 	bool is_linked() const {
 		return linked;
@@ -135,6 +147,7 @@ public:
 		return traits<param_traits_t<info::program, param>, param>().get_info(this);
 	}
 
+	// TODO
 	vector_class<vector_class<unsigned char>> get_binaries() const;
 	vector_class<size_t> get_binary_sizes() const;
 	vector_class<device> get_devices() const;
