@@ -37,6 +37,13 @@ private:
 
 	using issue = detail::issue_command;
 
+	template <class... Args>
+	void issue_enqueue(shared_ptr_class<kernel> kern, void(*issue_enqueue_f)(shared_ptr_class<kernel>, Args...), Args... params) {
+		issue::write_buffers_to_device(kern);
+		issue_enqueue_f(kern, params...);
+		issue::read_buffers_from_device(kern);
+	}
+
 public:
 	template <typename DataType, int dimensions, access::mode mode, access::target target>
 	void set_arg(int arg_index, accessor<DataType, dimensions, mode, target>& acc_obj);
@@ -51,9 +58,7 @@ public:
 	template <class KernelType>
 	void single_task(KernelType kernFunctor) {
 		auto kern = build(kernFunctor);
-		issue::write_buffers_to_device(kern);
-		issue::enqueue_task(kern);
-		issue::read_buffers_from_device(kern);
+		issue_enqueue(kern, &issue::enqueue_task);
 	}
 
 
@@ -68,17 +73,13 @@ public:
 	template <class KernelType, int dimensions>
 	void parallel_for(range<dimensions> numWorkItems, id<dimensions> workItemOffset, KernelType kernFunctor) {
 		auto kern = build(kernFunctor);
-		issue::write_buffers_to_device(kern);
-		issue::enqueue_range(kern, numWorkItems, workItemOffset);
-		issue::read_buffers_from_device(kern);
+		issue_enqueue(kern, &issue::enqueue_range, numWorkItems, workItemOffset);
 	}
 
 	template <class KernelType, int dimensions>
 	void parallel_for(nd_range<dimensions> executionRange, KernelType kernFunctor) {
 		auto kern = build(kernFunctor);
-		issue::write_buffers_to_device(kern);
-		issue::enqueue_nd_range(kern, executionRange);
-		issue::read_buffers_from_device(kern);
+		issue_enqueue(kern, &issue::enqueue_nd_range, executionRange);
 	}
 
 	// TODO: Why is the offset needed? It's already contained in the nd_range
