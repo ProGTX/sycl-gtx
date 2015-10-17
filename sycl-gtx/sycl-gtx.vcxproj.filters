@@ -111,6 +111,9 @@
     <ClCompile Include="implementation\specification\ranges\point.cpp">
       <Filter>Source Files\specification\ranges</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\kernel_name.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\sycl.hpp">

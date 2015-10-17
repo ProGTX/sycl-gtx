@@ -27,7 +27,6 @@ public:
 	}
 };
 
-size_t kernel_name::current_count = 0;
 template <class T>
 size_t kernel_name::namer<T>::id = 0;
 template <class T>
