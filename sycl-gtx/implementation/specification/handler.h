@@ -98,13 +98,22 @@ public:
 
 	// OpenCL interoperability invoke
 
-	void single_task(kernel syclKernel);
+	void single_task(kernel syclKernel) {
+		auto kern = shared_ptr_class<kernel>(new kernel(std::move(syclKernel)));
+		issue_enqueue(kern, &issue::enqueue_task);
+	}
 
 	template <int dimensions>
-	void parallel_for(range<dimensions> numWorkItems, kernel syclKernel);
+	void parallel_for(range<dimensions> numWorkItems, kernel syclKernel) {
+		auto kern = shared_ptr_class<kernel>(new kernel(std::move(syclKernel)));
+		issue_enqueue(kern, &issue::enqueue_range, numWorkItems, id<dimensions>());
+	}
 
 	template <int dimensions>
-	void parallel_for(nd_range<dimensions> ndRange, kernel syclKernel);
+	void parallel_for(nd_range<dimensions> ndRange, kernel syclKernel) {
+		auto kern = shared_ptr_class<kernel>(new kernel(std::move(syclKernel)));
+		issue_enqueue(kern, &issue::enqueue_nd_range, ndRange);
+	}
 };
 
 } // namespace sycl
