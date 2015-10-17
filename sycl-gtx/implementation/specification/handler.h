@@ -32,7 +32,7 @@ private:
 		prog.build(kernFunctor, "");
 
 		// We know here the program only contains one kernel
-		return prog.kernels.back();
+		return prog.kernels.begin()->second;
 	}
 
 	using issue = detail::issue_command;
