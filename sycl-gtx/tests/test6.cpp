@@ -23,7 +23,7 @@ bool test6() {
 		myQueue.submit([&](handler& cgh) {
 			auto p = P->get_access<access::write>(cgh);
 
-			cgh.parallel_for<>(range<1>(size), [=](id<1> index) {
+			cgh.parallel_for<class init>(range<1>(size), [=](id<1> index) {
 				p[index] = index;
 			});
 		});
@@ -35,7 +35,7 @@ bool test6() {
 				auto output = Q->get_access<access::write>(cgh);
 				auto local = accessor<float, 1, access::read_write, access::local>(group_size);
 
-				cgh.parallel_for<>(nd_range<1>(N, group_size), [=](nd_item<1> index) {
+				cgh.parallel_for<class reduction_sum>(nd_range<1>(N, group_size), [=](nd_item<1> index) {
 					auto gid = index.get_global(0);
 					auto lid = index.get_local(0);
 					uint1 N = index.get_global_range().get(0);

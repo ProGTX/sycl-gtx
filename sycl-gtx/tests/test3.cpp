@@ -28,7 +28,7 @@ bool test3() {
 			auto a = A.get_access<access::read>(cgh);
 			auto b = B.get_access<access::write>(cgh);
 
-			cgh.parallel_for<>(range<2>(N, N), [=](id<2> i) {
+			cgh.parallel_for<class rotation>(range<2>(N, N), [=](id<2> i) {
 				b[N - i[1] - 1][i[0]] = a[i];
 			});
 		});

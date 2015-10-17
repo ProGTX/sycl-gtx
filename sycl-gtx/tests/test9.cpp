@@ -183,7 +183,7 @@ bool test9() {
 		myQueue.submit([&](handler& cgh) {
 			auto d = data[0].get_access<access::write>(cgh);
 
-			cgh.parallel_for<>(range<1>(size), [=](id<1> index) {
+			cgh.parallel_for<class init>(range<1>(size), [=](id<1> index) {
 				d[index] = index;
 			});
 		});
@@ -191,7 +191,7 @@ bool test9() {
 		myQueue.submit([&](handler& cgh) {
 			N = size;
 
-			cgh.parallel_for<>(
+			cgh.parallel_for(
 				nd_range<1>(N / 2, group_size),
 				prefix_sum_kernel<type>(cgh, data[0], data[1], 2*group_size)
 			);

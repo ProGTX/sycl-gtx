@@ -28,7 +28,7 @@ bool test7() {
 			auto A = a.get_access<access::write>(cgh);
 
 			// Enqueue a parallel kernel iterating on a N*M 2D iteration space
-			cgh.parallel_for</*class init_a*/>(range<2>(N, M), [=](id<2> index) {
+			cgh.parallel_for<class init_a>(range<2>(N, M), [=](id<2> index) {
 				A[index] = index[0] * 2 + index[1];
 			});
 		});
@@ -42,7 +42,7 @@ bool test7() {
 			// and can be scheduled independently
 
 			// Enqueue a parallel kernel iterating on a N*M 2D iteration space
-			cgh.parallel_for</*class init_b*/>(range<2>(N, M), [=](id<2> index) {
+			cgh.parallel_for<class init_b>(range<2>(N, M), [=](id<2> index) {
 				B[index] = index[0] * 2014 + index[1] * 42;
 			});
 		});
@@ -57,7 +57,7 @@ bool test7() {
 			// this kernel is run, the kernels computing a and b completed
 
 			// Enqueue a parallel kernel iterating on a N*M 2D iteration space
-			cgh.parallel_for</*class matrix_add*/>(range<2>(N, M), [=](id<2> index) {
+			cgh.parallel_for<class matrix_add>(range<2>(N, M), [=](id<2> index) {
 				C[index] = A[index] + B[index];
 			});
 		});

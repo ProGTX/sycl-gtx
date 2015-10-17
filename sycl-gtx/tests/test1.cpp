@@ -41,7 +41,7 @@ bool test1() {
 			auto r = d_r.get_access<access::write>(cgh);
 
 			// Kernel
-			cgh.parallel_for<>(range<1>(count), [=](id<> i) {
+			cgh.parallel_for<class addition>(range<1>(count), [=](id<> i) {
 				r[i] = a[i] + b[i] + c[i];
 			});
 		});
