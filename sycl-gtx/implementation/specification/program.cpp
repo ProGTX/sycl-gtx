@@ -19,8 +19,8 @@ program::program(const context& context, cl_program clProgram)
 	: program(clProgram, context, context.get_devices()) {}
 
 
-void program::compile(string_class compile_options, shared_ptr_class<kernel> kern) {
-	kernels.push_back(kern);
+void program::compile(string_class compile_options, size_t kernel_name_id, shared_ptr_class<kernel> kern) {
+	kernels.emplace(kernel_name_id, kern);
 	auto& src = kern->src;
 	auto code = src.get_code();
 
@@ -75,7 +75,7 @@ void program::report_compile_error(shared_ptr_class<kernel> kern, device& dev) c
 void program::init_kernels() {
 	for(auto& kern : kernels) {
 		// The extra kernel parameter is required because of complex dependencies
-		kern->src.init_kernel(*this, kern);
+		kern.second->src.init_kernel(*this, kern.second);
 	}
 }
 
@@ -84,7 +84,7 @@ vector_class<cl_program> program::get_program_pointers() const {
 	program_pointers.reserve(kernels.size());
 
 	for(auto& kern : kernels) {
-		program_pointers.push_back(kern->prog.get());
+		program_pointers.push_back(kern.second->prog.get());
 	}
 
 	return program_pointers;

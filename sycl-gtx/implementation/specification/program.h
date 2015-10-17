@@ -9,8 +9,10 @@
 #include "param_traits.h"
 #include "refc.h"
 #include "../common.h"
+#include "../kernel_name.h"
 #include "../src_handlers/invoke_source.h"
 #include "../src_handlers/kernel_source.h"
+#include <unordered_map>
 
 namespace cl {
 namespace sycl {
@@ -31,11 +33,11 @@ protected:
 
 	context ctx;
 	vector_class<device> devices;
-	vector_class<shared_ptr_class<kernel>> kernels;
+	std::unordered_map<size_t, shared_ptr_class<kernel>> kernels;
 
 	program(cl_program clProgram, const context& context, vector_class<device> deviceList);
 
-	void compile(string_class compile_options, shared_ptr_class<kernel> kern);
+	void compile(string_class compile_options, size_t kernel_name_id, shared_ptr_class<kernel> kern);
 	void report_compile_error(shared_ptr_class<kernel> kern, device& dev) const;
 	void init_kernels();
 	vector_class<cl_program> get_program_pointers() const;
@@ -58,7 +60,7 @@ public:
 		auto src = detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(kernFunctor);
 		auto kern = shared_ptr_class<kernel>(new kernel(true));
 		kern->src = std::move(src);
-		compile(compile_options, kern);
+		compile(compile_options, detail::kernel_name::get<KernelType>(), kern);
 	}
 
 	template <class KernelType>
