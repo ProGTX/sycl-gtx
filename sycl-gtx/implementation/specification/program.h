@@ -6,6 +6,7 @@
 #include "device.h"
 #include "error_handler.h"
 #include "info.h"
+#include "kernel.h"
 #include "param_traits.h"
 #include "refc.h"
 #include "../common.h"
@@ -88,12 +89,10 @@ public:
 	void link(string_class linking_options = "");
 
 	// Gets a kernel from a given name (Functor)
-	// TODO: Resolve dependencies
 	template <typename kernelT>
-	kernel get_kernel() const;
-	/*{
-		return kernels.find(detail::kernel_name::get<kernelT>()).get();
-	}*/
+	kernel get_kernel() const {
+		return *(kernels.at(detail::kernel_name::get<kernelT>()));
+	}
 
 	bool is_linked() const {
 		return linked;

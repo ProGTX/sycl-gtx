@@ -38,7 +38,7 @@ void program::compile(string_class compile_options, size_t kernel_name_id, share
 	auto device_pointers = detail::get_cl_array(devices);
 
 	error_code = clCompileProgram(
-		kern->prog.get(), devices.size(), device_pointers.data(), compile_options.c_str(),
+		kern->prog.get()->get(), devices.size(), device_pointers.data(), compile_options.c_str(),
 		0, nullptr, nullptr, nullptr, nullptr
 	);
 
@@ -59,13 +59,13 @@ void program::report_compile_error(shared_ptr_class<kernel> kern, device& dev) c
 
 	// Determine the size of the log
 	size_t log_size;
-	clGetProgramBuildInfo(kern->prog.get(), dev.get(), CL_PROGRAM_BUILD_LOG, 0, nullptr, &log_size);
+	clGetProgramBuildInfo(kern->prog.get()->get(), dev.get(), CL_PROGRAM_BUILD_LOG, 0, nullptr, &log_size);
 
 	// Allocate memory for the log
 	auto log = new char[log_size];
 
 	// Get the log
-	clGetProgramBuildInfo(kern->prog.get(), dev.get(), CL_PROGRAM_BUILD_LOG, log_size, log, nullptr);
+	clGetProgramBuildInfo(kern->prog.get()->get(), dev.get(), CL_PROGRAM_BUILD_LOG, log_size, log, nullptr);
 
 	debug() << "\tWhile compiling for device" << dev.get_info<info::device::name>() << "->\n" << log;
 
@@ -84,7 +84,7 @@ vector_class<cl_program> program::get_program_pointers() const {
 	program_pointers.reserve(kernels.size());
 
 	for(auto& kern : kernels) {
-		program_pointers.push_back(kern.second->prog.get());
+		program_pointers.push_back(kern.second->prog.get()->get());
 	}
 
 	return program_pointers;

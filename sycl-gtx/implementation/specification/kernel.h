@@ -6,7 +6,6 @@
 #include "error_handler.h"
 #include "info.h"
 #include "param_traits.h"
-#include "program.h"
 #include "ranges.h"
 #include "refc.h"
 #include "../common.h"
@@ -20,6 +19,7 @@ namespace sycl {
 // Forward declarations
 class context;
 class queue;
+class program;
 
 class kernel {
 private:
@@ -29,7 +29,7 @@ private:
 
 	detail::refc<cl_kernel, clRetainKernel, clReleaseKernel> kern;
 	context ctx;
-	program prog;
+	shared_ptr_class<program> prog;
 	detail::kernel_::source src;
 
 	// These are meant only for program class
@@ -56,9 +56,7 @@ public:
 	}
 
 	// Return the program that this kernel is part of.
-	program get_program() const {
-		return prog;
-	}
+	program get_program() const;
 
 	template <info::kernel param>
 	typename param_traits<info::kernel, param>::type

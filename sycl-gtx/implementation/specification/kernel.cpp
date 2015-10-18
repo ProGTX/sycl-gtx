@@ -5,12 +5,12 @@
 using namespace cl::sycl;
 
 kernel::kernel(bool)
-	:	prog(ctx) {}
+	:	prog(new program(ctx)) {}
 
 kernel::kernel(cl_kernel k)
 	:	kern(k),
 		ctx(get_info<info::kernel::context>()),
-		prog(ctx, get_info<info::kernel::program>())
+		prog(new program(ctx, get_info<info::kernel::program>()))
 {}
 
 void kernel::enqueue_task(queue* q) const {
@@ -22,6 +22,10 @@ void kernel::enqueue_task(queue* q) const {
 	detail::error::report(error_code);
 }
 
+program kernel::get_program() const {
+	return *prog;
+}
+
 void kernel::set(cl_kernel openclKernelObject) {
 	kern = openclKernelObject;
 	clReleaseKernel(openclKernelObject);
@@ -29,5 +33,5 @@ void kernel::set(cl_kernel openclKernelObject) {
 
 void kernel::set(const context& context, cl_program validProgram) {
 	ctx = context;
-	prog = program(context, validProgram);
+	*prog = program(context, validProgram);
 }
