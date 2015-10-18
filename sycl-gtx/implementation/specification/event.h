@@ -12,8 +12,12 @@
 namespace cl {
 namespace sycl {
 
+// Forward declaration
+class kernel;
+
 class event {
 private:
+	friend class kernel;
 	detail::refc<cl_event, clRetainEvent, clReleaseEvent> evnt;
 
 public:

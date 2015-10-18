@@ -1,5 +1,6 @@
 #include "kernel.h"
 
+#include "event.h"
 #include "program.h"
 #include "queue.h"
 
@@ -14,11 +15,14 @@ kernel::kernel(cl_kernel k)
 		prog(new program(ctx, get_info<info::kernel::program>()))
 {}
 
-void kernel::enqueue_task(queue* q) const {
+void kernel::enqueue_task(queue* q, event* evnt) const {
+	auto e = evnt->evnt.get();
+
 	auto error_code = clEnqueueTask(
 		q->get(), kern.get(),
 		// TODO: Events
-		0, nullptr, nullptr
+		0, nullptr,
+		&e
 	);
 	detail::error::report(error_code);
 }

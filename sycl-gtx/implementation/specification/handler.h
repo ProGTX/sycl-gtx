@@ -3,6 +3,7 @@
 // 3.5.3 SYCL functions for invoking kernels
 
 #include "access.h"
+#include "handler_event.h"
 #include "kernel.h"
 #include "ranges.h"
 #include "../src_handlers/issue_command.h"
@@ -20,6 +21,7 @@ class handler {
 private:
 	friend class detail::command_group;
 	queue* q;
+	handler_event events;
 
 	// TODO: Implementation defined constructor
 	handler(queue* q)
@@ -38,9 +40,13 @@ private:
 	using issue = detail::issue_command;
 
 	template <class... Args>
-	void issue_enqueue(shared_ptr_class<kernel> kern, void(*issue_enqueue_f)(shared_ptr_class<kernel>, Args...), Args... params) {
+	void issue_enqueue(
+		shared_ptr_class<kernel> kern,
+		void(*issue_enqueue_f)(shared_ptr_class<kernel>, event*, Args...),
+		Args... params
+	) {
 		issue::write_buffers_to_device(kern);
-		issue_enqueue_f(kern, params...);
+		issue_enqueue_f(kern, &events.kernel_, params...);
 		issue::read_buffers_from_device(kern);
 	}
 
