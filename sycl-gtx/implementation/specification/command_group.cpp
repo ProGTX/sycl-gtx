@@ -113,7 +113,6 @@ void command_group::flush() {
 }
 
 command_group::~command_group() {
-	// TODO: Move flush to end of caller command queue
 	flush();
 }
 

@@ -87,14 +87,14 @@ private:
 	void enqueue_range(queue* q, event* evnt, range<dimensions> num_work_items, id<dimensions> offset) const {
 		size_t* global_work_size = &num_work_items[0];
 		size_t* offst = &((size_t&)offset[0]);
-		auto e = evnt->evnt.get();
+		auto ev = evnt->evnt.get();
 
 		auto error_code = clEnqueueNDRangeKernel(
 			q->get(), kern.get(), dimensions,
 			offst, global_work_size, nullptr,
 			// TODO: Events
 			0, nullptr,
-			&e
+			&ev
 		);
 		detail::error::report(error_code);
 	}
@@ -116,14 +116,14 @@ private:
 			}
 		}
 
-		auto e = evnt->evnt.get();
+		auto ev = evnt->evnt.get();
 
 		auto error_code = clEnqueueNDRangeKernel(
 			q->get(), kern.get(), dimensions,
 			offst, global_work_size, local_work_size,
 			// TODO: Events
 			0, nullptr,
-			&e
+			&ev
 		);
 		detail::error::report(error_code);
 	}
