@@ -6,7 +6,7 @@
 #include "context.h"
 #include "device.h"
 #include "error_handler.h"
-#include "event.h"
+#include "handler_event.h"
 #include "info.h"
 #include "param_traits.h"
 #include "refc.h"
@@ -15,14 +15,6 @@
 
 namespace cl {
 namespace sycl {
-
-// TODO
-class handler_event {
-public:
-	event get_kernel() const;
-	event get_complete() const;
-	event get_end() const;
-};
 
 // Encapsulation of an OpenCL cl_command_queue
 class queue {

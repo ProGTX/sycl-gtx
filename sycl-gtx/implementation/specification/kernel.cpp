@@ -1,4 +1,6 @@
 #include "kernel.h"
+
+#include "event.h"
 #include "program.h"
 #include "queue.h"
 

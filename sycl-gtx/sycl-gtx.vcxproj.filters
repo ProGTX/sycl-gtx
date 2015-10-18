@@ -266,5 +266,8 @@
     <ClInclude Include="implementation\kernel_name.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\handler_event.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -18,6 +18,7 @@ namespace sycl {
 
 // Forward declarations
 class context;
+class event;
 class queue;
 class program;
 

@@ -199,6 +199,7 @@
     <ClInclude Include="implementation\specification\device.h" />
     <ClInclude Include="implementation\specification\device_selector.h" />
     <ClInclude Include="implementation\specification\exception.h" />
+    <ClInclude Include="implementation\specification\handler_event.h" />
     <ClInclude Include="implementation\specification\info.h" />
     <ClInclude Include="implementation\specification\error_handler.h" />
     <ClInclude Include="implementation\specification\event.h" />
