@@ -1,11 +1,18 @@
+#pragma once
+
 #include "event.h"
 
 namespace cl {
 namespace sycl {
 
+// Forward declaration
+class handler;
+
 // TODO
 class handler_event {
 private:
+	friend class handler;
+
 	event kernel_;
 	event complete_;
 	event end_;
