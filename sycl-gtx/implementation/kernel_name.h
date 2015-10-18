@@ -13,7 +13,7 @@ private:
 		static bool is_set;
 		static void set() {
 			if(!is_set) {
-				id = current_count++;
+				id = ++current_count;
 				is_set = true;
 			}
 		}
