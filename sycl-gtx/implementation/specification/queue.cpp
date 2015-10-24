@@ -15,11 +15,11 @@ void queue::display_device_info() const {
 	debug();
 }
 
-cl_command_queue queue::create_queue(info::queue_profiling properties) {
+cl_command_queue queue::create_queue(info::queue_profiling enable_profiling) {
 	display_device_info();
 
 	cl_int error_code;
-	auto q = clCreateCommandQueue(ctx.get(), dev.get(), properties, &error_code);
+	auto q = clCreateCommandQueue(ctx.get(), dev.get(), (enable_profiling ? CL_QUEUE_PROFILING_ENABLE : 0), &error_code);
 	detail::error::report(error_code);
 	return q;
 }

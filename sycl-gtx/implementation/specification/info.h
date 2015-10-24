@@ -181,7 +181,7 @@ enum class device_execution_capabilities : cl_device_exec_capabilities {
 
 
 // C.4 Queue Information Descriptors
-using queue_profiling = cl_command_queue_properties;
+using queue_profiling = bool;
 enum class queue : cl_command_queue_info {
 	context			= CL_QUEUE_CONTEXT,
 	device			= CL_QUEUE_DEVICE,
