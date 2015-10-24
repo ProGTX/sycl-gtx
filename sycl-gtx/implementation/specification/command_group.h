@@ -5,6 +5,7 @@
 #include "access.h"
 #include "../common.h"
 #include "../debug.h"
+#include <set>
 
 namespace cl {
 namespace sycl {
@@ -115,6 +116,7 @@ public:
 			type_t::get_accessor,
 			metadata(buf_acc)
 		});
+		last->dependencies.insert(buf_acc.data);
 	}
 
 	// Add buffer copy command
@@ -153,6 +155,7 @@ private:
 	using command_t = command::info;
 
 	vector_class<command_t> commands;
+	std::set<buffer_base*> dependencies;
 	queue* q;
 
 	void enter();
