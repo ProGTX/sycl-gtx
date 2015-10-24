@@ -165,6 +165,7 @@ class command_group {
 private:
 	friend class kernel;
 	friend class command::group_;
+	friend class queue;
 	using command_f = command::group_::command_f;
 	using command_t = command::info;
 
@@ -208,7 +209,7 @@ public:
 	command_group(queue& primaryQueue, queue& secondaryQueue, functorT lambda);
 
 	void optimize_and_move(command_group& saveResults);
-	void flush();
+	void flush(vector_class<cl_event> wait_events);
 };
 
 } // namespace detail

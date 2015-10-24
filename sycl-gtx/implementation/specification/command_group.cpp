@@ -88,13 +88,10 @@ void command_group::optimize_and_move(command_group& saveResults) {
 }
 
 // Executes all commands in queue and removes them
-void command_group::flush() {
+void command_group::flush(vector_class<cl_event> wait_events) {
 	DSELF();
 
 	using detail::command::type_t;
-
-	// TODO
-	vector_class<cl_event> wait_events;
 
 	for(auto& command : commands) {
 		if(command.type == type_t::get_accessor) {
