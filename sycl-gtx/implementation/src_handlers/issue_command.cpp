@@ -57,7 +57,7 @@ void issue_command::write_buffers_to_device(shared_ptr_class<kernel> kern) {
 
 void issue_command::enqueue_task_command(queue* q, vector_class<cl_event>& wait_events, shared_ptr_class<kernel> kern, event* evnt) {
 	prepare_kernel(kern);
-	kern->enqueue_task(q, evnt);
+	kern->enqueue_task(q, wait_events, evnt);
 }
 
 void issue_command::enqueue_task(shared_ptr_class<kernel> kern, event* evnt) {

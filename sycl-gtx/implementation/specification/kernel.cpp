@@ -15,16 +15,18 @@ kernel::kernel(cl_kernel k)
 		prog(new program(ctx, get_info<info::kernel::program>()))
 {}
 
-void kernel::enqueue_task(queue* q, event* evnt) const {
+void kernel::enqueue_task(queue* q, vector_class<cl_event>& wait_events, event* evnt) const {
 	auto ev = evnt->evnt.get();
 
 	auto error_code = clEnqueueTask(
 		q->get(), kern.get(),
-		// TODO: Events
-		0, nullptr,
+		wait_events.size(),
+		get_events_ptr(wait_events),
 		&ev
 	);
 	detail::error::report(error_code);
+
+	set_new_events(wait_events, ev);
 }
 
 program kernel::get_program() const {

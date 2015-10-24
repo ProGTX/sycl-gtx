@@ -25,7 +25,7 @@ private:
 		queue* q, vector_class<cl_event>& wait_events, shared_ptr_class<kernel> kern, event* evnt, range<dimensions> num_work_items, id<dimensions> offset
 	) {
 		prepare_kernel(kern);
-		kern->enqueue_range(q, evnt, num_work_items, offset);
+		kern->enqueue_range(q, wait_events, evnt, num_work_items, offset);
 	}
 
 	template <int dimensions>
@@ -33,7 +33,7 @@ private:
 		queue* q, vector_class<cl_event>& wait_events, shared_ptr_class<kernel> kern, event* evnt, nd_range<dimensions> execution_range
 	) {
 		prepare_kernel(kern);
-		kern->enqueue_nd_range(q, evnt, execution_range);
+		kern->enqueue_nd_range(q, wait_events, evnt, execution_range);
 	}
 
 public:
