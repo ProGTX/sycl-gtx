@@ -234,6 +234,7 @@ private:
 	// TODO
 	virtual void enqueue(queue* q, vector_class<cl_event>& wait_events, clEnqueueBuffer_f clEnqueueBuffer) override {
 		cl_event evnt;
+		auto num_events_to_wait = wait_events.size();
 
 		cl_int error_code = clEnqueueBuffer(
 			q->get(),
@@ -243,11 +244,14 @@ private:
 			// TODO: Sub-buffer access
 			0, get_size(),
 			host_data.get(),
-			// TODO: Events
-			0, nullptr,
+			num_events_to_wait,
+			(num_events_to_wait == 0 ? nullptr : wait_events.data()),
 			&evnt
 		);
 		detail::error::report(error_code);
+
+		wait_events.clear();
+		wait_events.push_back(evnt);
 
 		events.emplace_back(evnt);
 	}
