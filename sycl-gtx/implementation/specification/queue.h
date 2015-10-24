@@ -24,6 +24,7 @@ private:
 	detail::refc<cl_command_queue, clRetainCommandQueue, clReleaseCommandQueue> command_q;
 	exception_list ex_list;
 	detail::command_group command_group;
+	std::set<detail::buffer_base*> buffers_in_use;
 
 	void display_device_info() const;
 	cl_command_queue create_queue(info::queue_profiling properties = 0);
@@ -111,13 +112,21 @@ public:
 	handler_event submit(T cgf) {
 		detail::command_group group(*this, cgf);
 		group.optimize_and_move(command_group);
-		command_group.flush();
+
+		command_group.flush(get_wait_events(group.dependencies));
+
+		// TODO: Buffers must also be removed at some point
+		buffers_in_use.insert(group.dependencies.begin(), group.dependencies.end());
+
 		return handler_event();
 	}
 
 	// TODO
 	template <typename T>
 	handler_event submit(T cgf, queue &secondaryQueue);
+
+private:
+	vector_class<cl_event> get_wait_events(const std::set<detail::buffer_base*>& dependencies) const;
 };
 
 } // namespace sycl

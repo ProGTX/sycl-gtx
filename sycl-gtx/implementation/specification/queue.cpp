@@ -1,5 +1,7 @@
 #include "queue.h"
 
+#include "buffer_base.h"
+
 using namespace cl::sycl;
 
 void queue::display_device_info() const {
@@ -56,7 +58,6 @@ queue::queue(cl_command_queue clQueue, const async_handler& asyncHandler)
 }
 
 queue::~queue() {
-	command_group.flush();
 	wait_and_throw();
 }
 
@@ -93,4 +94,19 @@ void queue::wait() {
 void queue::wait_and_throw() {
 	wait();
 	throw_asynchronous();
+}
+
+vector_class<cl_event> queue::get_wait_events(const std::set<detail::buffer_base*>& dependencies) const {
+	vector_class<cl_event> wait_events;
+
+	for(auto&& buf : dependencies) {
+		if(buffers_in_use.count(buf) > 0) {
+			wait_events.reserve(wait_events.size() + buf->events.size());
+			for(auto& ev : buf->events) {
+				wait_events.push_back(ev.get());
+			}
+		}
+	}
+
+	return wait_events;
 }
