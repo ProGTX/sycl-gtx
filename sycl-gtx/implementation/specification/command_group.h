@@ -207,8 +207,6 @@ public:
 	template <typename functorT>
 	command_group(queue& primaryQueue, queue& secondaryQueue, functorT lambda);
 
-	~command_group();
-
 	void optimize_and_move(command_group& saveResults);
 	void flush();
 };

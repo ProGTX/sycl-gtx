@@ -115,10 +115,6 @@ void command_group::flush() {
 	commands.clear();
 }
 
-command_group::~command_group() {
-	flush();
-}
-
 
 using namespace detail;
 

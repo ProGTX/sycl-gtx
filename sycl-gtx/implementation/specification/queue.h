@@ -110,7 +110,8 @@ public:
 	template <typename T>
 	handler_event submit(T cgf) {
 		detail::command_group group(*this, cgf);
-		//group.optimize_and_move(command_group);
+		group.optimize_and_move(command_group);
+		command_group.flush();
 		return handler_event();
 	}
 
