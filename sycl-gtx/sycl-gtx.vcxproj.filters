@@ -269,5 +269,8 @@
     <ClInclude Include="implementation\specification\handler_event.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\buffer_base.h">
+      <Filter>Header Files\specification</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

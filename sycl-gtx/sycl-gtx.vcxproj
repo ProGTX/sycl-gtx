@@ -194,6 +194,7 @@
     <ClInclude Include="implementation\specification\accessor\local.h" />
     <ClInclude Include="implementation\specification\atomic.h" />
     <ClInclude Include="implementation\specification\buffer.h" />
+    <ClInclude Include="implementation\specification\buffer_base.h" />
     <ClInclude Include="implementation\specification\command_group.h" />
     <ClInclude Include="implementation\specification\context.h" />
     <ClInclude Include="implementation\specification\device.h" />

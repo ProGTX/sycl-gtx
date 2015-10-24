@@ -3,6 +3,7 @@
 // 3.4.2 Buffers
 
 #include "access.h"
+#include "buffer_base.h"
 #include "error_handler.h"
 #include "event.h"
 #include "info.h"
@@ -12,7 +13,6 @@
 #include "../common.h"
 #include "../debug.h"
 #include <algorithm>
-#include <vector>
 
 
 namespace cl {
@@ -36,27 +36,9 @@ class accessor_;
 template <typename DataType, int dimensions>
 class accessor_buffer;
 class command_group;
-class issue_command;
 
 #undef SYCL_ADD_ACCESS_MODE_HELPER
 
-
-class buffer_base {
-protected:
-	friend class issue_command;
-
-	detail::refc<cl_mem, clRetainMemObject, clReleaseMemObject> device_data;
-
-	void create_accessor_command();
-
-	using clEnqueueBuffer_f = decltype(&clEnqueueWriteBuffer);
-	virtual void enqueue(queue* q, vector_class<cl_event>& wait_events, clEnqueueBuffer_f clEnqueueBuffer) {
-		DSELF() << "not implemented";
-	}
-	static void enqueue_command(queue* q, vector_class<cl_event>& wait_events, buffer_base* buffer, clEnqueueBuffer_f clEnqueueBuffer) {
-		buffer->enqueue(q, wait_events, clEnqueueBuffer);
-	}
-};
 
 template <typename DataType, int dimensions>
 class buffer_ : public buffer_base {
@@ -65,7 +47,6 @@ protected:
 
 	range<dimensions> rang;
 	ptr_t host_data;
-	vector_class<event> events;
 
 	bool is_read_only = false;
 	bool is_blocking = true;
