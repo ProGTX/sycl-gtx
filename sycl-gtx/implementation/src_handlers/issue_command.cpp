@@ -9,7 +9,7 @@ using detail::issue_command;
 using namespace detail::kernel_;
 
 // TODO
-void issue_command::compile_command(queue* q, source src, shared_ptr_class<kernel> kern) {}
+void issue_command::compile_command(queue* q, vector_class<cl_event>& wait_events, source src, shared_ptr_class<kernel> kern) {}
 
 void issue_command::prepare_kernel(shared_ptr_class<kernel> kern) {
 	//DSELF() << kern->src.kernel_name;
@@ -36,11 +36,11 @@ void issue_command::write_buffers_to_device(shared_ptr_class<kernel> kern) {
 	for(auto& acc : kern->src.resources) {
 		auto mode = acc.second.acc.mode;
 		if(
-			mode == access::write ||
-			mode == access::discard_write ||
-			mode == access::discard_read_write ||
+			mode == access::write				||
+			mode == access::discard_write		||
+			mode == access::discard_read_write	||
 			acc.second.acc.target == access::local
-			) {
+		) {
 			// Don't need to copy data that won't be used
 			continue;
 		}
@@ -55,7 +55,7 @@ void issue_command::write_buffers_to_device(shared_ptr_class<kernel> kern) {
 	}
 }
 
-void issue_command::enqueue_task_command(queue* q, shared_ptr_class<kernel> kern, event* evnt) {
+void issue_command::enqueue_task_command(queue* q, vector_class<cl_event>& wait_events, shared_ptr_class<kernel> kern, event* evnt) {
 	prepare_kernel(kern);
 	kern->enqueue_task(q, evnt);
 }

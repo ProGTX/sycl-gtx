@@ -50,11 +50,11 @@ protected:
 	void create_accessor_command();
 
 	using clEnqueueBuffer_f = decltype(&clEnqueueWriteBuffer);
-	virtual void enqueue(queue* q, clEnqueueBuffer_f clEnqueueBuffer) {
+	virtual void enqueue(queue* q, vector_class<cl_event>& wait_events, clEnqueueBuffer_f clEnqueueBuffer) {
 		DSELF() << "not implemented";
 	}
-	static void enqueue_command(queue* q, buffer_base* buffer, clEnqueueBuffer_f clEnqueueBuffer) {
-		buffer->enqueue(q, clEnqueueBuffer);
+	static void enqueue_command(queue* q, vector_class<cl_event>& wait_events, buffer_base* buffer, clEnqueueBuffer_f clEnqueueBuffer) {
+		buffer->enqueue(q, wait_events, clEnqueueBuffer);
 	}
 };
 
@@ -168,7 +168,7 @@ public:
 	}
 
 private:
-	static void create(queue* q, buffer_* buffer) {
+	static void create(queue* q, vector_class<cl_event>& wait_events, buffer_* buffer) {
 		cl_int error_code;
 		const cl_mem_flags all_flags =
 			((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR)	|
@@ -232,7 +232,7 @@ public:
 
 private:
 	// TODO
-	virtual void enqueue(queue* q, clEnqueueBuffer_f clEnqueueBuffer) override {
+	virtual void enqueue(queue* q, vector_class<cl_event>& wait_events, clEnqueueBuffer_f clEnqueueBuffer) override {
 		cl_event evnt;
 
 		cl_int error_code = clEnqueueBuffer(

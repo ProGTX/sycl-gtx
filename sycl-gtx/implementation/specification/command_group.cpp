@@ -93,6 +93,9 @@ void command_group::flush() {
 
 	using detail::command::type_t;
 
+	// TODO
+	vector_class<cl_event> wait_events;
+
 	for(auto& command : commands) {
 		if(command.type == type_t::get_accessor) {
 			auto& acc = command.data.buf_acc;
@@ -107,7 +110,7 @@ void command_group::flush() {
 		else {
 			debug() << "command:" << command.name;
 		}
-		command.function(q);
+		command.function(q, wait_events);
 	}
 	commands.clear();
 }

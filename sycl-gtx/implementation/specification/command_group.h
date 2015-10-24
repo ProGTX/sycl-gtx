@@ -69,14 +69,14 @@ union metadata {
 };
 	
 struct info {
-	using command_f = function_class<void(queue*)>;
+	using command_f = function_class<void(queue*, vector_class<cl_event>&)>;
 
 	string_class name;	// Only for debugging
 	command_f function;
 	type_t type;
 	metadata data;
 
-	static void do_nothing(queue* q) {}
+	static void do_nothing(queue* q, vector_class<cl_event>&) {}
 };
 
 class group_ {
@@ -87,7 +87,7 @@ private:
 	SYCL_THREAD_LOCAL static command_group* last;
 
 	template <class... Args>
-	using fn = void(*)(queue*, Args...);
+	using fn = void(*)(queue*, vector_class<cl_event>&, Args...);
 
 public:
 	// Add generic command
@@ -99,7 +99,12 @@ public:
 	) {
 		last->commands.push_back({
 			name,
-			std::bind(function, std::placeholders::_1, params...),
+			std::bind(
+				function,
+				std::placeholders::_1,
+				std::placeholders::_2,
+				params...
+			),
 			type_t::unspecified
 		});
 	}
@@ -112,7 +117,11 @@ public:
 	) {
 		last->commands.push_back({
 			name,
-			std::bind(info::do_nothing, std::placeholders::_1),
+			std::bind(
+				info::do_nothing,
+				std::placeholders::_1,
+				std::placeholders::_2
+			),
 			type_t::get_accessor,
 			metadata(buf_acc)
 		});
@@ -130,7 +139,12 @@ public:
 	) {
 		last->commands.push_back({
 			name,
-			std::bind(function, std::placeholders::_1, params...),
+			std::bind(
+				function,
+				std::placeholders::_1,
+				std::placeholders::_2,
+				params...
+			),
 			type_t::copy_data,
 			metadata(buffer_copy{ buf_acc, copy_mode })
 		});
