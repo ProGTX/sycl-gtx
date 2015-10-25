@@ -96,7 +96,7 @@ void queue::wait_and_throw() {
 	throw_asynchronous();
 }
 
-handler_event queue::process_dependencies(detail::command_group& group) {
+handler_event queue::process_group(detail::command_group& group) {
 	group.optimize_and_move(command_group);
 
 	auto dependencies = group.read_buffers;
@@ -110,16 +110,28 @@ handler_event queue::process_dependencies(detail::command_group& group) {
 	return handler_event();
 }
 
-vector_class<cl_event> queue::get_wait_events(const std::set<detail::buffer_base*>& dependencies) const {
+vector_class<cl_event> queue::get_wait_events(const std::set<detail::buffer_base*>& dependencies) {
 	vector_class<cl_event> wait_events;
+	vector_class<decltype(buffers_in_use.begin())> remove_dependencies;
 
 	for(auto&& buf : dependencies) {
-		if(buffers_in_use.count(buf) > 0) {
-			wait_events.reserve(wait_events.size() + buf->events.size());
-			for(auto& ev : buf->events) {
-				wait_events.push_back(ev.get());
+		auto& buf_it = buffers_in_use.find(buf);
+		if(buf_it != buffers_in_use.end()) {
+			auto size = buf->events.size();
+			if(size == 0) {
+				remove_dependencies.push_back(buf_it);
+			}
+			else {
+				wait_events.reserve(wait_events.size() + size);
+				for(auto& ev : buf->events) {
+					wait_events.push_back(ev.get());
+				}
 			}
 		}
+	}
+
+	for(auto& buf_it : remove_dependencies) {
+		buffers_in_use.erase(buf_it);
 	}
 
 	return wait_events;
