@@ -92,7 +92,7 @@ void command_group::optimize() {
 
 // Executes all commands in queue and removes them
 void command_group::flush(vector_class<cl_event> wait_events) {
-	DSELF();
+	DSELF() << q << q->get();
 
 	using detail::command::type_t;
 

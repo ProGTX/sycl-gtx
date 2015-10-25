@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 
+#define SYCL_ENABLE_DEBUG 1
+
 // Visual Studio 2013 still lacks some support for modern C++
 #if _MSC_VER <= 1800
 #define MSVC_LOW 1
@@ -15,6 +17,7 @@
 
 #define DSELF() debug(__func__)
 
+#if SYCL_ENABLE_DEBUG
 class debug {
 protected:
 	static constexpr bool DEBUG_ACTIVE = true;
@@ -83,3 +86,25 @@ public:
 		return debug("SYCL warning: ", message);
 	}
 };
+#else
+class debug {
+public:
+	debug() {}
+
+	template <typename T>
+	debug(T) {}
+
+	template<typename U, typename T>
+	debug(U before, T add) {}
+
+	template<typename T>
+	debug& operator<<(T add) {
+		return *this;
+	}
+
+	template<typename T>
+	static debug warning(T message) {
+		return debug();
+	}
+};
+#endif
