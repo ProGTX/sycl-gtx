@@ -9,7 +9,7 @@ using detail::issue_command;
 using namespace detail::kernel_;
 
 // TODO
-void issue_command::compile_command(queue* q, vector_class<cl_event>& wait_events, source src, shared_ptr_class<kernel> kern) {}
+void issue_command::compile_command(queue* q, const vector_class<cl_event>& wait_events, source src, shared_ptr_class<kernel> kern) {}
 
 void issue_command::prepare_kernel(shared_ptr_class<kernel> kern) {
 	//DSELF() << kern->src.kernel_name;
@@ -55,7 +55,7 @@ void issue_command::write_buffers_to_device(shared_ptr_class<kernel> kern) {
 	}
 }
 
-void issue_command::enqueue_task_command(queue* q, vector_class<cl_event>& wait_events, shared_ptr_class<kernel> kern, event* evnt) {
+void issue_command::enqueue_task_command(queue* q, const vector_class<cl_event>& wait_events, shared_ptr_class<kernel> kern, event* evnt) {
 	prepare_kernel(kern);
 	kern->enqueue_task(q, wait_events, evnt);
 }

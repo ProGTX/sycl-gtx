@@ -149,7 +149,7 @@ public:
 	}
 
 private:
-	static void create(queue* q, vector_class<cl_event>& wait_events, buffer_* buffer) {
+	static void create(queue* q, const vector_class<cl_event>& wait_events, buffer_* buffer) {
 		cl_int error_code;
 		const cl_mem_flags all_flags =
 			((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR)	|
@@ -213,7 +213,7 @@ public:
 
 private:
 	// TODO
-	virtual void enqueue(queue* q, vector_class<cl_event>& wait_events, clEnqueueBuffer_f clEnqueueBuffer) override {
+	virtual void enqueue(queue* q, const vector_class<cl_event>& wait_events, clEnqueueBuffer_f clEnqueueBuffer) override {
 		cl_event evnt;
 		auto num_events_to_wait = wait_events.size();
 
@@ -230,9 +230,6 @@ private:
 			&evnt
 		);
 		detail::error::report(error_code);
-
-		wait_events.clear();
-		wait_events.push_back(evnt);
 
 		events.emplace_back(evnt);
 	}

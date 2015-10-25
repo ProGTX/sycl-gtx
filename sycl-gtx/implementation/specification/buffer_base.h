@@ -26,10 +26,10 @@ protected:
 	void create_accessor_command();
 
 	using clEnqueueBuffer_f = decltype(&clEnqueueWriteBuffer);
-	virtual void enqueue(queue* q, vector_class<cl_event>& wait_events, clEnqueueBuffer_f clEnqueueBuffer) {
+	virtual void enqueue(queue* q, const vector_class<cl_event>& wait_events, clEnqueueBuffer_f clEnqueueBuffer) {
 		DSELF() << "not implemented";
 	}
-	static void enqueue_command(queue* q, vector_class<cl_event>& wait_events, buffer_base* buffer, clEnqueueBuffer_f clEnqueueBuffer) {
+	static void enqueue_command(queue* q, const vector_class<cl_event>& wait_events, buffer_base* buffer, clEnqueueBuffer_f clEnqueueBuffer) {
 		buffer->enqueue(q, wait_events, clEnqueueBuffer);
 	}
 };

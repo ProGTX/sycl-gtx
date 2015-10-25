@@ -85,15 +85,10 @@ private:
 		return (wait_events.size() == 0 ? nullptr : wait_events.data());
 	}
 
-	static void set_new_events(vector_class<cl_event>& old_wait_events, cl_event new_event) {
-		old_wait_events.clear();
-		old_wait_events.push_back(new_event);
-	}
-
-	void enqueue_task(queue* q, vector_class<cl_event>& wait_events, event* evnt) const;
+	void enqueue_task(queue* q, const vector_class<cl_event>& wait_events, event* evnt) const;
 
 	template <int dimensions>
-	void enqueue_range(queue* q, vector_class<cl_event>& wait_events, event* evnt, range<dimensions> num_work_items, id<dimensions> offset) const {
+	void enqueue_range(queue* q, const vector_class<cl_event>& wait_events, event* evnt, range<dimensions> num_work_items, id<dimensions> offset) const {
 		size_t* global_work_size = &num_work_items[0];
 		size_t* offst = &((size_t&)offset[0]);
 		auto ev = evnt->evnt.get();
@@ -106,12 +101,10 @@ private:
 			&ev
 		);
 		detail::error::report(error_code);
-
-		set_new_events(wait_events, ev);
 	}
 
 	template <int dimensions>
-	void enqueue_nd_range(queue* q, vector_class<cl_event>& wait_events, event* evnt, nd_range<dimensions> execution_range) const {
+	void enqueue_nd_range(queue* q, const vector_class<cl_event>& wait_events, event* evnt, nd_range<dimensions> execution_range) const {
 		size_t* local_work_size = &execution_range.get_local()[0];
 		size_t* offst = &((size_t&)execution_range.get_offset()[0]);
 
@@ -137,8 +130,6 @@ private:
 			&ev
 		);
 		detail::error::report(error_code);
-
-		set_new_events(wait_events, ev);
 	}
 };
 
