@@ -1,6 +1,8 @@
+#include "command_group.h"
+
 #include "accessor.h"
 #include "buffer.h"
-#include "command_group.h"
+#include "queue.h"
 #include <unordered_map>
 #include <unordered_set>
 
@@ -110,6 +112,9 @@ void command_group::flush(vector_class<cl_event> wait_events) {
 		command.function(q, wait_events);
 	}
 	commands.clear();
+
+	auto error = clFlush(q->get());
+	detail::error::report(error);
 }
 
 
