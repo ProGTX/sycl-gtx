@@ -100,14 +100,14 @@ void queue::wait_and_throw() {
 	throw_asynchronous();
 }
 
-handler_event queue::process_group(detail::command_group& group) {
-	group.optimize_and_move(command_group);
-	command_group.flush(get_wait_events(group.read_buffers));
-	buffers_in_use.insert(group.write_buffers.begin(), group.write_buffers.end());
+handler_event queue::process(buffer_set& buffers_in_use_master) {
+	command_group.optimize();
+	command_group.flush(get_wait_events(command_group.read_buffers, buffers_in_use_master));
+	buffers_in_use_master.insert(command_group.write_buffers.begin(), command_group.write_buffers.end());
 	return handler_event();
 }
 
-vector_class<cl_event> queue::get_wait_events(const std::set<detail::buffer_base*>& dependencies) {
+vector_class<cl_event> queue::get_wait_events(const buffer_set& dependencies, buffer_set& buffers_in_use) {
 	vector_class<cl_event> wait_events;
 	vector_class<decltype(buffers_in_use.begin())> remove_dependencies;
 

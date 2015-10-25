@@ -19,12 +19,16 @@ namespace sycl {
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
 private:
+	using buffer_set = std::set<detail::buffer_base*>;
+
 	device dev;
 	context ctx;
 	detail::refc<cl_command_queue, clRetainCommandQueue, clReleaseCommandQueue> command_q;
 	exception_list ex_list;
 	detail::command_group command_group;
-	std::set<detail::buffer_base*> buffers_in_use;
+	buffer_set buffers_in_use;
+
+	vector_class<queue> subqueues;
 
 	void display_device_info() const;
 	cl_command_queue create_queue(bool display_info = true, info::queue_profiling enable_profiling = false);
@@ -50,6 +54,13 @@ public:
 	// At construction it does a retain on the queue memory object.
 	queue(cl_command_queue clQueue, const async_handler& asyncHandler = detail::default_async_handler);
 
+private:
+	// Create sub-queue, which executes the command group immediately
+	template <typename T>
+	queue(queue* master, T cgf)
+		: dev(master->dev), ctx(master->ctx), command_q(create_queue(false)), command_group(*this, cgf) {}
+
+public:
 	~queue();
 
 	// Copy and move semantics
@@ -61,7 +72,8 @@ public:
 			SYCL_MOVE_INIT(command_q),
 			SYCL_MOVE_INIT(ex_list),
 			SYCL_MOVE_INIT(command_group),
-			SYCL_MOVE_INIT(buffers_in_use)
+			SYCL_MOVE_INIT(buffers_in_use),
+			SYCL_MOVE_INIT(subqueues)
 	{
 		move.command_q = nullptr;
 		command_group.q = this;
@@ -74,6 +86,7 @@ public:
 		SYCL_SWAP(ex_list);
 		SYCL_SWAP(command_group);
 		SYCL_SWAP(buffers_in_use);
+		SYCL_SWAP(subqueues);
 	}
 #else
 	queue(queue&&) = default;
@@ -115,10 +128,8 @@ public:
 	// TODO
 	template <typename T>
 	handler_event submit(T cgf) {
-		detail::command_group group(*this, cgf);
-		group.optimize();
-		command_group = group;
-		return process_group(group);
+		subqueues.push_back(queue(this, cgf));
+		return subqueues.back().process(buffers_in_use);
 	}
 
 	// TODO
@@ -126,8 +137,8 @@ public:
 	handler_event submit(T cgf, queue &secondaryQueue);
 
 private:
-	handler_event process_group(detail::command_group& group);
-	vector_class<cl_event> get_wait_events(const std::set<detail::buffer_base*>& dependencies);
+	handler_event process(buffer_set& buffers_in_use_master);
+	static vector_class<cl_event> get_wait_events(const buffer_set& dependencies, buffer_set& buffers_in_use);
 };
 
 } // namespace sycl
