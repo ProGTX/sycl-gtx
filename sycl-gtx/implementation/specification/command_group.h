@@ -125,7 +125,7 @@ public:
 			type_t::get_accessor,
 			metadata(buf_acc)
 		});
-		if(buf_acc.mode == access::read || buf_acc.mode == access::read_write || buf_acc.mode == access::atomic) {
+		if(buf_acc.mode != access::discard_write && buf_acc.mode != access::discard_read_write) {
 			last->read_buffers.insert(buf_acc.data);
 		}
 		if(buf_acc.mode != access::read) {
