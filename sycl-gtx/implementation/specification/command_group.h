@@ -214,7 +214,7 @@ public:
 	template <typename functorT>
 	command_group(queue& primaryQueue, queue& secondaryQueue, functorT lambda);
 
-	void optimize_and_move(command_group& saveResults);
+	void optimize();
 	void flush(vector_class<cl_event> wait_events);
 };
 

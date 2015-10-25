@@ -116,6 +116,8 @@ public:
 	template <typename T>
 	handler_event submit(T cgf) {
 		detail::command_group group(*this, cgf);
+		group.optimize();
+		command_group = group;
 		return process_group(group);
 	}
 

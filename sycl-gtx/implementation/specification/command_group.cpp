@@ -17,7 +17,7 @@ void command_group::exit() {
 }
 
 // TODO: Reschedules commands to achieve better performance
-void command_group::optimize_and_move(command_group& saveResults) {
+void command_group::optimize() {
 	DSELF();
 
 	auto size_to_keep = commands.size();
@@ -79,14 +79,15 @@ void command_group::optimize_and_move(command_group& saveResults) {
 		}
 	}
 
-	saveResults.commands.reserve(saveResults.commands.size() + size_to_keep);
+	decltype(commands) saveResults;
+	saveResults.reserve(saveResults.size() + size_to_keep);
 
 	for(auto& command : commands) {
 		if(keep[&command]) {
-			saveResults.commands.push_back(std::move(command));
+			saveResults.push_back(std::move(command));
 		}
 	}
-	commands.clear();
+	commands = std::move(saveResults);
 }
 
 // Executes all commands in queue and removes them
