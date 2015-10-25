@@ -96,13 +96,16 @@ void queue::wait_and_throw() {
 	throw_asynchronous();
 }
 
-handler_event queue::process_group(detail::command_group& group) {
+handler_event queue::process_dependencies(detail::command_group& group) {
 	group.optimize_and_move(command_group);
 
-	command_group.flush(get_wait_events(group.dependencies));
+	auto dependencies = group.read_buffers;
+	dependencies.insert(group.write_buffers.begin(), group.write_buffers.end());
+
+	command_group.flush(get_wait_events(dependencies));
 
 	// TODO: Buffers must also be removed at some point
-	buffers_in_use.insert(group.dependencies.begin(), group.dependencies.end());
+	buffers_in_use.insert(dependencies.begin(), dependencies.end());
 
 	return handler_event();
 }

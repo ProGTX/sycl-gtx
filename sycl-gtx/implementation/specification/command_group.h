@@ -125,7 +125,12 @@ public:
 			type_t::get_accessor,
 			metadata(buf_acc)
 		});
-		last->dependencies.insert(buf_acc.data);
+		if(buf_acc.mode == access::read || buf_acc.mode == access::read_write || buf_acc.mode == access::atomic) {
+			last->read_buffers.insert(buf_acc.data);
+		}
+		if(buf_acc.mode != access::read) {
+			last->write_buffers.insert(buf_acc.data);
+		}
 	}
 
 	// Add buffer copy command
@@ -170,7 +175,8 @@ private:
 	using command_t = command::info;
 
 	vector_class<command_t> commands;
-	std::set<buffer_base*> dependencies;
+	std::set<buffer_base*> read_buffers;
+	std::set<buffer_base*> write_buffers;
 	queue* q;
 
 	void enter();

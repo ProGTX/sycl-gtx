@@ -111,7 +111,7 @@ public:
 	template <typename T>
 	handler_event submit(T cgf) {
 		detail::command_group group(*this, cgf);
-		return process_group(group);
+		return process_dependencies(group);
 	}
 
 	// TODO
@@ -119,7 +119,7 @@ public:
 	handler_event submit(T cgf, queue &secondaryQueue);
 
 private:
-	handler_event process_group(detail::command_group& group);
+	handler_event process_dependencies(detail::command_group& group);
 	vector_class<cl_event> get_wait_events(const std::set<detail::buffer_base*>& dependencies) const;
 };
 
