@@ -111,14 +111,7 @@ public:
 	template <typename T>
 	handler_event submit(T cgf) {
 		detail::command_group group(*this, cgf);
-		group.optimize_and_move(command_group);
-
-		command_group.flush(get_wait_events(group.dependencies));
-
-		// TODO: Buffers must also be removed at some point
-		buffers_in_use.insert(group.dependencies.begin(), group.dependencies.end());
-
-		return handler_event();
+		return process_group(group);
 	}
 
 	// TODO
@@ -126,6 +119,7 @@ public:
 	handler_event submit(T cgf, queue &secondaryQueue);
 
 private:
+	handler_event process_group(detail::command_group& group);
 	vector_class<cl_event> get_wait_events(const std::set<detail::buffer_base*>& dependencies) const;
 };
 
