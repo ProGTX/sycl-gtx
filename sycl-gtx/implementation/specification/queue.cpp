@@ -89,8 +89,10 @@ void queue::throw_asynchronous() {
 }
 
 void queue::wait() {
-	auto error_code = clFinish(command_q.get());
-	detail::error::report(error_code);
+	if(command_q.get() != nullptr) {
+		auto error_code = clFinish(command_q.get());
+		detail::error::report(error_code);
+	}
 }
 
 void queue::wait_and_throw() {

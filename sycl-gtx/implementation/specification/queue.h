@@ -56,19 +56,24 @@ public:
 	queue(const queue&) = default;
 #if MSVC_LOW
 	queue(queue&& move)
-		:	SYCL_MOVE_INIT(command_q),
+		:	SYCL_MOVE_INIT(dev),
 			SYCL_MOVE_INIT(ctx),
-			SYCL_MOVE_INIT(dev),
+			SYCL_MOVE_INIT(command_q),
 			SYCL_MOVE_INIT(ex_list),
-			SYCL_MOVE_INIT(command_group)
-	{}
+			SYCL_MOVE_INIT(command_group),
+			SYCL_MOVE_INIT(buffers_in_use)
+	{
+		move.command_q = nullptr;
+		command_group.q = this;
+	}
 	friend void swap(queue& first, queue& second) {
 		using std::swap;
-		SYCL_SWAP(command_q);
-		SYCL_SWAP(ctx);
 		SYCL_SWAP(dev);
+		SYCL_SWAP(ctx);
+		SYCL_SWAP(command_q);
 		SYCL_SWAP(ex_list);
 		SYCL_SWAP(command_group);
+		SYCL_SWAP(buffers_in_use);
 	}
 #else
 	queue(queue&&) = default;
