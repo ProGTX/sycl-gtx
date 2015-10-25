@@ -15,8 +15,10 @@ void queue::display_device_info() const {
 	debug();
 }
 
-cl_command_queue queue::create_queue(info::queue_profiling enable_profiling) {
-	display_device_info();
+cl_command_queue queue::create_queue(bool display_info, info::queue_profiling enable_profiling) {
+	if(display_info) {
+		display_device_info();
+	}
 
 	cl_int error_code;
 	auto q = clCreateCommandQueue(ctx.get(), dev.get(), (enable_profiling ? CL_QUEUE_PROFILING_ENABLE : 0), &error_code);

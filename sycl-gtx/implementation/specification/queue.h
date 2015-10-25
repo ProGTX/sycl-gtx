@@ -27,7 +27,7 @@ private:
 	std::set<detail::buffer_base*> buffers_in_use;
 
 	void display_device_info() const;
-	cl_command_queue create_queue(info::queue_profiling enable_profiling = false);
+	cl_command_queue create_queue(bool display_info = true, info::queue_profiling enable_profiling = false);
 
 public:
 	// Creates a queue for a device it chooses according to the heuristics of the default selector.
