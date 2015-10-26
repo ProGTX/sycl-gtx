@@ -15,7 +15,7 @@ void queue::display_device_info() const {
 	debug();
 }
 
-cl_command_queue queue::create_queue(bool display_info, info::queue_profiling enable_profiling) {
+cl_command_queue queue::create_queue(bool display_info, bool register_with_synchronizer, info::queue_profiling enable_profiling) {
 	if(display_info) {
 		display_device_info();
 	}
@@ -23,6 +23,11 @@ cl_command_queue queue::create_queue(bool display_info, info::queue_profiling en
 	cl_int error_code;
 	auto q = clCreateCommandQueue(ctx.get(), dev.get(), (enable_profiling ? CL_QUEUE_PROFILING_ENABLE : 0), &error_code);
 	detail::error::report(error_code);
+
+	if(register_with_synchronizer) {
+		detail::synchronizer::add(this);
+	}
+
 	return q;
 }
 
@@ -57,9 +62,12 @@ queue::queue(cl_command_queue clQueue, const async_handler& asyncHandler)
 
 	ctx = context(get_info<info::queue::context>(), asyncHandler);
 	dev = device(get_info<info::queue::device>());
+
+	detail::synchronizer::add(this);
 }
 
 queue::~queue() {
+	detail::synchronizer::remove(this);
 	wait_and_throw();
 }
 

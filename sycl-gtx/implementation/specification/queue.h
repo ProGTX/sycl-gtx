@@ -34,7 +34,7 @@ private:
 	vector_class<queue> subqueues;
 
 	void display_device_info() const;
-	cl_command_queue create_queue(bool display_info = true, info::queue_profiling enable_profiling = false);
+	cl_command_queue create_queue(bool display_info = true, bool register_with_synchronizer = true, info::queue_profiling enable_profiling = false);
 
 public:
 	// Creates a queue for a device it chooses according to the heuristics of the default selector.
@@ -61,7 +61,7 @@ private:
 	// Create sub-queue, which executes the command group immediately
 	template <typename T>
 	queue(queue* master, T cgf)
-		: dev(master->dev), ctx(master->ctx), command_q(create_queue(false)), command_group(*this, cgf) {}
+		: dev(master->dev), ctx(master->ctx), command_q(create_queue(false, false)), command_group(*this, cgf) {}
 
 public:
 	~queue();
