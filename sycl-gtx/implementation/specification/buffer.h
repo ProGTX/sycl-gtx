@@ -12,6 +12,7 @@
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
+#include "../synchronizer.h"
 #include <algorithm>
 
 
@@ -197,6 +198,7 @@ private:
 		if(mode != access::read) {
 			check_read_only();
 		}
+		synchronizer::barrier(this);
 		return acc_return_t<mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
 	}
 
@@ -220,8 +222,7 @@ private:
 		cl_int error_code = clEnqueueBuffer(
 			q->get(),
 			device_data.get(),
-			// TODO: It shouldn't block here, SYCL runtime needs to take care of consistency
-			true,
+			false,
 			// TODO: Sub-buffer access
 			0, get_size(),
 			host_data.get(),
