@@ -89,15 +89,32 @@ void queue::throw_asynchronous() {
 }
 
 void queue::wait() {
+	finish();
+	wait_subqueues(false);
+}
+
+void queue::wait_and_throw() {
+	finish();
+	wait_subqueues(true);
+	throw_asynchronous();
+}
+
+void queue::finish() {
 	if(command_q.get() != nullptr) {
 		auto error_code = clFinish(command_q.get());
 		detail::error::report(error_code);
 	}
 }
 
-void queue::wait_and_throw() {
-	wait();
-	throw_asynchronous();
+void queue::wait_subqueues(bool and_throw) {
+	for(auto& q : subqueues) {
+		if(and_throw) {
+			q.wait_and_throw();
+		}
+		else {
+			q.wait();
+		}
+	}
 }
 
 handler_event queue::process(buffer_set& buffers_in_use_master) {

@@ -140,6 +140,8 @@ public:
 	handler_event submit(T cgf, queue &secondaryQueue);
 
 private:
+	void finish();
+	void wait_subqueues(bool and_throw);
 	handler_event process(buffer_set& buffers_in_use_master);
 	static vector_class<cl_event> get_wait_events(const buffer_set& dependencies, buffer_set& buffers_in_use);
 };
