@@ -162,6 +162,7 @@
     <ClCompile Include="implementation\specification\ranges\point.cpp" />
     <ClCompile Include="implementation\src_handlers\issue_command.cpp" />
     <ClCompile Include="implementation\src_handlers\kernel_source.cpp" />
+    <ClCompile Include="implementation\synchronizer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tests\test1.cpp" />
     <ClCompile Include="tests\test2.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="implementation\src_handlers\issue_command.h" />
     <ClInclude Include="implementation\src_handlers\kernel_source.h" />
     <ClInclude Include="implementation\sycl.hpp" />
+    <ClInclude Include="implementation\synchronizer.h" />
     <ClInclude Include="tests\tests.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
