@@ -12,6 +12,7 @@
 #include "refc.h"
 #include "../common.h"
 #include "../debug.h"
+#include "../synchronizer.h"
 
 namespace cl {
 namespace sycl {
@@ -19,6 +20,8 @@ namespace sycl {
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
 private:
+	friend class detail::synchronizer;
+
 	using buffer_set = std::set<detail::buffer_base*>;
 
 	device dev;
