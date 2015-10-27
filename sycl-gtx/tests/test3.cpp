@@ -15,10 +15,12 @@ bool test3() {
 		buffer<float, 2> B({ N, N });
 
 		debug() << "Initializing buffer A";
-		auto ah = A.get_access<access::read_write, access::host_buffer>();
-		for(int i = 0; i < N; ++i) {
-			for(int j = 0; j < N; ++j) {
-				ah[i][j] = (float)(i + j * N);
+		{
+			auto ah = A.get_access<access::read_write, access::host_buffer>();
+			for(int i = 0; i < N; ++i) {
+				for(int j = 0; j < N; ++j) {
+					ah[i][j] = (float)(i + j * N);
+				}
 			}
 		}
 
@@ -34,6 +36,7 @@ bool test3() {
 		});
 
 		debug() << "Done, checking results";
+		auto ah = A.get_access<access::read_write, access::host_buffer>();
 		auto bh = B.get_access<access::read, access::host_buffer>();
 		for(int i = 0; i < N; ++i) {
 			for(int j = 0; j < N; ++j) {
