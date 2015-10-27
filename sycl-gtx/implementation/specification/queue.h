@@ -140,6 +140,7 @@ public:
 	handler_event submit(T cgf, queue &secondaryQueue);
 
 private:
+	void flush();
 	void finish();
 	void wait_subqueues(bool and_throw);
 	handler_event process(buffer_set& buffers_in_use_master);

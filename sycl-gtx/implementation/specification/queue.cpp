@@ -107,6 +107,13 @@ void queue::wait_and_throw() {
 	throw_asynchronous();
 }
 
+
+void queue::flush() {
+	for(auto& q : subqueues) {
+		q.process(buffers_in_use);
+	}
+}
+
 void queue::finish() {
 	if(command_q.get() != nullptr) {
 		auto error_code = clFinish(command_q.get());
