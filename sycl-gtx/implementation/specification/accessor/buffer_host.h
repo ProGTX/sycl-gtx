@@ -7,6 +7,7 @@
 #include "../access.h"
 #include "../accessor.h"
 #include "../ranges.h"
+#include "../../synchronizer.h"
 #include <array>
 
 namespace cl {
@@ -73,17 +74,23 @@ public:
 		range<dimensions> range
 	)	:	accessor_buffer(bufferRef, nullptr, offset, range),
 			accessor_host_ref(this, std::array<size_t, 3> { 0, 0, 0 })
-	{}
+	{
+		synchronizer::add(this, buf);
+	}
 	accessor_(buffer<DataType, dimensions>& bufferRef)
 		: accessor_(
 			bufferRef,
 			detail::empty_range<dimensions>(),
 			bufferRef.get_range()
-		) {}
+		) {
+		synchronizer::add(this, buf);
+	}
 	accessor_(const accessor_& copy)
 		:	accessor_buffer((const accessor_buffer<DataType, dimensions>&)copy),
 			accessor_host_ref(this, copy)
-	{}
+	{
+		synchronizer::add(this, buf);
+	}
 	accessor_(accessor_&& move)
 		:	accessor_buffer(std::move((accessor_buffer<DataType, dimensions>)move)),
 			accessor_host_ref(
@@ -92,7 +99,13 @@ public:
 					(accessor_host_ref<dimensions, DataType, dimensions, (access::mode)mode>)move
 				)
 			)
-	{}
+	{
+		synchronizer::add(this, buf);
+	}
+
+	~accessor_() {
+		synchronizer::remove(this, buf);
+	}
 };
 
 } // namespace detail

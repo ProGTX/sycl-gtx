@@ -198,7 +198,6 @@ private:
 		if(mode != access::read) {
 			check_read_only();
 		}
-		synchronizer::barrier(this);
 		return acc_return_t<mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
 	}
 
