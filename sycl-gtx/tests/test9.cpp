@@ -44,6 +44,9 @@ protected:
 	using target = cl::sycl::access::target;
 	using buffer = cl::sycl::buffer<T>;
 
+	// Constants
+	size_t global_size;
+
 	// Global memory
 	cl::sycl::accessor<T> input;
 	cl::sycl::accessor<T, 1, mode::write> higher_level;
@@ -52,10 +55,11 @@ protected:
 	cl::sycl::accessor<T, 1, mode::read_write, target::local> localBlock;
 
 public:
-	prefix_sum_kernel(cl::sycl::handler& cgh, buffer& data, buffer& higher_level, size_t group_size)
+	prefix_sum_kernel(cl::sycl::handler& cgh, buffer& data, buffer& higher_level, size_t global_size, size_t local_size)
 		: input(data.get_access<mode::read_write>(cgh)),
 		higher_level(higher_level.get_access<mode::write>(cgh)),
-		localBlock(group_size) {}
+		localBlock(local_size),
+		global_size(global_size) {}
 
 	void operator()(cl::sycl::nd_item<1> index) {
 		using namespace cl::sycl;
@@ -63,12 +67,16 @@ public:
 		uint1 GID = 2 * index.get_global(0);
 		uint1 LID = 2 * index.get_local(0);
 
-		localBlock[LID] = input[GID];
-		localBlock[LID + 1] = input[GID + 1];
+		SYCL_IF(GID < global_size)
+		SYCL_BEGIN {
+			localBlock[LID] = input[GID];
+			localBlock[LID + 1] = input[GID + 1];
+		}
+		SYCL_END
 
 		index.barrier(access::fence_space::local);
 
-		uint1 N = 2 * index.get_local(0);
+		uint1 N = 2 * index.get_local_range()[0];
 		uint1 first;
 		uint1 second;
 
@@ -77,7 +85,7 @@ public:
 		// Up-sweep
 		uint1 offset = 1;
 		SYCL_WHILE(offset < N)
-			SYCL_BEGIN {
+		SYCL_BEGIN {
 			SYCL_IF(LID % offset == 0)
 			SYCL_BEGIN {
 				first = 2 * LID + offset - 1;
@@ -119,8 +127,13 @@ public:
 		SYCL_END
 
 		LID *= 2;
-		input[GID] += localBlock[LID];
-		input[GID + 1] += localBlock[LID + 1];
+
+		SYCL_IF(GID < global_size)
+		SYCL_BEGIN {
+			input[GID] += localBlock[LID];
+			input[GID + 1] += localBlock[LID + 1];
+		}
+		SYCL_END
 	}
 };
 
@@ -143,7 +156,7 @@ public:
 	void operator()(cl::sycl::nd_item<1> index) {
 		using namespace cl::sycl;
 		int1 GID = index.get_global(0);
-		int1 N = 2 * index.get_local(0);
+		int1 N = 2 * index.get_local_range()[0];
 		SYCL_IF(GID >= N)
 		SYCL_THEN({
 			data[GID] += higher_level[GID / N - 1];
@@ -188,20 +201,21 @@ bool test9() {
 			});
 		});
 
-		myQueue.submit([&](handler& cgh) {
-			N = size;
+		N = size;
+		while(true) {
+			myQueue.submit([&](handler& cgh) {
+				cgh.parallel_for(
+					nd_range<1>(N / 2, group_size),
+					prefix_sum_kernel<type>(cgh, data[0], data[1], N, 2 * group_size)
+				);
+			});
 
-			cgh.parallel_for(
-				nd_range<1>(N / 2, group_size),
-				prefix_sum_kernel<type>(cgh, data[0], data[1], 2*group_size)
-			);
-
-			if(N <= group_size * 2) {
+			if(N <= 2 * group_size) {
 				return;
 			}
 
 			// TODO: Extend for large arrays
-		});
+		}
 
 		debug() << "Done, checking results";
 		return check_sum(data[0]);
