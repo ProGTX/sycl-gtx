@@ -134,6 +134,7 @@ void queue::wait_subqueues(bool and_throw) {
 
 handler_event queue::process(buffer_set& buffers_in_use_master) {
 	if(
+		is_flushed ||
 		!detail::synchronizer::can_flush(command_group.read_buffers) ||
 		!detail::synchronizer::can_flush(command_group.write_buffers)
 	) {
@@ -143,6 +144,7 @@ handler_event queue::process(buffer_set& buffers_in_use_master) {
 	command_group.optimize();
 	command_group.flush(get_wait_events(command_group.read_buffers, buffers_in_use_master));
 	buffers_in_use_master.insert(command_group.write_buffers.begin(), command_group.write_buffers.end());
+	is_flushed = true;
 	return handler_event();
 }
 

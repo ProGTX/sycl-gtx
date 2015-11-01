@@ -30,7 +30,7 @@ private:
 	exception_list ex_list;
 	detail::command_group command_group;
 	buffer_set buffers_in_use;
-
+	bool is_flushed = true;
 	vector_class<queue> subqueues;
 
 	void display_device_info() const;
@@ -61,7 +61,7 @@ private:
 	// Create sub-queue, which executes the command group immediately
 	template <typename T>
 	queue(queue* master, T cgf)
-		: dev(master->dev), ctx(master->ctx), command_q(create_queue(false, false)), command_group(*this, cgf) {}
+		: dev(master->dev), ctx(master->ctx), command_q(create_queue(false, false)), command_group(*this, cgf), is_flushed(false) {}
 
 public:
 	~queue();
@@ -76,6 +76,7 @@ public:
 			SYCL_MOVE_INIT(ex_list),
 			SYCL_MOVE_INIT(command_group),
 			SYCL_MOVE_INIT(buffers_in_use),
+			SYCL_MOVE_INIT(is_flushed),
 			SYCL_MOVE_INIT(subqueues)
 	{
 		move.command_q = nullptr;
@@ -89,6 +90,7 @@ public:
 		SYCL_SWAP(ex_list);
 		SYCL_SWAP(command_group);
 		SYCL_SWAP(buffers_in_use);
+		SYCL_SWAP(is_flushed);
 		SYCL_SWAP(subqueues);
 	}
 #else
