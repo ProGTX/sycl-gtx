@@ -9,7 +9,7 @@ bool test6() {
 		queue myQueue;
 
 		const auto group_size = myQueue.get_device().get_info<info::device::max_work_group_size>();
-		const auto size = group_size * 2;	// TODO: Bigger data
+		const auto size = group_size * 4;
 
 		using type_t = float;
 
@@ -28,14 +28,19 @@ bool test6() {
 			});
 		});
 
-		for(unsigned int N = size / 2; N > 0; N /= 2 * group_size) {
+		auto local_size = std::min(group_size, size);
+
+		for(unsigned int N = size; N > 1; N /= local_size) {
 			debug() << "Submitting work";
 			myQueue.submit([&](handler& cgh) {
 				auto input = P->get_access<access::read>(cgh);
 				auto output = Q->get_access<access::write>(cgh);
-				auto local = accessor<float, 1, access::read_write, access::local>(group_size);
 
-				cgh.parallel_for<class reduction_sum>(nd_range<1>(N, group_size), [=](nd_item<1> index) {
+				local_size = std::min(local_size, N);
+				auto local = accessor<float, 1, access::read_write, access::local>(local_size);
+
+				DSELF() << N << local_size;
+				cgh.parallel_for<class reduction_sum>(nd_range<1>(N / 2, local_size / 2), [=](nd_item<1> index) {
 					auto gid = index.get_global(0);
 					auto lid = index.get_local(0);
 					uint1 N = index.get_global_range().get(0);
