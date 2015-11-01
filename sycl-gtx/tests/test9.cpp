@@ -134,6 +134,8 @@ public:
 		}
 		SYCL_END
 
+		index.barrier(access::fence_space::local);
+
 		LID *= 2;
 
 		SYCL_IF(GID < global_size)
@@ -173,11 +175,13 @@ public:
 };
 
 template <typename type>
+template <typename type>
 void prefix_sum_recursion(
 	cl::sycl::queue& myQueue,
 	cl::sycl::vector_class<cl::sycl::buffer<type>>& data,
 	cl::sycl::vector_class<size_t>& sizes,
 	size_t level,
+	size_t number_levels,
 	size_t group_size
 ) {
 	using namespace cl::sycl;
@@ -189,13 +193,19 @@ void prefix_sum_recursion(
 		);
 	});
 
-	if(sizes[level + 1] <= group_size) {
+	if(level + 2 >= number_levels) {
 		return;
 	}
 
-	prefix_sum_recursion(myQueue, data, sizes, level + 1, group_size);
+	prefix_sum_recursion(myQueue, data, sizes, level + 1, number_levels, group_size);
 
-	// TODO: Extend for large arrays
+
+	myQueue.submit([&](handler& cgh) {
+		cgh.parallel_for(
+			nd_range<1>(sizes[level] / 2, group_size),
+			prefix_sum_join_kernel<type>(cgh, data[level], data[level + 1])
+		);
+	});
 
 }
 
@@ -213,7 +223,7 @@ bool test9() {
 		// Calculate required number of buffer levels
 		N = size;
 		size_t number_levels = 1;
-		while(N > 0) {
+		while(N > 1) {
 			N /= 2 * group_size;
 			++number_levels;
 		}
@@ -228,7 +238,7 @@ bool test9() {
 			sizes.push_back(N);
 			data.emplace_back(N);
 
-			N = std::max(N / (2 * group_size), group_size);
+			N = std::max((size_t)1, N / (2 * group_size));
 			N += N % 2;	// Needs to be divisible by 2
 		}
 
@@ -241,7 +251,7 @@ bool test9() {
 			});
 		});
 
-		prefix_sum_recursion(myQueue, data, sizes, 0, group_size);
+		prefix_sum_recursion(myQueue, data, sizes, 0, number_levels, group_size);
 
 		debug() << "Done, checking results";
 		return check_sum(data[0]);
