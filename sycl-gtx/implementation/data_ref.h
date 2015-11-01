@@ -55,10 +55,11 @@ public:
 	data_ref(const data_ref& copy) = default;
 #if MSVC_LOW
 	data_ref(data_ref&& move)
-		: SYCL_MOVE_INIT(name) {}
+		: SYCL_MOVE_INIT(name), SYCL_MOVE_INIT(type) {}
 	friend void swap(data_ref& first, data_ref& second) {
 		using std::swap;
 		SYCL_SWAP(name);
+		SYCL_SWAP(type);
 	}
 #else
 	data_ref(data_ref&&) = default;
