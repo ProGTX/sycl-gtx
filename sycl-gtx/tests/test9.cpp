@@ -27,7 +27,7 @@ bool check_sum(cl::sycl::buffer<I, 1>& data) {
 	auto d = data.get_access<access::read, access::host_buffer>();
 	I sum = 0;
 	for(size_t i = 0; i < data.get_count(); ++i) {
-		sum += (I)i;
+		sum += (I)1;
 		if(d[i] != sum) {
 			debug() << "wrong sum, should be" << sum << "- is" << d[i];
 			return false;
@@ -126,22 +126,22 @@ public:
 		}
 		SYCL_END
 
-		uint1 last_sum_id = GID + local_size - 1;
-		SYCL_IF(LID == 0 && last_sum_id < global_size)
-		SYCL_BEGIN {
-			// Write last sum into auxiliary array
-			higher_level[GID / local_size] = localBlock[local_size - 1] + input[last_sum_id];
-		}
-		SYCL_END
-
-		index.barrier(access::fence_space::local);
-
 		LID *= 2;
 
 		SYCL_IF(GID < global_size)
 		SYCL_BEGIN {
 			input[GID] += localBlock[LID];
 			input[GID + 1] += localBlock[LID + 1];
+		}
+		SYCL_END
+
+		index.barrier(access::fence_space::local);
+
+		uint1 last_sum_id = GID + local_size - 1;
+		SYCL_IF(LID == 0 && last_sum_id < global_size)
+			SYCL_BEGIN{
+			// Write last sum into auxiliary array
+			higher_level[GID / local_size] = input[last_sum_id];
 		}
 		SYCL_END
 	}
@@ -165,12 +165,15 @@ public:
 
 	void operator()(cl::sycl::nd_item<1> index) {
 		using namespace cl::sycl;
-		int1 GID = index.get_global(0);
+		int1 GID = 2 * index.get_global(0);
 		int1 local_size = 2 * index.get_local_range()[0];
 		SYCL_IF(GID >= local_size)
-		SYCL_THEN({
-			data[GID] += higher_level[GID / local_size - 1];
-		})
+		SYCL_BEGIN {
+			int1 higher_id = GID / local_size - 1;
+			data[GID] += higher_level[higher_id];
+			data[GID + 1] += higher_level[higher_id];
+		}
+		SYCL_END
 	}
 };
 
@@ -216,9 +219,9 @@ bool test9() {
 		queue myQueue;
 
 		const auto group_size = myQueue.get_device().get_info<info::device::max_work_group_size>();
-		const auto size = group_size * 2;
+		const auto size = group_size * 8;
 		size_t N = size;
-		using type = double;
+		using type = float;
 
 		// Calculate required number of buffer levels
 		N = size;
