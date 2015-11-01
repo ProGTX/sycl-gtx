@@ -76,7 +76,7 @@ public:
 
 		index.barrier(access::fence_space::local);
 
-		uint1 N = 2 * index.get_local_range()[0];
+		uint1 local_size = 2 * index.get_local_range()[0];
 		uint1 first;
 		uint1 second;
 
@@ -84,7 +84,7 @@ public:
 
 		// Up-sweep
 		uint1 offset = 1;
-		SYCL_WHILE(offset < N)
+		SYCL_WHILE(offset < local_size)
 		SYCL_BEGIN {
 			SYCL_IF(LID % offset == 0)
 			SYCL_BEGIN {
@@ -101,14 +101,14 @@ public:
 
 		SYCL_IF(LID == 0)
 		SYCL_THEN({
-			localBlock[N - 1] = 0;
+			localBlock[local_size - 1] = 0;
 		})
 		index.barrier(access::fence_space::local);
 
 		vec<T, 1> tmp;
 
 		// Down-sweep
-		offset = N;
+		offset = local_size;
 		SYCL_WHILE(offset > 0)
 		SYCL_BEGIN {
 			SYCL_IF(LID % offset == 0)
@@ -123,6 +123,14 @@ public:
 
 			index.barrier(access::fence_space::local);
 			offset /= 2;
+		}
+		SYCL_END
+
+		uint1 last_sum_id = GID + local_size - 1;
+		SYCL_IF(LID == 0 && last_sum_id < global_size)
+		SYCL_BEGIN {
+			// Write last sum into auxiliary array
+			higher_level[GID / local_size] = localBlock[local_size - 1] + input[last_sum_id];
 		}
 		SYCL_END
 
@@ -156,10 +164,10 @@ public:
 	void operator()(cl::sycl::nd_item<1> index) {
 		using namespace cl::sycl;
 		int1 GID = index.get_global(0);
-		int1 N = 2 * index.get_local_range()[0];
-		SYCL_IF(GID >= N)
+		int1 local_size = 2 * index.get_local_range()[0];
+		SYCL_IF(GID >= local_size)
 		SYCL_THEN({
-			data[GID] += higher_level[GID / N - 1];
+			data[GID] += higher_level[GID / local_size - 1];
 		})
 	}
 };
@@ -168,22 +176,24 @@ template <typename type>
 void prefix_sum_recursion(
 	cl::sycl::queue& myQueue,
 	cl::sycl::vector_class<cl::sycl::buffer<type>>& data,
+	cl::sycl::vector_class<size_t>& sizes,
 	size_t level,
-	size_t N,
 	size_t group_size
 ) {
 	using namespace cl::sycl;
+
 	myQueue.submit([&](handler& cgh) {
 		cgh.parallel_for(
-			nd_range<1>(N / 2, group_size),
-			prefix_sum_kernel<type>(cgh, data[level], data[level + 1], N, 2 * group_size)
+			nd_range<1>(sizes[level] / 2, group_size),
+			prefix_sum_kernel<type>(cgh, data[level], data[level + 1], sizes[level], 2 * group_size)
 		);
 	});
 
-	N /= 2 * group_size;
-	if(N <= 0) {
+	if(sizes[level + 1] <= group_size) {
 		return;
 	}
+
+	prefix_sum_recursion(myQueue, data, sizes, level + 1, group_size);
 
 	// TODO: Extend for large arrays
 
@@ -210,11 +220,16 @@ bool test9() {
 
 		// Create buffers
 		vector_class<buffer<type>> data;
+		vector_class<size_t> sizes;
 		data.reserve(number_levels);
+		sizes.reserve(number_levels);
 		N = size;
 		for(size_t i = 0; i < number_levels; ++i) {
+			sizes.push_back(N);
 			data.emplace_back(N);
+
 			N = std::max(N / (2 * group_size), group_size);
+			N += N % 2;	// Needs to be divisible by 2
 		}
 
 		// Init
@@ -226,7 +241,7 @@ bool test9() {
 			});
 		});
 
-		prefix_sum_recursion<type>(myQueue, data, 0, size, group_size);
+		prefix_sum_recursion(myQueue, data, sizes, 0, group_size);
 
 		debug() << "Done, checking results";
 		return check_sum(data[0]);
