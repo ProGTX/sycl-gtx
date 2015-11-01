@@ -9,7 +9,7 @@ bool check_sum(cl::sycl::buffer<F, 1>& data) {
 	auto d = data.get_access<access::read, access::host_buffer>();
 	F sum = 0;
 	for(size_t i = 0; i < data.get_count(); ++i) {
-		sum += (F)i;
+		sum += (F)1;
 		auto diff = std::abs(sum - d[i]);
 		if(diff > 0.01) {
 			debug() << "wrong sum, should be" << sum << "- is" << d[i];
@@ -164,6 +164,31 @@ public:
 	}
 };
 
+template <typename type>
+void prefix_sum_recursion(
+	cl::sycl::queue& myQueue,
+	cl::sycl::vector_class<cl::sycl::buffer<type>>& data,
+	size_t level,
+	size_t N,
+	size_t group_size
+) {
+	using namespace cl::sycl;
+	myQueue.submit([&](handler& cgh) {
+		cgh.parallel_for(
+			nd_range<1>(N / 2, group_size),
+			prefix_sum_kernel<type>(cgh, data[level], data[level + 1], N, 2 * group_size)
+		);
+	});
+
+	N /= 2 * group_size;
+	if(N <= 0) {
+		return;
+	}
+
+	// TODO: Extend for large arrays
+
+}
+
 bool test9() {
 	using namespace cl::sycl;
 
@@ -197,25 +222,11 @@ bool test9() {
 			auto d = data[0].get_access<access::write>(cgh);
 
 			cgh.parallel_for<class init>(range<1>(size), [=](id<1> index) {
-				d[index] = index;
+				d[index] = 1;
 			});
 		});
 
-		N = size;
-		while(true) {
-			myQueue.submit([&](handler& cgh) {
-				cgh.parallel_for(
-					nd_range<1>(N / 2, group_size),
-					prefix_sum_kernel<type>(cgh, data[0], data[1], N, 2 * group_size)
-				);
-			});
-
-			if(N <= 2 * group_size) {
-				return;
-			}
-
-			// TODO: Extend for large arrays
-		}
+		prefix_sum_recursion<type>(myQueue, data, 0, size, group_size);
 
 		debug() << "Done, checking results";
 		return check_sum(data[0]);
