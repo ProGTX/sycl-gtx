@@ -1,7 +1,5 @@
-#include "tests\tests.h"
+#include "tests.h"
 
-#include <debug.h>
-#include <sycl.hpp>
 #include <string>
 #include <map>
 #include <Windows.h>
@@ -9,10 +7,10 @@
 #define TRY_CATCH_ERRORS 1
 
 int main() {
-	debug() << "SYCL Provisional Specification.";
+	debug() << "SYCL 1.2 Final Specification, Provisional Implementation.";
 	
 	std::map<std::string, bool(*)()> tests{
-		//{ "test1", test1 },
+		{ "test1", test1 },
 		{ "test2", test2 },
 		{ "test3", test3 },
 		{ "test4", test4 },
@@ -46,6 +44,6 @@ int main() {
 		debug() << test.first << (result ? "successful" : "failed");
 	}
 
-	system("pause");
+	//system("pause");
 	return 0;
 }

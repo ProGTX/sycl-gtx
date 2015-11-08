@@ -13,9 +13,6 @@
       <UniqueIdentifier>{D011BB44-1BF7-4113-997B-A081035B40D8}</UniqueIdentifier>
       <Extensions>cl</Extensions>
     </Filter>
-    <Filter Include="Source Files\tests">
-      <UniqueIdentifier>{0b288f8f-268e-49ec-aa3b-61f8d4e186e3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\specification">
       <UniqueIdentifier>{1c9d35e7-f8ac-4442-a910-2dd30f82f9f1}</UniqueIdentifier>
     </Filter>
@@ -42,24 +39,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\test1.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\test2.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\test3.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\test4.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\test5.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="implementation\specification\device.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
@@ -68,9 +47,6 @@
     </ClCompile>
     <ClCompile Include="implementation\specification\context.cpp">
       <Filter>Source Files\specification</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\test6.cpp">
-      <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="implementation\specification\queue.cpp">
       <Filter>Source Files\specification</Filter>
@@ -81,23 +57,14 @@
     <ClCompile Include="implementation\specification\command_group.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="tests\test7.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="implementation\specification\program.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
     <ClCompile Include="implementation\specification\kernel.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="tests\test8.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="implementation\data_ref.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\test9.cpp">
-      <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="implementation\specification\event.cpp">
       <Filter>Source Files\specification</Filter>
@@ -119,13 +86,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="implementation\sycl.hpp">
+    <ClInclude Include="sycl.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="implementation\debug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tests\tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\access.h">

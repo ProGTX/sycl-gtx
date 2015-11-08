@@ -1,4 +1,4 @@
-#include "tests.h"
+#include "../tests.h"
 
 // 2.5.6 Anatomy of a SYCL application
 // (slightly revised from revision 2014-03-09 of the specification)

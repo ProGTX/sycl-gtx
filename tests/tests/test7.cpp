@@ -1,4 +1,4 @@
-#include "tests.h"
+#include "../tests.h"
 
 // 2.12 Example SYCL application
 

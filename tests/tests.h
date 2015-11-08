@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sycl.hpp>
-#include "../implementation/debug.h"
+#include <implementation/debug.h>
 
 bool test1();	// Milestone 3
 bool test2();	// Milestone 1

@@ -1,4 +1,4 @@
-#include "tests.h"
+#include "../tests.h"
 
 #include <vector>
 

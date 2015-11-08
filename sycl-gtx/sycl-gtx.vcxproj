@@ -23,13 +23,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -86,7 +86,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>implementation;$(INTELOCLSDKROOT)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(INTELOCLSDKROOT)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>Win32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -163,16 +163,6 @@
     <ClCompile Include="implementation\src_handlers\issue_command.cpp" />
     <ClCompile Include="implementation\src_handlers\kernel_source.cpp" />
     <ClCompile Include="implementation\synchronizer.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="tests\test1.cpp" />
-    <ClCompile Include="tests\test2.cpp" />
-    <ClCompile Include="tests\test3.cpp" />
-    <ClCompile Include="tests\test4.cpp" />
-    <ClCompile Include="tests\test5.cpp" />
-    <ClCompile Include="tests\test6.cpp" />
-    <ClCompile Include="tests\test7.cpp" />
-    <ClCompile Include="tests\test8.cpp" />
-    <ClCompile Include="tests\test9.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="implementation\common.h" />
@@ -225,9 +215,8 @@
     <ClInclude Include="implementation\src_handlers\invoke_source.h" />
     <ClInclude Include="implementation\src_handlers\issue_command.h" />
     <ClInclude Include="implementation\src_handlers\kernel_source.h" />
-    <ClInclude Include="implementation\sycl.hpp" />
     <ClInclude Include="implementation\synchronizer.h" />
-    <ClInclude Include="tests\tests.h" />
+    <ClInclude Include="sycl.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,4 +1,4 @@
-#include "tests.h"
+#include "../tests.h"
 #include <ctime>
 
 // Passing functors as nd-range kernels
