@@ -1,11 +1,15 @@
+// smallpt, a Path Tracer by Kevin Beason, 2008
+//
+// Modified by Peter Žužek
+// For the original code, see github.com/munificient/smallpt
+// For the original license, see smallpt.LICENSE.txt
+
 #include <math.h>   // smallpt, a Path Tracer by Kevin Beason, 2008
 #include <stdlib.h> // Make : g++ -O3 -fopenmp smallpt.cpp -o smallpt
 #include <stdio.h>  //        Remove "-fopenmp" for g++ version < 4.2
                     // Usage: time ./smallpt 5000 && xv image.ppm
                     // position, also color (r,g,b)
 
-// Added by Peter Žužek on 14.11.2015 to enable compilation in Visual Studio
-// The only other change in this file is renaming main() to original() and returning 0
 #include "msvc.h"
 
 struct Vec {

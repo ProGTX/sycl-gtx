@@ -1,8 +1,8 @@
 // smallpt, a Path Tracer by Kevin Beason, 2008
 //
 // Modified by Peter Žužek
-// For the original code, see original.cpp
-// and the corresponding license file original.cpp.LICENSE.txt
+// For the original code, see github.com/munificient/smallpt
+// For the original license, see smallpt.LICENSE.txt
 
 #include <cmath>
 #include <cstdlib>
