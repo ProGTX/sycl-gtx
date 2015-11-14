@@ -22,6 +22,7 @@ void to_file(int w, int h, Vec* c, std::string filename) {
 	for(int i = 0; i < w*h; i++) {
 		fprintf(f, "%d %d %d\n", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
 	}
+	fclose(f);
 }
 
 using time_point = std::chrono::high_resolution_clock::time_point;
