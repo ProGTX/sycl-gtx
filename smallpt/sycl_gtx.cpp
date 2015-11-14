@@ -99,14 +99,7 @@ inline double clamp(double x) {
 	return x < 0 ? 0 : x>1 ? 1 : x;
 }
 
-inline int toInt(double x) {
-	return int(pow(clamp(x), 1 / 2.2) * 255 + .5);
-}
-
-int sycl_gtx(int argc, char *argv[]) {
-	int w = 1024, h = 768, samps = argc == 2 ? atoi(argv[1]) / 4 : 1; // # samples
-	Ray cam(Vec(50, 52, 295.6), Vec(0, -0.042612, -1).norm()); // cam pos, dir
-	Vec cx = Vec(w*.5135 / h), cy = (cx%cam.d).norm()*.5135, r, *c = new Vec[w*h];
+void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec& r, Vec* c) {
 	for(int y = 0; y < h; y++) {						// Loop over image rows
 		fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samps * 4, 100.*y / (h - 1));
 		for(unsigned short x = 0, Xi[3] = { 0, 0, y*y*y }; x < w; x++) {	// Loop cols
@@ -129,10 +122,4 @@ int sycl_gtx(int argc, char *argv[]) {
 			}
 		}
 	}
-	FILE *f = fopen("image.ppm", "w");		 // Write image to PPM file.
-	fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
-	for(int i = 0; i < w*h; i++) {
-		fprintf(f, "%d %d %d ", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
-	}
-	return 0;
 }
