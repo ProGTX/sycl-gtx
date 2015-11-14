@@ -17,6 +17,10 @@ inline double distr(std::default_random_engine& generator_) {
 	return distr_(generator_);
 }
 
+static void reset() {
+	generator().seed(0);
+}
+
 } // namespace ns_erand
 
 // http://stackoverflow.com/a/27198754
@@ -25,5 +29,6 @@ std::uniform_real_distribution<double>;
 static double erand48(unsigned short int X[3]) {
 	return ns_erand::distr(ns_erand::generator());
 }
+
 
 #endif
