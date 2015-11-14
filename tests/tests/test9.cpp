@@ -178,7 +178,6 @@ public:
 };
 
 template <typename type>
-template <typename type>
 void prefix_sum_recursion(
 	cl::sycl::queue& myQueue,
 	cl::sycl::vector_class<cl::sycl::buffer<type>>& data,
