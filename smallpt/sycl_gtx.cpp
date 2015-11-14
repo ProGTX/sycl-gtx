@@ -8,71 +8,10 @@
 #include <cstdlib>
 #include <cstdio>
 
+#include "classes.h"
 #include "msvc.h"
 
 namespace ns_sycl_gtx {
-struct Vec {
-	double x, y, z;
-	Vec(double x_ = 0, double y_ = 0, double z_ = 0) {
-		x = x_; y = y_; z = z_;
-	}
-	Vec operator+(const Vec &b) const {
-		return Vec(x + b.x, y + b.y, z + b.z);
-	}
-	Vec operator-(const Vec &b) const {
-		return Vec(x - b.x, y - b.y, z - b.z);
-	}
-	Vec operator*(double b) const {
-		return Vec(x*b, y*b, z*b);
-	}
-	Vec mult(const Vec &b) const {
-		return Vec(x*b.x, y*b.y, z*b.z);
-	}
-	Vec& norm() {
-		return *this = *this * (1 / sqrt(x*x + y*y + z*z));
-	}
-	double dot(const Vec &b) const {
-		return x*b.x + y*b.y + z*b.z;
-	}
-	// cross:
-	Vec operator%(Vec&b) {
-		return Vec(y*b.z - z*b.y, z*b.x - x*b.z, x*b.y - y*b.x);
-	}
-};
-
-struct Ray {
-	Vec o, d;
-	Ray(Vec o_, Vec d_) : o(o_), d(d_) {}
-};
-
-enum Refl_t {
-	// material types, used in radiance()
-	DIFF, SPEC, REFR
-};
-
-struct Sphere {
-	double rad;		// radius
-	Vec p, e, c;	// position, emission, color
-	Refl_t refl;	// reflection type (DIFFuse, SPECular, REFRactive)
-
-	Sphere(double rad_, Vec p_, Vec e_, Vec c_, Refl_t refl_) :
-		rad(rad_), p(p_), e(e_), c(c_), refl(refl_) {}
-
-	double intersect(const Ray &r) const { // returns distance, 0 if nohit
-		Vec op = p - r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
-		double t;
-		double eps = 1e-4;
-		double b = op.dot(r.d);
-		double det = b*b - op.dot(op) + rad*rad;
-		if(det<0) {
-			return 0;
-		}
-		else {
-			det = sqrt(det);
-		}
-		return (t = b - det)>eps ? t : ((t = b + det) > eps ? t : 0);
-	}
-};
 
 Sphere spheres[] = {//Scene: radius, position, emission, color, material
 	Sphere(1e5, Vec(1e5 + 1, 40.8, 81.6), Vec(), Vec(.75, .25, .25), DIFF),//Left
@@ -165,9 +104,6 @@ inline int toInt(double x) {
 }
 
 int sycl_gtx(int argc, char *argv[]) {
-	using Ray = ns_sycl_gtx::Ray;
-	using Vec = ns_sycl_gtx::Vec;
-
 	int w = 1024, h = 768, samps = argc == 2 ? atoi(argv[1]) / 4 : 1; // # samples
 	Ray cam(Vec(50, 52, 295.6), Vec(0, -0.042612, -1).norm()); // cam pos, dir
 	Vec cx = Vec(w*.5135 / h), cy = (cx%cam.d).norm()*.5135, r, *c = new Vec[w*h];
@@ -185,7 +121,7 @@ int sycl_gtx(int argc, char *argv[]) {
 
 						Vec d = cx*(((sx + .5 + dx) / 2 + x) / w - .5) +
 							cy*(((sy + .5 + dy) / 2 + y) / h - .5) + cam.d;
-						r = r + radiance(Ray(cam.o + d * 140, d.norm()), 0, Xi)*(1. / samps);
+						r = r + ns_sycl_gtx::radiance(Ray(cam.o + d * 140, d.norm()), 0, Xi)*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 
 					c[i] = c[i] + Vec(clamp(r.x), clamp(r.y), clamp(r.z))*.25;
