@@ -122,6 +122,19 @@ public:
 
 #undef SYCL_DATA_REF_OPERATOR
 
+	// TODO: A bit problematic
+	data_ref operator++() const {
+		return data_ref(open_parenthesis + "++" + name + ")");
+	}
+	data_ref operator++(int) const {
+		return data_ref(open_parenthesis + name + "++" + ")");
+	}
+	data_ref operator--() const {
+		return data_ref(open_parenthesis + "--" + name + ")");
+	}
+	data_ref operator--(int) const {
+		return data_ref(open_parenthesis + name + "--" + ")");
+	}
 };
 
 } // namespace detail
