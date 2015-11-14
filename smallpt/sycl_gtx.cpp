@@ -99,7 +99,7 @@ inline double clamp(double x) {
 	return x < 0 ? 0 : x>1 ? 1 : x;
 }
 
-void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec& r, Vec* c) {
+void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
 	for(int y = 0; y < h; y++) {						// Loop over image rows
 		fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samps * 4, 100.*y / (h - 1));
 		for(unsigned short x = 0, Xi[3] = { 0, 0, y*y*y }; x < w; x++) {	// Loop cols

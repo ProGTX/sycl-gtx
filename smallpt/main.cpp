@@ -7,8 +7,9 @@
 #include <string>
 #include <vector>
 
-extern void compute_org(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec& r, Vec* c);
-extern void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec& r, Vec* c);
+extern void compute_org(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_org_openmp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
 
 inline double clamp(double x) {
 	return x < 0 ? 0 : x>1 ? 1 : x;
@@ -44,8 +45,9 @@ int main(int argc, char *argv[]) {
 
 	int iterations = 1;
 
-	map<string, void(*)(int, int, int, Ray&, Vec&, Vec&, Vec&, Vec*)> tests = {
+	map<string, void(*)(int, int, int, Ray&, Vec&, Vec&, Vec, Vec*)> tests = {
 		{ "org", compute_org },
+		{ "openmp", compute_org_openmp },
 		{ "sycl_gtx", compute_sycl_gtx }
 	};
 

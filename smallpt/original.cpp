@@ -57,20 +57,29 @@ Vec radiance(const Ray &r, int depth, unsigned short *Xi){
     radiance(reflRay,depth,Xi)*RP:radiance(Ray(x,tdir),depth,Xi)*TP) :
     radiance(reflRay,depth,Xi)*Re+radiance(Ray(x,tdir),depth,Xi)*Tr);
 }
-void compute_org(int w, int h, int samps, Ray &cam, Vec &cx, Vec &cy, Vec &r, Vec *c){
+inline void compute_inner(int y, int w, int h, int samps, Ray &cam, Vec &cx, Vec &cy, Vec &r, Vec *c){
+  fprintf(stderr,"\rRendering (%d spp) %5.2f%%",samps*4,100.*y/(h-1));
+  for (unsigned short x=0, Xi[3]={0,0,y*y*y}; x<w; x++)   // Loop cols
+    for (int sy=0, i=(h-y-1)*w+x; sy<2; sy++)     // 2x2 subpixel rows
+      for (int sx=0; sx<2; sx++, r=Vec()){        // 2x2 subpixel cols
+        for (int s=0; s<samps; s++){
+          double r1=2*erand48(Xi), dx=r1<1 ? sqrt(r1)-1: 1-sqrt(2-r1);
+          double r2=2*erand48(Xi), dy=r2<1 ? sqrt(r2)-1: 1-sqrt(2-r2);
+          Vec d = cx*( ( (sx+.5 + dx)/2 + x)/w - .5) +
+                  cy*( ( (sy+.5 + dy)/2 + y)/h - .5) + cam.d;
+          r = r + radiance(Ray(cam.o+d*140,d.norm()),0,Xi)*(1./samps);
+        } // Camera rays are pushed ^^^^^ forward to start in interior
+        c[i] = c[i] + Vec(clamp(r.x),clamp(r.y),clamp(r.z))*.25;
+      }
+}
+void compute_org(int w, int h, int samps, Ray &cam, Vec &cx, Vec &cy, Vec r, Vec *c){
   for (int y=0; y<h; y++){                       // Loop over image rows
-    fprintf(stderr,"\rRendering (%d spp) %5.2f%%",samps*4,100.*y/(h-1));
-    for (unsigned short x=0, Xi[3]={0,0,y*y*y}; x<w; x++)   // Loop cols
-      for (int sy=0, i=(h-y-1)*w+x; sy<2; sy++)     // 2x2 subpixel rows
-        for (int sx=0; sx<2; sx++, r=Vec()){        // 2x2 subpixel cols
-          for (int s=0; s<samps; s++){
-            double r1=2*erand48(Xi), dx=r1<1 ? sqrt(r1)-1: 1-sqrt(2-r1);
-            double r2=2*erand48(Xi), dy=r2<1 ? sqrt(r2)-1: 1-sqrt(2-r2);
-            Vec d = cx*( ( (sx+.5 + dx)/2 + x)/w - .5) +
-                    cy*( ( (sy+.5 + dy)/2 + y)/h - .5) + cam.d;
-            r = r + radiance(Ray(cam.o+d*140,d.norm()),0,Xi)*(1./samps);
-          } // Camera rays are pushed ^^^^^ forward to start in interior
-          c[i] = c[i] + Vec(clamp(r.x),clamp(r.y),clamp(r.z))*.25;
-        }
+    compute_inner(y, w, h, samps, cam, cx, cy, r, c);
+  }
+}
+void compute_org_openmp(int w, int h, int samps, Ray &cam, Vec &cx, Vec &cy, Vec r, Vec *c){
+  #pragma omp parallel for schedule(dynamic, 1) private(r)
+  for (int y=0; y<h; y++){                       // Loop over image rows
+    compute_inner(y, w, h, samps, cam, cx, cy, r, c);
   }
 }
