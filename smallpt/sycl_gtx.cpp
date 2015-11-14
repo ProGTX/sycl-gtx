@@ -13,7 +13,8 @@
 
 namespace ns_sycl_gtx {
 
-Sphere spheres[] = {//Scene: radius, position, emission, color, material
+static const int numSpheres = 9;
+Sphere spheres[numSpheres] = {//Scene: radius, position, emission, color, material
 	Sphere(1e5, Vec(1e5 + 1, 40.8, 81.6), Vec(), Vec(.75, .25, .25), DIFF),//Left
 	Sphere(1e5, Vec(-1e5 + 99, 40.8, 81.6), Vec(), Vec(.25, .25, .75), DIFF),//Rght
 	Sphere(1e5, Vec(50, 40.8, 1e5), Vec(), Vec(.75, .75, .75), DIFF),//Back
@@ -25,11 +26,11 @@ Sphere spheres[] = {//Scene: radius, position, emission, color, material
 	Sphere(600, Vec(50, 681.6 - .27, 81.6), Vec(12, 12, 12), Vec(), DIFF) //Lite
 };
 
-inline bool intersect(const Ray &r, double &t, int &id) {
-	double n = sizeof(spheres) / sizeof(Sphere);
+inline bool intersect(const Ray& r, double& t, int& id) {
 	double d;
 	double inf = t = 1e20;
-	for(int i = int(n); i--;) {
+	for(int i = numSpheres; i > 0;) {
+		--i;
 		if((d = spheres[i].intersect(r)) && d < t) {
 			t = d;
 			id = i;
@@ -38,20 +39,33 @@ inline bool intersect(const Ray &r, double &t, int &id) {
 	return t < inf;
 }
 
-Vec radiance(const Ray &r, int depth, unsigned short *Xi) {
+Vec radiance(const Ray& r, int depth, unsigned short *Xi) {
 	double t;								// distance to intersection
 	int id = 0;								// id of intersected object
 	if(!intersect(r, t, id)) {
 		return Vec(); // if miss, return black
 	}
-	const Sphere &obj = spheres[id];		// the hit object
+	const Sphere& obj = spheres[id];		// the hit object
 	Vec x = r.o + r.d*t;
 	Vec n = (x - obj.p).norm();
-	Vec nl = n.dot(r.d) < 0 ? n : n*-1;
+	Vec nl = n;
+	if(n.dot(r.d) > 0) {
+		nl = nl * -1;
+	}
 	Vec f = obj.c;
-	double p = f.x > f.y && f.x>f.z ? f.x : f.y > f.z ? f.y : f.z; // max refl
+	double p;	// max refl
+	if(f.x > f.y && f.x > f.z) {
+		p = f.x;
+	}
+	else if(f.y > f.z) {
+		p = f.y;
+	}
+	else {
+		p = f.z;
+	}
 
-	if(++depth > 5) {
+	depth += 1;
+	if(depth > 5) {
 		if(erand48(Xi) < p) {
 			f = f*(1 / p);
 		}
@@ -60,43 +74,84 @@ Vec radiance(const Ray &r, int depth, unsigned short *Xi) {
 		}
 	}
 
-	if(obj.refl == DIFF) {					// Ideal DIFFUSE reflection
+	if(obj.refl == DIFF) {	// Ideal DIFFUSE reflection
 		double r1 = 2 * M_PI*erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
 		Vec w = nl;
-		Vec u = ((fabs(w.x) > .1 ? Vec(0, 1) : Vec(1)) % w).norm();
+		Vec u;
+		if(fabs(w.x) > .1) {
+			u.y = 1;
+		}
+		else {
+			u.x = 1;
+		}
+		u = (u % w).norm();
 		Vec v = w%u;
 		Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
 		return obj.e + f.mult(radiance(Ray(x, d), depth, Xi));
 	}
-	else if(obj.refl == SPEC) {			// Ideal SPECULAR reflection
+	else if(obj.refl == SPEC) {	// Ideal SPECULAR reflection
 		return obj.e + f.mult(radiance(Ray(x, r.d - n * 2 * n.dot(r.d)), depth, Xi));
 	}
-	Ray reflRay(x, r.d - n * 2 * n.dot(r.d));	 // Ideal dielectric REFRACTION
-	bool into = n.dot(nl) > 0;				// Ray from outside going in?
+	Ray reflRay(x, r.d - n * 2 * n.dot(r.d));	// Ideal dielectric REFRACTION
+	bool into = n.dot(nl) > 0;	// Ray from outside going in?
 	double nc = 1;
 	double nt = 1.5;
-	double nnt = into ? nc / nt : nt / nc;
+	double nnt;
+	if(into) {
+		nnt = nc / nt;
+	}
+	else {
+		nnt = nt / nc;
+	}
 	double ddn = r.d.dot(nl);
 	double cos2t;
 	if((cos2t = 1 - nnt*nnt*(1 - ddn*ddn)) < 0) {	// Total internal reflection
 		return obj.e + f.mult(radiance(reflRay, depth, Xi));
 	}
-	Vec tdir = (r.d*nnt - n*((into ? 1 : -1)*(ddn*nnt + sqrt(cos2t)))).norm();
+	double tmp = 1;
+	if(!into) {
+		tmp = -1;
+	}
+	Vec tdir = (r.d*nnt - n*(tmp*(ddn*nnt + sqrt(cos2t)))).norm();
 	double a = nt - nc;
 	double b = nt + nc;
 	double R0 = a*a / (b*b);
-	double c = 1 - (into ? -ddn : tdir.dot(n));
+	double c = 1;
+	if(into) {
+		c += ddn;
+	}
+	else {
+		c -= tdir.dot(n);
+	}
 	double Re = R0 + (1 - R0)*c*c*c*c*c;
-	double Tr = 1 - Re, P = .25 + .5*Re;
-	double RP = Re / P, TP = Tr / (1 - P);
-	return obj.e + f.mult(depth > 2 ? (erand48(Xi) < P ?	// Russian roulette
-		radiance(reflRay, depth, Xi)*RP : radiance(Ray(x, tdir), depth, Xi)*TP) :
-		radiance(reflRay, depth, Xi)*Re + radiance(Ray(x, tdir), depth, Xi)*Tr);
+	double Tr = 1 - Re;
+	double P = .25 + .5*Re;
+	double RP = Re / P;
+	double TP = Tr / (1 - P);
+	Vec rad;
+	if(depth > 2) {
+		if(erand48(Xi) < P) {
+			rad = radiance(reflRay, depth, Xi)*RP;
+		}
+		else {
+			rad = radiance(Ray(x, tdir), depth, Xi)*TP;
+		}
+	}
+	else {
+		rad = radiance(reflRay, depth, Xi)*Re + radiance(Ray(x, tdir), depth, Xi)*Tr;
+	}
+	return obj.e + f.mult(rad);
 }
 } // namespace ns_sycl_gtx
 
 inline double clamp(double x) {
-	return x < 0 ? 0 : x>1 ? 1 : x;
+	if(x < 0) {
+		return 0;
+	}
+	if(x > 1) {
+		return 1;
+	}
+	return x;
 }
 
 void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
@@ -107,13 +162,23 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r
 				for(int sx = 0; sx < 2; sx++, r = Vec()) {		// 2x2 subpixel cols
 					for(int s = 0; s < samps; s++) {
 						double r1 = 2 * erand48(Xi);
-						double dx = r1 < 1 ? sqrt(r1) - 1 : 1 - sqrt(2 - r1);
-
 						double r2 = 2 * erand48(Xi);
-						double dy = r2 < 1 ? sqrt(r2) - 1 : 1 - sqrt(2 - r2);
 
-						Vec d = cx*(((sx + .5 + dx) / 2 + x) / w - .5) +
-							cy*(((sy + .5 + dy) / 2 + y) / h - .5) + cam.d;
+						double dx, dy;
+						if(r1 < 1) {
+							dx = sqrt(r1) - 1;
+						}
+						else {
+							dx = 1 - sqrt(2 - r1);
+						}
+						if(r2 < 1) {
+							dy = sqrt(r2) - 1;
+						}
+						else {
+							dy = 1 - sqrt(2 - r2);
+						}
+
+						Vec d = cx*(((sx + .5 + dx) / 2 + x) / w - .5) + cy*(((sy + .5 + dy) / 2 + y) / h - .5) + cam.d;
 						r = r + ns_sycl_gtx::radiance(Ray(cam.o + d * 140, d.norm()), 0, Xi)*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 
