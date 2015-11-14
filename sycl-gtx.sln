@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "tests\tests.vcxproj", "{58105A31-A584-4CCB-B062-CA55EBB2DA6C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smallpt", "smallpt\smallpt.vcxproj", "{A63F570C-8916-4E9C-A0E2-ED0B8C6E8B59}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -26,6 +28,10 @@ Global
 		{58105A31-A584-4CCB-B062-CA55EBB2DA6C}.Debug|Win32.Build.0 = Debug|Win32
 		{58105A31-A584-4CCB-B062-CA55EBB2DA6C}.Release|Win32.ActiveCfg = Release|Win32
 		{58105A31-A584-4CCB-B062-CA55EBB2DA6C}.Release|Win32.Build.0 = Release|Win32
+		{A63F570C-8916-4E9C-A0E2-ED0B8C6E8B59}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A63F570C-8916-4E9C-A0E2-ED0B8C6E8B59}.Debug|Win32.Build.0 = Debug|Win32
+		{A63F570C-8916-4E9C-A0E2-ED0B8C6E8B59}.Release|Win32.ActiveCfg = Release|Win32
+		{A63F570C-8916-4E9C-A0E2-ED0B8C6E8B59}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
