@@ -30,6 +30,11 @@ static void while_(data_ref condition) {
 	kernel_::source::add<false>(string_class("while( ") + condition.name + ")");
 }
 
+// Note: Increment can only be ++ or --, other assignment doesn't work
+static void for_(data_ref condition, data_ref increment) {
+	kernel_::source::add<false>(string_class("for(; ") + condition.name + "; " + increment.name + ")");
+}
+
 } // namespace control
 } // namespace detail
 
@@ -69,4 +74,11 @@ SYCL_BLOCK(code)
 #define SYCL_WHILE(condition)					\
 ::cl::sycl::detail::control::while_(			\
 	::cl::sycl::detail::data_ref((condition))	\
+);
+
+#define SYCL_FOR(init, condition, increment)	\
+init;											\
+::cl::sycl::detail::control::for_(				\
+	::cl::sycl::detail::data_ref((condition)),	\
+	::cl::sycl::detail::data_ref((increment))	\
 );
