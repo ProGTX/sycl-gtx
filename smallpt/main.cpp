@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -37,30 +38,32 @@ auto duration = [](time_point before, time_point after) {
 int main(int argc, char *argv[]) {
 	int w = 1024, h = 768, samps = argc == 2 ? atoi(argv[1]) / 4 : 1; // # samples
 	Ray cam(Vec(50, 52, 295.6), Vec(0, -0.042612, -1).norm()); // cam pos, dir
-	Vec cx = Vec(w*.5135 / h), cy = (cx%cam.d).norm()*.5135, r, *c = new Vec[w*h];
+	Vec cx = Vec(w*.5135 / h), cy = (cx%cam.d).norm()*.5135, r;
 
-	std::vector<Vec> vectors_org(w*h, 0);
-	auto vector_sycl_gtx(vectors_org);
+	using namespace std;
 
 	int iterations = 1;
 
-	ns_erand::reset();
-	auto start = now();
-	for(int i = 0; i < iterations; ++i) {
-		compute_org(w, h, samps, cam, cx, cy, r, vectors_org.data());
-	}
-	std::cout << "\n" << (duration(start, now()) / (float)iterations) << std::endl;
-	to_file(w, h, vectors_org.data(), "image_org.ppm");
+	map<string, void(*)(int, int, int, Ray&, Vec&, Vec&, Vec&, Vec*)> tests = {
+		{ "org", compute_org },
+		{ "sycl_gtx", compute_sycl_gtx }
+	};
 
-	ns_erand::reset();
-	start = now();
-	for(int i = 0; i < iterations; ++i) {
-		compute_sycl_gtx(w, h, samps, cam, cx, cy, r, vector_sycl_gtx.data());
+	vector<Vec> empty_vectors(w*h, 0);
+	for(auto&& t : tests) {
+		cout << "Running test: " << t.first << endl;
+		ns_erand::reset();
+		auto vectors(empty_vectors);
+		auto start = now();
+		for(int i = 0; i < iterations; ++i) {
+			t.second(w, h, samps, cam, cx, cy, r, vectors.data());
+		}
+		cout << "\n" << (duration(start, now()) / (float)iterations) << endl;
+		to_file(w, h, vectors.data(), string("image_") + t.first + ".ppm");
 	}
-	std::cout << "\n" << (duration(start, now()) / (float)iterations) << std::endl;
-	to_file(w, h, vector_sycl_gtx.data(), "image_sycl_gtx.ppm");
 
-	std::cin.get();
+	cout << "\n" << "Press any key to exit" << endl;
+	cin.get();
 
 	return 0;
 }
