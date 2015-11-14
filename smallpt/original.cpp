@@ -1,8 +1,15 @@
 #include <math.h>   // smallpt, a Path Tracer by Kevin Beason, 2008
 #include <stdlib.h> // Make : g++ -O3 -fopenmp smallpt.cpp -o smallpt
 #include <stdio.h>  //        Remove "-fopenmp" for g++ version < 4.2
-struct Vec {        // Usage: time ./smallpt 5000 && xv image.ppm
-  double x, y, z;                  // position, also color (r,g,b)
+                    // Usage: time ./smallpt 5000 && xv image.ppm
+                    // position, also color (r,g,b)
+
+// Added by Peter Žužek on 14.11.2015 to enable compilation in Visual Studio
+// The only other change in this file is renaming main() to original() and returning 0
+#include "msvc.h"
+
+struct Vec {
+  double x, y, z;
   Vec(double x_=0, double y_=0, double z_=0){ x=x_; y=y_; z=z_; }
   Vec operator+(const Vec &b) const { return Vec(x+b.x,y+b.y,z+b.z); }
   Vec operator-(const Vec &b) const { return Vec(x-b.x,y-b.y,z-b.z); }
@@ -72,7 +79,7 @@ Vec radiance(const Ray &r, int depth, unsigned short *Xi){
     radiance(reflRay,depth,Xi)*RP:radiance(Ray(x,tdir),depth,Xi)*TP) :
     radiance(reflRay,depth,Xi)*Re+radiance(Ray(x,tdir),depth,Xi)*Tr);
 }
-int main(int argc, char *argv[]){
+int original(int argc, char *argv[]){
   int w=1024, h=768, samps = argc==2 ? atoi(argv[1])/4 : 1; // # samples
   Ray cam(Vec(50,52,295.6), Vec(0,-0.042612,-1).norm()); // cam pos, dir
   Vec cx=Vec(w*.5135/h), cy=(cx%cam.d).norm()*.5135, r, *c=new Vec[w*h];
@@ -95,4 +102,5 @@ int main(int argc, char *argv[]){
   fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
   for (int i=0; i<w*h; i++)
     fprintf(f,"%d %d %d ", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
+  return 0;
 }

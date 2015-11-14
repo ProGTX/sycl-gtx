@@ -8,3 +8,4 @@ Release/
 *.vspx
 cl/
 *.stackdump
+smallpt/image.ppm
