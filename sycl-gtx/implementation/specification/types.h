@@ -22,12 +22,18 @@ struct vec_members {
 	vec_members(string_class name = "") {}
 };
 
+#define SYCL_V(member)	member(name + "." #member)
+
 template <typename dataT>
-struct vec_members<dataT, 2> : vec_members<dataT, 1> {
-	vec_base<dataT, 1> x, y, s0, s1;
+struct vec_members<dataT, 2> : vec_members<dataT, 1>{
+	vec_base<dataT, 1> x, y, s0, s1, lo, hi;
+	vec_base<dataT, 2> xx, xy, yx, yy;
 	vec_members(string_class name)
-		: x(name + ".x"), y(name + ".y"), s0(x.name), s1(y.name) {}
+		:	SYCL_V(x), SYCL_V(y), SYCL_V(s0), SYCL_V(s1), SYCL_V(lo), SYCL_V(hi),
+			SYCL_V(xx), SYCL_V(xy), SYCL_V(yx), SYCL_V(yy) {}
 };
+
+#undef SYCL_V
 
 template <typename dataT, int numElements>
 class vec_base : protected detail::counter<vec_base<dataT, numElements>>, public detail::data_ref {
