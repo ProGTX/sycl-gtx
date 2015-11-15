@@ -22,18 +22,33 @@ struct vec_members {
 	vec_members(string_class name = "") {}
 };
 
-#define SYCL_V(member)	member(name + "." #member)
+#define SYCL_V(member)								member(name + "." #member)
+#define SYCL_V2(m1, m2)								SYCL_V(m1), SYCL_V(m2)
+#define SYCL_V3(m1, m2, m3)							SYCL_V2(m1, m2), SYCL_V(m3)
+#define SYCL_V4(m1, m2, m3, m4)						SYCL_V2(m1, m2), SYCL_V2(m3, m4)
+#define SYCL_V5(m1, m2, m3, m4, m5)					SYCL_V3(m1, m2, m3), SYCL_V2(m4, m5)
+#define SYCL_V6(m1, m2, m3, m4, m5, m6)				SYCL_V3(m1, m2, m3), SYCL_V3(m4, m5, m6)
+#define SYCL_V7(m1, m2, m3, m4, m5, m6, m7)			SYCL_V4(m1, m2, m3, m4), SYCL_V3(m5, m6, m7)
+#define SYCL_V8(m1, m2, m3, m4, m5, m6, m7, m8)		SYCL_V4(m1, m2, m3, m4), SYCL_V4(m5, m6, m7, m8)
+#define SYCL_V9(m1, m2, m3, m4, m5, m6, m7, m8, m9)	SYCL_V5(m1, m2, m3, m4, m5), SYCL_V4(m6, m7, m8, m9)
 
 template <typename dataT>
-struct vec_members<dataT, 2> : vec_members<dataT, 1>{
+struct vec_members<dataT, 2> : vec_members<dataT, 1> {
 	vec_base<dataT, 1> x, y, s0, s1, lo, hi;
 	vec_base<dataT, 2> xx, xy, yx, yy;
 	vec_members(string_class name)
-		:	SYCL_V(x), SYCL_V(y), SYCL_V(s0), SYCL_V(s1), SYCL_V(lo), SYCL_V(hi),
-			SYCL_V(xx), SYCL_V(xy), SYCL_V(yx), SYCL_V(yy) {}
+		:	SYCL_V4(x, y, s0, s1), SYCL_V2(lo, hi), SYCL_V4(xx, xy, yx, yy) {}
 };
 
 #undef SYCL_V
+#undef SYCL_V2
+#undef SYCL_V3
+#undef SYCL_V4
+#undef SYCL_V5
+#undef SYCL_V6
+#undef SYCL_V7
+#undef SYCL_V8
+#undef SYCL_V9
 
 template <typename dataT, int numElements>
 class vec_base : protected detail::counter<vec_base<dataT, numElements>>, public detail::data_ref {
