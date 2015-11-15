@@ -238,7 +238,7 @@ inline double clamp(double x) {
 	return x;
 }
 
-void compute_sycl_gtx_cpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
+void compute_sycl_gtx_openmp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
 	#pragma omp parallel for schedule(dynamic, 1) private(r)
 	for(int y = 0; y < h; y++) {						// Loop over image rows
 		fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samps * 4, 100.*y / (h - 1));
@@ -273,9 +273,24 @@ void compute_sycl_gtx_cpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, V
 		}
 	}
 }
-
-void compute_sycl_gtx_gpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
+void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c, cl::sycl::device_selector& selector) {
 	using namespace cl::sycl;
 
-	gpu_selector gpu;
+	queue q(selector);
+
+	buffer<Vec> colors(c, range<1>(w*h));
+
+	q.submit([&](handler& cgh) {
+		// TODO
+	});
+}
+
+void compute_sycl_gtx_cpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
+	cl::sycl::cpu_selector cpu;
+	compute_sycl_gtx(w, h, samps, cam, cx, cy, r, c, cpu);
+}
+
+void compute_sycl_gtx_gpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
+	cl::sycl::gpu_selector gpu;
+	compute_sycl_gtx(w, h, samps, cam, cx, cy, r, c, gpu);
 }
