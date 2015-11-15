@@ -183,10 +183,6 @@ public:
 	template <class T>								\
 	data_ref& operator=(T n) {						\
 		return data_ref::operator=(n);				\
-	}												\
-	template <class T>								\
-	friend data_ref operator*(T n, type&& elem) {	\
-		return n * (data_ref&&)elem;				\
 	}
 
 template <typename dataT, int numElements>
