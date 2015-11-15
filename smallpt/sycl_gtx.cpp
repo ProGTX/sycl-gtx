@@ -274,21 +274,81 @@ void compute_sycl_gtx_openmp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy
 	}
 }
 
-void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* clrs, cl::sycl::device_selector& selector) {
+namespace sycl_class {
+
+using cl::sycl::double1;
+
+#ifdef SYCL_GTX
+struct Vec : public cl::sycl::vec<double, 3> {
+	Vec()
+		: vec(0, 0, 0) {}
+	Vec(const ::Vec& v)
+		: vec(v.x, v.y, v.z) {}
+	template <class X, class Y, class Z>
+	Vec(X x, Y y, Z z)
+		: vec(x, y, z) {}
+
+	Vec mult(const Vec &b) const {
+		return Vec(x*b.x, y*b.y, z*b.z);
+	}
+	Vec& norm() {
+		operator*=(1 / cl::sycl::sqrt(x*x + y*y + z*z));
+		return *this;
+	}
+	double1 dot(const Vec &b) const {
+		return x*b.x + y*b.y + z*b.z;
+	}
+	Vec operator%(Vec&b) {
+		return Vec(y*b.z - z*b.y, z*b.x - x*b.z, x*b.y - y*b.x);
+	}
+};
+
+inline double1 clamp(double1 x) {
+	SYCL_IF(x < 0)
+	SYCL_BEGIN {
+		return 0;
+	}
+	SYCL_END
+
+	SYCL_IF(x > 1)
+	SYCL_BEGIN{
+		return 1;
+	}
+	SYCL_END
+
+	return x;
+}
+
+#else
+using Vec = ::Vec;
+inline double clamp(double x) {
+	return ::clamp(x);
+}
+#endif
+
+
+
+} // sycl_class
+
+void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec r_, Vec* c_, cl::sycl::device_selector& selector) {
 	using namespace cl::sycl;
 
 	queue q(selector);
 
-	buffer<Vec> colors(clrs, range<1>(w*h));
+	buffer<Vec> colors(c_, range<1>(w*h));
 
 	q.submit([&](handler& cgh) {
 		auto c = colors.get_access<access::read_write, access::global_buffer>();
 
-		// TODO: Should not be mutable
-		cgh.parallel_for<class smallpt>(range<2>(w, h), [=](id<2> index) mutable {
+		cgh.parallel_for<class smallpt>(range<2>(w, h), [=](id<2> index) {
+			sycl_class::Vec cx(cx_);
+			sycl_class::Vec cy(cy_);
+			sycl_class::Vec r(r_);
+
 			auto x = index[0];
 			auto y = index[1];
-			unsigned short Xi[3] = { 0, 0, (size_t)y*y*y };	// TODO
+			//unsigned short Xi[3] = { 0, 0, (size_t)y*y*y };	// TODO
+			unsigned short Xi[3] = { 0, 0, 0 };	// TODO
 			int1 i = (h - y - 1)*w + x;
 
 			// 2x2 subpixel rows
@@ -326,17 +386,23 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r
 						}
 						SYCL_END
 
-						Vec d = cx * (((sx + .5 + rnew.x) / 2 + x) / w - .5) +
-								cy * (((sy + .5 + rnew.y) / 2 + y) / h - .5) +
-								cam.d;
+						// TODO
+						sycl_class::Vec d;
+						d =	cx * (((sx + .5 + dd.x) / 2 + x) / w - .5) +
+							cy * (((sy + .5 + dd.y) / 2 + y) / h - .5) +
+							cam.d;
 
 						// TODO:
 						//r = r + ns_sycl_gtx::radiance(Ray(cam.o + d * 140, d.norm()), Xi)*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 
-					c[i] = c[i] + Vec(clamp(r.x), clamp(r.y), clamp(r.z))*.25;
+					c[i] = c[i] + sycl_class::Vec(
+						sycl_class::clamp(r.x),
+						sycl_class::clamp(r.y),
+						sycl_class::clamp(r.z)
+					) * .25;
 
-					r = Vec();
+					r = sycl_class::Vec();
 				}
 				SYCL_END
 			}
