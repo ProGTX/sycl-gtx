@@ -46,7 +46,8 @@ enum class DoNext {
 DoNext radianceInner(
 	Ray& r, int& depth, unsigned short* Xi,	// Original parameters
 	double& t, int& id, Vec& cl, Vec& cf,	// Passed references
-	double& Re, double& Tr, double& P, double& RP, double& TP, Ray& reflRay, Vec& x, Vec& tdir  // Output references
+	// Output references
+	double& Re, double& Tr, double& P, double& RP, double& TP, Ray& reflRay, Vec& x, Vec& tdir
 ) {
 	if(!intersect(r, t, id)) {
 		// if miss, don't add anything
@@ -150,7 +151,7 @@ DoNext radianceInner(
 	return DoNext::Proceed;
 }
 
-void radiance(Ray r, int depth, unsigned short *Xi, Vec& cl, Vec& cf) {
+void radiance(Ray r, int depth, unsigned short* Xi, Vec& cl, Vec& cf) {
 	double t;	// distance to intersection
 	int id = 0;	// id of intersected object
 
@@ -183,74 +184,14 @@ void radiance(Ray r, int depth, unsigned short *Xi, Vec& cl, Vec& cf) {
 	}
 }
 
-Vec radiance2(Ray r, unsigned short *Xi, Vec cl, Vec cf) {
+template <int depth_ = 0>
+Vec radiance(Ray r, unsigned short* Xi, Vec cl = { 0, 0, 0 }, Vec cf = {1, 1, 1}) {
 	double t;	// distance to intersection
 	int id = 0;	// id of intersected object
-	int depth = 2;
+	int depth = depth_;
 
-	double Re, Tr, P, RP, TP;
-	Ray reflRay(0, 0);
-	Vec x, tdir;
-
-	while(true) {
-		auto doNext = radianceInner(
-			r, depth, Xi,
-			t, id, cl, cf,
-			Re, Tr, P, RP, TP, reflRay, x, tdir
-		);
-
-		if(doNext == DoNext::ContinueLoop) {
-			continue;
-		}
-		if(doNext == DoNext::Return) {
-			return cl;
-		}
-
-		radiance(r, depth, Xi, cl, cf);
-		return cl;
-	}
-}
-
-Vec radiance1(Ray r, unsigned short *Xi, Vec cl, Vec cf) {
-	double t;	// distance to intersection
-	int id = 0;	// id of intersected object
-	int depth = 1;
-
-	double Re, Tr, P, RP, TP;
-	Ray reflRay(0, 0);
-	Vec x, tdir;
-
-	while(true) {
-		auto doNext = radianceInner(
-			r, depth, Xi,
-			t, id, cl, cf,
-			Re, Tr, P, RP, TP, reflRay, x, tdir
-		);
-
-		if(doNext == DoNext::ContinueLoop) {
-			continue;
-		}
-		if(doNext == DoNext::Return) {
-			return cl;
-		}
-
-		if(depth == 2) {
-			return radiance2(reflRay, Xi, cl, cf * Re) + radiance2(Ray(x, tdir), Xi, cl, cf * Tr);
-		}
-		else {
-			radiance(r, depth, Xi, cl, cf);
-			return cl;
-		}
-	}
-}
-
-Vec radiance(Ray r, unsigned short *Xi) {
-	double t;	// distance to intersection
-	int id = 0;	// id of intersected object
-	int depth = 0;
-
-	Vec cl(0, 0, 0); // accumulated color
-	Vec cf(1, 1, 1); // accumulated reflectance
+	// cl is accumulated color
+	// cf is accumulated reflectance
 
 	double Re, Tr, P, RP, TP;
 	Ray reflRay(0, 0);
@@ -271,10 +212,10 @@ Vec radiance(Ray r, unsigned short *Xi) {
 		}
 
 		if(depth == 1) {
-			return radiance1(reflRay, Xi, cl, cf * Re) + radiance1(Ray(x, tdir), Xi, cl, cf * Tr);
+			return radiance<1>(reflRay, Xi, cl, cf * Re) + radiance<1>(Ray(x, tdir), Xi, cl, cf * Tr);
 		}
 		else if(depth == 2) {
-			return radiance2(reflRay, Xi, cl, cf * Re) + radiance2(Ray(x, tdir), Xi, cl, cf * Tr);
+			return radiance<2>(reflRay, Xi, cl, cf * Re) + radiance<2>(Ray(x, tdir), Xi, cl, cf * Tr);
 		}
 		else {
 			radiance(r, depth, Xi, cl, cf);
