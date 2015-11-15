@@ -25,6 +25,16 @@ SYCL_TYPE(long)
 
 #undef SYCL_TYPE
 
+template <class First>
+static First sqrt(First first) {
+	return ::std::sqrt(first);
+}
+
+template <class First, class Second>
+static auto min(First first, Second second) -> decltype(::std::min(first, second)) {
+	return ::std::min(first, second);
+}
+
 } // namespace sycl
 } // namespace cl
 
