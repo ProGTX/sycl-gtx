@@ -129,25 +129,25 @@ private:
 
 public:
 	vec_base()
-		: counter(), data_ref(generate_name()) {
+		: data_ref(generate_name()) {
 		detail::kernel_add(type_name() + ' ' + name);
 	}
 
 	template <class T>
 	vec_base(T n)
-		: counter(), data_ref(generate_name()) {
+		: data_ref(generate_name()) {
 		detail::kernel_add(type_name() + ' ' + name + " = " + get_name(n));
 	}
 
 	template <int num = numElements>
 	vec_base(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
-		: counter(), data_ref(generate_name()) {
+		: data_ref(generate_name()) {
 		detail::kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ")");
 	}
 
 	template <int num = numElements>
 	vec_base(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
-		: counter(), data_ref(generate_name()) {
+		: data_ref(generate_name()) {
 		detail::kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ", " + z.name + ")");
 	}
 
