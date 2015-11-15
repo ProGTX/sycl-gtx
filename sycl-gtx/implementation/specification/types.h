@@ -40,6 +40,34 @@ struct vec_members<dataT, 2> : vec_members<dataT, 1> {
 		:	SYCL_V4(x, y, s0, s1), SYCL_V2(lo, hi), SYCL_V4(xx, xy, yx, yy) {}
 };
 
+template <typename dataT>
+struct vec_members<dataT, 3> : vec_members<dataT, 2>{
+	vec_base<dataT, 1> z, s2;
+	vec_base<dataT, 2> lo, hi;
+	vec_base<dataT, 3>	xxx, xxy, xxz,
+						xyx, xyy, xyz,
+						xzx, xzy, xzz,
+						yxx, yxy, yxz,
+						yyx, yyy, yyz,
+						yzx, yzy, yzz,
+						zxx, zxy, zxz,
+						zyx, zyy, zyz,
+						zzx, zzy, zzz;
+	vec_members(string_class name)
+		:	vec_members<dataT, 2>(name),
+			SYCL_V2(z, s2),
+			SYCL_V2(lo, hi),
+			SYCL_V9(xxx, xxy, xxz,
+					xyx, xyy, xyz,
+					xzx, xzy, xzz),
+			SYCL_V9(yxx, yxy, yxz,
+					yyx, yyy, yyz,
+					yzx, yzy, yzz),
+			SYCL_V9(zxx, zxy, zxz,
+					zyx, zyy, zyz,
+					zzx, zzy, zzz) {}
+};
+
 #undef SYCL_V
 #undef SYCL_V2
 #undef SYCL_V3
