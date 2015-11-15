@@ -1,6 +1,6 @@
 #pragma once
 
-// 3.8 Data Types
+// 3.7 Data Types
 
 #include "../common.h"
 #include "../counter.h"
@@ -9,13 +9,32 @@
 namespace cl {
 namespace sycl {
 
-// 3.8.1 Vector types
+// 3.7.2 Vector types
 
 namespace detail {
+
+// Forward declaration
+template <typename dataT, int numElements>
+class vec_base;
+
+template <typename dataT, int numElements>
+struct vec_members {
+	vec_members(string_class name = "") {}
+};
+
+template <typename dataT>
+struct vec_members<dataT, 2> : vec_members<dataT, 1> {
+	vec_base<dataT, 1> x, y, s0, s1;
+	vec_members(string_class name)
+		: x(name + ".x"), y(name + ".y"), s0(x.name), s1(y.name) {}
+};
 
 template <typename dataT, int numElements>
 class vec_base : protected detail::counter<vec_base<dataT, numElements>>, public detail::data_ref {
 private:
+	template <typename dataT, int numElements>
+	friend struct detail::vec_members;
+
 	static string_class type_name() {
 		return detail::type_string<dataT>() + (numElements == 1 ? "" : std::to_string(numElements));
 	}
@@ -23,6 +42,9 @@ private:
 	string_class generate_name() const {
 		return '_' + type_name() + '_' + std::to_string(get_count_id());
 	}
+
+	vec_base(string_class name)
+		: data_ref(name) {}
 
 public:
 	vec_base()
@@ -47,12 +69,14 @@ public:
 } // namespace detail
 
 
-#define SYCL_VEC_INHERIT(type)						\
-	type()											\
-		: Base() {}									\
-	template <class T>								\
-	type(T n)										\
-		: Base(n) {}								\
+#define SYCL_VEC_INHERIT_CONSTRUCTORS(type)	\
+	type()									\
+		: Base() {}							\
+	template <class T>						\
+	type(T n)								\
+		: Base(n) {}						\
+
+#define SYCL_VEC_INHERIT_ASSIGNMENTS(type)			\
 	template <class T>								\
 	data_ref& operator=(T n) {						\
 		return data_ref::operator=(n);				\
@@ -63,11 +87,17 @@ public:
 	}
 
 template <typename dataT, int numElements>
-class vec : public detail::vec_base<dataT, numElements> {
+class vec : public detail::vec_base<dataT, numElements>, public detail::vec_members<dataT, numElements> {
 private:
 	using Base = detail::vec_base<dataT, numElements>;
+	using Members = detail::vec_members<dataT, numElements>;
 public:
-	SYCL_VEC_INHERIT(vec)
+	vec()
+		: Base(), Members(name) {}
+	template <class T>
+	vec(T n)
+		: Base(n), Members(name) {}
+	SYCL_VEC_INHERIT_ASSIGNMENTS(vec)
 };
 
 
@@ -77,14 +107,16 @@ public:
 	class type##numElements : public vec<type, numElements> {	\
 		using Base = vec<type, numElements>;					\
 	public:														\
-		SYCL_VEC_INHERIT(type##numElements)						\
+		SYCL_VEC_INHERIT_CONSTRUCTORS(type##numElements)		\
+		SYCL_VEC_INHERIT_ASSIGNMENTS(type##numElements)			\
 	};
 
 #define SYCL_VEC_UNSIGNED(type, numElements)								\
 	class u##type##numElements : public vec<unsigned type, numElements> {	\
 		using Base = vec<unsigned type, numElements>;						\
 	public:																	\
-		SYCL_VEC_INHERIT(u##type##numElements)								\
+		SYCL_VEC_INHERIT_CONSTRUCTORS(u##type##numElements)					\
+		SYCL_VEC_INHERIT_ASSIGNMENTS(u##type##numElements)					\
 	};
 
 #define SYCL_ADD_SIGNED_vec(type)	\
@@ -118,7 +150,8 @@ SYCL_ADD_UNSIGNED_vec(long)
 
 #undef SYCL_ADD_SIGNED_vec
 #undef SYCL_ADD_UNSIGNED_vec
-#undef SYCL_VEC_INHERIT
+#undef SYCL_VEC_INHERIT_ASSIGNMENTS
+#undef SYCL_VEC_INHERIT_CONSTRUCTORS
 #undef SYCL_VEC_SIGNED
 #undef SYCL_VEC_UNSIGNED
 
