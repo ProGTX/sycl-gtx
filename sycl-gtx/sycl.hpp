@@ -1,5 +1,6 @@
 #pragma once
 
+#define SYCL_GTX
 #define CL_SYCL_LANGUAGE_VERSION 120
 
 #include "implementation/specification/accessor/buffer.h"

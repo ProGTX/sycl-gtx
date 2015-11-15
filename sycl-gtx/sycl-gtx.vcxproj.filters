@@ -242,5 +242,8 @@
     <ClInclude Include="implementation\synchronizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sycl_gtx_flow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

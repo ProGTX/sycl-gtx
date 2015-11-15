@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef SYCL_GTX
+
 #include "data_ref.h"
 #include "common.h"
 #include "debug.h"
@@ -62,9 +64,8 @@ SYCL_END					\
 #define SYCL_THEN(code) \
 SYCL_BLOCK(code)
 
-#define SYCL_ELSE(code)					\
-::cl::sycl::detail::control::else_();	\
-SYCL_BLOCK(code)
+#define SYCL_ELSE	\
+::cl::sycl::detail::control::else_();
 
 #define SYCL_ELSE_IF(condition)					\
 ::cl::sycl::detail::control::else_if(			\
@@ -82,3 +83,5 @@ init;											\
 	::cl::sycl::detail::data_ref((condition)),	\
 	::cl::sycl::detail::data_ref((increment))	\
 );
+
+#endif // SYCL_GTX

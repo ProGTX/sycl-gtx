@@ -217,6 +217,7 @@
     <ClInclude Include="implementation\src_handlers\kernel_source.h" />
     <ClInclude Include="implementation\synchronizer.h" />
     <ClInclude Include="sycl.hpp" />
+    <ClInclude Include="sycl_gtx_flow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
