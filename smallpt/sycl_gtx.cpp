@@ -39,14 +39,21 @@ inline bool intersect(const Ray& r, double& t, int& id) {
 	return t < inf;
 }
 
-Vec radiance(const Ray& r, int depth, unsigned short *Xi) {
-	double t;								// distance to intersection
-	int id = 0;								// id of intersected object
+enum class DoNext {
+	Return, ContinueLoop, Proceed
+};
+
+DoNext radianceInner(
+	Ray& r, int& depth, unsigned short* Xi,	// Original parameters
+	double& t, int& id, Vec& cl, Vec& cf,	// Passed references
+	double& Re, double& Tr, double& P, double& RP, double& TP, Ray& reflRay, Vec& x, Vec& tdir  // Output references
+) {
 	if(!intersect(r, t, id)) {
-		return Vec(); // if miss, return black
+		// if miss, don't add anything
+		return DoNext::Return;
 	}
-	const Sphere& obj = spheres[id];		// the hit object
-	Vec x = r.o + r.d*t;
+	const Sphere& obj = spheres[id]; // the hit object
+	x = r.o + r.d*t;
 	Vec n = (x - obj.p).norm();
 	Vec nl = n;
 	if(n.dot(r.d) > 0) {
@@ -64,15 +71,19 @@ Vec radiance(const Ray& r, int depth, unsigned short *Xi) {
 		p = f.z;
 	}
 
+	cl = cl + cf.mult(obj.e);
+
 	depth += 1;
 	if(depth > 5) {
 		if(erand48(Xi) < p) {
 			f = f*(1 / p);
 		}
 		else {
-			return obj.e;
+			return DoNext::Return;
 		}
 	}
+
+	cf = cf.mult(f);
 
 	if(obj.refl == DIFF) {	// Ideal DIFFUSE reflection
 		double r1 = 2 * M_PI*erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
@@ -87,12 +98,17 @@ Vec radiance(const Ray& r, int depth, unsigned short *Xi) {
 		u = (u % w).norm();
 		Vec v = w%u;
 		Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
-		return obj.e + f.mult(radiance(Ray(x, d), depth, Xi));
+
+		// Recursion
+		r = Ray(x, d);
+		return DoNext::ContinueLoop;
 	}
 	else if(obj.refl == SPEC) {	// Ideal SPECULAR reflection
-		return obj.e + f.mult(radiance(Ray(x, r.d - n * 2 * n.dot(r.d)), depth, Xi));
+		// Recursion
+		r = Ray(x, r.d - n * 2 * n.dot(r.d));
+		return DoNext::ContinueLoop;
 	}
-	Ray reflRay(x, r.d - n * 2 * n.dot(r.d));	// Ideal dielectric REFRACTION
+	reflRay = Ray(x, r.d - n * 2 * n.dot(r.d));	// Ideal dielectric REFRACTION
 	bool into = n.dot(nl) > 0;	// Ray from outside going in?
 	double nc = 1;
 	double nt = 1.5;
@@ -106,13 +122,15 @@ Vec radiance(const Ray& r, int depth, unsigned short *Xi) {
 	double ddn = r.d.dot(nl);
 	double cos2t;
 	if((cos2t = 1 - nnt*nnt*(1 - ddn*ddn)) < 0) {	// Total internal reflection
-		return obj.e + f.mult(radiance(reflRay, depth, Xi));
+		// Recursion
+		r = reflRay;
+		return DoNext::ContinueLoop;
 	}
 	double tmp = 1;
 	if(!into) {
 		tmp = -1;
 	}
-	Vec tdir = (r.d*nnt - n*(tmp*(ddn*nnt + sqrt(cos2t)))).norm();
+	tdir = (r.d*nnt - n*(tmp*(ddn*nnt + sqrt(cos2t)))).norm();
 	double a = nt - nc;
 	double b = nt + nc;
 	double R0 = a*a / (b*b);
@@ -123,25 +141,148 @@ Vec radiance(const Ray& r, int depth, unsigned short *Xi) {
 	else {
 		c -= tdir.dot(n);
 	}
-	double Re = R0 + (1 - R0)*c*c*c*c*c;
-	double Tr = 1 - Re;
-	double P = .25 + .5*Re;
-	double RP = Re / P;
-	double TP = Tr / (1 - P);
-	Vec rad;
-	if(depth > 2) {
+	Re = R0 + (1 - R0)*c*c*c*c*c;
+	Tr = 1 - Re;
+	P = .25 + .5*Re;
+	RP = Re / P;
+	TP = Tr / (1 - P);
+
+	return DoNext::Proceed;
+}
+
+void radiance(Ray r, int depth, unsigned short *Xi, Vec& cl, Vec& cf) {
+	double t;	// distance to intersection
+	int id = 0;	// id of intersected object
+
+	double Re, Tr, P, RP, TP;
+	Ray reflRay(0, 0);
+	Vec x, tdir;
+
+	while(true) {
+		auto doNext = radianceInner(
+			r, depth, Xi,
+			t, id, cl, cf,
+			Re, Tr, P, RP, TP, reflRay, x, tdir
+		);
+
+		if(doNext == DoNext::ContinueLoop) {
+			continue;
+		}
+		if(doNext == DoNext::Return) {
+			return;
+		}
+
 		if(erand48(Xi) < P) {
-			rad = radiance(reflRay, depth, Xi)*RP;
+			cf = cf * RP;
+			r = reflRay;
 		}
 		else {
-			rad = radiance(Ray(x, tdir), depth, Xi)*TP;
+			cf = cf * TP;
+			r = Ray(x, tdir);
 		}
 	}
-	else {
-		rad = radiance(reflRay, depth, Xi)*Re + radiance(Ray(x, tdir), depth, Xi)*Tr;
-	}
-	return obj.e + f.mult(rad);
 }
+
+Vec radiance2(Ray r, unsigned short *Xi, Vec cl, Vec cf) {
+	double t;	// distance to intersection
+	int id = 0;	// id of intersected object
+	int depth = 2;
+
+	double Re, Tr, P, RP, TP;
+	Ray reflRay(0, 0);
+	Vec x, tdir;
+
+	while(true) {
+		auto doNext = radianceInner(
+			r, depth, Xi,
+			t, id, cl, cf,
+			Re, Tr, P, RP, TP, reflRay, x, tdir
+		);
+
+		if(doNext == DoNext::ContinueLoop) {
+			continue;
+		}
+		if(doNext == DoNext::Return) {
+			return cl;
+		}
+
+		radiance(r, depth, Xi, cl, cf);
+		return cl;
+	}
+}
+
+Vec radiance1(Ray r, unsigned short *Xi, Vec cl, Vec cf) {
+	double t;	// distance to intersection
+	int id = 0;	// id of intersected object
+	int depth = 1;
+
+	double Re, Tr, P, RP, TP;
+	Ray reflRay(0, 0);
+	Vec x, tdir;
+
+	while(true) {
+		auto doNext = radianceInner(
+			r, depth, Xi,
+			t, id, cl, cf,
+			Re, Tr, P, RP, TP, reflRay, x, tdir
+		);
+
+		if(doNext == DoNext::ContinueLoop) {
+			continue;
+		}
+		if(doNext == DoNext::Return) {
+			return cl;
+		}
+
+		if(depth == 2) {
+			return radiance2(reflRay, Xi, cl, cf * Re) + radiance2(Ray(x, tdir), Xi, cl, cf * Tr);
+		}
+		else {
+			radiance(r, depth, Xi, cl, cf);
+			return cl;
+		}
+	}
+}
+
+Vec radiance(Ray r, unsigned short *Xi) {
+	double t;	// distance to intersection
+	int id = 0;	// id of intersected object
+	int depth = 0;
+
+	Vec cl(0, 0, 0); // accumulated color
+	Vec cf(1, 1, 1); // accumulated reflectance
+
+	double Re, Tr, P, RP, TP;
+	Ray reflRay(0, 0);
+	Vec x, tdir;
+
+	while(true) {
+		auto doNext = radianceInner(
+			r, depth, Xi,
+			t, id, cl, cf,
+			Re, Tr, P, RP, TP, reflRay, x, tdir
+		);
+
+		if(doNext == DoNext::ContinueLoop) {
+			continue;
+		}
+		if(doNext == DoNext::Return) {
+			return cl;
+		}
+
+		if(depth == 1) {
+			return radiance1(reflRay, Xi, cl, cf * Re) + radiance1(Ray(x, tdir), Xi, cl, cf * Tr);
+		}
+		else if(depth == 2) {
+			return radiance2(reflRay, Xi, cl, cf * Re) + radiance2(Ray(x, tdir), Xi, cl, cf * Tr);
+		}
+		else {
+			radiance(r, depth, Xi, cl, cf);
+			return cl;
+		}
+	}
+}
+
 } // namespace ns_sycl_gtx
 
 inline double clamp(double x) {
@@ -179,7 +320,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r
 						}
 
 						Vec d = cx*(((sx + .5 + dx) / 2 + x) / w - .5) + cy*(((sy + .5 + dy) / 2 + y) / h - .5) + cam.d;
-						r = r + ns_sycl_gtx::radiance(Ray(cam.o + d * 140, d.norm()), 0, Xi)*(1. / samps);
+						r = r + ns_sycl_gtx::radiance(Ray(cam.o + d * 140, d.norm()), Xi)*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 
 					c[i] = c[i] + Vec(clamp(r.x), clamp(r.y), clamp(r.z))*.25;
