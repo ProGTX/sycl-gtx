@@ -13,6 +13,9 @@ namespace sycl {
 
 namespace detail {
 
+#define SYCL_ENABLE_IF_DIM(dim)	\
+typename std::enable_if<num == dim>::type* = nullptr
+
 // Forward declaration
 template <typename dataT, int numElements>
 class vec_base;
@@ -136,6 +139,18 @@ public:
 		detail::kernel_add(type_name() + ' ' + name + " = " + get_name(n));
 	}
 
+	template <int num = numElements>
+	vec_base(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
+		: counter(), data_ref(generate_name()) {
+		detail::kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ")");
+	}
+
+	template <int num = numElements>
+	vec_base(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
+		: counter(), data_ref(generate_name()) {
+		detail::kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ", " + z.name + ")");
+	}
+
 	// TODO: Swizzle methods
 	//swizzled_vec<T, out_dims> swizzle<int s1, ...>();
 #ifdef SYCL_SIMPLE_SWIZZLES
@@ -146,13 +161,23 @@ public:
 
 } // namespace detail
 
-
+#if MSVC_LOW
+#define SYCL_VEC_INHERIT_CONSTRUCTORS(type)							\
+	type()															\
+		: Base() {}													\
+	template <class T>												\
+	type(T n)														\
+		: Base(n) {}												\
+	template <int num = numElements>								\
+	type(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))				\
+		: Base(x, y) {}												\
+	template <int num = numElements>								\
+	type(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))	\
+		: Base(x, y, z) {}
+#else
 #define SYCL_VEC_INHERIT_CONSTRUCTORS(type)	\
-	type()									\
-		: Base() {}							\
-	template <class T>						\
-	type(T n)								\
-		: Base(n) {}						\
+	using Base::Base;
+#endif
 
 #define SYCL_VEC_INHERIT_ASSIGNMENTS(type)			\
 	template <class T>								\
@@ -175,6 +200,13 @@ public:
 	template <class T>
 	vec(T n)
 		: Base(n), Members(name) {}
+	
+	template <int num = numElements>
+	vec(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
+		: Base(x, y), Members(name) {}
+	template <int num = numElements>
+	vec(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
+		: Base(x, y, z), Members(name) {}
 	SYCL_VEC_INHERIT_ASSIGNMENTS(vec)
 };
 
@@ -225,6 +257,8 @@ SYCL_ADD_UNSIGNED_vec(int)
 SYCL_ADD_UNSIGNED_vec(char)
 SYCL_ADD_UNSIGNED_vec(short)
 SYCL_ADD_UNSIGNED_vec(long)
+
+#undef SYCL_ENABLE_IF_DIM
 
 #undef SYCL_ADD_SIGNED_vec
 #undef SYCL_ADD_UNSIGNED_vec
