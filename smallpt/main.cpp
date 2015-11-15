@@ -9,7 +9,8 @@
 
 extern void compute_org(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
 extern void compute_org_openmp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
-extern void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_sycl_gtx_cpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_sycl_gtx_gpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
 
 inline double clamp(double x) {
 	return x < 0 ? 0 : x>1 ? 1 : x;
@@ -48,7 +49,8 @@ int main(int argc, char *argv[]) {
 	map<string, void(*)(int, int, int, Ray&, Vec&, Vec&, Vec, Vec*)> tests = {
 		{ "org", compute_org },
 		{ "openmp", compute_org_openmp },
-		{ "sycl_gtx", compute_sycl_gtx }
+		{ "sycl_cpu", compute_sycl_gtx_cpu },
+		{ "sycl_gpu", compute_sycl_gtx_gpu }
 	};
 
 	vector<Vec> empty_vectors(w*h, 0);

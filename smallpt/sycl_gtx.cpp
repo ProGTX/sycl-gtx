@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <cstdio>
 
+#include <sycl.hpp>
+
 #include "classes.h"
 #include "msvc.h"
 
@@ -269,4 +271,10 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r
 			}
 		}
 	}
+}
+
+void compute_sycl_gtx_gpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
+	using namespace cl::sycl;
+
+	gpu_selector gpu;
 }
