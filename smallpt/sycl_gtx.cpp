@@ -238,7 +238,8 @@ inline double clamp(double x) {
 	return x;
 }
 
-void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
+void compute_sycl_gtx_cpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
+	#pragma omp parallel for schedule(dynamic, 1) private(r)
 	for(int y = 0; y < h; y++) {						// Loop over image rows
 		fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samps * 4, 100.*y / (h - 1));
 		for(unsigned short x = 0, Xi[3] = { 0, 0, y*y*y }; x < w; x++) {	// Loop cols
