@@ -273,15 +273,75 @@ void compute_sycl_gtx_openmp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy
 		}
 	}
 }
-void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c, cl::sycl::device_selector& selector) {
+
+void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* clrs, cl::sycl::device_selector& selector) {
 	using namespace cl::sycl;
 
 	queue q(selector);
 
-	buffer<Vec> colors(c, range<1>(w*h));
+	buffer<Vec> colors(clrs, range<1>(w*h));
 
 	q.submit([&](handler& cgh) {
-		// TODO
+		auto c = colors.get_access<access::read_write, access::global_buffer>();
+
+		// TODO: Should not be mutable
+		cgh.parallel_for<class smallpt>(range<2>(w, h), [=](id<2> index) mutable {
+			auto x = index[0];
+			auto y = index[1];
+			unsigned short Xi[3] = { 0, 0, (size_t)y*y*y };	// TODO
+			int1 i = (h - y - 1)*w + x;
+
+			// 2x2 subpixel rows
+			SYCL_FOR(int1 sy = 0, sy < 2, sy++)
+			SYCL_BEGIN {
+				// 2x2 subpixel cols
+				SYCL_FOR(int1 sx = 0, sx < 2, sx++)
+				SYCL_BEGIN {
+					SYCL_FOR(int1 s = 0, s < samps, s++) {
+						double2 rnew;
+						rnew.x = 2 * erand48(Xi);
+						rnew.y = 2 * erand48(Xi);
+
+						double2 dd;
+
+						SYCL_IF(rnew.x < 1)
+						SYCL_BEGIN {
+							dd.x = sqrt(rnew.x) - 1;
+						}
+						SYCL_END
+						SYCL_ELSE
+						SYCL_BEGIN {
+							dd.x = 1 - sqrt(2 - rnew.x);
+						}
+						SYCL_END
+
+						SYCL_IF(rnew.y < 1)
+						SYCL_BEGIN {
+							dd.y = sqrt(rnew.y) - 1;
+						}
+						SYCL_END
+						SYCL_ELSE
+						SYCL_BEGIN {
+							dd.y = 1 - sqrt(2 - rnew.y);
+						}
+						SYCL_END
+
+						Vec d = cx * (((sx + .5 + rnew.x) / 2 + x) / w - .5) +
+								cy * (((sy + .5 + rnew.y) / 2 + y) / h - .5) +
+								cam.d;
+
+						// TODO:
+						//r = r + ns_sycl_gtx::radiance(Ray(cam.o + d * 140, d.norm()), Xi)*(1. / samps);
+					} // Camera rays are pushed ^^^^^ forward to start in interior
+
+					c[i] = c[i] + Vec(clamp(r.x), clamp(r.y), clamp(r.z))*.25;
+
+					r = Vec();
+				}
+				SYCL_END
+			}
+			SYCL_END
+		});
 	});
 }
 
