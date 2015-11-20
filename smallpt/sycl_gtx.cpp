@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
+#include <iostream>
 
 #include <sycl.hpp>
 
@@ -309,40 +310,64 @@ struct Vector : public cl::sycl::vec<double, 3> {
 	}
 };
 
-inline double1 clamp(double1 x) {
+#else
+
+using Vector = ::Vec;
+
+#endif // SYCL_GTX
+
+struct RaySycl {
+	Vector o, d;
+	RaySycl(const ::Ray& r)
+		: o(r.o), d(r.d) {}
+	RaySycl(Vector o_, Vector d_)
+		: o(o_), d(d_) {}
+};
+
+inline void clamp(double1& x) {
 	SYCL_IF(x < 0)
 	SYCL_BEGIN {
-		return 0;
+		x = 0;
 	}
 	SYCL_END
-
-	SYCL_IF(x > 1)
-	SYCL_BEGIN{
-		return 1;
+	SYCL_ELSE_IF(x > 1)
+	SYCL_BEGIN {
+		x = 1;
 	}
 	SYCL_END
-
-	return x;
 }
 
-#else
-using Vec = ::Vec;
-inline double clamp(double x) {
-	return ::clamp(x);
-}
-#endif
-
-
+struct VecData : public ::Vec {
+	double w;	// Padding
+	static cl::sycl::string_class type_name() {
+		return "double3";
+	}
+	VecData& operator=(const Vec& v) {
+		Vec::operator=(v);
+		return *this;
+	}
+};
 
 } // sycl_class
 
 void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec r_, Vec* c_, cl::sycl::device_selector& selector) {
+	using namespace std;
 	using namespace cl::sycl;
 	using sycl_class::Vector;
 
 	queue q(selector);
 
-	buffer<Vec> colors(c_, range<1>(w*h));
+	buffer<sycl_class::VecData> colors(range<1>(w*h));
+	{
+		auto c = colors.get_access<access::discard_write, access::host_buffer>();
+
+		for(int y = 0; y < h; ++y) {
+			for(int x = 0; x < w; ++x) {
+				int i = (h - y - 1)*w + x;
+				c[i] = c_[i];
+			}
+		}
+	}
 
 	q.submit([&](handler& cgh) {
 		auto c = colors.get_access<access::read_write, access::global_buffer>(cgh);
@@ -351,6 +376,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec
 			Vector cx(cx_);
 			Vector cy(cy_);
 			Vector r(r_);
+			Vector camera_d(cam.d);
 
 			auto x = index[0];
 			auto y = index[1];
@@ -364,7 +390,8 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec
 				// 2x2 subpixel cols
 				SYCL_FOR(int1 sx = 0, sx < 2, sx++)
 				SYCL_BEGIN {
-					SYCL_FOR(int1 s = 0, s < samps, s++) {
+					SYCL_FOR(int1 s = 0, s < samps, s++)
+					SYCL_BEGIN {
 						double2 rnew;
 						rnew.x = 2 * erand48(Xi);
 						rnew.y = 2 * erand48(Xi);
@@ -393,21 +420,22 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec
 						}
 						SYCL_END
 
-						// TODO
 						Vector d;
-						d =	cx * (((sx + .5 + dd.x) / 2 + x) / w - .5) +
+						d = cx * (((sx + .5 + dd.x) / 2 + x) / w - .5) +
 							cy * (((sy + .5 + dd.y) / 2 + y) / h - .5) +
-							cam.d;
+							camera_d;
 
 						// TODO:
 						//r = r + ns_sycl_gtx::radiance(Ray(cam.o + d * 140, d.norm()), Xi)*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
+					SYCL_END
 
-					c[i] = c[i] + Vector(
-						clamp(r.x),
-						clamp(r.y),
-						clamp(r.z)
-					) * .25;
+					Vector rc = r;
+					sycl_class::clamp(rc.x);
+					sycl_class::clamp(rc.y);
+					sycl_class::clamp(rc.z);
+
+					c[i] = c[i] + rc * .25;
 
 					r = Vector();
 				}
@@ -416,6 +444,14 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec
 			SYCL_END
 		});
 	});
+
+	auto c = colors.get_access<access::read, access::host_buffer>();
+	for(int y = 0; y < h; ++y) {
+		for(int x = 0; x < w; ++x) {
+			int i = (h - y - 1)*w + x;
+			c_[i] = c[i];
+		}
+	}
 }
 
 void compute_sycl_gtx_cpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
