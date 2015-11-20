@@ -163,30 +163,6 @@ public:
 
 } // namespace detail
 
-#if MSVC_LOW
-#define SYCL_VEC_INHERIT_CONSTRUCTORS(type)							\
-	type()															\
-		: Base() {}													\
-	template <class T>												\
-	type(T n)														\
-		: Base(n) {}												\
-	template <int num = numElements>								\
-	type(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))				\
-		: Base(x, y) {}												\
-	template <int num = numElements>								\
-	type(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))	\
-		: Base(x, y, z) {}
-#else
-#define SYCL_VEC_INHERIT_CONSTRUCTORS(type)	\
-	using Base::Base;
-#endif
-
-#define SYCL_VEC_INHERIT_ASSIGNMENTS(type)			\
-	template <class T>								\
-	data_ref& operator=(T n) {						\
-		return data_ref::operator=(n);				\
-	}
-
 template <typename dataT, int numElements>
 class vec : public detail::vec_base<dataT, numElements>, public detail::vec_members<dataT, numElements> {
 private:
@@ -198,34 +174,27 @@ public:
 	template <class T>
 	vec(T n)
 		: Base(n), Members(name) {}
-	
 	template <int num = numElements>
 	vec(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
 		: Base(x, y), Members(name) {}
 	template <int num = numElements>
 	vec(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
 		: Base(x, y, z), Members(name) {}
-	SYCL_VEC_INHERIT_ASSIGNMENTS(vec)
+
+	template <class T>
+	data_ref& operator=(T n) {
+		return data_ref::operator=(n);
+	}
 };
 
 
 // 3.9.1 Description of the built-in types available for SYCL host and device
 
-#define SYCL_VEC_SIGNED(type, numElements)						\
-	class type##numElements : public vec<type, numElements> {	\
-		using Base = vec<type, numElements>;					\
-	public:														\
-		SYCL_VEC_INHERIT_CONSTRUCTORS(type##numElements)		\
-		SYCL_VEC_INHERIT_ASSIGNMENTS(type##numElements)			\
-	};
+#define SYCL_VEC_SIGNED(type, numElements) \
+using type##numElements = vec<type, numElements>;
 
-#define SYCL_VEC_UNSIGNED(type, numElements)								\
-	class u##type##numElements : public vec<unsigned type, numElements> {	\
-		using Base = vec<unsigned type, numElements>;						\
-	public:																	\
-		SYCL_VEC_INHERIT_CONSTRUCTORS(u##type##numElements)					\
-		SYCL_VEC_INHERIT_ASSIGNMENTS(u##type##numElements)					\
-	};
+#define SYCL_VEC_UNSIGNED(type, numElements) \
+using u##type##numElements = vec<unsigned type, numElements>;
 
 #define SYCL_ADD_SIGNED_vec(type)	\
 	SYCL_VEC_SIGNED(type, 1)		\
@@ -260,8 +229,6 @@ SYCL_ADD_UNSIGNED_vec(long)
 
 #undef SYCL_ADD_SIGNED_vec
 #undef SYCL_ADD_UNSIGNED_vec
-#undef SYCL_VEC_INHERIT_ASSIGNMENTS
-#undef SYCL_VEC_INHERIT_CONSTRUCTORS
 #undef SYCL_VEC_SIGNED
 #undef SYCL_VEC_UNSIGNED
 
