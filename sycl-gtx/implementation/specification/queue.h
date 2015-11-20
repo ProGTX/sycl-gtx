@@ -24,8 +24,8 @@ private:
 
 	using buffer_set = std::set<detail::buffer_base*>;
 
-	device dev;
 	context ctx;
+	device dev;
 	detail::refc<cl_command_queue, clRetainCommandQueue, clReleaseCommandQueue> command_q;
 	exception_list ex_list;
 	detail::command_group command_group;
@@ -61,7 +61,7 @@ private:
 	// Create sub-queue, which executes the command group immediately
 	template <typename T>
 	queue(queue* master, T cgf)
-		: dev(master->dev), ctx(master->ctx), command_q(create_queue(false, false)), command_group(*this, cgf), is_flushed(false) {}
+		: ctx(master->ctx), dev(master->dev), command_q(create_queue(false, false)), command_group(*this, cgf), is_flushed(false) {}
 
 public:
 	~queue();
@@ -70,8 +70,8 @@ public:
 	queue(const queue&) = default;
 #if MSVC_LOW
 	queue(queue&& move)
-		:	SYCL_MOVE_INIT(dev),
-			SYCL_MOVE_INIT(ctx),
+		:	SYCL_MOVE_INIT(ctx),
+			SYCL_MOVE_INIT(dev),
 			SYCL_MOVE_INIT(command_q),
 			SYCL_MOVE_INIT(ex_list),
 			SYCL_MOVE_INIT(command_group),
@@ -84,8 +84,8 @@ public:
 	}
 	friend void swap(queue& first, queue& second) {
 		using std::swap;
-		SYCL_SWAP(dev);
 		SYCL_SWAP(ctx);
+		SYCL_SWAP(dev);
 		SYCL_SWAP(command_q);
 		SYCL_SWAP(ex_list);
 		SYCL_SWAP(command_group);

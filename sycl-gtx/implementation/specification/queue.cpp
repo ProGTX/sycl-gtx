@@ -33,26 +33,25 @@ cl_command_queue queue::create_queue(bool display_info, bool register_with_synch
 
 
 queue::queue(const async_handler& asyncHandler)
-	: ctx(asyncHandler), command_q(create_queue()), command_group(this) {}
+	: ctx(asyncHandler), dev(ctx.get_devices()[0]), command_q(create_queue()), command_group(this) {}
 
 queue::queue(const device_selector& deviceSelector, const async_handler& asyncHandler)
-	// TODO: Specification requires const selector in queue and non-const in device
-	: dev(const_cast<device_selector&>(deviceSelector)), ctx(asyncHandler), command_q(create_queue()), command_group(this) {}
+	: ctx(deviceSelector, false, asyncHandler), dev(ctx.get_devices()[0]), command_q(create_queue()), command_group(this) {}
 
 queue::queue(const context& syclContext, const device_selector& deviceSelector, const async_handler& asyncHandler)
 	// TODO: Specification requires const selector in queue and non-const in device
-	: dev(const_cast<device_selector&>(deviceSelector)), ctx(syclContext.get(), asyncHandler), command_q(create_queue()), command_group(this) {}
+	: ctx(syclContext.get(), asyncHandler), dev(deviceSelector.select_device(ctx.get_devices())), command_q(create_queue()), command_group(this) {}
 
 queue::queue(const context& syclContext, const device& syclDevice, const async_handler& asyncHandler)
 	: queue(syclContext, syclDevice, false, asyncHandler) {}
 
 // Chooses a device based on the provided device selector in the given context.
 queue::queue(const context& syclContext, const device& syclDevice, info::queue_profiling profilingFlag, const async_handler& asyncHandler)
-	: dev(syclDevice), ctx(syclContext.get(), asyncHandler), command_q(create_queue(profilingFlag)), command_group(this) {}
+	: ctx(syclContext.get(), asyncHandler), dev(syclDevice), command_q(create_queue(profilingFlag)), command_group(this) {}
 
 // Creates a queue for the provided device.
 queue::queue(const device& syclDevice, const async_handler& asyncHandler)
-	: dev(syclDevice), ctx(asyncHandler), command_q(create_queue()), command_group(this) {}
+	: ctx(syclDevice, false, asyncHandler), dev(syclDevice), command_q(create_queue()), command_group(this) {}
 
 // Creates a SYCL queue from an OpenCL queue.
 // At construction it does a retain on the queue memory object.
