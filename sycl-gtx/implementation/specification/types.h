@@ -111,13 +111,13 @@ struct vec_members<dataT, 3> : vec_members<dataT, 2> {
 #undef SYCL_V9
 
 template <typename dataT, int numElements>
-class vec_base : protected detail::counter<vec_base<dataT, numElements>>, public detail::data_ref {
+class vec_base : protected counter<vec_base<dataT, numElements>>, public data_ref {
 private:
 	template <typename dataT, int numElements>
-	friend struct detail::vec_members;
+	friend struct vec_members;
 
 	static string_class type_name() {
-		return detail::type_string<dataT>::get() + (numElements == 1 ? "" : std::to_string(numElements));
+		return type_string<dataT>::get() + (numElements == 1 ? "" : std::to_string(numElements));
 	}
 
 	string_class generate_name() const {
@@ -130,25 +130,25 @@ private:
 public:
 	vec_base()
 		: data_ref(generate_name()) {
-		detail::kernel_add(type_name() + ' ' + name);
+		kernel_add(type_name() + ' ' + name);
 	}
 
 	template <class T>
 	vec_base(T n)
 		: data_ref(generate_name()) {
-		detail::kernel_add(type_name() + ' ' + name + " = " + get_name(n));
+		kernel_add(type_name() + ' ' + name + " = " + get_name(n));
 	}
 
 	template <int num = numElements>
 	vec_base(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
 		: data_ref(generate_name()) {
-		detail::kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ")");
+		kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ")");
 	}
 
 	template <int num = numElements>
 	vec_base(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
 		: data_ref(generate_name()) {
-		detail::kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ", " + z.name + ")");
+		kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ", " + z.name + ")");
 	}
 
 	// TODO: Swizzle methods
