@@ -279,27 +279,33 @@ namespace sycl_class {
 using cl::sycl::double1;
 
 #ifdef SYCL_GTX
-struct Vec : public cl::sycl::vec<double, 3> {
-	Vec()
+struct Vector : public cl::sycl::vec<double, 3> {
+	Vector()
 		: vec(0, 0, 0) {}
-	Vec(const ::Vec& v)
+	Vector(const Vec& v)
 		: vec(v.x, v.y, v.z) {}
 	template <class X, class Y, class Z>
-	Vec(X x, Y y, Z z)
+	Vector(X&& x, Y&& y, Z&& z)
 		: vec(x, y, z) {}
 
-	Vec mult(const Vec &b) const {
-		return Vec(x*b.x, y*b.y, z*b.z);
+	template <class T>
+	Vector& operator=(T&& t) {
+		vec::operator=(t);
+		return *this;
 	}
-	Vec& norm() {
+
+	Vector mult(const Vector &b) const {
+		return Vector(x*b.x, y*b.y, z*b.z);
+	}
+	Vector& norm() {
 		operator*=(1 / cl::sycl::sqrt(x*x + y*y + z*z));
 		return *this;
 	}
-	double1 dot(const Vec &b) const {
+	double1 dot(const Vector &b) const {
 		return x*b.x + y*b.y + z*b.z;
 	}
-	Vec operator%(Vec&b) {
-		return Vec(y*b.z - z*b.y, z*b.x - x*b.z, x*b.y - y*b.x);
+	Vector operator%(Vector&b) {
+		return Vector(y*b.z - z*b.y, z*b.x - x*b.z, x*b.y - y*b.x);
 	}
 };
 
@@ -332,18 +338,19 @@ inline double clamp(double x) {
 
 void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec r_, Vec* c_, cl::sycl::device_selector& selector) {
 	using namespace cl::sycl;
+	using sycl_class::Vector;
 
 	queue q(selector);
 
 	buffer<Vec> colors(c_, range<1>(w*h));
 
 	q.submit([&](handler& cgh) {
-		auto c = colors.get_access<access::read_write, access::global_buffer>();
+		auto c = colors.get_access<access::read_write, access::global_buffer>(cgh);
 
 		cgh.parallel_for<class smallpt>(range<2>(w, h), [=](id<2> index) {
-			sycl_class::Vec cx(cx_);
-			sycl_class::Vec cy(cy_);
-			sycl_class::Vec r(r_);
+			Vector cx(cx_);
+			Vector cy(cy_);
+			Vector r(r_);
 
 			auto x = index[0];
 			auto y = index[1];
@@ -387,7 +394,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec
 						SYCL_END
 
 						// TODO
-						sycl_class::Vec d;
+						Vector d;
 						d =	cx * (((sx + .5 + dd.x) / 2 + x) / w - .5) +
 							cy * (((sy + .5 + dd.y) / 2 + y) / h - .5) +
 							cam.d;
@@ -396,13 +403,13 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec
 						//r = r + ns_sycl_gtx::radiance(Ray(cam.o + d * 140, d.norm()), Xi)*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 
-					c[i] = c[i] + sycl_class::Vec(
-						sycl_class::clamp(r.x),
-						sycl_class::clamp(r.y),
-						sycl_class::clamp(r.z)
+					c[i] = c[i] + Vector(
+						clamp(r.x),
+						clamp(r.y),
+						clamp(r.z)
 					) * .25;
 
-					r = sycl_class::Vec();
+					r = Vector();
 				}
 				SYCL_END
 			}
