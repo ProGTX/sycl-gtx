@@ -128,7 +128,11 @@ bool has_extension(T* sycl_class, const string_class& extension_name) {
 }
 
 template <typename DataType>
-struct type_string;
+struct type_string {
+	static string_class get() {
+		return DataType::type_name();
+	}
+};
 
 template <typename DataType>
 static string_class type_string_get();

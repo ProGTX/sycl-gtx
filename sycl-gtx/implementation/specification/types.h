@@ -115,6 +115,8 @@ class vec_base : protected counter<vec_base<dataT, numElements>>, public data_re
 private:
 	template <typename dataT, int numElements>
 	friend struct vec_members;
+	template <typename DataType>
+	friend struct type_string;
 
 	static string_class type_name() {
 		return type_string<dataT>::get() + (numElements == 1 ? "" : std::to_string(numElements));
