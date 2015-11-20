@@ -37,6 +37,10 @@ static void for_(data_ref condition, data_ref increment) {
 	kernel_::source::add<false>(string_class("for(; ") + condition.name + "; " + increment.name + ")");
 }
 
+static void break_() {
+	kernel_::source::add<true>("break_");
+}
+
 static void continue_() {
 	kernel_::source::add<true>("continue");
 }
@@ -91,6 +95,9 @@ init;											\
 	::cl::sycl::detail::data_ref((condition)),	\
 	::cl::sycl::detail::data_ref((increment))	\
 );
+
+#define SYCL_BREAK	\
+::cl::sycl::detail::control::break_();
 
 #define SYCL_CONTINUE	\
 ::cl::sycl::detail::control::continue_();
