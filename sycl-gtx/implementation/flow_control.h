@@ -93,9 +93,9 @@ init;											\
 );
 
 #define SYCL_CONTINUE	\
-::cl::sycl::detail::control::else_();
+::cl::sycl::detail::control::continue_();
 
 #define SYCL_RETURN	\
-::cl::sycl::detail::control::else_();
+::cl::sycl::detail::control::return_();
 
 #endif // SYCL_GTX
