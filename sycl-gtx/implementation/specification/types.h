@@ -190,8 +190,9 @@ public:
 		: Base(x, y, z), Members(name) {}
 
 	template <class T>
-	data_ref& operator=(T n) {
-		return data_ref::operator=(n);
+	vec& operator=(T n) {
+		data_ref::operator=(n);
+		return *this;
 	}
 };
 
