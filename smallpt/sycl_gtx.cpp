@@ -348,12 +348,74 @@ struct VecData : public ::Vec {
 	}
 };
 
+template <int depth_ = 0>
+void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 }, Vector cf = { 1, 1, 1 }) {
+	using namespace cl::sycl;
+
+	double1 t;	// distance to intersection
+	int1 id = 0;	// id of intersected object
+	int1 depth = depth_;
+
+	// cl is accumulated color
+	// cf is accumulated reflectance
+
+	double1 Re, Tr, P, RP, TP;
+	RaySycl reflRay(0, 0);
+	Vector x, tdir;
+
+	SYCL_WHILE(true)
+	SYCL_BEGIN {
+		// TODO
+		/*
+		auto doNext = radianceInner(
+		r, depth, Xi,
+		t, id, cl, cf,
+		Re, Tr, P, RP, TP, reflRay, x, tdir
+		);
+
+		if(doNext == DoNext::ContinueLoop) {
+			SYCL_CONTINUE
+		}
+		if(doNext == DoNext::Return) {
+			ret = cl;
+			SYCL_BREAK
+		}
+		*/
+
+		SYCL_IF(depth == 1)
+		SYCL_BEGIN {
+			Vector res1, res2;
+			radiance<1>(res1, reflRay, Xi, cl, cf * Re);
+			radiance<1>(res2, Ray(x, tdir), Xi, cl, cf * Tr);
+			res = res1 + res2;
+		}
+		SYCL_END
+		SYCL_ELSE_IF(depth == 2)
+		SYCL_BEGIN{
+			Vector res1, res2;
+			radiance<2>(res1, reflRay, Xi, cl, cf * Re);
+			radiance<2>(res2, Ray(x, tdir), Xi, cl, cf * Tr);
+			res = res1 + res2;
+		}
+		SYCL_END
+		SYCL_ELSE
+		SYCL_BEGIN {
+			radiance(ret, r, depth, Xi, cl, cf);
+			ret = cl;
+			SYCL_BREAK
+		}
+		SYCL_END
+	}
+	SYCL_END
+}
+
 } // sycl_class
 
-void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec r_, Vec* c_, cl::sycl::device_selector& selector) {
+void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_, cl::sycl::device_selector& selector) {
 	using namespace std;
 	using namespace cl::sycl;
 	using sycl_class::Vector;
+	using sycl_class::RaySycl;
 
 	queue q(selector);
 
@@ -376,7 +438,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec
 			Vector cx(cx_);
 			Vector cy(cy_);
 			Vector r(r_);
-			Vector camera_d(cam.d);
+			RaySycl cam(cam_);
 
 			auto x = index[0];
 			auto y = index[1];
@@ -423,10 +485,12 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam, Vec& cx_, Vec& cy_, Vec
 						Vector d;
 						d = cx * (((sx + .5 + dd.x) / 2 + x) / w - .5) +
 							cy * (((sy + .5 + dd.y) / 2 + y) / h - .5) +
-							camera_d;
+							cam.d;
 
 						// TODO:
-						//r = r + ns_sycl_gtx::radiance(Ray(cam.o + d * 140, d.norm()), Xi)*(1. / samps);
+						Vector rad;
+						ns_sycl_gtx::radiance(rad, RaySycl(cam.o + d * 140, d.norm()), Xi);
+						r = r + rad*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 					SYCL_END
 
