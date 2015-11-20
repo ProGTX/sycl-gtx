@@ -117,7 +117,7 @@ private:
 	friend struct detail::vec_members;
 
 	static string_class type_name() {
-		return detail::type_string<dataT>() + (numElements == 1 ? "" : std::to_string(numElements));
+		return detail::type_string<dataT>::get() + (numElements == 1 ? "" : std::to_string(numElements));
 	}
 
 	string_class generate_name() const {

@@ -86,7 +86,7 @@ public:
 			scope->resources[buf] = {
 				{ buf, mode, target },
 				resource_name,
-				detail::type_string<DataType>() + '*',
+				detail::type_string<DataType>::get() + '*',
 				acc.argument_size()
 			};
 		}

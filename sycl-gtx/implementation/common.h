@@ -128,19 +128,26 @@ bool has_extension(T* sycl_class, const string_class& extension_name) {
 }
 
 template <typename DataType>
-static string_class type_string();
+struct type_string;
 
-#define SYCL_GET_TYPE_STRING(type)			\
+template <typename DataType>
+static string_class type_string_get();
+
+#define SYCL_GET_TYPE_STRING(type)	\
+template <>						  	\
+struct type_string<type> {			\
+	static string_class get() {		\
+		return #type;				\
+	}								\
+};
+
+#define SYCL_GET_TYPE_STRING_UNSIGNED(type)	\
 template <>									\
-static string_class type_string<type>() {	\
-	return #type;						\
-}
-
-#define SYCL_GET_TYPE_STRING_UNSIGNED(type)			\
-template <>											\
-static string_class type_string<unsigned type>() {	\
-	return "u"#type;								\
-}
+struct type_string<unsigned type> {			\
+	static string_class get() {				\
+		return "u"#type;					\
+	}										\
+};
 
 SYCL_GET_TYPE_STRING(bool)
 SYCL_GET_TYPE_STRING(int)
