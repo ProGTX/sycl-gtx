@@ -61,4 +61,8 @@ SYCL_BLOCK(code)
 
 #define SYCL_FOR(init, condition, increment) for(init; condition; increment)
 
+#define SYCL_CONTINUE continue
+
+#define SYCL_RETURN	return
+
 #endif // SYCL_GTX

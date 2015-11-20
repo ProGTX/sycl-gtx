@@ -37,6 +37,14 @@ static void for_(data_ref condition, data_ref increment) {
 	kernel_::source::add<false>(string_class("for(; ") + condition.name + "; " + increment.name + ")");
 }
 
+static void continue_() {
+	kernel_::source::add<true>("continue");
+}
+
+static void return_() {
+	kernel_::source::add<true>("return");
+}
+
 } // namespace control
 } // namespace detail
 
@@ -83,5 +91,11 @@ init;											\
 	::cl::sycl::detail::data_ref((condition)),	\
 	::cl::sycl::detail::data_ref((increment))	\
 );
+
+#define SYCL_CONTINUE	\
+::cl::sycl::detail::control::else_();
+
+#define SYCL_RETURN	\
+::cl::sycl::detail::control::else_();
 
 #endif // SYCL_GTX
