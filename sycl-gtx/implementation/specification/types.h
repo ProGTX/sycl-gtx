@@ -11,6 +11,10 @@ namespace sycl {
 
 // 3.7.2 Vector types
 
+// Forward declaration
+template <typename dataT, int numElements>
+class vec;
+
 namespace detail {
 
 #define SYCL_ENABLE_IF_DIM(dim)	\
@@ -151,6 +155,10 @@ public:
 	vec_base(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
 		: data_ref(generate_name()) {
 		kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ", " + z.name + ")");
+	}
+
+	operator vec<dataT, numElements>&() {
+		return *reinterpret_cast<vec<dataT, numElements>*>(this);
 	}
 
 	// TODO: Swizzle methods
