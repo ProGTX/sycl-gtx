@@ -33,7 +33,7 @@ public:
 	string_class name;
 	type_t type;
 
-	static string_class get_name(const data_ref& dref) {
+	static string_class get_name(data_ref& dref) {
 		return dref.name;
 	}
 
