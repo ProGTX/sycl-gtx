@@ -180,6 +180,16 @@ public:
 #endif // #ifdef SYCL_SIMPLE_SWIZZLES
 };
 
+template <typename dataT, int numElements>
+struct vector_data;
+
+template <typename dataT, int numElements>
+struct data_size<vec<dataT, numElements>> {
+	static size_t get() {
+		return sizeof(typename vector_data<dataT, numElements>::type);
+	}
+};
+
 } // namespace detail
 
 template <typename dataT, int numElements>
@@ -210,19 +220,32 @@ public:
 
 // 3.9.1 Description of the built-in types available for SYCL host and device
 
-#define SYCL_VEC_SIGNED(type, numElements) \
-using type##numElements = vec<type, numElements>;
+#define SYCL_VEC_SIGNED(basetype, numElements) \
+using basetype##numElements = vec<basetype, numElements>;
+
+#define SYCL_VEC_SIGNED_EXTRA(basetype, numElements)	\
+SYCL_VEC_SIGNED(basetype, numElements)					\
+template <>												\
+struct detail::vector_data<basetype, numElements> {		\
+	using type = cl_##basetype##numElements;			\
+};
+
+#define SYCL_VEC_SIGNED_EXTRA_ONE(basetype)	\
+SYCL_VEC_SIGNED(basetype, 1)				\
+template <>									\
+struct detail::vector_data<basetype, 1> {	\
+	using type = cl_##basetype;				\
+};
 
 #define SYCL_VEC_UNSIGNED(type, numElements) \
 using u##type##numElements = vec<unsigned type, numElements>;
 
 #define SYCL_ADD_SIGNED_vec(type)	\
-	SYCL_VEC_SIGNED(type, 1)		\
-	SYCL_VEC_SIGNED(type, 2)		\
-	SYCL_VEC_SIGNED(type, 3)		\
-	SYCL_VEC_SIGNED(type, 4)		\
-	SYCL_VEC_SIGNED(type, 8)		\
-	SYCL_VEC_SIGNED(type, 16)
+	SYCL_VEC_SIGNED_EXTRA(type, 2)	\
+	SYCL_VEC_SIGNED_EXTRA(type, 3)	\
+	SYCL_VEC_SIGNED_EXTRA(type, 4)	\
+	SYCL_VEC_SIGNED_EXTRA(type, 8)	\
+	SYCL_VEC_SIGNED_EXTRA(type, 16)
 
 #define SYCL_ADD_UNSIGNED_vec(type)	\
 	SYCL_VEC_UNSIGNED(type, 1)		\
@@ -232,7 +255,6 @@ using u##type##numElements = vec<unsigned type, numElements>;
 	SYCL_VEC_UNSIGNED(type, 8)		\
 	SYCL_VEC_UNSIGNED(type, 16)
 
-SYCL_ADD_SIGNED_vec(bool)
 SYCL_ADD_SIGNED_vec(int)
 SYCL_ADD_SIGNED_vec(char)
 SYCL_ADD_SIGNED_vec(short)
@@ -240,16 +262,30 @@ SYCL_ADD_SIGNED_vec(long)
 SYCL_ADD_SIGNED_vec(float)
 SYCL_ADD_SIGNED_vec(double)
 
+SYCL_VEC_SIGNED_EXTRA_ONE(int)
+SYCL_VEC_SIGNED_EXTRA_ONE(char)
+SYCL_VEC_SIGNED_EXTRA_ONE(short)
+SYCL_VEC_SIGNED_EXTRA_ONE(long)
+SYCL_VEC_SIGNED_EXTRA_ONE(float)
+SYCL_VEC_SIGNED_EXTRA_ONE(double)
+
+SYCL_VEC_SIGNED(bool, 1)
+template <>
+struct detail::vector_data<bool, 1> {
+	using type = cl_bool;
+};
+
 SYCL_ADD_UNSIGNED_vec(int)
 SYCL_ADD_UNSIGNED_vec(char)
 SYCL_ADD_UNSIGNED_vec(short)
 SYCL_ADD_UNSIGNED_vec(long)
 
 #undef SYCL_ENABLE_IF_DIM
-
 #undef SYCL_ADD_SIGNED_vec
 #undef SYCL_ADD_UNSIGNED_vec
 #undef SYCL_VEC_SIGNED
+#undef SYCL_VEC_SIGNED_EXTRA
+#undef SYCL_VEC_SIGNED_EXTRA_ONE
 #undef SYCL_VEC_UNSIGNED
 
 } // namespace sycl
