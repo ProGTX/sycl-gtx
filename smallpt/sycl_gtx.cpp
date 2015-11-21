@@ -368,46 +368,107 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 
 	SYCL_WHILE(true)
 	SYCL_BEGIN {
-		// TODO
-		/*
-		auto doNext = radianceInner(
-		r, depth, Xi,
-		t, id, cl, cf,
-		Re, Tr, P, RP, TP, reflRay, x, tdir
-		);
-
-		if(doNext == DoNext::ContinueLoop) {
-			SYCL_CONTINUE
-		}
-		if(doNext == DoNext::Return) {
+		if(!intersect(r, t, id)) {
+			// if miss, don't add anything
 			ret = cl;
-			SYCL_BREAK
+			SYCL_RETURN
 		}
-		*/
+		const Sphere& obj = spheres[id]; // the hit object
+		x = r.o + r.d*t;
+		Vec n = (x - obj.p).norm();
+		Vec nl = n;
+		if(n.dot(r.d) > 0) {
+			nl = nl * -1;
+		}
+		Vec f = obj.c;
+		double p;	// max refl
+		if(f.x > f.y && f.x > f.z) {
+			p = f.x;
+		}
+		else if(f.y > f.z) {
+			p = f.y;
+		}
+		else {
+			p = f.z;
+		}
 
-		SYCL_IF(depth == 1)
-		SYCL_BEGIN {
-			Vector res1, res2;
-			radiance<1>(res1, reflRay, Xi, cl, cf * Re);
-			radiance<1>(res2, RaySycl(x, tdir), Xi, cl, cf * Tr);
-			ret = res1 + res2;
+		cl = cl + cf.mult(obj.e);
+
+		depth += 1;
+		if(depth > 5) {
+			if(erand48(Xi) < p) {
+				f = f*(1 / p);
+			}
+			else {
+				return DoNext::Return;
+			}
 		}
-		SYCL_END
-		SYCL_ELSE_IF(depth == 2)
-		SYCL_BEGIN{
-			Vector res1, res2;
-			radiance<2>(res1, reflRay, Xi, cl, cf * Re);
-			radiance<2>(res2, RaySycl(x, tdir), Xi, cl, cf * Tr);
-			ret = res1 + res2;
+
+		cf = cf.mult(f);
+
+		if(obj.refl == DIFF) {	// Ideal DIFFUSE reflection
+			double r1 = 2 * M_PI*erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
+			Vec w = nl;
+			Vec u;
+			if(fabs(w.x) > .1) {
+				u.y = 1;
+			}
+			else {
+				u.x = 1;
+			}
+			u = (u % w).norm();
+			Vec v = w%u;
+			Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
+
+			// Recursion
+			r = Ray(x, d);
+			return DoNext::ContinueLoop;
 		}
-		SYCL_END
-		SYCL_ELSE
-		SYCL_BEGIN {
-			radiance(ret, r, depth, Xi, cl, cf);
-			ret = cl;
-			SYCL_BREAK
+		else if(obj.refl == SPEC) {	// Ideal SPECULAR reflection
+			// Recursion
+			r = Ray(x, r.d - n * 2 * n.dot(r.d));
+			return DoNext::ContinueLoop;
 		}
-		SYCL_END
+		reflRay = Ray(x, r.d - n * 2 * n.dot(r.d));	// Ideal dielectric REFRACTION
+		bool into = n.dot(nl) > 0;	// Ray from outside going in?
+		double nc = 1;
+		double nt = 1.5;
+		double nnt;
+		if(into) {
+			nnt = nc / nt;
+		}
+		else {
+			nnt = nt / nc;
+		}
+		double ddn = r.d.dot(nl);
+		double cos2t;
+		if((cos2t = 1 - nnt*nnt*(1 - ddn*ddn)) < 0) {	// Total internal reflection
+			// Recursion
+			r = reflRay;
+			return DoNext::ContinueLoop;
+		}
+		double tmp = 1;
+		if(!into) {
+			tmp = -1;
+		}
+		tdir = (r.d*nnt - n*(tmp*(ddn*nnt + sqrt(cos2t)))).norm();
+		double a = nt - nc;
+		double b = nt + nc;
+		double R0 = a*a / (b*b);
+		double c = 1;
+		if(into) {
+			c += ddn;
+		}
+		else {
+			c -= tdir.dot(n);
+		}
+		Re = R0 + (1 - R0)*c*c*c*c*c;
+		Tr = 1 - Re;
+		P = .25 + .5*Re;
+		RP = Re / P;
+		TP = Tr / (1 - P);
+
+		return DoNext::Proceed;
 	}
 	SYCL_END
 }
