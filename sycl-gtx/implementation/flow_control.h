@@ -38,7 +38,7 @@ static void for_(data_ref condition, data_ref increment) {
 }
 
 static void break_() {
-	kernel_::source::add<true>("break_");
+	kernel_::source::add<true>("break");
 }
 
 static void continue_() {
