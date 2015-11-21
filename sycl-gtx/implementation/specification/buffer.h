@@ -43,8 +43,13 @@ class command_group;
 
 template <typename DataType, int dimensions>
 class buffer_ : public buffer_base {
+public:
+	using value_type = typename base_host_data<DataType>::type;
+	using reference = value_type&;
+	using const_reference = const value_type&;
+
 protected:
-	using ptr_t = shared_ptr_class<DataType>;
+	using ptr_t = shared_ptr_class<value_type>;
 
 	range<dimensions> rang;
 	ptr_t host_data;
@@ -68,10 +73,6 @@ protected:
 		: buffer_(nullptr, range, false) {}
 
 public:
-	using value_type = DataType;
-	using reference = value_type&;
-	using const_reference = const value_type&;
-
 	// Creates a new buffer with associated host memory.
 	// The memory is owned by the runtime during the lifetime of the object.
 	// Data is copied back to the host unless the user overrides the behavior using the set_final_data method.
@@ -95,7 +96,7 @@ public:
 	// If the type of the buffer has the const qualifier,
 	// then the default allocator will remove the qualifier to allow host access to the data.
 	buffer_(const range<dimensions>& range)
-		:	host_data(ptr_t(new DataType[ range.size() ])),
+		:	host_data(ptr_t(new value_type[ range.size() ])),
 			rang(range),
 			is_read_only(false),
 			is_blocking(false) {}

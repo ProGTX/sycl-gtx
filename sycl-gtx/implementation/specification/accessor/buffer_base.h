@@ -39,7 +39,7 @@ protected:
 	size_t access_buffer_range(int n) const {
 		return buf->rang.get(n);
 	}
-	DataType* access_host_data() const {
+	typename base_host_data<DataType>::type* access_host_data() const {
 		return buf->host_data.get();
 	}
 };

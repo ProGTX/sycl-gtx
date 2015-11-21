@@ -176,6 +176,11 @@ struct data_size {
 	}
 };
 
+template <typename DataType>
+struct base_host_data {
+	using type = DataType;
+};
+
 } // namespace detail
 
 } // namespace sycl

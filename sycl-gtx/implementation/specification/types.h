@@ -186,8 +186,13 @@ struct vector_data;
 template <typename dataT, int numElements>
 struct data_size<vec<dataT, numElements>> {
 	static size_t get() {
-		return sizeof(typename vector_data<dataT, numElements>::type);
+		return sizeof(typename base_host_data<vec<dataT, numElements>>::type);
 	}
+};
+
+template <typename dataT, int numElements>
+struct base_host_data<vec<dataT, numElements>> {
+	using type = typename vector_data<dataT, numElements>::type;
 };
 
 } // namespace detail

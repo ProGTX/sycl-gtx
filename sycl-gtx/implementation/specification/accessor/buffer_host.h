@@ -48,7 +48,7 @@ class accessor_host_ref<1, DataType, dimensions, mode> {
 protected:
 	SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR();
 public:
-	DataType& operator[](int index) {
+	typename base_host_data<DataType>::type& operator[](int index) {
 		// http://stackoverflow.com/questions/7367770
 		rang[dimensions - 1] = index;
 		index = 0;
