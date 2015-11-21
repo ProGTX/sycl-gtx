@@ -278,23 +278,24 @@ void compute_sycl_gtx_openmp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy
 namespace sycl_class {
 
 using cl::sycl::double1;
+using cl::sycl::double3;
 
 #ifdef SYCL_GTX
-struct Vector : public cl::sycl::vec<double, 3> {
+struct Vector : public double3 {
 	Vector()
-		: vec(0, 0, 0) {}
+		: double3(0, 0, 0) {}
 	Vector(const Vec& v)
-		: vec(v.x, v.y, v.z) {}
+		: double3(v.x, v.y, v.z) {}
 	template <class T>
 	Vector(T n)
-		: vec(n) {}
+		: double3(n) {}
 	template <class X, class Y, class Z>
 	Vector(X&& x, Y&& y, Z&& z)
-		: vec(x, y, z) {}
+		: double3(x, y, z) {}
 
 	template <class T>
 	Vector& operator=(T&& t) {
-		vec::operator=(t);
+		double3::operator=(t);
 		return *this;
 	}
 
@@ -341,21 +342,10 @@ inline void clamp(double1& x) {
 	SYCL_END
 }
 
-struct VecData : public ::Vec {
-	double w;	// Padding
-	static cl::sycl::string_class type_name() {
-		return "double3";
-	}
-	VecData& operator=(const Vec& v) {
-		Vec::operator=(v);
-		return *this;
-	}
-};
-
 struct SphereSycl {
-	double1 rad;       // radius
-	Vector p, e, c;      // position, emission, color
-	Refl_t refl;      // reflection type (DIFFuse, SPECular, REFRactive)
+	double1 rad;	// radius
+	Vector p, e, c;	// position, emission, color
+	Refl_t refl;	// reflection type (DIFFuse, SPECular, REFRactive)
 
 	SphereSycl(const Sphere& s)
 		: rad(s.rad), p(s.p), e(s.e), c(s.c), refl(s.refl) {}
@@ -373,11 +363,11 @@ struct SphereSycl {
 		}
 		SYCL_END
 		SYCL_ELSE
-		SYCL_BEGIN{
+		SYCL_BEGIN {
 			det = sqrt(det);
 			t = b - det;
 			SYCL_IF(t > eps)
-			SYCL_BEGIN{
+			SYCL_BEGIN {
 				ret = t;
 			}
 			SYCL_END
@@ -579,14 +569,17 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 
 	queue q(selector);
 
-	buffer<sycl_class::VecData> colors(range<1>(w*h));
+	buffer<double3> colors(range<1>(w*h));
 	{
 		auto c = colors.get_access<access::discard_write, access::host_buffer>();
 
 		for(int y = 0; y < h; ++y) {
 			for(int x = 0; x < w; ++x) {
 				int i = (h - y - 1)*w + x;
-				c[i] = c_[i];
+				auto& ci = c[i];
+				ci.x = c_[i].x;
+				ci.y = c_[i].y;
+				ci.z = c_[i].z;
 			}
 		}
 	}
@@ -673,7 +666,10 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 	for(int y = 0; y < h; ++y) {
 		for(int x = 0; x < w; ++x) {
 			int i = (h - y - 1)*w + x;
-			c_[i] = c[i];
+			auto& ci = c[i];
+			c_[i].x = ci.x;
+			c_[i].y = ci.y;
+			c_[i].z = ci.z;
 		}
 	}
 }
