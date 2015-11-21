@@ -39,25 +39,29 @@ struct vec_members {
 #define SYCL_V8(m1, m2, m3, m4, m5, m6, m7, m8)		SYCL_V4(m1, m2, m3, m4), SYCL_V4(m5, m6, m7, m8)
 #define SYCL_V9(m1, m2, m3, m4, m5, m6, m7, m8, m9)	SYCL_V5(m1, m2, m3, m4, m5), SYCL_V4(m6, m7, m8, m9)
 
+#define SYCL_R2(org, m1, m2)	m1(org), m2(org)
+
 template <typename dataT>
 struct vec_members<dataT, 2> : vec_members<dataT, 1> {
-	vec_base<dataT, 1> x, y, s0, s1;
-	vec_base<dataT, 1> lo, hi;
+	vec_base<dataT, 1> x, y;
+	vec_base<dataT, 1> &s0, &s1, &lo, &hi;
 	vec_base<dataT, 2> xx, xy, yx, yy;
-	vec_base<dataT, 2> s00, s01, s10, s11;
+	vec_base<dataT, 2> &s00, &s01, &s10, &s11;
 	vec_members(string_class name)
-		:	SYCL_V4(x, y, s0, s1),
-			SYCL_V2(lo, hi),
+		:	SYCL_V2(x, y),
+			SYCL_R2(x, s0, lo),
+			SYCL_R2(y, s1, hi),
 			SYCL_V4(xx, xy, yx, yy),
-			SYCL_V4(s00, s01, s10, s11) {}
+			s00(xx), s01(xy), s10(yx), s11(yy) {}
 };
 
 template <typename dataT>
 struct vec_members<dataT, 3> : vec_members<dataT, 2> {
-	vec_base<dataT, 1> z, s2;
-	vec_base<dataT, 2> lo, hi;
+	vec_base<dataT, 1> z;
+	vec_base<dataT, 1> &s2;
+	vec_base<dataT, 2> &lo, hi;	// hi is not a reference, because w does is not physically present
 	vec_base<dataT, 2> xz, yz, zx, zy, zz;
-	vec_base<dataT, 2> s02, s12, s20, s21, s22;
+	vec_base<dataT, 2> &s02, &s12, &s20, &s21, &s22;
 	vec_base<dataT, 3>	xxx, xxy, xxz,
 						xyx, xyy, xyz,
 						xzx, xzy, xzz,
@@ -67,21 +71,21 @@ struct vec_members<dataT, 3> : vec_members<dataT, 2> {
 						zxx, zxy, zxz,
 						zyx, zyy, zyz,
 						zzx, zzy, zzz;
-	vec_base<dataT, 3>	s000, s001, s002,
-						s010, s011, s012,
-						s020, s021, s022,
-						s100, s101, s102,
-						s110, s111, s112,
-						s120, s121, s122,
-						s200, s201, s202,
-						s210, s211, s212,
-						s220, s221, s222;
+	vec_base<dataT, 3>	&s000, &s001, &s002,
+						&s010, &s011, &s012,
+						&s020, &s021, &s022,
+						&s100, &s101, &s102,
+						&s110, &s111, &s112,
+						&s120, &s121, &s122,
+						&s200, &s201, &s202,
+						&s210, &s211, &s212,
+						&s220, &s221, &s222;
 	vec_members(string_class name)
 		:	vec_members<dataT, 2>(name),
-			SYCL_V2(z, s2),
-			SYCL_V2(lo, hi),
+			SYCL_V(z), s2(z),
+			lo(xy), SYCL_V(hi),
 			SYCL_V5(xz, yz, zx, zy, zz),
-			SYCL_V5(s02, s12, s20, s21, s22),
+			s02(xz), s12(yz), s20(zx), s21(zy), s22(zz),
 			SYCL_V9(xxx, xxy, xxz,
 					xyx, xyy, xyz,
 					xzx, xzy, xzz),
@@ -91,15 +95,15 @@ struct vec_members<dataT, 3> : vec_members<dataT, 2> {
 			SYCL_V9(zxx, zxy, zxz,
 					zyx, zyy, zyz,
 					zzx, zzy, zzz),
-			SYCL_V9(s000, s001, s002,
-					s010, s011, s012,
-					s020, s021, s022),
-			SYCL_V9(s100, s101, s102,
-					s110, s111, s112,
-					s120, s121, s122),
-			SYCL_V9(s200, s201, s202,
-					s210, s211, s212,
-					s220, s221, s222) {}
+			s000(xxx), s001(xxy), s002(xxz),
+			s010(xyx), s011(xyy), s012(xyz),
+			s020(xzx), s021(xzy), s022(xzz),
+			s100(yxx), s101(yxy), s102(yxz),
+			s110(yyx), s111(yyy), s112(yyz),
+			s120(yzx), s121(yzy), s122(yzz),
+			s200(zxx), s201(zxy), s202(zxz),
+			s210(zyx), s211(zyy), s212(zyz),
+			s220(zzx), s221(zzy), s222(zzz) {}
 };
 
 // TODO: Higher dimensions
@@ -113,6 +117,9 @@ struct vec_members<dataT, 3> : vec_members<dataT, 2> {
 #undef SYCL_V7
 #undef SYCL_V8
 #undef SYCL_V9
+
+#undef SYCL_R2
+
 
 template <typename dataT, int numElements>
 class vec_base : protected counter<vec_base<dataT, numElements>>, public data_ref {
