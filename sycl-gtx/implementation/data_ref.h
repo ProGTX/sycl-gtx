@@ -94,11 +94,11 @@ public:
 #define SYCL_DATA_REF_OPERATOR(op)																	\
 	template <class T>																				\
 	data_ref operator op(T n) const {																\
-		return data_ref(open_parenthesis + name + " " #op " " + get_name(n) + ")");					\
+		return data_ref(open_parenthesis + name + " " #op " " + get_name(n) + ')');					\
 	}																								\
 	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>	\
 	friend data_ref operator op(T n, data_ref dref) {												\
-		return data_ref(open_parenthesis + get_name(n) + " " #op " " + dref.name + ")");			\
+		return data_ref(open_parenthesis + get_name(n) + " " #op " " + dref.name + ')');			\
 	}
 
 	// Arithmetic operatos
@@ -124,16 +124,20 @@ public:
 
 	// TODO: A bit problematic
 	data_ref operator++() const {
-		return data_ref(open_parenthesis + "++" + name + ")");
+		return data_ref(open_parenthesis + "++" + name + ')');
 	}
 	data_ref operator++(int) const {
-		return data_ref(open_parenthesis + name + "++" + ")");
+		return data_ref(open_parenthesis + name + "++" + ')');
 	}
 	data_ref operator--() const {
-		return data_ref(open_parenthesis + "--" + name + ")");
+		return data_ref(open_parenthesis + "--" + name + ')');
 	}
 	data_ref operator--(int) const {
-		return data_ref(open_parenthesis + name + "--" + ")");
+		return data_ref(open_parenthesis + name + "--" + ')');
+	}
+
+	data_ref operator!() const {
+		return data_ref(open_parenthesis + '!' + name + ')');
 	}
 };
 
