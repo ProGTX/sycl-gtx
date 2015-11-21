@@ -106,7 +106,42 @@ struct vec_members<dataT, 3> : vec_members<dataT, 2> {
 			s220(zzx), s221(zzy), s222(zzz) {}
 };
 
-// TODO: Higher dimensions
+// TODO: All members
+
+template <typename dataT>
+struct vec_members<dataT, 4> : vec_members<dataT, 3> {
+	vec_base<dataT, 1> w;
+	vec_base<dataT, 1> &s3;
+	vec_base<dataT, 3> yzw;
+	vec_base<dataT, 3> &s123;
+	vec_base<dataT, 4> xyzw;
+	vec_base<dataT, 4> &s0123;
+
+	vec_members(string_class name)
+		:	vec_members<dataT, 3>(name),
+			SYCL_V(w), s3(w),
+			SYCL_V(yzw), s123(yzw),
+			SYCL_V(xyzw), s0123(xyzw) {}
+};
+
+template <typename dataT>
+struct vec_members<dataT, 8> : vec_members<dataT, 4> {
+	vec_base<dataT, 4> &lo, hi;
+
+	vec_members(string_class name)
+		:	vec_members<dataT, 4>(name),
+			lo(xyzw), SYCL_V(hi) {}
+};
+
+template <typename dataT>
+struct vec_members<dataT, 16> : vec_members<dataT, 8> {
+	vec_base<dataT, 8> lo, hi;
+
+	vec_members(string_class name)
+		:	vec_members<dataT, 8>(name),
+			SYCL_V2(lo, hi) {}
+};
+
 
 #undef SYCL_V
 #undef SYCL_V2
