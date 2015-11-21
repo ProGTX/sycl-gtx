@@ -325,6 +325,7 @@ struct RaySycl {
 		: o(r.o), d(r.d) {}
 	RaySycl(Vector o_, Vector d_)
 		: o(o_), d(d_) {}
+	RaySycl& operator=(const RaySycl&) = default;
 };
 
 inline void clamp(double1& x) {
@@ -424,6 +425,7 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 		// TODO: need to pass spheres to the kernel
 		SphereSycl obj(ns_sycl_gtx::spheres[0]); // the hit object
 		x = r.o + r.d*t;
+
 		Vector n = Vector(x - obj.p).norm();
 		Vector nl = n;
 		SYCL_IF(n.dot(r.d) > 0)
@@ -431,89 +433,133 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 			nl = nl * -1;
 		}
 		SYCL_END
+
 		Vector f = obj.c;
+
 		double1 p;	// max refl
-		if(f.x > f.y && f.x > f.z) {
+		SYCL_IF(f.x > f.y && f.x > f.z)
+		SYCL_BEGIN {
 			p = f.x;
 		}
-		else if(f.y > f.z) {
+		SYCL_END
+		SYCL_ELSE_IF(f.y > f.z)
+		SYCL_BEGIN {
 			p = f.y;
 		}
-		else {
+		SYCL_END
+		SYCL_ELSE
+		SYCL_BEGIN {
 			p = f.z;
 		}
+		SYCL_END
 
 		cl = cl + cf.mult(obj.e);
 
 		depth += 1;
-		if(depth > 5) {
-			if(erand48(Xi) < p) {
+
+		SYCL_IF(depth > 5)
+		SYCL_BEGIN {
+			SYCL_IF(erand48(Xi) < p)
+			SYCL_BEGIN {
 				f = f*(1 / p);
 			}
-			else {
+			SYCL_END
+			SYCL_ELSE
+			SYCL_BEGIN {
 				ret = cl;
 				SYCL_RETURN
 			}
+			SYCL_END
 		}
+		SYCL_END
 
 		cf = cf.mult(f);
 
-		if(obj.refl == DIFF) {	// Ideal DIFFUSE reflection
+		SYCL_IF(obj.refl == DIFF) // Ideal DIFFUSE reflection
+		SYCL_BEGIN {
 			double1 r1 = 2 * M_PI*erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
 			Vector w = nl;
 			Vector u;
-			if(fabs(w.x) > .1) {
+
+			SYCL_IF(fabs(w.x) > .1)
+			SYCL_BEGIN {
 				u.y = 1;
 			}
-			else {
+			SYCL_END
+			SYCL_ELSE
+			SYCL_BEGIN {
 				u.x = 1;
 			}
+			SYCL_END
+
 			u = (u % w).norm();
 			Vector v = w%u;
-			Vector d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
+			Vector d = Vector(u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
 
 			// Recursion
 			r = RaySycl(x, d);
 			SYCL_CONTINUE
 		}
-		else if(obj.refl == SPEC) {	// Ideal SPECULAR reflection
+		SYCL_END
+		SYCL_ELSE_IF(obj.refl == SPEC)// Ideal SPECULAR reflection
+		SYCL_BEGIN {
 			// Recursion
 			r = RaySycl(x, r.d - n * 2 * n.dot(r.d));
 			SYCL_CONTINUE
 		}
+		SYCL_END
+
 		reflRay = RaySycl(x, r.d - n * 2 * n.dot(r.d));	// Ideal dielectric REFRACTION
 		bool1 into = n.dot(nl) > 0;	// Ray from outside going in?
 		double1 nc = 1;
 		double1 nt = 1.5;
+
 		double1 nnt;
-		if(into) {
+		SYCL_IF(into)
+		SYCL_BEGIN {
 			nnt = nc / nt;
 		}
-		else {
+		SYCL_END
+		SYCL_ELSE
+		SYCL_BEGIN {
 			nnt = nt / nc;
 		}
+		SYCL_END
+
 		double1 ddn = r.d.dot(nl);
-		double1 cos2t;
-		if((cos2t = 1 - nnt*nnt*(1 - ddn*ddn)) < 0) {	// Total internal reflection
+		double1 cos2t = 1 - nnt*nnt*(1 - ddn*ddn);
+		SYCL_IF(cos2t < 0) // // Total internal reflection
+		SYCL_BEGIN {	
 			// Recursion
 			r = reflRay;
 			SYCL_CONTINUE
 		}
+		SYCL_END
+
 		double1 tmp = 1;
-		if(!into) {
+		SYCL_IF(!into)
+		SYCL_BEGIN {
 			tmp = -1;
 		}
+		SYCL_END
+
 		tdir = Vector(r.d*nnt - n*(tmp*(ddn*nnt + sqrt(cos2t)))).norm();
 		double1 a = nt - nc;
 		double1 b = nt + nc;
 		double1 R0 = a*a / (b*b);
+
 		double1 c = 1;
-		if(into) {
+		SYCL_IF(into)
+		SYCL_BEGIN {
 			c += ddn;
 		}
-		else {
+		SYCL_END
+		SYCL_ELSE
+		SYCL_BEGIN {
 			c -= tdir.dot(n);
 		}
+		SYCL_END
+
 		Re = R0 + (1 - R0)*c*c*c*c*c;
 		Tr = 1 - Re;
 		P = .25 + .5*Re;
