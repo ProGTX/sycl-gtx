@@ -130,31 +130,35 @@ private:
 		return '_' + type_name() + '_' + std::to_string(get_count_id());
 	}
 
+	string_class this_name() const {
+		return type_name() + ' ' + name;
+	}
+
 	vec_base(string_class name)
 		: data_ref(name) {}
 
 public:
 	vec_base()
 		: data_ref(generate_name()) {
-		kernel_add(type_name() + ' ' + name);
+		kernel_add(this_name());
 	}
 
 	template <class T>
 	vec_base(T n)
 		: data_ref(generate_name()) {
-		kernel_add(type_name() + ' ' + name + " = " + get_name(n));
+		kernel_add(this_name() + " = " + get_name(n));
 	}
 
 	template <int num = numElements>
 	vec_base(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
 		: data_ref(generate_name()) {
-		kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ")");
+		kernel_add(this_name() + " = (" + x.name + ", " + y.name + ')');
 	}
 
 	template <int num = numElements>
 	vec_base(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
 		: data_ref(generate_name()) {
-		kernel_add(type_name() + ' ' + name + " = (" + x.name + ", " + y.name + ", " + z.name + ")");
+		kernel_add(this_name() + " = (" + x.name + ", " + y.name + ", " + z.name + ')');
 	}
 
 	operator vec<dataT, numElements>&() {
