@@ -351,13 +351,12 @@ struct VecData : public ::Vec {
 	}
 };
 
-template <int depth_ = 0>
 void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 }, Vector cf = { 1, 1, 1 }) {
 	using namespace cl::sycl;
 
 	double1 t;	// distance to intersection
 	int1 id = 0;	// id of intersected object
-	int1 depth = depth_;
+	int1 depth = 0;
 
 	// cl is accumulated color
 	// cf is accumulated reflectance
@@ -368,20 +367,23 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 
 	SYCL_WHILE(true)
 	SYCL_BEGIN {
-		if(!intersect(r, t, id)) {
+		if(!ns_sycl_gtx::intersect(r, t, id)) {
 			// if miss, don't add anything
 			ret = cl;
 			SYCL_RETURN
 		}
-		const Sphere& obj = spheres[id]; // the hit object
+		// TODO: id instead of 0
+		const Sphere& obj = ns_sycl_gtx::spheres[0]; // the hit object
 		x = r.o + r.d*t;
-		Vec n = (x - obj.p).norm();
-		Vec nl = n;
-		if(n.dot(r.d) > 0) {
+		Vector n = Vector(x - obj.p).norm();
+		Vector nl = n;
+		SYCL_IF(n.dot(r.d) > 0)
+		SYCL_BEGIN {
 			nl = nl * -1;
 		}
-		Vec f = obj.c;
-		double p;	// max refl
+		SYCL_END
+		Vector f = obj.c;
+		double1 p;	// max refl
 		if(f.x > f.y && f.x > f.z) {
 			p = f.x;
 		}
@@ -400,16 +402,17 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 				f = f*(1 / p);
 			}
 			else {
-				return DoNext::Return;
+				ret = cl;
+				SYCL_RETURN
 			}
 		}
 
 		cf = cf.mult(f);
 
 		if(obj.refl == DIFF) {	// Ideal DIFFUSE reflection
-			double r1 = 2 * M_PI*erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
-			Vec w = nl;
-			Vec u;
+			double1 r1 = 2 * M_PI*erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
+			Vector w = nl;
+			Vector u;
 			if(fabs(w.x) > .1) {
 				u.y = 1;
 			}
@@ -417,45 +420,45 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 				u.x = 1;
 			}
 			u = (u % w).norm();
-			Vec v = w%u;
-			Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
+			Vector v = w%u;
+			Vector d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
 
 			// Recursion
-			r = Ray(x, d);
-			return DoNext::ContinueLoop;
+			r = RaySycl(x, d);
+			SYCL_CONTINUE
 		}
 		else if(obj.refl == SPEC) {	// Ideal SPECULAR reflection
 			// Recursion
-			r = Ray(x, r.d - n * 2 * n.dot(r.d));
-			return DoNext::ContinueLoop;
+			r = RaySycl(x, r.d - n * 2 * n.dot(r.d));
+			SYCL_CONTINUE
 		}
-		reflRay = Ray(x, r.d - n * 2 * n.dot(r.d));	// Ideal dielectric REFRACTION
-		bool into = n.dot(nl) > 0;	// Ray from outside going in?
-		double nc = 1;
-		double nt = 1.5;
-		double nnt;
+		reflRay = RaySycl(x, r.d - n * 2 * n.dot(r.d));	// Ideal dielectric REFRACTION
+		bool1 into = n.dot(nl) > 0;	// Ray from outside going in?
+		double1 nc = 1;
+		double1 nt = 1.5;
+		double1 nnt;
 		if(into) {
 			nnt = nc / nt;
 		}
 		else {
 			nnt = nt / nc;
 		}
-		double ddn = r.d.dot(nl);
-		double cos2t;
+		double1 ddn = r.d.dot(nl);
+		double1 cos2t;
 		if((cos2t = 1 - nnt*nnt*(1 - ddn*ddn)) < 0) {	// Total internal reflection
 			// Recursion
 			r = reflRay;
-			return DoNext::ContinueLoop;
+			SYCL_CONTINUE
 		}
-		double tmp = 1;
+		double1 tmp = 1;
 		if(!into) {
 			tmp = -1;
 		}
-		tdir = (r.d*nnt - n*(tmp*(ddn*nnt + sqrt(cos2t)))).norm();
-		double a = nt - nc;
-		double b = nt + nc;
-		double R0 = a*a / (b*b);
-		double c = 1;
+		tdir = Vector(r.d*nnt - n*(tmp*(ddn*nnt + sqrt(cos2t)))).norm();
+		double1 a = nt - nc;
+		double1 b = nt + nc;
+		double1 R0 = a*a / (b*b);
+		double1 c = 1;
 		if(into) {
 			c += ddn;
 		}
@@ -467,8 +470,6 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 		P = .25 + .5*Re;
 		RP = Re / P;
 		TP = Tr / (1 - P);
-
-		return DoNext::Proceed;
 	}
 	SYCL_END
 }
