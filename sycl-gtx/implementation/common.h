@@ -169,6 +169,13 @@ SYCL_GET_TYPE_STRING_UNSIGNED(long)
 #undef SYCL_GET_TYPE_STRING
 #undef SYCL_GET_TYPE_STRING_UNSIGNED
 
+template <typename T>
+struct data_size {
+	static size_t get() {
+		return sizeof(T);
+	}
+};
+
 } // namespace detail
 
 } // namespace sycl

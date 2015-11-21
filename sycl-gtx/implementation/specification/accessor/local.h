@@ -9,6 +9,7 @@
 #include "../command_group.h"
 #include "../ranges.h"
 #include "../../counter.h"
+#include "../../common.h"
 
 namespace cl {
 namespace sycl {
@@ -34,7 +35,7 @@ protected:
 	}
 
 	virtual size_t argument_size() const override {
-		return sizeof(DataType) * allocationSize.size();
+		return data_size<DataType>::get() * allocationSize.size();
 	}
 
 public:

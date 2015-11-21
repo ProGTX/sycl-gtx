@@ -146,7 +146,7 @@ public:
 
 	// Total number of bytes in the buffer
 	size_t get_size() const {
-		return get_count() * sizeof(DataType);
+		return get_count() * data_size<DataType>::get();
 	}
 
 private:
