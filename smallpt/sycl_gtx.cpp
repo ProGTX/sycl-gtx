@@ -351,6 +351,67 @@ struct VecData : public ::Vec {
 	}
 };
 
+struct SphereSycl {
+	double1 rad;       // radius
+	Vector p, e, c;      // position, emission, color
+	Refl_t refl;      // reflection type (DIFFuse, SPECular, REFRactive)
+
+	SphereSycl(const Sphere& s)
+		: rad(s.rad), p(s.p), e(s.e), c(s.c), refl(s.refl) {}
+
+	void intersect(double1& ret, const RaySycl& r) const { // returns distance, 0 if no hit
+		Vector op = p - r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
+		double1 t;
+		double1 eps = 1e-4;
+		double1 b = op.dot(r.d);
+		double1 det = b*b - op.dot(op) + rad*rad;
+
+		SYCL_IF(det < 0)
+		SYCL_BEGIN {
+			ret = 0;
+		}
+		SYCL_END
+		SYCL_ELSE
+		SYCL_BEGIN{
+			det = sqrt(det);
+			t = b - det;
+			SYCL_IF(t > eps)
+			SYCL_BEGIN{
+				ret = t;
+			}
+			SYCL_END
+			SYCL_ELSE
+			SYCL_BEGIN{
+				t = b + det;
+				SYCL_IF(t > eps)
+				SYCL_BEGIN {
+					ret = t;
+				}
+				SYCL_END
+				SYCL_ELSE
+				SYCL_BEGIN {
+					ret = 0;
+				}
+				SYCL_END
+			}
+			SYCL_END
+		}
+		SYCL_END
+	}
+};
+
+SphereSycl spheres[ns_sycl_gtx::numSpheres] = {
+	ns_sycl_gtx::spheres[0],
+	ns_sycl_gtx::spheres[1],
+	ns_sycl_gtx::spheres[2],
+	ns_sycl_gtx::spheres[3],
+	ns_sycl_gtx::spheres[4],
+	ns_sycl_gtx::spheres[5],
+	ns_sycl_gtx::spheres[6],
+	ns_sycl_gtx::spheres[7],
+	ns_sycl_gtx::spheres[8]
+};
+
 void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 }, Vector cf = { 1, 1, 1 }) {
 	using namespace cl::sycl;
 
@@ -373,7 +434,7 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 			SYCL_RETURN
 		}
 		// TODO: id instead of 0
-		const Sphere& obj = ns_sycl_gtx::spheres[0]; // the hit object
+		const SphereSycl& obj = spheres[0]; // the hit object
 		x = r.o + r.d*t;
 		Vector n = Vector(x - obj.p).norm();
 		Vector nl = n;
