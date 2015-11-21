@@ -285,6 +285,9 @@ struct Vector : public cl::sycl::vec<double, 3> {
 		: vec(0, 0, 0) {}
 	Vector(const Vec& v)
 		: vec(v.x, v.y, v.z) {}
+	template <class T>
+	Vector(T n)
+		: vec(n) {}
 	template <class X, class Y, class Z>
 	Vector(X&& x, Y&& y, Z&& z)
 		: vec(x, y, z) {}
@@ -386,16 +389,16 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 		SYCL_BEGIN {
 			Vector res1, res2;
 			radiance<1>(res1, reflRay, Xi, cl, cf * Re);
-			radiance<1>(res2, Ray(x, tdir), Xi, cl, cf * Tr);
-			res = res1 + res2;
+			radiance<1>(res2, RaySycl(x, tdir), Xi, cl, cf * Tr);
+			ret = res1 + res2;
 		}
 		SYCL_END
 		SYCL_ELSE_IF(depth == 2)
 		SYCL_BEGIN{
 			Vector res1, res2;
 			radiance<2>(res1, reflRay, Xi, cl, cf * Re);
-			radiance<2>(res2, Ray(x, tdir), Xi, cl, cf * Tr);
-			res = res1 + res2;
+			radiance<2>(res2, RaySycl(x, tdir), Xi, cl, cf * Tr);
+			ret = res1 + res2;
 		}
 		SYCL_END
 		SYCL_ELSE
@@ -489,7 +492,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 
 						// TODO:
 						Vector rad;
-						ns_sycl_gtx::radiance(rad, RaySycl(cam.o + d * 140, d.norm()), Xi);
+						sycl_class::radiance(rad, RaySycl(cam.o + d * 140, d.norm()), Xi);
 						r = r + rad*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 					SYCL_END
