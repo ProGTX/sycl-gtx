@@ -400,18 +400,6 @@ struct SphereSycl {
 	}
 };
 
-SphereSycl spheres[ns_sycl_gtx::numSpheres] = {
-	ns_sycl_gtx::spheres[0],
-	ns_sycl_gtx::spheres[1],
-	ns_sycl_gtx::spheres[2],
-	ns_sycl_gtx::spheres[3],
-	ns_sycl_gtx::spheres[4],
-	ns_sycl_gtx::spheres[5],
-	ns_sycl_gtx::spheres[6],
-	ns_sycl_gtx::spheres[7],
-	ns_sycl_gtx::spheres[8]
-};
-
 void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 }, Vector cf = { 1, 1, 1 }) {
 	using namespace cl::sycl;
 
@@ -433,8 +421,8 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 			ret = cl;
 			SYCL_RETURN
 		}
-		// TODO: id instead of 0
-		const SphereSycl& obj = spheres[0]; // the hit object
+		// TODO: need to pass spheres to the kernel
+		SphereSycl obj(ns_sycl_gtx::spheres[0]); // the hit object
 		x = r.o + r.d*t;
 		Vector n = Vector(x - obj.p).norm();
 		Vector nl = n;
