@@ -25,6 +25,19 @@ SYCL_TYPE(long)
 
 #undef SYCL_TYPE
 
+#define SYCL_ONE_ARG(name)			\
+template <class First>				\
+static First name(First first) {	\
+	return ::std:: name(first);		\
+}
+
+SYCL_ONE_ARG(cos)
+SYCL_ONE_ARG(fabs)
+SYCL_ONE_ARG(sin)
+SYCL_ONE_ARG(sqrt)
+
+#undef SYCL_ONE_ARG
+
 template <class First>
 static First sqrt(First first) {
 	return ::std::sqrt(first);

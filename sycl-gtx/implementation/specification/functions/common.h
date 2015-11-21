@@ -8,11 +8,20 @@
 namespace cl {
 namespace sycl {
 
-template <class First>
-static detail::data_ref sqrt(First first) {
-	using detail::data_ref;
-	return data_ref(string_class("sqrt(") + data_ref::get_name(first) + ")");
+#define SYCL_ONE_ARG(name)						\
+template <class First>							\
+static detail::data_ref name(First first) {		\
+	using detail::data_ref;						\
+	return	data_ref(string_class(#name "(") +	\
+			data_ref::get_name(first) + ')');	\
 }
+
+SYCL_ONE_ARG(cos)
+SYCL_ONE_ARG(fabs)
+SYCL_ONE_ARG(sin)
+SYCL_ONE_ARG(sqrt)
+
+#undef SYCL_ONE_ARG
 
 template <class First, class Second>
 static detail::data_ref min(First first, Second second) {
