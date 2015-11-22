@@ -25,6 +25,14 @@ typename std::enable_if<num == dim>::type* = nullptr
 template <typename dataT, int numElements>
 class base;
 
+
+template <typename dataT>
+using single_member = base<dataT, 1>;
+
+template <typename dataT, int numElements>
+struct value_members {
+	value_members(string_class name = "") {}
+};
 template <typename dataT, int numElements>
 struct members {
 	members(string_class name = "") {}
@@ -40,107 +48,65 @@ struct members {
 #define SYCL_V8(m1, m2, m3, m4, m5, m6, m7, m8)		SYCL_V4(m1, m2, m3, m4), SYCL_V4(m5, m6, m7, m8)
 #define SYCL_V9(m1, m2, m3, m4, m5, m6, m7, m8, m9)	SYCL_V5(m1, m2, m3, m4, m5), SYCL_V4(m6, m7, m8, m9)
 
-#define SYCL_R2(org, m1, m2)	m1(org), m2(org)
 
 template <typename dataT>
-struct members<dataT, 2> : members<dataT, 1> {
-	base<dataT, 1> x, y;
-	base<dataT, 1> &s0, &s1, &lo, &hi;
-	base<dataT, 2> xx, xy, yx, yy;
-	base<dataT, 2> &s00, &s01, &s10, &s11;
-	members(string_class name)
-		:	SYCL_V2(x, y),
-			SYCL_R2(x, s0, lo),
-			SYCL_R2(y, s1, hi),
-			SYCL_V4(xx, xy, yx, yy),
-			s00(xx), s01(xy), s10(yx), s11(yy) {}
+struct value_members<dataT, 2> {
+	single_member<dataT> x;
+	single_member<dataT> y;
+
+	value_members(string_class name)
+		: SYCL_V2(x, y) {}
 };
 
 template <typename dataT>
-struct members<dataT, 3> : members<dataT, 2> {
-	base<dataT, 1> z;
-	base<dataT, 1> &s2;
-	members<dataT, 2> lo, hi;
-	base<dataT, 2> xz, yz, zx, zy, zz;
-	base<dataT, 2> &s02, &s12, &s20, &s21, &s22;
-	base<dataT, 3>	xxx, xxy, xxz,
-						xyx, xyy, xyz,
-						xzx, xzy, xzz,
-						yxx, yxy, yxz,
-						yyx, yyy, yyz,
-						yzx, yzy, yzz,
-						zxx, zxy, zxz,
-						zyx, zyy, zyz,
-						zzx, zzy, zzz;
-	base<dataT, 3>	&s000, &s001, &s002,
-						&s010, &s011, &s012,
-						&s020, &s021, &s022,
-						&s100, &s101, &s102,
-						&s110, &s111, &s112,
-						&s120, &s121, &s122,
-						&s200, &s201, &s202,
-						&s210, &s211, &s212,
-						&s220, &s221, &s222;
+struct value_members<dataT, 3> {
+	value_members<dataT, 2> lo, hi;
+
+	single_member<dataT> &x, &y, &z;
+	value_members(string_class name)
+		:	SYCL_V2(lo, hi),
+			x(lo.x), y(lo.y), z(hi.x) {}
+};
+
+template <typename dataT>
+struct value_members<dataT, 4> : value_members<dataT, 3>{
+	single_member<dataT> w;
+	value_members(string_class name)
+		: value_members<dataT, 3>(name),
+		SYCL_V(w) {
+	}
+};
+
+template <typename dataT>
+struct members<dataT, 2> : value_members<dataT, 2> {
 	members(string_class name)
-		:	members<dataT, 2>(name),
-			SYCL_V(z), s2(z),
-			SYCL_V2(lo, hi),
-			SYCL_V5(xz, yz, zx, zy, zz),
-			s02(xz), s12(yz), s20(zx), s21(zy), s22(zz),
-			SYCL_V9(xxx, xxy, xxz,
-					xyx, xyy, xyz,
-					xzx, xzy, xzz),
-			SYCL_V9(yxx, yxy, yxz,
-					yyx, yyy, yyz,
-					yzx, yzy, yzz),
-			SYCL_V9(zxx, zxy, zxz,
-					zyx, zyy, zyz,
-					zzx, zzy, zzz),
-			s000(xxx), s001(xxy), s002(xxz),
-			s010(xyx), s011(xyy), s012(xyz),
-			s020(xzx), s021(xzy), s022(xzz),
-			s100(yxx), s101(yxy), s102(yxz),
-			s110(yyx), s111(yyy), s112(yyz),
-			s120(yzx), s121(yzy), s122(yzz),
-			s200(zxx), s201(zxy), s202(zxz),
-			s210(zyx), s211(zyy), s212(zyz),
-			s220(zzx), s221(zzy), s222(zzz) {}
+		: value_members<dataT, 2>(name) {}
+};
+
+template <typename dataT>
+struct members<dataT, 3> : value_members<dataT, 3> {
+	members(string_class name)
+		: value_members<dataT, 3>(name) {}
 };
 
 // TODO: All members
 
 template <typename dataT>
-struct members<dataT, 4> : members<dataT, 3> {
-	base<dataT, 1> w;
-	base<dataT, 1> &s3;
-	base<dataT, 3> yzw;
-	base<dataT, 3> &s123;
-	base<dataT, 4> xyzw;
-	base<dataT, 4> &s0123;
-
+struct members<dataT, 4> : value_members<dataT, 4> {
 	members(string_class name)
-		:	members<dataT, 3>(name),
-			SYCL_V(w), s3(w),
-			SYCL_V(yzw), s123(yzw),
-			SYCL_V(xyzw), s0123(xyzw) {}
+		:	value_members<dataT, 4>(name) {}
 };
 
 template <typename dataT>
-struct members<dataT, 8> : members<dataT, 4> {
-	members<dataT, 4> lo, hi;
-
+struct members<dataT, 8> : value_members<dataT, 8>{
 	members(string_class name)
-		:	members<dataT, 4>(name),
-			SYCL_V2(lo, hi) {}
+		:	value_members<dataT, 8>(name) {}
 };
 
 template <typename dataT>
-struct members<dataT, 16> : members<dataT, 8> {
-	members<dataT, 8> lo, hi;
-
+struct members<dataT, 16> : value_members<dataT, 16>{
 	members(string_class name)
-		:	members<dataT, 8>(name),
-			SYCL_V2(lo, hi) {}
+		:	value_members<dataT, 16>(name) {}
 };
 
 
@@ -154,14 +120,14 @@ struct members<dataT, 16> : members<dataT, 8> {
 #undef SYCL_V8
 #undef SYCL_V9
 
-#undef SYCL_R2
-
 
 template <typename dataT, int numElements>
 class base : protected counter<base<dataT, numElements>>, public data_ref {
 private:
 	template <typename dataT, int numElements>
 	friend struct members;
+	template <typename dataT, int numElements>
+	friend struct value_members;
 	template <typename DataType>
 	friend struct type_string;
 
@@ -177,6 +143,12 @@ private:
 		return type_name() + ' ' + name;
 	}
 
+protected:
+	base(string_class assign, bool generate_new)
+		: data_ref(generate_name()) {
+		kernel_add(this_name() + " = " + assign);
+	}
+
 	base(string_class name)
 		: data_ref(name) {}
 
@@ -187,22 +159,16 @@ public:
 	}
 
 	template <class T>
-	base(T n)
-		: data_ref(generate_name()) {
-		kernel_add(this_name() + " = " + get_name(n));
-	}
+	base(T n, typename std::enable_if<!std::is_same<T, const base&>::value>::type* = nullptr)
+		: base(get_name(n), true) {}
 
 	template <int num = numElements>
 	base(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
-		: data_ref(generate_name()) {
-		kernel_add(this_name() + " = (" + x.name + ", " + y.name + ')');
-	}
+		: base(open_parenthesis + x.name + ", " + y.name + ')', true) {}
 
 	template <int num = numElements>
 	base(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
-		: data_ref(generate_name()) {
-		kernel_add(this_name() + " = (" + x.name + ", " + y.name + ", " + z.name + ')');
-	}
+		: base(open_parenthesis + x.name + ", " + y.name + ", " + z.name + ')', true) {}
 
 	operator vec<dataT, numElements>&() {
 		return *reinterpret_cast<vec<dataT, numElements>*>(this);
@@ -245,8 +211,10 @@ private:
 public:
 	vec()
 		: Base(), Members(name) {}
+	vec(const vec& copy)
+		: Base(copy.name, true), Members(name) {}
 	template <class T>
-	vec(T n)
+	vec(T n, typename std::enable_if<!std::is_same<T, const vec&>::value>::type* = nullptr)
 		: Base(n), Members(name) {}
 	template <int num = numElements>
 	vec(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
@@ -256,8 +224,8 @@ public:
 		: Base(x, y, z), Members(name) {}
 
 	template <class T>
-	vec& operator=(T n) {
-		data_ref::operator=(n);
+	vec& operator=(T&& n) {
+		data_ref::operator=(std::forward<T>(n));
 		return *this;
 	}
 };
