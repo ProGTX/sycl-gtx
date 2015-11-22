@@ -30,12 +30,8 @@ template <typename dataT>
 using single_member = base<dataT, 1>;
 
 template <typename dataT, int numElements>
-struct value_members {
-	value_members(string_class name = "") {}
-};
-template <typename dataT, int numElements>
 struct members {
-	members(string_class name = "") {}
+	members(base<dataT, numElements>* parent, string_class name = "") {}
 };
 
 #define SYCL_V(member)								member(name + "." #member)
@@ -48,67 +44,159 @@ struct members {
 #define SYCL_V8(m1, m2, m3, m4, m5, m6, m7, m8)		SYCL_V4(m1, m2, m3, m4), SYCL_V4(m5, m6, m7, m8)
 #define SYCL_V9(m1, m2, m3, m4, m5, m6, m7, m8, m9)	SYCL_V5(m1, m2, m3, m4, m5), SYCL_V4(m6, m7, m8, m9)
 
-
-template <typename dataT>
-struct value_members<dataT, 2> {
-	single_member<dataT> x;
-	single_member<dataT> y;
-
-	value_members(string_class name)
-		: SYCL_V2(x, y) {}
-};
-
-template <typename dataT>
-struct value_members<dataT, 3> {
-	value_members<dataT, 2> lo, hi;
-
-	single_member<dataT> &x, &y, &z;
-	value_members(string_class name)
-		:	SYCL_V2(lo, hi),
-			x(lo.x), y(lo.y), z(hi.x) {}
-};
-
-template <typename dataT>
-struct value_members<dataT, 4> : value_members<dataT, 3>{
-	single_member<dataT> w;
-	value_members(string_class name)
-		: value_members<dataT, 3>(name),
-		SYCL_V(w) {
-	}
-};
-
-template <typename dataT>
-struct members<dataT, 2> : value_members<dataT, 2> {
-	members(string_class name)
-		: value_members<dataT, 2>(name) {}
-};
-
-template <typename dataT>
-struct members<dataT, 3> : value_members<dataT, 3> {
-	members(string_class name)
-		: value_members<dataT, 3>(name) {}
-};
+#define SYCL_R2(org, r1, r2)	r1(org), r2(org)
+#define SYCL_R2_LO(pf, r1, r2)	r1(pf lo.r1), r2(pf lo.r1)
 
 // TODO: All members
 
 template <typename dataT>
-struct members<dataT, 4> : value_members<dataT, 4> {
-	members(string_class name)
-		:	value_members<dataT, 4>(name) {}
+struct members<dataT, 2> {
+	single_member<dataT> x, y;
+	single_member<dataT> &lo, &hi;
+	single_member<dataT> &s0, &s1;
+
+	members(base<dataT, 2>* parent, string_class name)
+	:	SYCL_V2(x, y),
+		SYCL_R2(x, lo, s0),
+		SYCL_R2(y, hi, s1) {}
+};
+
+#define SYCL_MEMBERS_3()	\
+SYCL_V2(lo, hi),			\
+SYCL_R2(lo.x, x, s0),		\
+SYCL_R2(lo.y, y, s1),		\
+SYCL_R2(hi.x, z, s2)
+
+#define SYCL_SWIZZLE_3(pf)				\
+base<dataT, 3>	pf xxx, pf xxy, pf xxz,	\
+				pf xyx, pf xyy,			\
+				pf xzx, pf xzy, pf xzz,	\
+				pf yxx, pf yxy, pf yxz,	\
+				pf yyx, pf yyy, pf yyz,	\
+				pf yzx, pf yzy, pf yzz,	\
+				pf zxx, pf zxy, pf zxz,	\
+				pf zyx, pf zyy, pf zyz,	\
+				pf zzx, pf zzy, pf zzz;	\
+base<dataT, 3>	&s000, &s001, &s002,	\
+				&s010, &s011,			\
+				&s020, &s021, &s022,	\
+				&s100, &s101, &s102,	\
+				&s110, &s111, &s112,	\
+				&s120, &s121, &s122,	\
+				&s200, &s201, &s202,	\
+				&s210, &s211, &s212,	\
+				&s220, &s221, &s222;
+
+#define SYCL_SWIZZLE_3_VALUES()				\
+SYCL_V8(xxx, xxy, xxz,						\
+		xyx, xyy,							\
+		xzx, xzy, xzz),						\
+SYCL_V9(yxx, yxy, yxz,						\
+		yyx, yyy, yyz,						\
+		yzx, yzy, yzz),						\
+SYCL_V9(zxx, zxy, zxz,						\
+		zyx, zyy, zyz,						\
+		zzx, zzy, zzz),						\
+		s000(xxx), s001(xxy), s002(xxz),	\
+		s010(xyx), s011(xyy),				\
+		s020(xzx), s021(xzy), s022(xzz),	\
+		s100(yxx), s101(yxy), s102(yxz),	\
+		s110(yyx), s111(yyy), s112(yyz),	\
+		s120(yzx), s121(yzy), s122(yzz),	\
+		s200(zxx), s201(zxy), s202(zxz),	\
+		s210(zyx), s211(zyy), s212(zyz),	\
+		s220(zzx), s221(zzy), s222(zzz)
+
+template <typename dataT>
+struct members<dataT, 3> {
+	vec<dataT, 2> lo, hi;
+	single_member<dataT> &x, &y, &z;
+	single_member<dataT> &s0, &s1, &s2;
+	vec<dataT, 3> &xyz, &s012;
+	SYCL_SWIZZLE_3();
+
+	members(base<dataT, 3>* parent, string_class name)
+	:	SYCL_MEMBERS_3(),
+		SYCL_R2(*parent, xyz, s012),
+		SYCL_SWIZZLE_3_VALUES() {}
 };
 
 template <typename dataT>
-struct members<dataT, 8> : value_members<dataT, 8>{
-	members(string_class name)
-		:	value_members<dataT, 8>(name) {}
+struct members<dataT, 4> {
+	vec<dataT, 2> lo, hi;
+	single_member<dataT> &x, &y, &z, &w;
+	single_member<dataT> &s0, &s1, &s2, &s3;
+	vec<dataT, 3> xyz, &s012;
+	SYCL_SWIZZLE_3();
+	vec<dataT, 3> yzw;
+
+	members(base<dataT, 4>* parent, string_class name)
+	:	SYCL_MEMBERS_3(),
+		SYCL_R2(hi.y, w, s3),
+		SYCL_V(xyz), s012(xyz),
+		SYCL_SWIZZLE_3_VALUES(),
+		SYCL_V(yzw) {}
+};
+
+#define SYCL_MEMBERS_8(pf)	\
+SYCL_V2(lo, hi),			\
+SYCL_R2_LO(pf, x, s0),		\
+SYCL_R2_LO(pf, y, s1),		\
+SYCL_R2_LO(pf, z, s2),		\
+SYCL_R2_LO(pf, w, s3),		\
+s4(pf hi.x),				\
+s5(pf hi.y),				\
+s6(pf hi.z),				\
+s7(pf hi.w)
+
+#define SYCL_SWIZZLE_3_REFS_9(pf, vf, sf)	\
+SYCL_R2_LO(pf, vf##xx, sf##00),				\
+SYCL_R2_LO(pf, vf##xy, sf##01),				\
+SYCL_R2_LO(pf, vf##xz, sf##02),				\
+SYCL_R2_LO(pf, vf##yx, sf##10),				\
+SYCL_R2_LO(pf, vf##yy, sf##11),				\
+SYCL_R2_LO(pf, vf##yz, sf##12),				\
+SYCL_R2_LO(pf, vf##zx, sf##21),				\
+SYCL_R2_LO(pf, vf##zy, sf##21),				\
+SYCL_R2_LO(pf, vf##zz, sf##22)
+
+#define SYCL_SWIZZLE_3_REFS(pf)		\
+SYCL_SWIZZLE_3_REFS_9(pf, x, s0),	\
+SYCL_SWIZZLE_3_REFS_9(pf, y, s1),	\
+SYCL_SWIZZLE_3_REFS_9(pf, z, s2)
+
+template <typename dataT>
+struct members<dataT, 8> {
+	vec<dataT, 4> lo, hi;
+	single_member<dataT> &x, &y, &z, &w;
+	single_member<dataT> &s0, &s1, &s2, &s3, &s4, &s5, &s6, &s7;
+	vec<dataT, 3> &xyz, &s012;
+	SYCL_SWIZZLE_3(&);
+	vec<dataT, 3> &yzw;
+
+	members(base<dataT, 8>* parent, string_class name)
+	:	SYCL_MEMBERS_8(this->),
+		SYCL_SWIZZLE_3_REFS(this->),
+		yzw(lo.yzw) {}
 };
 
 template <typename dataT>
-struct members<dataT, 16> : value_members<dataT, 16>{
-	members(string_class name)
-		:	value_members<dataT, 16>(name) {}
-};
+struct members<dataT, 16> {
+	vec<dataT, 8> lo, hi;
+	single_member<dataT> &x, &y, &z, &w;
+	single_member<dataT>	&s0, &s1, &s2, &s3,
+							&s4, &s5, &s6, &s7,
+							&s8, &s9, &sa, &sb,
+							&sc, &sd, &se, &sf;
+	vec<dataT, 3> &xyz, &s012;
+	SYCL_SWIZZLE_3(&);
+	vec<dataT, 3> &yzw;
 
+	members(base<dataT, 16>* parent, string_class name)
+	:	SYCL_MEMBERS_8(lo.),
+		SYCL_SWIZZLE_3_REFS(lo.),
+		yzw(lo.yzw) {}
+};
 
 #undef SYCL_V
 #undef SYCL_V2
@@ -120,14 +208,22 @@ struct members<dataT, 16> : value_members<dataT, 16>{
 #undef SYCL_V8
 #undef SYCL_V9
 
+#undef SYCL_R2
+#undef SYCL_R2_LO
+#undef SYCL_MEMBERS_3
+#undef SYCL_MEMBERS_8
+
+#undef SYCL_SWIZZLE_3
+#undef SYCL_SWIZZLE_3_VALUES
+#undef SYCL_SWIZZLE_3_REFS
+#undef SYCL_SWIZZLE_3_REFS_9
+
 
 template <typename dataT, int numElements>
 class base : protected counter<base<dataT, numElements>>, public data_ref {
 private:
 	template <typename dataT, int numElements>
 	friend struct members;
-	template <typename dataT, int numElements>
-	friend struct value_members;
 	template <typename DataType>
 	friend struct type_string;
 
@@ -206,22 +302,29 @@ struct base_host_data<vec<dataT, numElements>> {
 template <typename dataT, int numElements>
 class vec : public detail::vectors::base<dataT, numElements>, public detail::vectors::members<dataT, numElements> {
 private:
+	template <typename, int>
+	friend struct detail::vectors::members;
+
 	using Base = detail::vectors::base<dataT, numElements>;
 	using Members = detail::vectors::members<dataT, numElements>;
+
+protected:
+	vec(string_class name_)
+		: Base(name_), Members(this, name) {}
 public:
 	vec()
-		: Base(), Members(name) {}
+		: Base(), Members(this, name) {}
 	vec(const vec& copy)
-		: Base(copy.name, true), Members(name) {}
+		: Base(copy.name, true), Members(this, name) {}
 	template <class T>
 	vec(T n, typename std::enable_if<!std::is_same<T, const vec&>::value>::type* = nullptr)
-		: Base(n), Members(name) {}
+		: Base(n), Members(this, name) {}
 	template <int num = numElements>
 	vec(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
-		: Base(x, y), Members(name) {}
+		: Base(x, y), Members(this, name) {}
 	template <int num = numElements>
 	vec(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
-		: Base(x, y, z), Members(name) {}
+		: Base(x, y, z), Members(this, name) {}
 
 	template <class T>
 	vec& operator=(T&& n) {
@@ -231,7 +334,7 @@ public:
 };
 
 
-// 3.9.1 Description of the built-in types available for SYCL host and device
+// 3.10.1 Description of the built-in types available for SYCL host and device
 
 #define SYCL_VEC_SIGNED(basetype, numElements) \
 using basetype##numElements = vec<basetype, numElements>;
