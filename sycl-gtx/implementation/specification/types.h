@@ -16,17 +16,18 @@ template <typename dataT, int numElements>
 class vec;
 
 namespace detail {
+namespace vectors {
 
 #define SYCL_ENABLE_IF_DIM(dim)	\
 typename std::enable_if<num == dim>::type* = nullptr
 
 // Forward declaration
 template <typename dataT, int numElements>
-class vec_base;
+class base;
 
 template <typename dataT, int numElements>
-struct vec_members {
-	vec_members(string_class name = "") {}
+struct members {
+	members(string_class name = "") {}
 };
 
 #define SYCL_V(member)								member(name + "." #member)
@@ -42,12 +43,12 @@ struct vec_members {
 #define SYCL_R2(org, m1, m2)	m1(org), m2(org)
 
 template <typename dataT>
-struct vec_members<dataT, 2> : vec_members<dataT, 1> {
-	vec_base<dataT, 1> x, y;
-	vec_base<dataT, 1> &s0, &s1, &lo, &hi;
-	vec_base<dataT, 2> xx, xy, yx, yy;
-	vec_base<dataT, 2> &s00, &s01, &s10, &s11;
-	vec_members(string_class name)
+struct members<dataT, 2> : members<dataT, 1> {
+	base<dataT, 1> x, y;
+	base<dataT, 1> &s0, &s1, &lo, &hi;
+	base<dataT, 2> xx, xy, yx, yy;
+	base<dataT, 2> &s00, &s01, &s10, &s11;
+	members(string_class name)
 		:	SYCL_V2(x, y),
 			SYCL_R2(x, s0, lo),
 			SYCL_R2(y, s1, hi),
@@ -56,13 +57,13 @@ struct vec_members<dataT, 2> : vec_members<dataT, 1> {
 };
 
 template <typename dataT>
-struct vec_members<dataT, 3> : vec_members<dataT, 2> {
-	vec_base<dataT, 1> z;
-	vec_base<dataT, 1> &s2;
-	vec_members<dataT, 2> lo, hi;
-	vec_base<dataT, 2> xz, yz, zx, zy, zz;
-	vec_base<dataT, 2> &s02, &s12, &s20, &s21, &s22;
-	vec_base<dataT, 3>	xxx, xxy, xxz,
+struct members<dataT, 3> : members<dataT, 2> {
+	base<dataT, 1> z;
+	base<dataT, 1> &s2;
+	members<dataT, 2> lo, hi;
+	base<dataT, 2> xz, yz, zx, zy, zz;
+	base<dataT, 2> &s02, &s12, &s20, &s21, &s22;
+	base<dataT, 3>	xxx, xxy, xxz,
 						xyx, xyy, xyz,
 						xzx, xzy, xzz,
 						yxx, yxy, yxz,
@@ -71,7 +72,7 @@ struct vec_members<dataT, 3> : vec_members<dataT, 2> {
 						zxx, zxy, zxz,
 						zyx, zyy, zyz,
 						zzx, zzy, zzz;
-	vec_base<dataT, 3>	&s000, &s001, &s002,
+	base<dataT, 3>	&s000, &s001, &s002,
 						&s010, &s011, &s012,
 						&s020, &s021, &s022,
 						&s100, &s101, &s102,
@@ -80,8 +81,8 @@ struct vec_members<dataT, 3> : vec_members<dataT, 2> {
 						&s200, &s201, &s202,
 						&s210, &s211, &s212,
 						&s220, &s221, &s222;
-	vec_members(string_class name)
-		:	vec_members<dataT, 2>(name),
+	members(string_class name)
+		:	members<dataT, 2>(name),
 			SYCL_V(z), s2(z),
 			SYCL_V2(lo, hi),
 			SYCL_V5(xz, yz, zx, zy, zz),
@@ -109,36 +110,36 @@ struct vec_members<dataT, 3> : vec_members<dataT, 2> {
 // TODO: All members
 
 template <typename dataT>
-struct vec_members<dataT, 4> : vec_members<dataT, 3> {
-	vec_base<dataT, 1> w;
-	vec_base<dataT, 1> &s3;
-	vec_base<dataT, 3> yzw;
-	vec_base<dataT, 3> &s123;
-	vec_base<dataT, 4> xyzw;
-	vec_base<dataT, 4> &s0123;
+struct members<dataT, 4> : members<dataT, 3> {
+	base<dataT, 1> w;
+	base<dataT, 1> &s3;
+	base<dataT, 3> yzw;
+	base<dataT, 3> &s123;
+	base<dataT, 4> xyzw;
+	base<dataT, 4> &s0123;
 
-	vec_members(string_class name)
-		:	vec_members<dataT, 3>(name),
+	members(string_class name)
+		:	members<dataT, 3>(name),
 			SYCL_V(w), s3(w),
 			SYCL_V(yzw), s123(yzw),
 			SYCL_V(xyzw), s0123(xyzw) {}
 };
 
 template <typename dataT>
-struct vec_members<dataT, 8> : vec_members<dataT, 4> {
-	vec_members<dataT, 4> lo, hi;
+struct members<dataT, 8> : members<dataT, 4> {
+	members<dataT, 4> lo, hi;
 
-	vec_members(string_class name)
-		:	vec_members<dataT, 4>(name),
+	members(string_class name)
+		:	members<dataT, 4>(name),
 			SYCL_V2(lo, hi) {}
 };
 
 template <typename dataT>
-struct vec_members<dataT, 16> : vec_members<dataT, 8> {
-	vec_members<dataT, 8> lo, hi;
+struct members<dataT, 16> : members<dataT, 8> {
+	members<dataT, 8> lo, hi;
 
-	vec_members(string_class name)
-		:	vec_members<dataT, 8>(name),
+	members(string_class name)
+		:	members<dataT, 8>(name),
 			SYCL_V2(lo, hi) {}
 };
 
@@ -157,10 +158,10 @@ struct vec_members<dataT, 16> : vec_members<dataT, 8> {
 
 
 template <typename dataT, int numElements>
-class vec_base : protected counter<vec_base<dataT, numElements>>, public data_ref {
+class base : protected counter<base<dataT, numElements>>, public data_ref {
 private:
 	template <typename dataT, int numElements>
-	friend struct vec_members;
+	friend struct members;
 	template <typename DataType>
 	friend struct type_string;
 
@@ -176,29 +177,29 @@ private:
 		return type_name() + ' ' + name;
 	}
 
-	vec_base(string_class name)
+	base(string_class name)
 		: data_ref(name) {}
 
 public:
-	vec_base()
+	base()
 		: data_ref(generate_name()) {
 		kernel_add(this_name());
 	}
 
 	template <class T>
-	vec_base(T n)
+	base(T n)
 		: data_ref(generate_name()) {
 		kernel_add(this_name() + " = " + get_name(n));
 	}
 
 	template <int num = numElements>
-	vec_base(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
+	base(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
 		: data_ref(generate_name()) {
 		kernel_add(this_name() + " = (" + x.name + ", " + y.name + ')');
 	}
 
 	template <int num = numElements>
-	vec_base(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
+	base(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
 		: data_ref(generate_name()) {
 		kernel_add(this_name() + " = (" + x.name + ", " + y.name + ", " + z.name + ')');
 	}
@@ -216,7 +217,10 @@ public:
 };
 
 template <typename dataT, int numElements>
-struct vector_data;
+struct data;
+
+} // namespace vectors
+
 
 template <typename dataT, int numElements>
 struct data_size<vec<dataT, numElements>> {
@@ -227,16 +231,17 @@ struct data_size<vec<dataT, numElements>> {
 
 template <typename dataT, int numElements>
 struct base_host_data<vec<dataT, numElements>> {
-	using type = typename vector_data<dataT, numElements>::type;
+	using type = typename vectors::data<dataT, numElements>::type;
 };
 
 } // namespace detail
 
+
 template <typename dataT, int numElements>
-class vec : public detail::vec_base<dataT, numElements>, public detail::vec_members<dataT, numElements> {
+class vec : public detail::vectors::base<dataT, numElements>, public detail::vectors::members<dataT, numElements> {
 private:
-	using Base = detail::vec_base<dataT, numElements>;
-	using Members = detail::vec_members<dataT, numElements>;
+	using Base = detail::vectors::base<dataT, numElements>;
+	using Members = detail::vectors::members<dataT, numElements>;
 public:
 	vec()
 		: Base(), Members(name) {}
@@ -266,14 +271,14 @@ using basetype##numElements = vec<basetype, numElements>;
 #define SYCL_VEC_SIGNED_EXTRA(basetype, numElements)	\
 SYCL_VEC_SIGNED(basetype, numElements)					\
 template <>												\
-struct detail::vector_data<basetype, numElements> {		\
+struct detail::vectors::data<basetype, numElements> {	\
 	using type = cl_##basetype##numElements;			\
 };
 
 #define SYCL_VEC_SIGNED_EXTRA_ONE(basetype)	\
 SYCL_VEC_SIGNED(basetype, 1)				\
 template <>									\
-struct detail::vector_data<basetype, 1> {	\
+struct detail::vectors::data<basetype, 1> {	\
 	using type = cl_##basetype;				\
 };
 
@@ -311,7 +316,7 @@ SYCL_VEC_SIGNED_EXTRA_ONE(double)
 
 SYCL_VEC_SIGNED(bool, 1)
 template <>
-struct detail::vector_data<bool, 1> {
+struct detail::vectors::data<bool, 1> {
 	using type = cl_bool;
 };
 
