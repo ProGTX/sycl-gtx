@@ -130,7 +130,7 @@ DoNext radianceInner(
 		r = reflRay;
 		return DoNext::ContinueLoop;
 	}
-	double tmp = 1;
+	double tmp = 1; 
 	if(!into) {
 		tmp = -1;
 	}
@@ -342,20 +342,38 @@ inline void clamp(double1& x) {
 	SYCL_END
 }
 
-struct SphereSycl {
-	double1 rad;	// radius
-	Vector p, e, c;	// position, emission, color
-	Refl_t refl;	// reflection type (DIFFuse, SPECular, REFRactive)
 
-	SphereSycl(const Sphere& s)
-		: rad(s.rad), p(s.p), e(s.e), c(s.c), refl(s.refl) {}
+struct SphereSycl {
+private:
+	cl::sycl::double16 data;
+
+public:
+	template <class T>
+	SphereSycl(T&& data)
+		: data(data) {}
+
+	double1& rad() const {
+		return data.w;
+	}
+	double3& p() const { // position
+		return data.xyz;
+	}
+	double3& e() { // emission
+		return data.lo.hi.xyz;
+	}
+	double3& c() const { // color
+		return data.hi.xyz;
+	}
+	double1 refl() const { // reflection type (Refl_t)
+		return data.hi.w;
+	}
 
 	void intersect(double1& ret, const RaySycl& r) const { // returns distance, 0 if no hit
-		Vector op = p - r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
+		Vector op = p() - r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
 		double1 t;
 		double1 eps = 1e-4;
 		double1 b = op.dot(r.d);
-		double1 det = b*b - op.dot(op) + rad*rad;
+		double1 det = b*b - op.dot(op) + rad()*rad();
 
 		SYCL_IF(det < 0)
 		SYCL_BEGIN {
@@ -391,7 +409,14 @@ struct SphereSycl {
 	}
 };
 
-void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 }, Vector cf = { 1, 1, 1 }) {
+void radiance(
+	Vector& ret,
+	cl::sycl::accessor<cl::sycl::double16, 1, cl::sycl::access::read, cl::sycl::access::global_buffer> spheres,
+	RaySycl r,
+	unsigned short* Xi,
+	Vector cl = { 0, 0, 0 },
+	Vector cf = { 1, 1, 1 }
+) {
 	using namespace cl::sycl;
 
 	double1 t;	// distance to intersection
@@ -407,16 +432,17 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 
 	SYCL_WHILE(true)
 	SYCL_BEGIN {
+		/*
 		if(!ns_sycl_gtx::intersect(r, t, id)) {
 			// if miss, don't add anything
 			ret = cl;
 			SYCL_RETURN
 		}
-		// TODO: need to pass spheres to the kernel
-		SphereSycl obj(ns_sycl_gtx::spheres[0]); // the hit object
+		*/
+		SphereSycl obj(spheres[id]); // the hit object
 		x = r.o + r.d*t;
 
-		Vector n = Vector(x - obj.p).norm();
+		Vector n = Vector(x - obj.p()).norm();
 		Vector nl = n;
 		SYCL_IF(n.dot(r.d) > 0)
 		SYCL_BEGIN {
@@ -424,7 +450,7 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 		}
 		SYCL_END
 
-		Vector f = obj.c;
+		Vector f = obj.c();
 
 		double1 p;	// max refl
 		SYCL_IF(f.x > f.y && f.x > f.z)
@@ -443,9 +469,9 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 		}
 		SYCL_END
 
-		cl = cl + cf.mult(obj.e);
+		cl = cl + cf.mult(obj.e());
 
-		depth += 1;
+		depth += 1; 
 
 		SYCL_IF(depth > 5)
 		SYCL_BEGIN {
@@ -465,7 +491,7 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 
 		cf = cf.mult(f);
 
-		SYCL_IF(obj.refl == DIFF) // Ideal DIFFUSE reflection
+		SYCL_IF(obj.refl() == (double)DIFF) // Ideal DIFFUSE reflection
 		SYCL_BEGIN {
 			double1 r1 = 2 * M_PI*erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
 			Vector w = nl;
@@ -491,7 +517,7 @@ void radiance(Vector& ret, RaySycl r, unsigned short* Xi, Vector cl = { 0, 0, 0 
 			SYCL_CONTINUE
 		}
 		SYCL_END
-		SYCL_ELSE_IF(obj.refl == SPEC)// Ideal SPECULAR reflection
+		SYCL_ELSE_IF(obj.refl() == (double)SPEC)// Ideal SPECULAR reflection
 		SYCL_BEGIN {
 			// Recursion
 			r = RaySycl(x, r.d - n * 2 * n.dot(r.d));
@@ -570,12 +596,32 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 	queue q(selector);
 
 	buffer<double3> colors(range<1>(w*h));
+	buffer<double16> spheres_(ns_sycl_gtx::numSpheres);
 	{
-		auto c = colors.get_access<access::discard_write, access::host_buffer>();
+		auto assign = [](cl_double4& target, Vec& data) {
+			target.x = data.x;
+			target.y = data.y;
+			target.z = data.z;
+		};
 
+		auto s = spheres_.get_access<access::discard_write, access::host_buffer>();
+		// See SphereSycl
+		for(int i = 0; i < ns_sycl_gtx::numSpheres; ++i) {
+			auto& si = s[i];
+			auto& sj = ns_sycl_gtx::spheres[i];
+
+			assign(si.lo.lo, sj.p);
+			assign(si.lo.hi, sj.e);
+			assign(si.hi.lo, sj.c);
+
+			si.lo.lo.w = sj.rad;
+			si.hi.lo.w = sj.refl;
+		}
+
+		auto c = colors.get_access<access::discard_write, access::host_buffer>();
 		for(int y = 0; y < h; ++y) {
 			for(int x = 0; x < w; ++x) {
-				int i = (h - y - 1)*w + x;
+				int i = y*w + x;
 				auto& ci = c[i];
 				ci.x = c_[i].x;
 				ci.y = c_[i].y;
@@ -586,6 +632,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 
 	q.submit([&](handler& cgh) {
 		auto c = colors.get_access<access::read_write, access::global_buffer>(cgh);
+		auto spheres = spheres_.get_access<access::read, access::global_buffer>(cgh);	// TODO: constant_buffer
 
 		cgh.parallel_for<class smallpt>(range<2>(w, h), [=](id<2> index) {
 			Vector cx(cx_);
@@ -642,7 +689,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 
 						// TODO:
 						Vector rad;
-						sycl_class::radiance(rad, RaySycl(cam.o + d * 140, d.norm()), Xi);
+						sycl_class::radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()), Xi);
 						r = r + rad*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 					SYCL_END
@@ -665,7 +712,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 	auto c = colors.get_access<access::read, access::host_buffer>();
 	for(int y = 0; y < h; ++y) {
 		for(int x = 0; x < w; ++x) {
-			int i = (h - y - 1)*w + x;
+			int i = y*w + x;
 			auto& ci = c[i];
 			c_[i].x = ci.x;
 			c_[i].y = ci.y;
