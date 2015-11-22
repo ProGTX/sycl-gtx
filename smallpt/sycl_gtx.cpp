@@ -409,9 +409,34 @@ public:
 	}
 };
 
+using spheres_t = cl::sycl::accessor<cl::sycl::double16, 1, cl::sycl::access::read, cl::sycl::access::global_buffer>;
+
+inline cl::sycl::bool1 intersect(spheres_t spheres, const RaySycl& r, double1& t, cl::sycl::int1& id) {
+	using namespace cl::sycl;
+	double1 d;
+	double1 inf = t = 1e20;
+
+	int1 i = ns_sycl_gtx::numSpheres;
+	SYCL_WHILE(i > 0)
+	SYCL_BEGIN {
+		i -= 1;
+		SphereSycl(spheres[i]).intersect(d, r);
+		SYCL_IF(d != 0 && d < t)
+		SYCL_BEGIN {
+			t = d;
+			id = i;
+		}
+		SYCL_END
+	}
+	SYCL_END
+
+	bool1 res = t < inf;
+	return res;
+}
+
 void radiance(
 	Vector& ret,
-	cl::sycl::accessor<cl::sycl::double16, 1, cl::sycl::access::read, cl::sycl::access::global_buffer> spheres,
+	spheres_t spheres,
 	RaySycl r,
 	unsigned short* Xi,
 	Vector cl = { 0, 0, 0 },
@@ -432,13 +457,14 @@ void radiance(
 
 	SYCL_WHILE(true)
 	SYCL_BEGIN {
-		/*
-		if(!ns_sycl_gtx::intersect(r, t, id)) {
+		SYCL_IF(!intersect(spheres, r, t, id))
+		SYCL_BEGIN {
 			// if miss, don't add anything
 			ret = cl;
 			SYCL_RETURN
 		}
-		*/
+		SYCL_END
+
 		SphereSycl obj(spheres[id]); // the hit object
 		x = r.o + r.d*t;
 
