@@ -211,6 +211,7 @@
     <ClInclude Include="implementation\specification\ranges\range.h" />
     <ClInclude Include="implementation\specification\refc.h" />
     <ClInclude Include="implementation\specification\types.h" />
+    <ClInclude Include="implementation\specification\vector_members.h" />
     <ClInclude Include="implementation\specification\workitem_functions.h" />
     <ClInclude Include="implementation\src_handlers\invoke_source.h" />
     <ClInclude Include="implementation\src_handlers\issue_command.h" />

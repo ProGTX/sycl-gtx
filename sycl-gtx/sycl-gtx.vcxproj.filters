@@ -245,5 +245,8 @@
     <ClInclude Include="sycl_gtx_flow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\vector_members.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
