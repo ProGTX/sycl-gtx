@@ -20,6 +20,10 @@ class vec;
 namespace detail {
 namespace vectors {
 
+// Forward declaration
+template <typename dataT, int numElements>
+struct data;
+
 #define SYCL_ENABLE_IF_DIM(dim)	\
 typename std::enable_if<num == dim>::type* = nullptr
 
@@ -27,9 +31,9 @@ typename std::enable_if<num == dim>::type* = nullptr
 template <typename dataT, int numElements>
 class base : protected counter<base<dataT, numElements>>, public data_ref {
 private:
-	template <typename dataT, int numElements>
+	template <typename, int>
 	friend struct members;
-	template <typename DataType>
+	template <typename>
 	friend struct type_string;
 
 	static string_class type_name() {
@@ -75,6 +79,13 @@ public:
 		return *reinterpret_cast<vec<dataT, numElements>*>(this);
 	}
 
+	size_t get_count() const {
+		return numElements;
+	}
+	size_t get_size() const {
+		return numElements * sizeof(typename data<dataT, numElements>::type);
+	}
+
 	// TODO: Swizzle methods
 	//swizzled_vec<T, out_dims> swizzle<int s1, ...>();
 #ifdef SYCL_SIMPLE_SWIZZLES
@@ -82,9 +93,6 @@ public:
 	...
 #endif // #ifdef SYCL_SIMPLE_SWIZZLES
 };
-
-template <typename dataT, int numElements>
-struct data;
 
 } // namespace vectors
 
