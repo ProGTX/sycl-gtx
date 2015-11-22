@@ -146,7 +146,7 @@ SYCL_R2_LO(pf, vf##xz, sf##02),				\
 SYCL_R2_LO(pf, vf##yx, sf##10),				\
 SYCL_R2_LO(pf, vf##yy, sf##11),				\
 SYCL_R2_LO(pf, vf##yz, sf##12),				\
-SYCL_R2_LO(pf, vf##zx, sf##21),				\
+SYCL_R2_LO(pf, vf##zx, sf##20),				\
 SYCL_R2_LO(pf, vf##zy, sf##21),				\
 SYCL_R2_LO(pf, vf##zz, sf##22)
 
@@ -184,6 +184,8 @@ struct members<dataT, 16> {
 
 	members(base<dataT, 16>* parent, string_class name)
 	:	SYCL_MEMBERS_8(lo.),
+		s8(hi.x), s9(hi.y), sa(hi.z), sb(hi.w),
+		sc(hi.hi.x), sd(hi.hi.y), se(hi.hi.z), sf(hi.hi.w),
 		SYCL_SWIZZLE_3_REFS(lo.),
 		yzw(lo.yzw) {}
 };
