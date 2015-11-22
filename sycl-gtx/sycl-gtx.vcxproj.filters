@@ -246,7 +246,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="implementation\specification\vector_members.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\specification</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
