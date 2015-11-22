@@ -59,7 +59,7 @@ template <typename dataT>
 struct vec_members<dataT, 3> : vec_members<dataT, 2> {
 	vec_base<dataT, 1> z;
 	vec_base<dataT, 1> &s2;
-	vec_base<dataT, 2> &lo, hi;	// hi is not a reference, because w does is not physically present
+	vec_members<dataT, 2> lo, hi;
 	vec_base<dataT, 2> xz, yz, zx, zy, zz;
 	vec_base<dataT, 2> &s02, &s12, &s20, &s21, &s22;
 	vec_base<dataT, 3>	xxx, xxy, xxz,
@@ -83,7 +83,7 @@ struct vec_members<dataT, 3> : vec_members<dataT, 2> {
 	vec_members(string_class name)
 		:	vec_members<dataT, 2>(name),
 			SYCL_V(z), s2(z),
-			lo(xy), SYCL_V(hi),
+			SYCL_V2(lo, hi),
 			SYCL_V5(xz, yz, zx, zy, zz),
 			s02(xz), s12(yz), s20(zx), s21(zy), s22(zz),
 			SYCL_V9(xxx, xxy, xxz,
@@ -126,16 +126,16 @@ struct vec_members<dataT, 4> : vec_members<dataT, 3> {
 
 template <typename dataT>
 struct vec_members<dataT, 8> : vec_members<dataT, 4> {
-	vec_base<dataT, 4> &lo, hi;
+	vec_members<dataT, 4> lo, hi;
 
 	vec_members(string_class name)
 		:	vec_members<dataT, 4>(name),
-			lo(xyzw), SYCL_V(hi) {}
+			SYCL_V2(lo, hi) {}
 };
 
 template <typename dataT>
 struct vec_members<dataT, 16> : vec_members<dataT, 8> {
-	vec_base<dataT, 8> lo, hi;
+	vec_members<dataT, 8> lo, hi;
 
 	vec_members(string_class name)
 		:	vec_members<dataT, 8>(name),
