@@ -585,6 +585,13 @@ void radiance(
 	SYCL_END
 }
 
+template <class T, class D>
+void assign(T& target, D& data) {
+	target.x = data.x;
+	target.y = data.y;
+	target.z = data.z;
+}
+
 } // sycl_class
 
 void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_, cl::sycl::device_selector& selector) {
@@ -592,18 +599,13 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 	using namespace cl::sycl;
 	using sycl_class::Vector;
 	using sycl_class::RaySycl;
+	using sycl_class::assign;
 
 	queue q(selector);
 
 	buffer<double3> colors(range<1>(w*h));
 	buffer<double16> spheres_(ns_sycl_gtx::numSpheres);
 	{
-		auto assign = [](cl_double4& target, Vec& data) {
-			target.x = data.x;
-			target.y = data.y;
-			target.z = data.z;
-		};
-
 		auto s = spheres_.get_access<access::discard_write, access::host_buffer>();
 		// See SphereSycl
 		for(int i = 0; i < ns_sycl_gtx::numSpheres; ++i) {
@@ -623,9 +625,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 			for(int x = 0; x < w; ++x) {
 				int i = y*w + x;
 				auto& ci = c[i];
-				ci.x = c_[i].x;
-				ci.y = c_[i].y;
-				ci.z = c_[i].z;
+				assign(ci, c_[i]);
 			}
 		}
 	}
@@ -714,9 +714,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 		for(int x = 0; x < w; ++x) {
 			int i = y*w + x;
 			auto& ci = c[i];
-			c_[i].x = ci.x;
-			c_[i].y = ci.y;
-			c_[i].z = ci.z;
+			assign(c_[i], ci);
 		}
 	}
 }
