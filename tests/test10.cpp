@@ -1,5 +1,7 @@
 #include "tests.h"
 
+// Test vectors in kernel
+
 #include <sstream>
 
 template <class T>
@@ -14,16 +16,18 @@ bool test10() {
 	using namespace cl::sycl;
 	using namespace std;
 
-	queue myQueue;
+	cpu_selector gpu;
+	queue myQueue(gpu);
+
 	const int size = 10;
-	cl_double3 testVector = { 1, 2, 3 };
-	buffer<double3> vectors(size);
+	cl_float3 testVector = { 1, 2, 3 };
+	buffer<float3> vectors(size);
 
 	myQueue.submit([&](handler& cgh) {
 		auto v = vectors.get_access<access::discard_write>(cgh);
 			
 		cgh.parallel_for<class addition>(range<1>(size), [=](id<> i) {
-			v[i] = double3(testVector.x, testVector.y, testVector.z);
+			v[i] = float3(testVector.x, testVector.y, testVector.z);
 		});
 	});
 
