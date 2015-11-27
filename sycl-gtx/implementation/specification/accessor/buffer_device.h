@@ -22,8 +22,11 @@ SYCL_ACCESSOR_CLASS(
 	public accessor_buffer<DataType, dimensions>,
 	public accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>
 {
+private:
 	template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
 	friend class accessor_device_ref;
+
+	using return_t = typename acc_device_return<DataType>::type;
 
 public:
 	accessor_(
@@ -59,9 +62,9 @@ public:
 		return get_buffer_object();
 	}
 
-	data_ref operator[](id<dimensions> index) const {
+	return_t operator[](id<dimensions> index) const {
 		auto resource_name = kernel_::source::register_resource(*this);
-		return data_ref(
+		return return_t(
 			resource_name + "[" + data_ref::get_name(index) + "]"
 		);
 	}

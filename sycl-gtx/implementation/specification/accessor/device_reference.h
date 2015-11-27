@@ -14,6 +14,11 @@ namespace detail {
 template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_device_ref;
 
+template <typename DataType>
+struct acc_device_return {
+	using type = data_ref;
+};
+
 template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
 struct subscript_helper {
 	using type = accessor_device_ref<level - 1, DataType, dimensions, mode, target>;
@@ -68,11 +73,11 @@ public:
 template <typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_device_ref<1, DataType, dimensions, mode, target> {
 protected:
-	using subscript_return_t = data_ref;
+	using subscript_return_t = typename acc_device_return<DataType>::type;
 	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
 
 	template <class T>
-	data_ref subscript(T index) const {
+	subscript_return_t subscript(T index) const {
 		// Basically the same as with host buffer accessor, just dealing with strings
 		auto rang_copy = rang;
 		rang_copy[dimensions - 1] = data_ref::get_name(index);
@@ -83,7 +88,7 @@ protected:
 			multiplier *= parent->access_buffer_range(i);
 		}
 		auto resource_name = kernel_::source::register_resource(*parent);
-		return data_ref(
+		return subscript_return_t(
 			resource_name + "[" + ind + "]"
 		);
 	}
