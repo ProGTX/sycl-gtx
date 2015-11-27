@@ -25,7 +25,7 @@ struct subscript_helper {
 };
 template <typename DataType, int dimensions, access::mode mode, access::target target>
 struct subscript_helper<1, DataType, dimensions, mode, target> {
-	using type = data_ref;
+	using type = typename acc_device_return<DataType>::type;
 };
 
 #define SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR()									\
@@ -46,9 +46,9 @@ struct subscript_helper<1, DataType, dimensions, mode, target> {
 		std::swap(first.rang, second.rang);										\
 	}
 
-#define SYCL_DEVICE_REF_SUBSCRIPT_OP(type)				\
-	subscript_return_t operator[](type index) const {	\
-		return subscript(index);						\
+#define SYCL_DEVICE_REF_SUBSCRIPT_OP(type)						\
+	subscript_return_t operator[](const type& index) const {	\
+		return subscript(index);								\
 	}
 
 #define SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS()	\
@@ -61,7 +61,7 @@ protected:
 	using subscript_return_t = typename subscript_helper<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>::type;
 	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
 	template <class T>
-	subscript_return_t subscript(T index) const {
+	subscript_return_t subscript(const T& index) const {
 		auto rang_copy = rang;
 		rang_copy[dimensions - level] = data_ref::get_name(index);
 		return subscript_return_t(parent, rang_copy);
@@ -77,7 +77,7 @@ protected:
 	SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR();
 
 	template <class T>
-	subscript_return_t subscript(T index) const {
+	subscript_return_t subscript(const T& index) const {
 		// Basically the same as with host buffer accessor, just dealing with strings
 		auto rang_copy = rang;
 		rang_copy[dimensions - 1] = data_ref::get_name(index);
