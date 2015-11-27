@@ -2,6 +2,7 @@
 
 // 3.7 Data Types
 
+#include "access.h"
 #include "vector_members.h"
 
 #include "../common.h"
@@ -109,6 +110,11 @@ struct base_host_data<vec<dataT, numElements>> {
 	using type = typename vectors::data<dataT, numElements>::type;
 };
 
+template <typename dataT, int numElements>
+struct acc_device_return<vec<dataT, numElements>> {
+	using type = vec<dataT, numElements>;
+};
+
 } // namespace detail
 
 
@@ -117,6 +123,10 @@ class vec : public detail::vectors::base<dataT, numElements>, public detail::vec
 private:
 	template <typename, int>
 	friend struct detail::vectors::members;
+	template <typename, int, int, int, typename>
+	friend class detail::accessor_;
+	template <int, typename, int, access::mode, access::target>
+	friend class detail::accessor_device_ref;
 
 	using Base = detail::vectors::base<dataT, numElements>;
 	using Members = detail::vectors::members<dataT, numElements>;
@@ -129,6 +139,9 @@ public:
 		: Base(), Members(this, name) {}
 	vec(const vec& copy)
 		: Base(copy.name, true), Members(this, name) {}
+	// TODO: Move members
+	vec(vec&& move)
+		: Base(std::move(move.name)), Members(this, name) {}
 	template <class T>
 	vec(T n, typename std::enable_if<!std::is_same<T, const vec&>::value>::type* = nullptr)
 		: Base(n), Members(this, name) {}
