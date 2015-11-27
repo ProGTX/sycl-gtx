@@ -2,11 +2,12 @@
 
 #include <string>
 #include <map>
-#include <Windows.h>
 
 #define TRY_CATCH_ERRORS 1
 
 int main() {
+	using namespace std;
+
 	debug() << "SYCL 1.2 Final Specification, Provisional Implementation.";
 	
 	std::map<std::string, bool(*)()> tests{
@@ -44,6 +45,8 @@ int main() {
 		debug() << test.first << (result ? "successful" : "failed");
 	}
 
-	//system("pause");
+	cout << "Press any key to exit ..." << endl;
+	cin.get();
+
 	return 0;
 }
