@@ -69,11 +69,11 @@ public:
 
 	template <int num = numElements>
 	base(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
-		: base(open_parenthesis + x.name + ", " + y.name + ')', true) {}
+		: base(open_parenthesis + type_name() + ")(" + x.name + ", " + y.name + ')', true) {}
 
 	template <int num = numElements>
 	base(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
-		: base(open_parenthesis + x.name + ", " + y.name + ", " + z.name + ')', true) {}
+		: base(open_parenthesis + type_name() + ")(" + x.name + ", " + y.name + ", " + z.name + ')', true) {}
 
 	operator vec<dataT, numElements>&() {
 		return *reinterpret_cast<vec<dataT, numElements>*>(this);
