@@ -461,7 +461,7 @@ void radiance(
 		SYCL_BEGIN {
 			// if miss, don't add anything
 			ret = cl;
-			SYCL_RETURN
+			SYCL_BREAK
 		}
 		SYCL_END
 
@@ -509,7 +509,7 @@ void radiance(
 			SYCL_ELSE
 			SYCL_BEGIN {
 				ret = cl;
-				SYCL_RETURN
+				SYCL_BREAK
 			}
 			SYCL_END
 		}
@@ -660,17 +660,14 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 		auto c = colors.get_access<access::read_write, access::global_buffer>(cgh);
 		auto spheres = spheres_.get_access<access::read, access::global_buffer>(cgh);	// TODO: constant_buffer
 
-		cgh.parallel_for<class smallpt>(range<2>(w, h), [=](id<2> index) {
+		cgh.parallel_for<class smallpt>(range<2>(w, h), [=](id<2> i) {
 			Vector cx(cx_);
 			Vector cy(cy_);
 			Vector r(r_);
 			RaySycl cam(cam_);
 
-			auto x = index[0];
-			auto y = index[1];
 			//unsigned short Xi[3] = { 0, 0, (size_t)y*y*y };	// TODO
 			unsigned short Xi[3] = { 0, 0, 0 };	// TODO
-			int1 i = (h - y - 1)*w + x;
 
 			// 2x2 subpixel rows
 			SYCL_FOR(int1 sy = 0, sy < 2, sy++)
@@ -709,8 +706,8 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 						SYCL_END
 
 						Vector d;
-						d = cx * (((sx + .5 + dd.x) / 2 + x) / w - .5) +
-							cy * (((sy + .5 + dd.y) / 2 + y) / h - .5) +
+						d = cx * (((sx + .5 + dd.x) / 2 + i[0]) / w - .5) +
+							cy * (((sy + .5 + dd.y) / 2 + i[1]) / h - .5) +
 							cam.d;
 
 						// TODO:
@@ -725,7 +722,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 					sycl_class::clamp(rc.y);
 					sycl_class::clamp(rc.z);
 
-					c[i] = c[i] + rc * .25;
+					c[i] += rc * .25;
 
 					r = Vector();
 				}
