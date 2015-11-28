@@ -15,7 +15,7 @@ float1 getRandom(uint2& seed) {
 	return (float1)(x * (x * x * 15731 + 74323) + 871483) * invMaxInt;
 }
 
-bool test10() {
+bool test11() {
 
 	using namespace cl::sycl;
 	using namespace std;
@@ -23,12 +23,18 @@ bool test10() {
 	queue myQueue;
 
 	const int size = 4096;
-	buffer<float3> numbers(size);
+	buffer<float> numbers(size);
 
 	myQueue.submit([&](handler& cgh) {
 		auto n = numbers.get_access<access::discard_write>(cgh);
 
 		cgh.single_task<class generate>([=]() {
+			uint2 seed;
+			SYCL_FOR(int1 i = 0, i < size, ++i)
+			SYCL_BEGIN {
+				n[i] = getRandom(seed);
+			}
+			SYCL_END
 		});
 	});
 
@@ -36,7 +42,9 @@ bool test10() {
 
 	// TODO: How to automatically check correctness?
 	for(auto i = 0; i < size; ++i) {
+		cout << n[i] << ", ";
 	}
+	cout << endl;
 
 	return true;
 }
