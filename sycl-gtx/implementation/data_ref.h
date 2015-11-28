@@ -66,11 +66,12 @@ public:
 #endif
 
 	// Without this one explicitly stated, default copy assignment is used
-	data_ref& operator=(data_ref dref) {
+	data_ref& operator=(const data_ref& dref) {
 		kernel_add(name + " = " + dref.name);
 		return *this;
 	}
 
+	// TODO: https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/operators.html
 
 #define SYCL_ASSIGNMENT_OPERATOR(op)					\
 	template <class T>									\
@@ -78,18 +79,6 @@ public:
 		kernel_add(name + " " #op " " + get_name(n));	\
 		return *this;						 			\
 	}
-
-	SYCL_ASSIGNMENT_OPERATOR(=);
-	SYCL_ASSIGNMENT_OPERATOR(+=);
-	SYCL_ASSIGNMENT_OPERATOR(-=);
-	SYCL_ASSIGNMENT_OPERATOR(*=);
-	SYCL_ASSIGNMENT_OPERATOR(/=);
-	SYCL_ASSIGNMENT_OPERATOR(%=);
-
-#undef SYCL_ASSIGNMENT_OPERATOR
-
-
-	// TODO: https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/operators.html
 
 #define SYCL_DATA_REF_OPERATOR(op)																	\
 	template <class T>																				\
@@ -101,12 +90,18 @@ public:
 		return data_ref(open_parenthesis + get_name(n) + " " #op " " + dref.name + ')');			\
 	}
 
+#define SYCL_DATA_AND_ASSIGN_OP(op)	\
+	SYCL_ASSIGNMENT_OPERATOR(op=)	\
+	SYCL_DATA_REF_OPERATOR(op)
+
+	SYCL_ASSIGNMENT_OPERATOR(=);
+
 	// Arithmetic operatos
-	SYCL_DATA_REF_OPERATOR(+);
-	SYCL_DATA_REF_OPERATOR(-);
-	SYCL_DATA_REF_OPERATOR(*);
-	SYCL_DATA_REF_OPERATOR(/);
-	SYCL_DATA_REF_OPERATOR(%);
+	SYCL_DATA_AND_ASSIGN_OP(+);
+	SYCL_DATA_AND_ASSIGN_OP(-);
+	SYCL_DATA_AND_ASSIGN_OP(*);
+	SYCL_DATA_AND_ASSIGN_OP(/);
+	SYCL_DATA_AND_ASSIGN_OP(%);
 
 	// Comparison operators
 	SYCL_DATA_REF_OPERATOR(==);
@@ -120,9 +115,22 @@ public:
 	SYCL_DATA_REF_OPERATOR(||);
 	SYCL_DATA_REF_OPERATOR(&&);
 
-#undef SYCL_DATA_REF_OPERATOR
+	// Bit operators
+	SYCL_DATA_AND_ASSIGN_OP(&);
+	SYCL_DATA_AND_ASSIGN_OP(|);
+	SYCL_DATA_AND_ASSIGN_OP(^);
 
-	// TODO: A bit problematic
+	// Shifts
+	SYCL_DATA_AND_ASSIGN_OP(>>);
+	SYCL_DATA_AND_ASSIGN_OP(<<);
+
+#undef SYCL_ASSIGNMENT_OPERATOR
+#undef SYCL_DATA_REF_OPERATOR
+#undef SYCL_DATA_AND_ASSIGN_OP
+
+	// TODO: Increment and decrement can be either a statement or an expression
+	// But there is no way to distinguish it
+	// Here presume an expression
 	data_ref operator++() const {
 		return data_ref(open_parenthesis + "++" + name + ')');
 	}
