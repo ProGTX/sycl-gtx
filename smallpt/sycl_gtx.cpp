@@ -375,7 +375,7 @@ public:
 		return data.hi.w;
 	}
 
-	void intersect(double1& ret, const RaySycl& r) const { // returns distance, 0 if no hit
+	void intersect(double1& return_, const RaySycl& r) const { // returns distance, 0 if no hit
 		Vector op = p() - r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
 		double1 t;
 		double1 eps = 1e-4;
@@ -384,7 +384,7 @@ public:
 
 		SYCL_IF(det < 0)
 		SYCL_BEGIN {
-			ret = 0;
+			return_ = 0;
 		}
 		SYCL_END
 		SYCL_ELSE
@@ -393,7 +393,7 @@ public:
 			t = b - det;
 			SYCL_IF(t > eps)
 			SYCL_BEGIN {
-				ret = t;
+				return_ = t;
 			}
 			SYCL_END
 			SYCL_ELSE
@@ -401,12 +401,12 @@ public:
 				t = b + det;
 				SYCL_IF(t > eps)
 				SYCL_BEGIN {
-					ret = t;
+					return_ = t;
 				}
 				SYCL_END
 				SYCL_ELSE
 				SYCL_BEGIN {
-					ret = 0;
+					return_ = 0;
 				}
 				SYCL_END
 			}
@@ -449,7 +449,7 @@ float1 getRandom(uint2& seed) {
 }
 
 void radiance(
-	Vector& ret,
+	Vector& return_,
 	spheres_t spheres,
 	RaySycl r,
 	uint2& randomSeed,
@@ -465,7 +465,6 @@ void radiance(
 	// cl is accumulated color
 	// cf is accumulated reflectance
 
-	double1 Re, Tr, P, RP, TP;
 	RaySycl reflRay(0, 0);
 	Vector x, tdir;
 
@@ -474,7 +473,7 @@ void radiance(
 		SYCL_IF(!intersect(spheres, r, t, id))
 		SYCL_BEGIN {
 			// if miss, don't add anything
-			ret = cl;
+			return_ = cl;
 			SYCL_BREAK
 		}
 		SYCL_END
@@ -486,7 +485,7 @@ void radiance(
 		Vector nl = n;
 		SYCL_IF(n.dot(r.d) > 0)
 		SYCL_BEGIN {
-			nl = nl * -1;
+			nl *= -1;
 		}
 		SYCL_END
 
@@ -509,20 +508,19 @@ void radiance(
 		}
 		SYCL_END
 
-		cl = cl + cf.mult(obj.e());
+		cl += cf.mult(obj.e());
 
 		depth += 1; 
-
 		SYCL_IF(depth > 5)
 		SYCL_BEGIN {
 			SYCL_IF(getRandom(randomSeed) < p)
 			SYCL_BEGIN {
-				f = f*(1 / p);
+				f *= 1 / p;
 			}
 			SYCL_END
 			SYCL_ELSE
 			SYCL_BEGIN {
-				ret = cl;
+				return_ = cl;
 				SYCL_BREAK
 			}
 			SYCL_END
@@ -549,9 +547,9 @@ void radiance(
 				u.x = 1;
 			}
 			SYCL_END
-
 			u = (u % w).norm();
-			Vector v = w%u;
+
+			Vector v = w % u;
 			Vector d = Vector(u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
 
 			// Recursion
@@ -618,11 +616,11 @@ void radiance(
 		}
 		SYCL_END
 
-		Re = R0 + (1 - R0)*c*c*c*c*c;
-		Tr = 1 - Re;
-		P = .25 + .5*Re;
-		RP = Re / P;
-		TP = Tr / (1 - P);
+		double1 Re = R0 + (1 - R0)*c*c*c*c*c;
+		double1 Tr = 1 - Re;
+		double1 P = .25 + .5*Re;
+		double1 RP = Re / P;
+		double1 TP = Tr / (1 - P);
 	}
 	SYCL_END
 }
@@ -742,7 +740,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 						// TODO:
 						Vector rad;
 						sycl_class::radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()), randomSeed);
-						r = r + rad*(1. / samps);
+						r += rad*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 					SYCL_END
 
