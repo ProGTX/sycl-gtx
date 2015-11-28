@@ -277,8 +277,12 @@ void compute_sycl_gtx_openmp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy
 
 namespace sycl_class {
 
+using cl::sycl::bool1;
+using cl::sycl::int1;
+using cl::sycl::ulong1;
 using cl::sycl::double1;
 using cl::sycl::double3;
+using cl::sycl::double16;
 
 #ifdef SYCL_GTX
 struct Vector : public double3 {
@@ -345,7 +349,7 @@ inline void clamp(double1& x) {
 
 struct SphereSycl {
 private:
-	cl::sycl::double16 data;
+	double16 data;
 
 public:
 	template <class T>
@@ -409,9 +413,9 @@ public:
 	}
 };
 
-using spheres_t = cl::sycl::accessor<cl::sycl::double16, 1, cl::sycl::access::read, cl::sycl::access::global_buffer>;
+using spheres_t = cl::sycl::accessor<double16, 1, cl::sycl::access::read, cl::sycl::access::global_buffer>;
 
-inline cl::sycl::bool1 intersect(spheres_t spheres, const RaySycl& r, double1& t, cl::sycl::int1& id) {
+inline bool1 intersect(spheres_t spheres, const RaySycl& r, double1& t, int1& id) {
 	using namespace cl::sycl;
 	double1 d;
 	double1 inf = t = 1e20;
@@ -430,15 +434,21 @@ inline cl::sycl::bool1 intersect(spheres_t spheres, const RaySycl& r, double1& t
 	}
 	SYCL_END
 
-	bool1 res = t < inf;
-	return res;
+	return t < inf;
+}
+
+// http://stackoverflow.com/a/16130111
+ulong1 getRandom(ulong1& seed) {
+	using namespace cl::sycl;
+	seed = (seed * 0x5DEECE66DL + 0xBL) & ((1L << 48) - 1);
+	return seed >> 16;
 }
 
 void radiance(
 	Vector& ret,
 	spheres_t spheres,
 	RaySycl r,
-	unsigned short* Xi,
+	ulong1& randomSeed,
 	Vector cl = { 0, 0, 0 },
 	Vector cf = { 1, 1, 1 }
 ) {
@@ -501,7 +511,7 @@ void radiance(
 
 		SYCL_IF(depth > 5)
 		SYCL_BEGIN {
-			SYCL_IF(erand48(Xi) < p)
+			SYCL_IF(getRandom(randomSeed) < p)
 			SYCL_BEGIN {
 				f = f*(1 / p);
 			}
@@ -519,7 +529,9 @@ void radiance(
 
 		SYCL_IF(obj.refl() == (double)DIFF) // Ideal DIFFUSE reflection
 		SYCL_BEGIN {
-			double1 r1 = 2 * M_PI*erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
+			double1 r1 = 2 * M_PI * getRandom(randomSeed);
+			double1 r2 = getRandom(randomSeed);
+			double1 r2s = sqrt(r2);
 			Vector w = nl;
 			Vector u;
 
@@ -626,11 +638,15 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 	using sycl_class::Vector;
 	using sycl_class::RaySycl;
 	using sycl_class::assign;
+	using sycl_class::getRandom;
 
 	queue q(selector);
 
+	unsigned short Xi[3] = { 0, 0, 0 };
+
 	buffer<double3> colors(range<1>(w*h));
 	buffer<double16> spheres_(ns_sycl_gtx::numSpheres);
+	buffer<ulong1> seeds_(w*h);
 	{
 		auto s = spheres_.get_access<access::discard_write, access::host_buffer>();
 		// See SphereSycl
@@ -647,27 +663,32 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 		}
 
 		auto c = colors.get_access<access::discard_write, access::host_buffer>();
+		auto rs = seeds_.get_access<access::discard_write, access::host_buffer>();
 		for(int y = 0; y < h; ++y) {
 			for(int x = 0; x < w; ++x) {
 				int i = y*w + x;
 				auto& ci = c[i];
 				assign(ci, c_[i]);
+				Xi[2] = y*y*y;
+				rs[i] = erand48(Xi);
 			}
 		}
 	}
 
 	q.submit([&](handler& cgh) {
 		auto c = colors.get_access<access::read_write, access::global_buffer>(cgh);
-		auto spheres = spheres_.get_access<access::read, access::global_buffer>(cgh);	// TODO: constant_buffer
+
+		// TODO: constant_buffer
+		auto spheres = spheres_.get_access<access::read, access::global_buffer>(cgh);
+		auto seeds = seeds_.get_access<access::read, access::global_buffer>(cgh);
 
 		cgh.parallel_for<class smallpt>(range<2>(w, h), [=](id<2> i) {
 			Vector cx(cx_);
 			Vector cy(cy_);
 			Vector r(r_);
 			RaySycl cam(cam_);
-
-			//unsigned short Xi[3] = { 0, 0, (size_t)y*y*y };	// TODO
-			unsigned short Xi[3] = { 0, 0, 0 };	// TODO
+			ulong1 randomSeed;
+			randomSeed = seeds[i];
 
 			// 2x2 subpixel rows
 			SYCL_FOR(int1 sy = 0, sy < 2, sy++)
@@ -678,8 +699,8 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 					SYCL_FOR(int1 s = 0, s < samps, s++)
 					SYCL_BEGIN {
 						double2 rnew;
-						rnew.x = 2 * erand48(Xi);
-						rnew.y = 2 * erand48(Xi);
+						rnew.x = 2 * getRandom(randomSeed);
+						rnew.y = 2 * getRandom(randomSeed);
 
 						double2 dd;
 
@@ -712,17 +733,16 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 
 						// TODO:
 						Vector rad;
-						sycl_class::radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()), Xi);
+						sycl_class::radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()), randomSeed);
 						r = r + rad*(1. / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 					SYCL_END
 
-					Vector rc = r;
-					sycl_class::clamp(rc.x);
-					sycl_class::clamp(rc.y);
-					sycl_class::clamp(rc.z);
+					sycl_class::clamp(r.x);
+					sycl_class::clamp(r.y);
+					sycl_class::clamp(r.z);
 
-					c[i] += rc * .25;
+					c[i] += r * .25;
 
 					r = Vector();
 				}
