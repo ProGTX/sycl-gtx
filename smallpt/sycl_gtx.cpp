@@ -535,8 +535,8 @@ void radiance(
 			double1 r2 = getRandom(randomSeed);
 			double1 r2s = sqrt(r2);
 			Vector w = nl;
-			Vector u;
-
+			
+			Vector u(0, 0, 0);
 			SYCL_IF(fabs(w.x) > .1)
 			SYCL_BEGIN {
 				u.y = 1;
@@ -621,6 +621,20 @@ void radiance(
 		double1 P = .25 + .5*Re;
 		double1 RP = Re / P;
 		double1 TP = Tr / (1 - P);
+
+		// Tail recursion
+		SYCL_IF(getRandom(randomSeed) < P)
+		SYCL_BEGIN {
+			cf *= RP;
+			r = reflRay;
+		}
+		SYCL_END
+		SYCL_ELSE
+		SYCL_BEGIN {
+			cf *= TP;
+			r = RaySycl(x, tdir);
+		}
+		SYCL_END
 	}
 	SYCL_END
 }
