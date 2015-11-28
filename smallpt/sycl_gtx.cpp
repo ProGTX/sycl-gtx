@@ -279,10 +279,13 @@ namespace sycl_class {
 
 using cl::sycl::bool1;
 using cl::sycl::int1;
-using cl::sycl::ulong1;
+using cl::sycl::uint1;
+using cl::sycl::uint2;
+using cl::sycl::float1;
 using cl::sycl::double1;
 using cl::sycl::double3;
 using cl::sycl::double16;
+using spheres_t = cl::sycl::accessor<double16, 1, cl::sycl::access::read, cl::sycl::access::global_buffer>;
 
 #ifdef SYCL_GTX
 struct Vector : public double3 {
@@ -413,7 +416,6 @@ public:
 	}
 };
 
-using spheres_t = cl::sycl::accessor<double16, 1, cl::sycl::access::read, cl::sycl::access::global_buffer>;
 
 inline bool1 intersect(spheres_t spheres, const RaySycl& r, double1& t, int1& id) {
 	using namespace cl::sycl;
@@ -437,18 +439,20 @@ inline bool1 intersect(spheres_t spheres, const RaySycl& r, double1& t, int1& id
 	return t < inf;
 }
 
-// http://stackoverflow.com/a/16130111
-ulong1 getRandom(ulong1& seed) {
-	using namespace cl::sycl;
-	seed = (seed * 0x5DEECE66DL + 0xBL) & ((1L << 48) - 1);
-	return seed >> 16;
+// http://stackoverflow.com/a/16077942
+float1 getRandom(uint2& seed) {
+	static const float1 invMaxInt = 1.0f / 4294967296.0f;
+	uint1 x = seed.x * 17 + seed.y * 13123;
+	seed.x = (x << 13) ^ x;
+	seed.y ^= x << 7;
+	return (float1)(x * (x * x * 15731 + 74323) + 871483) * invMaxInt;
 }
 
 void radiance(
 	Vector& ret,
 	spheres_t spheres,
 	RaySycl r,
-	ulong1& randomSeed,
+	uint2& randomSeed,
 	Vector cl = { 0, 0, 0 },
 	Vector cf = { 1, 1, 1 }
 ) {
@@ -646,7 +650,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 
 	buffer<double3> colors(range<1>(w*h));
 	buffer<double16> spheres_(ns_sycl_gtx::numSpheres);
-	buffer<ulong1> seeds_(w*h);
+	buffer<uint2> seeds_(w*h);
 	{
 		auto s = spheres_.get_access<access::discard_write, access::host_buffer>();
 		// See SphereSycl
@@ -667,10 +671,14 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 		for(int y = 0; y < h; ++y) {
 			for(int x = 0; x < w; ++x) {
 				int i = y*w + x;
+				
 				auto& ci = c[i];
 				assign(ci, c_[i]);
 				Xi[2] = y*y*y;
-				rs[i] = erand48(Xi);
+
+				auto& rsi = rs[i];
+				rsi.x = erand48(Xi);
+				rsi.y = erand48(Xi);
 			}
 		}
 	}
@@ -687,7 +695,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 			Vector cy(cy_);
 			Vector r(r_);
 			RaySycl cam(cam_);
-			ulong1 randomSeed;
+			uint2 randomSeed;
 			randomSeed = seeds[i];
 
 			// 2x2 subpixel rows
@@ -726,8 +734,8 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 						}
 						SYCL_END
 
-						Vector d;
-						d = cx * (((sx + .5 + dd.x) / 2 + i[0]) / w - .5) +
+						Vector d =
+							cx * (((sx + .5 + dd.x) / 2 + i[0]) / w - .5) +
 							cy * (((sy + .5 + dd.y) / 2 + i[1]) / h - .5) +
 							cam.d;
 
