@@ -48,7 +48,10 @@
     <ClCompile Include="tests\test9.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
-    <ClCompile Include="test10.cpp">
+    <ClCompile Include="tests\test10.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\test11.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
   </ItemGroup>

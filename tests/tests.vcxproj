@@ -83,7 +83,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="test10.cpp" />
     <ClCompile Include="tests\test1.cpp" />
     <ClCompile Include="tests\test2.cpp" />
     <ClCompile Include="tests\test3.cpp" />
@@ -93,6 +92,8 @@
     <ClCompile Include="tests\test7.cpp" />
     <ClCompile Include="tests\test8.cpp" />
     <ClCompile Include="tests\test9.cpp" />
+    <ClCompile Include="tests\test10.cpp" />
+    <ClCompile Include="tests\test11.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests.h" />
