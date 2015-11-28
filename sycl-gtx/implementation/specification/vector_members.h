@@ -57,16 +57,8 @@ SYCL_R2(lo.x, x, s0),		\
 SYCL_R2(lo.y, y, s1),		\
 SYCL_R2(hi.x, z, s2)
 
-#define SYCL_SWIZZLE_3(pf)				\
-base<dataT, 3>	pf xxx, pf xxy, pf xxz,	\
-				pf xyx, pf xyy,			\
-				pf xzx, pf xzy, pf xzz,	\
-				pf yxx, pf yxy, pf yxz,	\
-				pf yyx, pf yyy, pf yyz,	\
-				pf yzx, pf yzy, pf yzz,	\
-				pf zxx, pf zxy, pf zxz,	\
-				pf zyx, pf zyy, pf zyz,	\
-				pf zzx, pf zzy, pf zzz;	\
+
+#define SYCL_SWIZZLE_3_SREFS()			\
 base<dataT, 3>	&s000, &s001, &s002,	\
 				&s010, &s011,			\
 				&s020, &s021, &s022,	\
@@ -77,7 +69,19 @@ base<dataT, 3>	&s000, &s001, &s002,	\
 				&s210, &s211, &s212,	\
 				&s220, &s221, &s222;
 
-#define SYCL_SWIZZLE_3_VALUES()				\
+#define SYCL_SWIZZLE_3_DATA()	\
+base<dataT, 3>	xxx, xxy, xxz,	\
+				xyx, xyy,		\
+				xzx, xzy, xzz,	\
+				yxx, yxy, yxz,	\
+				yyx, yyy, yyz,	\
+				yzx, yzy, yzz,	\
+				zxx, zxy, zxz,	\
+				zyx, zyy, zyz,	\
+				zzx, zzy, zzz;	\
+	SYCL_SWIZZLE_3_SREFS()
+
+#define SYCL_SWIZZLE_3_SET_VALUES()			\
 SYCL_V8(xxx, xxy, xxz,						\
 		xyx, xyy,							\
 		xzx, xzy, xzz),						\
@@ -103,12 +107,12 @@ struct members<dataT, 3> {
 	single_member<dataT> &x, &y, &z;
 	single_member<dataT> &s0, &s1, &s2;
 	vec<dataT, 3> &xyz, &s012;
-	SYCL_SWIZZLE_3();
+	SYCL_SWIZZLE_3_DATA();
 
 	members(base<dataT, 3>* parent, string_class name)
 	:	SYCL_MEMBERS_3(),
 		SYCL_R2(*parent, xyz, s012),
-		SYCL_SWIZZLE_3_VALUES() {}
+		SYCL_SWIZZLE_3_SET_VALUES() {}
 };
 
 template <typename dataT>
@@ -117,14 +121,14 @@ struct members<dataT, 4> {
 	single_member<dataT> &x, &y, &z, &w;
 	single_member<dataT> &s0, &s1, &s2, &s3;
 	vec<dataT, 3> xyz, &s012;
-	SYCL_SWIZZLE_3();
+	SYCL_SWIZZLE_3_DATA();
 	vec<dataT, 3> yzw;
 
 	members(base<dataT, 4>* parent, string_class name)
 	:	SYCL_MEMBERS_3(),
 		SYCL_R2(hi.y, w, s3),
 		SYCL_V(xyz), s012(xyz),
-		SYCL_SWIZZLE_3_VALUES(),
+		SYCL_SWIZZLE_3_SET_VALUES(),
 		SYCL_V(yzw) {}
 };
 
@@ -139,6 +143,19 @@ s5(pf hi.y),				\
 s6(pf hi.z),				\
 s7(pf hi.w)
 
+
+#define SYCL_SWIZZLE_3_VALUE_REFS()	\
+base<dataT, 3>	&xxx, &xxy, &xxz,	\
+				&xyx, &xyy,			\
+				&xzx, &xzy, &xzz,	\
+				&yxx, &yxy, &yxz,	\
+				&yyx, &yyy, &yyz,	\
+				&yzx, &yzy, &yzz,	\
+				&zxx, &zxy, &zxz,	\
+				&zyx, &zyy, &zyz,	\
+				&zzx, &zzy, &zzz;	\
+	SYCL_SWIZZLE_3_SREFS()
+
 #define SYCL_SWIZZLE_3_REFS_9(pf, vf, sf)	\
 SYCL_R2_LO(pf, vf##xx, sf##00),				\
 SYCL_R2_LO(pf, vf##xy, sf##01),				\
@@ -150,7 +167,7 @@ SYCL_R2_LO(pf, vf##zx, sf##20),				\
 SYCL_R2_LO(pf, vf##zy, sf##21),				\
 SYCL_R2_LO(pf, vf##zz, sf##22)
 
-#define SYCL_SWIZZLE_3_REFS(pf)		\
+#define SYCL_SWIZZLE_3_SET_REFS(pf)	\
 SYCL_SWIZZLE_3_REFS_9(pf, x, s0),	\
 SYCL_SWIZZLE_3_REFS_9(pf, y, s1),	\
 SYCL_SWIZZLE_3_REFS_9(pf, z, s2)
@@ -161,12 +178,12 @@ struct members<dataT, 8> {
 	single_member<dataT> &x, &y, &z, &w;
 	single_member<dataT> &s0, &s1, &s2, &s3, &s4, &s5, &s6, &s7;
 	vec<dataT, 3> &xyz, &s012;
-	SYCL_SWIZZLE_3(&);
+	SYCL_SWIZZLE_3_VALUE_REFS();
 	vec<dataT, 3> &yzw;
 
 	members(base<dataT, 8>* parent, string_class name)
 	:	SYCL_MEMBERS_8(this->),
-		SYCL_SWIZZLE_3_REFS(this->),
+		SYCL_SWIZZLE_3_SET_REFS(this->),
 		yzw(lo.yzw) {}
 };
 
@@ -179,14 +196,14 @@ struct members<dataT, 16> {
 							&s8, &s9, &sa, &sb,
 							&sc, &sd, &se, &sf;
 	vec<dataT, 3> &xyz, &s012;
-	SYCL_SWIZZLE_3(&);
+	SYCL_SWIZZLE_3_VALUE_REFS();
 	vec<dataT, 3> &yzw;
 
 	members(base<dataT, 16>* parent, string_class name)
 	:	SYCL_MEMBERS_8(lo.),
 		s8(hi.x), s9(hi.y), sa(hi.z), sb(hi.w),
 		sc(hi.hi.x), sd(hi.hi.y), se(hi.hi.z), sf(hi.hi.w),
-		SYCL_SWIZZLE_3_REFS(lo.),
+		SYCL_SWIZZLE_3_SET_REFS(lo.),
 		yzw(lo.yzw) {}
 };
 
@@ -205,9 +222,11 @@ struct members<dataT, 16> {
 #undef SYCL_MEMBERS_3
 #undef SYCL_MEMBERS_8
 
-#undef SYCL_SWIZZLE_3
-#undef SYCL_SWIZZLE_3_VALUES
-#undef SYCL_SWIZZLE_3_REFS
+#undef SYCL_SWIZZLE_3_DATA
+#undef SYCL_SWIZZLE_3_SREFS
+#undef SYCL_SWIZZLE_3_VALUE_REFS
+#undef SYCL_SWIZZLE_3_SET_VALUES
+#undef SYCL_SWIZZLE_3_SET_REFS
 #undef SYCL_SWIZZLE_3_REFS_9
 
 } // namespace vectors
