@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CL/cl.h>
+#include <sstream>	// TODO: Non-standard
 
 #if _MSC_VER <= 1800
 #define MSVC_LOW 1
@@ -180,6 +181,13 @@ template <typename DataType>
 struct base_host_data {
 	using type = DataType;
 };
+
+template <typename T>
+string_class get_string(T t) {
+	std::stringstream s;
+	s << t;
+	return s.str();
+}
 
 } // namespace detail
 

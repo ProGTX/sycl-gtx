@@ -38,11 +38,11 @@ private:
 	friend struct type_string;
 
 	static string_class type_name() {
-		return type_string<dataT>::get() + (numElements == 1 ? "" : std::to_string(numElements));
+		return type_string<dataT>::get() + (numElements == 1 ? "" : get_string(numElements));
 	}
 
 	string_class generate_name() const {
-		return '_' + type_name() + '_' + std::to_string(get_count_id());
+		return '_' + type_name() + '_' + get_string(get_count_id());
 	}
 
 	string_class this_name() const {

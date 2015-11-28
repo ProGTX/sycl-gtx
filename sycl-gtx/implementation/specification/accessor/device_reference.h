@@ -84,7 +84,7 @@ protected:
 		string_class ind(std::move(rang_copy[0]));
 		auto multiplier = parent->access_buffer_range(0);
 		for(int i = 1; i < dimensions; ++i) {
-			ind += string_class(" + ") + std::move(rang_copy[i]) + " * " + std::to_string(multiplier);
+			ind += string_class(" + ") + std::move(rang_copy[i]) + " * " + get_string(multiplier);
 			multiplier *= parent->access_buffer_range(i);
 		}
 		auto resource_name = kernel_::source::register_resource(*parent);

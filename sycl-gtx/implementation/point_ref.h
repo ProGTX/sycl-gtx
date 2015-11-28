@@ -32,7 +32,7 @@ protected:
 
 	template <bool defer = true>
 	point_ref(data_basic_t value, type_t type_, bool)
-		: data_ref(std::to_string(value)), data(value) {
+		: data_ref(get_string(value)), data(value) {
 		type = type_;
 	}
 	template <bool defer = true>
@@ -89,7 +89,7 @@ public:
 	point_ref& operator=(T n) {
 		if(type == type_t::numeric) {
 			data = n;
-			name = std::to_string(data);
+			name = get_string(data);
 		}
 		else {
 			data_ref::operator=(n);
@@ -102,7 +102,7 @@ public:
 	point_ref& operator OP=(T n) {																\
 		if(type == type_t::numeric) {															\
 			data OP= n;																			\
-			name = std::to_string(data);														\
+			name = get_string(data);															\
 		}																						\
 		else {																					\
 			data_ref::operator OP=(n);															\

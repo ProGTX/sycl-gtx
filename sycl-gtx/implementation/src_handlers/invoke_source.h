@@ -38,7 +38,7 @@ struct identifier_code {
 		string_class function_name = get_function_name(type);
 
 		for(int i = 0; i < dimensions; ++i) {
-			auto id_s = std::to_string(i);
+			auto id_s = get_string(i);
 			source::add(
 				string_class("const int ") + name + id_s + " = " + function_name + "(" + id_s + ")"
 			);

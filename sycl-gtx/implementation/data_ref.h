@@ -39,7 +39,7 @@ public:
 
 	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
 	static string_class get_name(T n) {
-		return std::to_string(n);
+		return get_string(n);
 	}
 
 	data_ref(string_class name)
