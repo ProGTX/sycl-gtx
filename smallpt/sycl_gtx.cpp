@@ -772,12 +772,16 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 		});
 	});
 
+	cout << "Waiting for kernel to finish ..." << endl;
 	auto c = colors.get_access<access::read, access::host_buffer>();
+
+	cout << "Checking results ..." << endl;
 	for(int y = 0; y < h; ++y) {
 		for(int x = 0; x < w; ++x) {
 			int i = y*w + x;
+			int ri = (h - y - 1) * w + x;	// Picture is upside down
 			auto& ci = c[i];
-			assign(c_[i], ci);
+			assign(c_[ri], ci);
 		}
 	}
 }
