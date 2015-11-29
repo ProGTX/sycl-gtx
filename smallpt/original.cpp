@@ -13,6 +13,7 @@
 #include "msvc.h"
 #include "classes.h"
 
+namespace org {
 Sphere spheres[] = {//Scene: radius, position, emission, color, material
 	Sphere(1e5, Vec(1e5 + 1, 40.8, 81.6), Vec(), Vec(.75, .25, .25), DIFF),//Left
 	Sphere(1e5, Vec(-1e5 + 99, 40.8, 81.6), Vec(), Vec(.25, .25, .75), DIFF),//Rght
@@ -73,14 +74,15 @@ inline void compute_inner(int y, int w, int h, int samps, Ray &cam, Vec &cx, Vec
 				c[i] = c[i] + Vec(clamp(r.x), clamp(r.y), clamp(r.z))*.25;
 			}
 }
+} // namespace org
 void compute_org(int w, int h, int samps, Ray &cam, Vec &cx, Vec &cy, Vec r, Vec *c) {
 	for(int y = 0; y < h; y++) { // Loop over image rows
-		compute_inner(y, w, h, samps, cam, cx, cy, r, c);
+		org::compute_inner(y, w, h, samps, cam, cx, cy, r, c);
 	}
 }
 void compute_org_openmp(int w, int h, int samps, Ray &cam, Vec &cx, Vec &cy, Vec r, Vec *c) {
 	#pragma omp parallel for schedule(dynamic, 1) private(r)
 	for(int y = 0; y < h; y++) { // Loop over image rows
-		compute_inner(y, w, h, samps, cam, cx, cy, r, c);
+		org::compute_inner(y, w, h, samps, cam, cx, cy, r, c);
 	}
 }
