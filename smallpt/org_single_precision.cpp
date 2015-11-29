@@ -146,7 +146,7 @@ void compute_org_sp_openmp(int w, int h, int samps, Ray &cam_, Vec &cx_, Vec &cy
 	org_sp::Vec cy(cy_);
 	org_sp::Vec r(r_);
 	auto c = org_sp::get_c(w, h, c_);
-#pragma omp parallel for schedule(dynamic, 1) private(r)
+	#pragma omp parallel for schedule(dynamic, 1) private(r)
 	for(int y = 0; y < h; y++) { // Loop over image rows
 		org_sp::compute_inner(y, w, h, samps, cam, cx, cy, r, c.data());
 	}

@@ -50,8 +50,8 @@ int main(int argc, char *argv[]) {
 	vector<pair<string, void(*)(int, int, int, Ray&, Vec&, Vec&, Vec, Vec*)>> tests = {
 		{ "org", compute_org },
 		{ "openmp", compute_org_openmp },
-		{ "openmp_single", compute_org_sp },
-		{ "org_single", compute_org_sp_openmp },
+		{ "org_single", compute_org_sp },
+		{ "openmp_single", compute_org_sp_openmp },
 		{ "sycl_cpu", compute_sycl_gtx_cpu },
 		{ "sycl_gpu", compute_sycl_gtx_gpu }
 	};
