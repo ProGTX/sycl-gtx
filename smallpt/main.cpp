@@ -39,7 +39,7 @@ auto duration = [](time_point before, time_point after) {
 };
 
 int main(int argc, char *argv[]) {
-	int w = 1024, h = 768, samps = argc == 2 ? atoi(argv[1]) / 4 : 1; // # samples
+	int w = 1024, h = 768, samps = argc == 2 ? atoi(argv[1]) / 4 : 40; // # samples
 	Ray cam(Vec(50, 52, 295.6), Vec(0, -0.042612, -1).norm()); // cam pos, dir
 	Vec cx = Vec(w*.5135 / h), cy = (cx%cam.d).norm()*.5135, r;
 
@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {
 	};
 
 	vector<Vec> empty_vectors(w*h, 0);
+	float to_seconds = 1e6f;
 	for(auto&& t : tests) {
 		cout << "Running test: " << t.first << endl;
 		ns_erand::reset();
@@ -65,12 +66,14 @@ int main(int argc, char *argv[]) {
 		for(int i = 0; i < iterations; ++i) {
 			t.second(w, h, samps, cam, cx, cy, r, vectors.data());
 		}
-		cout << "\n" << (duration(start, now()) / (float)iterations) << endl;
+		auto time = (duration(start, now()) / (float)iterations);
+		time /= to_seconds;
+		cout << "time: " << time << endl;
 		to_file(w, h, vectors.data(), string("image_") + t.first + ".ppm");
 	}
 
-	cout << "\n" << "Press any key to exit" << endl;
-	cin.get();
+	//cout << "Press any key to exit" << endl;
+	//cin.get();
 
 	return 0;
 }
