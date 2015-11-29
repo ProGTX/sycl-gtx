@@ -708,7 +708,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 			Vector r(r_);
 			RaySycl cam(cam_);
 			uint2 randomSeed;
-			randomSeed = seeds[i] * (i + 1) + i;
+			randomSeed = seeds[i] * (i + 1) + i + 1;
 
 			// 2x2 subpixel rows
 			SYCL_FOR(int1 sy = 0, sy < 2, sy++)
