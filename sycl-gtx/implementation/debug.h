@@ -3,8 +3,6 @@
 #include <iostream>
 #include <sstream>
 
-#define SYCL_ENABLE_DEBUG 1
-
 // Visual Studio 2013 still lacks some support for modern C++
 #if _MSC_VER <= 1800
 #define MSVC_LOW 1
@@ -75,7 +73,7 @@ public:
 		return *this;
 	}
 
-	virtual ~debug() {
+	~debug() {
 		if(DEBUG_ACTIVE) {
 			std::cout << before.str() << stream.str() << std::endl;
 		}
@@ -106,5 +104,7 @@ public:
 	static debug warning(T message) {
 		return debug();
 	}
+
+	~debug() {}
 };
 #endif
