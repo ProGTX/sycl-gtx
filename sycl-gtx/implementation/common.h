@@ -1,7 +1,10 @@
 #pragma once
 
 #include <CL/cl.h>
-#include <sstream>	// TODO: Non-standard
+
+// TODO: Non-standard
+#include <cstdio>
+#include <sstream>
 
 #if _MSC_VER <= 1800
 #define MSVC_LOW 1
@@ -183,11 +186,13 @@ struct base_host_data {
 };
 
 template <typename T>
-string_class get_string(T t) {
-	std::stringstream s;
-	s << t;
-	return s.str();
-}
+struct get_string {
+	static string_class get(T t) {
+		std::stringstream s;
+		s << t;
+		return s.str();
+	}
+};
 
 } // namespace detail
 

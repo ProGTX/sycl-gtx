@@ -61,7 +61,7 @@ private:
 public:
 	source()
 		: tab_offset("\t"),
-		kernel_name(string_class("_sycl_kernel_") + get_string(get_count_id())) {}
+		kernel_name(string_class("_sycl_kernel_") + get_string<counter_t>::get(get_count_id())) {}
 
 	static bool in_scope();
 
@@ -82,7 +82,7 @@ public:
 		auto it = scope->resources.find(buf);
 
 		if(it == scope->resources.end()) {
-			resource_name = resource_name_root + get_string(++num_resources);
+			resource_name = resource_name_root + get_string<decltype(num_resources)>::get(++num_resources);
 			scope->resources[buf] = {
 				{ buf, mode, target },
 				resource_name,

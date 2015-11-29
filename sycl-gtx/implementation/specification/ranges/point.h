@@ -96,7 +96,7 @@ protected:
 			}
 		}
 		else {
-			name = get_string(x);
+			name = get_string<size_t>::get(x);
 		}
 	}
 
@@ -111,7 +111,7 @@ public:
 		if(type == type_t::numeric && rhs.type == type_t::numeric) {	\
 			SYCL_POINT_OP_EQ(this->, OP);								\
 			if(dimensions == 1) {										\
-				name = get_string(values[0]);						\
+				name = get_string<size_t>::get(values[0]);				\
 			}															\
 		}																\
 		else {															\
@@ -152,10 +152,10 @@ private:
 		auto name_ = name;
 
 		if(is_identifier()) {
-			name_ += get_string(dimension);
+			name_ += get_string<size_t>::get(dimension);
 		}
 		else if(type == type_t::numeric && name.empty()) {
-			name_ = get_string(values[dimension]);
+			name_ = get_string<size_t>::get(values[dimension]);
 		}
 		
 		return point_ref<is_const>(values[dimension], name_, type);
