@@ -16,6 +16,8 @@
 
 namespace ns_sycl_gtx {
 
+using namespace cl::sycl;
+
 static const int numSpheres = 9;
 Sphere spheres[numSpheres] = {//Scene: radius, position, emission, color, material
 	Sphere(1e5, Vec(1e5 + 1, 40.8, 81.6), Vec(), Vec(.75, .25, .25), DIFF),//Left
@@ -29,262 +31,7 @@ Sphere spheres[numSpheres] = {//Scene: radius, position, emission, color, materi
 	Sphere(600, Vec(50, 681.6 - .27, 81.6), Vec(12, 12, 12), Vec(), DIFF) //Lite
 };
 
-inline bool intersect(const Ray& r, double& t, int& id) {
-	double d;
-	double inf = t = 1e20;
-	for(int i = numSpheres; i > 0;) {
-		--i;
-		if((d = spheres[i].intersect(r)) && d < t) {
-			t = d;
-			id = i;
-		}
-	}
-	return t < inf;
-}
-
-enum class DoNext {
-	Return, ContinueLoop, Proceed
-};
-
-DoNext radianceInner(
-	Ray& r, int& depth, unsigned short* Xi,	// Original parameters
-	double& t, int& id, Vec& cl, Vec& cf,	// Passed references
-	// Output references
-	double& Re, double& Tr, double& P, double& RP, double& TP, Ray& reflRay, Vec& x, Vec& tdir
-) {
-	if(!intersect(r, t, id)) {
-		// if miss, don't add anything
-		return DoNext::Return;
-	}
-	const Sphere& obj = spheres[id]; // the hit object
-	x = r.o + r.d*t;
-	Vec n = (x - obj.p).norm();
-	Vec nl = n;
-	if(n.dot(r.d) > 0) {
-		nl = nl * -1;
-	}
-	Vec f = obj.c;
-	double p;	// max refl
-	if(f.x > f.y && f.x > f.z) {
-		p = f.x;
-	}
-	else if(f.y > f.z) {
-		p = f.y;
-	}
-	else {
-		p = f.z;
-	}
-
-	cl = cl + cf.mult(obj.e);
-
-	depth += 1;
-	if(depth > 5) {
-		if(erand48(Xi) < p) {
-			f = f*(1 / p);
-		}
-		else {
-			return DoNext::Return;
-		}
-	}
-
-	cf = cf.mult(f);
-
-	if(obj.refl == DIFF) {	// Ideal DIFFUSE reflection
-		double r1 = 2 * M_PI*erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
-		Vec w = nl;
-		Vec u;
-		if(fabs(w.x) > .1) {
-			u.y = 1;
-		}
-		else {
-			u.x = 1;
-		}
-		u = (u % w).norm();
-		Vec v = w%u;
-		Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
-
-		// Recursion
-		r = Ray(x, d);
-		return DoNext::ContinueLoop;
-	}
-	else if(obj.refl == SPEC) {	// Ideal SPECULAR reflection
-		// Recursion
-		r = Ray(x, r.d - n * 2 * n.dot(r.d));
-		return DoNext::ContinueLoop;
-	}
-	reflRay = Ray(x, r.d - n * 2 * n.dot(r.d));	// Ideal dielectric REFRACTION
-	bool into = n.dot(nl) > 0;	// Ray from outside going in?
-	double nc = 1;
-	double nt = 1.5;
-	double nnt;
-	if(into) {
-		nnt = nc / nt;
-	}
-	else {
-		nnt = nt / nc;
-	}
-	double ddn = r.d.dot(nl);
-	double cos2t;
-	if((cos2t = 1 - nnt*nnt*(1 - ddn*ddn)) < 0) {	// Total internal reflection
-		// Recursion
-		r = reflRay;
-		return DoNext::ContinueLoop;
-	}
-	double tmp = 1; 
-	if(!into) {
-		tmp = -1;
-	}
-	tdir = (r.d*nnt - n*(tmp*(ddn*nnt + sqrt(cos2t)))).norm();
-	double a = nt - nc;
-	double b = nt + nc;
-	double R0 = a*a / (b*b);
-	double c = 1;
-	if(into) {
-		c += ddn;
-	}
-	else {
-		c -= tdir.dot(n);
-	}
-	Re = R0 + (1 - R0)*c*c*c*c*c;
-	Tr = 1 - Re;
-	P = .25 + .5*Re;
-	RP = Re / P;
-	TP = Tr / (1 - P);
-
-	return DoNext::Proceed;
-}
-
-void radiance(Ray r, int depth, unsigned short* Xi, Vec& cl, Vec& cf) {
-	double t;	// distance to intersection
-	int id = 0;	// id of intersected object
-
-	double Re, Tr, P, RP, TP;
-	Ray reflRay(0, 0);
-	Vec x, tdir;
-
-	while(true) {
-		auto doNext = radianceInner(
-			r, depth, Xi,
-			t, id, cl, cf,
-			Re, Tr, P, RP, TP, reflRay, x, tdir
-		);
-
-		if(doNext == DoNext::ContinueLoop) {
-			continue;
-		}
-		if(doNext == DoNext::Return) {
-			return;
-		}
-
-		if(erand48(Xi) < P) {
-			cf = cf * RP;
-			r = reflRay;
-		}
-		else {
-			cf = cf * TP;
-			r = Ray(x, tdir);
-		}
-	}
-}
-
-template <int depth_ = 0>
-Vec radiance(Ray r, unsigned short* Xi, Vec cl = { 0, 0, 0 }, Vec cf = {1, 1, 1}) {
-	double t;	// distance to intersection
-	int id = 0;	// id of intersected object
-	int depth = depth_;
-
-	// cl is accumulated color
-	// cf is accumulated reflectance
-
-	double Re, Tr, P, RP, TP;
-	Ray reflRay(0, 0);
-	Vec x, tdir;
-
-	while(true) {
-		auto doNext = radianceInner(
-			r, depth, Xi,
-			t, id, cl, cf,
-			Re, Tr, P, RP, TP, reflRay, x, tdir
-		);
-
-		if(doNext == DoNext::ContinueLoop) {
-			continue;
-		}
-		if(doNext == DoNext::Return) {
-			return cl;
-		}
-
-		if(depth == 1) {
-			return radiance<1>(reflRay, Xi, cl, cf * Re) + radiance<1>(Ray(x, tdir), Xi, cl, cf * Tr);
-		}
-		else if(depth == 2) {
-			return radiance<2>(reflRay, Xi, cl, cf * Re) + radiance<2>(Ray(x, tdir), Xi, cl, cf * Tr);
-		}
-		else {
-			radiance(r, depth, Xi, cl, cf);
-			return cl;
-		}
-	}
-}
-
-} // namespace ns_sycl_gtx
-
-inline double clamp(double x) {
-	if(x < 0) {
-		return 0;
-	}
-	if(x > 1) {
-		return 1;
-	}
-	return x;
-}
-
-void compute_sycl_gtx_openmp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
-	#pragma omp parallel for schedule(dynamic, 1) private(r)
-	for(int y = 0; y < h; y++) {						// Loop over image rows
-		fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samps * 4, 100.*y / (h - 1));
-		for(unsigned short x = 0, Xi[3] = { 0, 0, y*y*y }; x < w; x++) {	// Loop cols
-			for(int sy = 0, i = (h - y - 1)*w + x; sy < 2; sy++) {	 // 2x2 subpixel rows
-				for(int sx = 0; sx < 2; sx++, r = Vec()) {		// 2x2 subpixel cols
-					for(int s = 0; s < samps; s++) {
-						double r1 = 2 * erand48(Xi);
-						double r2 = 2 * erand48(Xi);
-
-						double dx, dy;
-						if(r1 < 1) {
-							dx = sqrt(r1) - 1;
-						}
-						else {
-							dx = 1 - sqrt(2 - r1);
-						}
-						if(r2 < 1) {
-							dy = sqrt(r2) - 1;
-						}
-						else {
-							dy = 1 - sqrt(2 - r2);
-						}
-
-						Vec d = cx*(((sx + .5 + dx) / 2 + x) / w - .5) + cy*(((sy + .5 + dy) / 2 + y) / h - .5) + cam.d;
-						r = r + ns_sycl_gtx::radiance(Ray(cam.o + d * 140, d.norm()), Xi)*(1. / samps);
-					} // Camera rays are pushed ^^^^^ forward to start in interior
-
-					c[i] = c[i] + Vec(clamp(r.x), clamp(r.y), clamp(r.z))*.25;
-				}
-			}
-		}
-	}
-}
-
-namespace sycl_class {
-
-using cl::sycl::bool1;
-using cl::sycl::int1;
-using cl::sycl::uint1;
-using cl::sycl::uint2;
-using cl::sycl::float1;
-using cl::sycl::float3;
-using cl::sycl::float16;
-using spheres_t = cl::sycl::accessor<float16, 1, cl::sycl::access::read, cl::sycl::access::global_buffer>;
+using spheres_t = accessor<float16, 1, access::read, access::global_buffer>;
 
 #ifdef SYCL_GTX
 struct Vector : public float3 {
@@ -309,7 +56,7 @@ struct Vector : public float3 {
 		return Vector(x*b.x, y*b.y, z*b.z);
 	}
 	Vector& norm() {
-		operator*=(1 / cl::sycl::sqrt(x*x + y*y + z*z));
+		operator*=(1 / sqrt(x*x + y*y + z*z));
 		return *this;
 	}
 	float1 dot(const Vector &b) const {
@@ -646,15 +393,12 @@ void assign(T& target, D& data) {
 	target.z = data.z;
 }
 
-} // sycl_class
+} // ns_sycl_gtx
 
 void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_, cl::sycl::device_selector& selector) {
 	using namespace std;
 	using namespace cl::sycl;
-	using sycl_class::Vector;
-	using sycl_class::RaySycl;
-	using sycl_class::assign;
-	using sycl_class::getRandom;
+	using namespace ns_sycl_gtx;
 
 	queue q(selector);
 
@@ -753,14 +497,14 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 
 						// TODO:
 						Vector rad;
-						sycl_class::radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()), randomSeed);
+						radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()), randomSeed);
 						r += rad*(1.f / samps);
 					} // Camera rays are pushed ^^^^^ forward to start in interior
 					SYCL_END
 
-					sycl_class::clamp(r.x);
-					sycl_class::clamp(r.y);
-					sycl_class::clamp(r.z);
+					clamp(r.x);
+					clamp(r.y);
+					clamp(r.z);
 
 					c[i] += r * .25f;
 
