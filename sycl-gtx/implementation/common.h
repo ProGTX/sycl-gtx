@@ -193,6 +193,22 @@ struct get_string {
 		return s.str();
 	}
 };
+// TODO: Should be more efficient
+template <>
+struct get_string<float> {
+	static string_class get(float t) {
+		std::stringstream s;
+		s << t;
+		auto str = s.str();
+		if(str.find('e') == string_class::npos && str.find('.') == string_class::npos) {
+			str += ".f";
+		}
+		else {
+			str += 'f';
+		}
+		return str;
+	}
+};
 
 } // namespace detail
 
