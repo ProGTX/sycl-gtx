@@ -3,7 +3,6 @@
 
 #include <chrono>
 #include <iostream>
-#include <map>
 #include <string>
 #include <vector>
 
@@ -46,9 +45,9 @@ int main(int argc, char *argv[]) {
 
 	int iterations = 1;
 
-	map<string, void(*)(int, int, int, Ray&, Vec&, Vec&, Vec, Vec*)> tests = {
 		{ "org", compute_org },
 		{ "openmp", compute_org_openmp },
+	vector<pair<string, void(*)(int, int, int, Ray&, Vec&, Vec&, Vec, Vec*)>> tests = {
 		{ "sycl_cpu", compute_sycl_gtx_cpu },
 		{ "sycl_gpu", compute_sycl_gtx_gpu }
 	};
