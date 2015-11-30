@@ -83,13 +83,10 @@ struct RaySycl {
 };
 
 inline void clamp(float1& x) {
-	SYCL_IF(x < 0)
-	SYCL_BEGIN {
+	SYCL_IF(x < 0) {
 		x = 0;
 	}
-	SYCL_END
-	SYCL_ELSE_IF(x > 1)
-	SYCL_BEGIN {
+	SYCL_ELSE_IF(x > 1) {
 		x = 1;
 	}
 	SYCL_END
@@ -128,30 +125,21 @@ public:
 		float1 b = op.dot(r.d);
 		float1 det = b*b - op.dot(op) + rad()*rad();
 
-		SYCL_IF(det < 0)
-		SYCL_BEGIN {
+		SYCL_IF(det < 0) {
 			return_ = 0;
 		}
-		SYCL_END
-		SYCL_ELSE
-		SYCL_BEGIN {
+		SYCL_ELSE {
 			det = sqrt(det);
 			t = b - det;
-			SYCL_IF(t > eps)
-			SYCL_BEGIN {
+			SYCL_IF(t > eps) {
 				return_ = t;
 			}
-			SYCL_END
-			SYCL_ELSE
-			SYCL_BEGIN{
+			SYCL_ELSE {
 				t = b + det;
-				SYCL_IF(t > eps)
-				SYCL_BEGIN {
+				SYCL_IF(t > eps) {
 					return_ = t;
 				}
-				SYCL_END
-				SYCL_ELSE
-				SYCL_BEGIN {
+				SYCL_ELSE {
 					return_ = 0;
 				}
 				SYCL_END
@@ -169,12 +157,10 @@ inline bool1 intersect(spheres_t spheres, const RaySycl& r, float1& t, int1& id)
 	float1 inf = t = 1e20f;
 
 	int1 i = ns_sycl_gtx::numSpheres;
-	SYCL_WHILE(i > 0)
-	SYCL_BEGIN {
+	SYCL_WHILE(i > 0) {
 		i -= 1;
 		SphereSycl(spheres[i]).intersect(d, r);
-		SYCL_IF(d != 0 && d < t)
-		SYCL_BEGIN {
+		SYCL_IF(d != 0 && d < t) {
 			t = d;
 			id = i;
 		}
@@ -215,10 +201,8 @@ void radiance(
 	RaySycl reflRay(0, 0);
 	Vector x, tdir;
 
-	SYCL_WHILE(true)
-	SYCL_BEGIN {
-		SYCL_IF(!intersect(spheres, r, t, id))
-		SYCL_BEGIN {
+	SYCL_WHILE(true) {
+		SYCL_IF(!intersect(spheres, r, t, id)) {
 			// if miss, don't add anything
 			return_ = cl;
 			SYCL_BREAK
@@ -230,8 +214,7 @@ void radiance(
 
 		Vector n = Vector(x - obj.p()).norm();
 		Vector nl = n;
-		SYCL_IF(n.dot(r.d) > 0)
-		SYCL_BEGIN {
+		SYCL_IF(n.dot(r.d) > 0) {
 			nl *= -1;
 		}
 		SYCL_END
@@ -239,18 +222,13 @@ void radiance(
 		Vector f = obj.c();
 
 		float1 p;	// max refl
-		SYCL_IF(f.x > f.y && f.x > f.z)
-		SYCL_BEGIN {
+		SYCL_IF(f.x > f.y && f.x > f.z) {
 			p = f.x;
 		}
-		SYCL_END
-		SYCL_ELSE_IF(f.y > f.z)
-		SYCL_BEGIN {
+		SYCL_ELSE_IF(f.y > f.z) {
 			p = f.y;
 		}
-		SYCL_END
-		SYCL_ELSE
-		SYCL_BEGIN {
+		SYCL_ELSE {
 			p = f.z;
 		}
 		SYCL_END
@@ -258,15 +236,11 @@ void radiance(
 		cl += cf.mult(obj.e());
 
 		depth += 1; 
-		SYCL_IF(depth > 5)
-		SYCL_BEGIN {
-			SYCL_IF(getRandom(randomSeed) < p)
-			SYCL_BEGIN {
+		SYCL_IF(depth > 5) {
+			SYCL_IF(getRandom(randomSeed) < p) {
 				f *= 1 / p;
 			}
-			SYCL_END
-			SYCL_ELSE
-			SYCL_BEGIN {
+			SYCL_ELSE {
 				return_ = cl;
 				SYCL_BREAK
 			}
@@ -276,21 +250,17 @@ void radiance(
 
 		cf = cf.mult(f);
 
-		SYCL_IF(obj.refl() == (float)DIFF) // Ideal DIFFUSE reflection
-		SYCL_BEGIN {
+		SYCL_IF(obj.refl() == (float)DIFF) { // Ideal DIFFUSE reflection 
 			float1 r1 = 2 * M_PI * getRandom(randomSeed);
 			float1 r2 = getRandom(randomSeed);
 			float1 r2s = sqrt(r2);
 			Vector w = nl;
 			
 			Vector u(0, 0, 0);
-			SYCL_IF(fabs(w.x) > .1f)
-			SYCL_BEGIN {
+			SYCL_IF(fabs(w.x) > .1f) {
 				u.y = 1;
 			}
-			SYCL_END
-			SYCL_ELSE
-			SYCL_BEGIN {
+			SYCL_ELSE {
 				u.x = 1;
 			}
 			SYCL_END
@@ -303,9 +273,7 @@ void radiance(
 			r = RaySycl(x, d);
 			SYCL_CONTINUE
 		}
-		SYCL_END
-		SYCL_ELSE_IF(obj.refl() == (float)SPEC)// Ideal SPECULAR reflection
-		SYCL_BEGIN {
+		SYCL_ELSE_IF(obj.refl() == (float)SPEC) { // Ideal SPECULAR reflection 
 			// Recursion
 			r = RaySycl(x, r.d - n * 2 * n.dot(r.d));
 			SYCL_CONTINUE
@@ -318,21 +286,17 @@ void radiance(
 		float1 nt = 1.5;
 
 		float1 nnt;
-		SYCL_IF(into)
-		SYCL_BEGIN {
+		SYCL_IF(into) {
 			nnt = nc / nt;
 		}
-		SYCL_END
-		SYCL_ELSE
-		SYCL_BEGIN {
+		SYCL_ELSE {
 			nnt = nt / nc;
 		}
 		SYCL_END
 
 		float1 ddn = r.d.dot(nl);
 		float1 cos2t = 1 - nnt*nnt*(1 - ddn*ddn);
-		SYCL_IF(cos2t < 0) // // Total internal reflection
-		SYCL_BEGIN {	
+		SYCL_IF(cos2t < 0) { // Total internal reflection 	
 			// Recursion
 			r = reflRay;
 			SYCL_CONTINUE
@@ -340,8 +304,7 @@ void radiance(
 		SYCL_END
 
 		float1 tmp = 1;
-		SYCL_IF(!into)
-		SYCL_BEGIN {
+		SYCL_IF(!into) {
 			tmp = -1;
 		}
 		SYCL_END
@@ -352,13 +315,10 @@ void radiance(
 		float1 R0 = a*a / (b*b);
 
 		float1 c = 1;
-		SYCL_IF(into)
-		SYCL_BEGIN {
+		SYCL_IF(into) {
 			c += ddn;
 		}
-		SYCL_END
-		SYCL_ELSE
-		SYCL_BEGIN {
+		SYCL_ELSE {
 			c -= tdir.dot(n);
 		}
 		SYCL_END
@@ -370,14 +330,11 @@ void radiance(
 		float1 TP = Tr / (1 - P);
 
 		// Tail recursion
-		SYCL_IF(getRandom(randomSeed) < P)
-		SYCL_BEGIN {
+		SYCL_IF(getRandom(randomSeed) < P) {
 			cf *= RP;
 			r = reflRay;
 		}
-		SYCL_END
-		SYCL_ELSE
-		SYCL_BEGIN {
+		SYCL_ELSE {
 			cf *= TP;
 			r = RaySycl(x, tdir);
 		}
@@ -455,37 +412,28 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 			randomSeed = seeds[i] * (i + 1) + i + 1;
 
 			// 2x2 subpixel rows
-			SYCL_FOR(int1 sy = 0, sy < 2, sy++)
-			SYCL_BEGIN {
+			SYCL_FOR(int1 sy = 0, sy < 2, sy++) {
 				// 2x2 subpixel cols
-				SYCL_FOR(int1 sx = 0, sx < 2, sx++)
-				SYCL_BEGIN {
-					SYCL_FOR(int1 s = 0, s < samps, s++)
-					SYCL_BEGIN {
+				SYCL_FOR(int1 sx = 0, sx < 2, sx++) {
+					SYCL_FOR(int1 s = 0, s < samps, s++) {
 						float2 rnew;
 						rnew.x = 2 * getRandom(randomSeed);
 						rnew.y = 2 * getRandom(randomSeed);
 
 						float2 dd;
 
-						SYCL_IF(rnew.x < 1)
-						SYCL_BEGIN {
+						SYCL_IF(rnew.x < 1) {
 							dd.x = sqrt(rnew.x) - 1;
 						}
-						SYCL_END
-						SYCL_ELSE
-						SYCL_BEGIN {
+						SYCL_ELSE {
 							dd.x = 1 - sqrt(2 - rnew.x);
 						}
 						SYCL_END
 
-						SYCL_IF(rnew.y < 1)
-						SYCL_BEGIN {
+						SYCL_IF(rnew.y < 1) {
 							dd.y = sqrt(rnew.y) - 1;
 						}
-						SYCL_END
-						SYCL_ELSE
-						SYCL_BEGIN {
+						SYCL_ELSE {
 							dd.y = 1 - sqrt(2 - rnew.y);
 						}
 						SYCL_END
