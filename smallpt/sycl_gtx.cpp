@@ -82,17 +82,6 @@ struct RaySycl {
 	RaySycl& operator=(const RaySycl&) = default;
 };
 
-inline void clamp(float1& x) {
-	SYCL_IF(x < 0) {
-		x = 0;
-	}
-	SYCL_ELSE_IF(x > 1) {
-		x = 1;
-	}
-	SYCL_END
-}
-
-
 struct SphereSycl {
 private:
 	float16 data;
@@ -125,23 +114,19 @@ public:
 		float1 b = op.dot(r.d);
 		float1 det = b*b - op.dot(op) + rad()*rad();
 
-		SYCL_IF(det < 0) {
+		SYCL_IF(det < 0)
 			return_ = 0;
-		}
 		SYCL_ELSE {
 			det = sqrt(det);
 			t = b - det;
-			SYCL_IF(t > eps) {
+			SYCL_IF(t > eps)
 				return_ = t;
-			}
 			SYCL_ELSE {
 				t = b + det;
-				SYCL_IF(t > eps) {
+				SYCL_IF(t > eps)
 					return_ = t;
-				}
-				SYCL_ELSE {
+				SYCL_ELSE
 					return_ = 0;
-				}
 				SYCL_END
 			}
 			SYCL_END
@@ -150,6 +135,13 @@ public:
 	}
 };
 
+inline void clamp(float1& x) {
+	SYCL_IF(x < 0)
+		x = 0;
+	SYCL_ELSE_IF(x > 1)
+		x = 1;
+	SYCL_END
+}
 
 inline bool1 intersect(spheres_t spheres, const RaySycl& r, float1& t, int1& id) {
 	using namespace cl::sycl;
@@ -214,23 +206,19 @@ void radiance(
 
 		Vector n = Vector(x - obj.p()).norm();
 		Vector nl = n;
-		SYCL_IF(n.dot(r.d) > 0) {
+		SYCL_IF(n.dot(r.d) > 0)
 			nl *= -1;
-		}
 		SYCL_END
 
 		Vector f = obj.c();
 
 		float1 p;	// max refl
-		SYCL_IF(f.x > f.y && f.x > f.z) {
+		SYCL_IF(f.x > f.y && f.x > f.z)
 			p = f.x;
-		}
-		SYCL_ELSE_IF(f.y > f.z) {
+		SYCL_ELSE_IF(f.y > f.z)
 			p = f.y;
-		}
-		SYCL_ELSE {
+		SYCL_ELSE
 			p = f.z;
-		}
 		SYCL_END
 
 		cl += cf.mult(obj.e());
@@ -257,12 +245,10 @@ void radiance(
 			Vector w = nl;
 			
 			Vector u(0, 0, 0);
-			SYCL_IF(fabs(w.x) > .1f) {
+			SYCL_IF(fabs(w.x) > .1f)
 				u.y = 1;
-			}
-			SYCL_ELSE {
+			SYCL_ELSE
 				u.x = 1;
-			}
 			SYCL_END
 			u = (u % w).norm();
 
@@ -286,12 +272,10 @@ void radiance(
 		float1 nt = 1.5;
 
 		float1 nnt;
-		SYCL_IF(into) {
+		SYCL_IF(into)
 			nnt = nc / nt;
-		}
-		SYCL_ELSE {
+		SYCL_ELSE
 			nnt = nt / nc;
-		}
 		SYCL_END
 
 		float1 ddn = r.d.dot(nl);
@@ -304,9 +288,8 @@ void radiance(
 		SYCL_END
 
 		float1 tmp = 1;
-		SYCL_IF(!into) {
+		SYCL_IF(!into)
 			tmp = -1;
-		}
 		SYCL_END
 
 		tdir = Vector(r.d*nnt - n*(tmp*(ddn*nnt + sqrt(cos2t)))).norm();
@@ -315,12 +298,10 @@ void radiance(
 		float1 R0 = a*a / (b*b);
 
 		float1 c = 1;
-		SYCL_IF(into) {
+		SYCL_IF(into)
 			c += ddn;
-		}
-		SYCL_ELSE {
+		SYCL_ELSE
 			c -= tdir.dot(n);
-		}
 		SYCL_END
 
 		float1 Re = R0 + (1 - R0)*c*c*c*c*c;
@@ -422,20 +403,16 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 
 						float2 dd;
 
-						SYCL_IF(rnew.x < 1) {
+						SYCL_IF(rnew.x < 1)
 							dd.x = sqrt(rnew.x) - 1;
-						}
-						SYCL_ELSE {
+						SYCL_ELSE
 							dd.x = 1 - sqrt(2 - rnew.x);
-						}
 						SYCL_END
 
-						SYCL_IF(rnew.y < 1) {
+						SYCL_IF(rnew.y < 1)
 							dd.y = sqrt(rnew.y) - 1;
-						}
-						SYCL_ELSE {
+						SYCL_ELSE
 							dd.y = 1 - sqrt(2 - rnew.y);
-						}
 						SYCL_END
 
 						Vector d =
