@@ -89,7 +89,7 @@ private:
 public:
 	template <class T>
 	SphereSycl(T&& data)
-		: data(data) {}
+		: data(std::forward<T>(data)) {}
 
 	float1& rad() const {
 		return data.w;
