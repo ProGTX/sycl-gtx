@@ -55,46 +55,44 @@ static void return_() {
 } // namespace sycl
 } // namespace cl
 
-#define SYCL_IF(condition)						\
-::cl::sycl::detail::control::if_(				\
-	::cl::sycl::detail::data_ref((condition))	\
-);
-
 #define SYCL_BEGIN	\
 ::cl::sycl::detail::kernel_::source::add_curlies();
 
 #define SYCL_END	\
 ::cl::sycl::detail::kernel_::source::remove_curlies();
 
-#define SYCL_BLOCK(code)	\
-{							\
-SYCL_BEGIN					\
-code						\
-SYCL_END					\
-}
+#define SYCL_IF(condition)						\
+::cl::sycl::detail::control::if_(				\
+	::cl::sycl::detail::data_ref((condition))	\
+);												\
+SYCL_BEGIN
 
-#define SYCL_THEN(code) \
-SYCL_BLOCK(code)
-
-#define SYCL_ELSE	\
-::cl::sycl::detail::control::else_();
+#define SYCL_ELSE						\
+SYCL_END								\
+::cl::sycl::detail::control::else_();	\
+SYCL_BEGIN
 
 #define SYCL_ELSE_IF(condition)					\
+SYCL_END										\
 ::cl::sycl::detail::control::else_if(			\
 	::cl::sycl::detail::data_ref((condition))	\
-);
+);												\
+SYCL_BEGIN
 
+// TODO: do-while not supported
 #define SYCL_WHILE(condition)					\
 ::cl::sycl::detail::control::while_(			\
 	::cl::sycl::detail::data_ref((condition))	\
-);
+);												\
+SYCL_BEGIN
 
 #define SYCL_FOR(init, condition, increment)	\
 init;											\
 ::cl::sycl::detail::control::for_(				\
 	::cl::sycl::detail::data_ref((condition)),	\
 	::cl::sycl::detail::data_ref((increment))	\
-);
+);												\
+SYCL_BEGIN
 
 #define SYCL_BREAK	\
 ::cl::sycl::detail::control::break_();
