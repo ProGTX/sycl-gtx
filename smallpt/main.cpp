@@ -43,13 +43,24 @@ auto duration = [](time_point before, time_point after) {
 	return std::chrono::duration_cast<std::chrono::microseconds>(after - before).count();
 };
 
-static std::vector<std::pair<string, void(*)(int, int, int, Ray&, Vec&, Vec&, Vec, Vec*)>> tests = {
-	{ "org", compute_org },
-	{ "openmp", compute_org_openmp },
-	{ "sycl_cpu", compute_sycl_gtx_cpu },
-	{ "sycl_gpu", compute_sycl_gtx_gpu },
-	{ "org_single", compute_org_sp },
-	{ "openmp_single", compute_org_sp_openmp },
+struct testInfo {
+	using function_ptr = void(*)(int, int, int, Ray&, Vec&, Vec&, Vec, Vec*);
+	string name;
+	function_ptr test;
+	bool isGpu;
+	float lastTime = 0;
+
+	testInfo(string name, function_ptr test, bool isGpu = false)
+		: name(name), test(test), isGpu(isGpu) {}
+};
+
+static std::vector<const testInfo> tests = {
+	testInfo("org", compute_org),
+	testInfo("openmp", compute_org_openmp),
+	testInfo("sycl_cpu", compute_sycl_gtx_cpu),
+	testInfo("sycl_gpu", compute_sycl_gtx_gpu, true),
+	testInfo("org_single", compute_org_sp),
+	testInfo("openmp_single", compute_org_sp_openmp),
 };
 static Ray cam(Vec(50, 52, 295.6), Vec(0, -0.042612, -1).norm()); // cam pos, dir
 static const float to_seconds = 1e-6f;
@@ -65,14 +76,26 @@ void tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 	float time;
 
 	for(int ti = from; ti < to; ++ti) {
-		auto&& t = tests[ti];
-		cout << "Running test: " << t.first << endl;
+		auto& t = tests[ti];
+
+		// Quality of Service
+		// Prevent the user from waiting too long
+		if(t.isGpu) {
+			if(t.lastTime > 15) {
+				continue;
+			}
+		}
+		else if(t.lastTime > 80) {
+			continue;
+		}
+
+		cout << "Running test: " << t.name << endl;
 		ns_erand::reset();
 		try {
 			auto start = now();
 			for(int i = 0; i < iterations; ++i) {
 				vectors = empty_vectors;
-				t.second(w, h, samples, cam, cx, cy, r, vectors.data());
+				t.test(w, h, samples, cam, cx, cy, r, vectors.data());
 			}
 			time = (duration(start, now()) / (float)iterations);
 		}
@@ -86,7 +109,9 @@ void tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 		}
 		time *= to_seconds;
 		cout << "time: " << time << endl;
-		to_file(w, h, vectors.data(), string("image_") + t.first + ".ppm");
+		//to_file(w, h, vectors.data(), string("image_") + t.name + ".ppm");
+
+		t.lastTime = time;
 	}
 }
 
@@ -108,26 +133,11 @@ int main(int argc, char *argv[]) {
 		// Test suite
 
 		auto start = now();
-
-		samples = 10;
 		iterations = 1;
-		tester(w, h, samples, cx, cy, iterations, 0, 1);
-		iterations = 2;
-		tester(w, h, samples, cx, cy, iterations, 1, 4);
 
-		samples = 20;
-		iterations = 1;
-		tester(w, h, samples, cx, cy, iterations, 1, 2);
-		iterations = 2;
-		tester(w, h, samples, cx, cy, iterations, 2, 4);
-
-		samples = 40;
-		iterations = 1;
-		tester(w, h, samples, cx, cy, iterations, 1, 4);
-
-		samples = 80;
-		iterations = 1;
-		tester(w, h, samples, cx, cy, iterations, 1, 4);
+		for(samples = 10; samples < 10000; samples *= 2) {
+			tester(w, h, samples, cx, cy, iterations, 0, 4);
+		}
 
 		auto time = duration(start, now()) * to_seconds;
 		cout << "total test suite duration: " << time << endl;
