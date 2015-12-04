@@ -15,6 +15,10 @@
 
 #define DSELF() debug(__func__)
 
+#ifdef _DEBUG
+#define SYCL_ENABLE_DEBUG 1
+#endif
+
 #if SYCL_ENABLE_DEBUG
 class debug {
 protected:
