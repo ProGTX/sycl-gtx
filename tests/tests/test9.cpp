@@ -67,8 +67,7 @@ public:
 		uint1 GID = 2 * index.get_global(0);
 		uint1 LID = 2 * index.get_local(0);
 
-		SYCL_IF(GID < global_size)
-		SYCL_BEGIN {
+		SYCL_IF(GID < global_size) {
 			localBlock[LID] = input[GID];
 			localBlock[LID + 1] = input[GID + 1];
 		}
@@ -84,10 +83,8 @@ public:
 
 		// Up-sweep
 		uint1 offset = 1;
-		SYCL_WHILE(offset < local_size)
-		SYCL_BEGIN {
-			SYCL_IF(LID % offset == 0)
-			SYCL_BEGIN {
+		SYCL_WHILE(offset < local_size) {
+			SYCL_IF(LID % offset == 0) {
 				first = 2 * LID + offset - 1;
 				second = first + offset;
 				localBlock[second] = localBlock[first] + localBlock[second];
@@ -99,20 +96,18 @@ public:
 		}
 		SYCL_END
 
-		SYCL_IF(LID == 0)
-		SYCL_THEN({
+		SYCL_IF(LID == 0) {
 			localBlock[local_size - 1] = 0;
-		})
+		}
+		SYCL_END
 		index.barrier(access::fence_space::local);
 
 		vec<T, 1> tmp;
 
 		// Down-sweep
 		offset = local_size;
-		SYCL_WHILE(offset > 0)
-		SYCL_BEGIN {
-			SYCL_IF(LID % offset == 0)
-			SYCL_BEGIN {
+		SYCL_WHILE(offset > 0) {
+			SYCL_IF(LID % offset == 0) {
 				first = 2 * LID + offset - 1;
 				second = first + offset;
 				tmp = localBlock[second];
@@ -128,8 +123,7 @@ public:
 
 		LID *= 2;
 
-		SYCL_IF(GID < global_size)
-		SYCL_BEGIN {
+		SYCL_IF(GID < global_size) {
 			input[GID] += localBlock[LID];
 			input[GID + 1] += localBlock[LID + 1];
 		}
@@ -138,8 +132,7 @@ public:
 		index.barrier(access::fence_space::local);
 
 		uint1 last_sum_id = GID + local_size - 1;
-		SYCL_IF(LID == 0 && last_sum_id < global_size)
-			SYCL_BEGIN{
+		SYCL_IF(LID == 0 && last_sum_id < global_size) {
 			// Write last sum into auxiliary array
 			higher_level[GID / local_size] = input[last_sum_id];
 		}
@@ -167,8 +160,7 @@ public:
 		using namespace cl::sycl;
 		int1 GID = 2 * index.get_global(0);
 		int1 local_size = 2 * index.get_local_range()[0];
-		SYCL_IF(GID >= local_size)
-		SYCL_BEGIN {
+		SYCL_IF(GID >= local_size) {
 			int1 higher_id = GID / local_size - 1;
 			data[GID] += higher_level[higher_id];
 			data[GID + 1] += higher_level[higher_id];

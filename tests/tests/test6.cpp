@@ -46,30 +46,30 @@ bool test6() {
 					uint1 N = index.get_global_range().get(0);
 					uint1 second = gid + N;
 
-					SYCL_IF(second < 2 * N)
-					SYCL_THEN({
+					SYCL_IF(second < 2 * N) {
 						local[lid] = input[gid] + input[second];
-					})
+					}
+					SYCL_END
 
 					index.barrier(access::fence_space::local);
 
 					N = min(N, (uint1)index.get_local_range().get(0));
 
 					uint1 stride = N / 2;
-					SYCL_WHILE(stride > 0)
-					SYCL_BLOCK({
-						SYCL_IF(lid < stride)
-						SYCL_THEN({
+					SYCL_WHILE(stride > 0) {
+						SYCL_IF(lid < stride) {
 							local[lid] += local[lid + stride];
-						})
+						}
+						SYCL_END
 						index.barrier(access::fence_space::local);
 						stride /= 2;
-					})
+					}
+					SYCL_END
 
-					SYCL_IF(lid == 0)
-					SYCL_THEN({
+					SYCL_IF(lid == 0) {
 						output[gid / N] = local[0];
-					})
+					}
+					SYCL_END
 				});
 			});
 

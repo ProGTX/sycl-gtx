@@ -44,8 +44,7 @@ bool test11() {
 
 		cgh.single_task<class generate>([=]() {
 			uint2 seed(startSeed_x, startSeed_y);
-			SYCL_FOR(int1 i = 0, i < size, ++i)
-			SYCL_BEGIN {
+			SYCL_FOR(int1 i = 0, i < size, ++i) {
 				n[i] = deviceRandom(seed);
 			}
 			SYCL_END
