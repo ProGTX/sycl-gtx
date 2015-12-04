@@ -138,9 +138,6 @@ struct type_string {
 	}
 };
 
-template <typename DataType>
-static string_class type_string_get();
-
 #define SYCL_GET_TYPE_STRING(type)	\
 template <>						  	\
 struct type_string<type> {			\
