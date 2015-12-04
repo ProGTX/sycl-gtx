@@ -1,10 +1,13 @@
 #include "classes.h"
 #include "msvc.h"
 
+#include <sycl.hpp>
+
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <vector>
+
 
 using std::string;
 
@@ -54,22 +57,33 @@ static const float to_seconds = 1e-6f;
 void tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int from, int to) {
 	using namespace std;
 
-	cout << "samples per pixel: " << samples;
+	cout << "samples per pixel: " << samples << endl;
 
 	Vec r;
 	vector<Vec> empty_vectors(w*h, 0);
 	vector<Vec> vectors;
+	float time;
 
 	for(int ti = from; ti < to; ++ti) {
 		auto&& t = tests[ti];
 		cout << "Running test: " << t.first << endl;
 		ns_erand::reset();
-		auto start = now();
-		for(int i = 0; i < iterations; ++i) {
-			vectors = empty_vectors;
-			t.second(w, h, samples, cam, cx, cy, r, vectors.data());
+		try {
+			auto start = now();
+			for(int i = 0; i < iterations; ++i) {
+				vectors = empty_vectors;
+				t.second(w, h, samples, cam, cx, cy, r, vectors.data());
+			}
+			time = (duration(start, now()) / (float)iterations);
 		}
-		auto time = (duration(start, now()) / (float)iterations);
+		catch(cl::sycl::exception& e) {
+			cerr << "SYCL error while testing: " << e.what() << endl;
+			continue;
+		}
+		catch(exception& e) {
+			cerr << "error while testing: " << e.what() << endl;
+			continue;
+		}
 		time *= to_seconds;
 		cout << "time: " << time << endl;
 		to_file(w, h, vectors.data(), string("image_") + t.first + ".ppm");
