@@ -343,8 +343,18 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 	unsigned short Xi[3] = { 0, 0, 0 };
 
 	buffer<float3> colors(range<1>(w*h));
+
+	vector<cl_uint2> seedArray;
+	seedArray.reserve(w*h);
+	for(int y = 0; y < h; ++y) {
+		Xi[2] = y*y*y;
+		for(int x = 0; x < w; ++x) {
+			seedArray.push_back({ erand48(Xi), erand48(Xi) });
+		}
+	}
+	buffer<cl_uint2> seeds_(seedArray);
+
 	buffer<float16> spheres_(ns_sycl_gtx::numSpheres);
-	buffer<uint2> seeds_(w*h);
 	{
 		auto s = spheres_.get_access<access::discard_write, access::host_buffer>();
 		// See SphereSycl
@@ -359,26 +369,10 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 			si.lo.lo.w = sj.rad;
 			si.hi.lo.w = sj.refl;
 		}
-
-		auto c = colors.get_access<access::discard_write, access::host_buffer>();
-		auto rs = seeds_.get_access<access::discard_write, access::host_buffer>();
-		for(int y = 0; y < h; ++y) {
-			for(int x = 0; x < w; ++x) {
-				int i = y*w + x;
-				
-				auto& ci = c[i];
-				assign(ci, c_[i]);
-				Xi[2] = y*y*y;
-
-				auto& rsi = rs[i];
-				rsi.x = erand48(Xi);
-				rsi.y = erand48(Xi);
-			}
-		}
 	}
 
 	q.submit([&](handler& cgh) {
-		auto c = colors.get_access<access::read_write, access::global_buffer>(cgh);
+		auto c = colors.get_access<access::discard_read_write, access::global_buffer>(cgh);
 
 		// TODO: constant_buffer
 		auto spheres = spheres_.get_access<access::read, access::global_buffer>(cgh);
@@ -444,13 +438,16 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 	cout << "Waiting for kernel to finish ..." << endl;
 	auto c = colors.get_access<access::read, access::host_buffer>();
 
-	cout << "Checking results ..." << endl;
+	cout << "Copying results ..." << endl;
 	for(int y = 0; y < h; ++y) {
+		int i = y*w;
+		int ri = (h - y - 1) * w;	// Picture is upside down
 		for(int x = 0; x < w; ++x) {
-			int i = y*w + x;
-			int ri = (h - y - 1) * w + x;	// Picture is upside down
 			auto& ci = c[i];
 			assign(c_[ri], ci);
+
+			++i;
+			++ri;
 		}
 	}
 }
