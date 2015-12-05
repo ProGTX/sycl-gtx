@@ -342,7 +342,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 
 	unsigned short Xi[3] = { 0, 0, 0 };
 
-	buffer<float3> colors(range<1>(w*h));
+	buffer<float3> colorsBuffer(range<1>(w*h));
 
 	vector<cl_uint2> seedArray;
 	seedArray.reserve(w*h);
@@ -352,7 +352,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 			seedArray.push_back({ erand48(Xi), erand48(Xi) });
 		}
 	}
-	buffer<cl_uint2> seeds_(seedArray);
+	buffer<cl_uint2> seedsBuffer(seedArray);
 
 	buffer<float16> spheres_(ns_sycl_gtx::numSpheres);
 	{
@@ -371,14 +371,35 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 		}
 	}
 
+	// Divide GPU calculation into parts to prevent monitor freezing
+	// TODO: Should be more intelligent depending on number of samples
+	const int numParts =
+		(q.get_device().get_info<info::device::device_type>() == info::device_type::gpu)
+			? 10
+			: 1;
+	vector<decltype(colorsBuffer)> colors;
+	vector<decltype(seedsBuffer)> seeds_;
+	vector<pair<int, int>> lineOffset;
+	for(int k = 0; k < numParts; ++k) {
+		int start = h*k / numParts;
+		int end = h*(k + 1) / numParts;
+		int height = end - start;
+		range<1> length(height*w);
+
+		lineOffset.emplace_back(start, height);
+		colors.emplace_back(colorsBuffer, id<1>(start*w), length);
+		seeds_.emplace_back(seedsBuffer, id<1>(start*w), length);
+	}
+
+	for(auto k = 0; k < numParts; ++k) {
 	q.submit([&](handler& cgh) {
-		auto c = colors.get_access<access::discard_read_write, access::global_buffer>(cgh);
+		auto c = colors[k].get_access<access::discard_read_write, access::global_buffer>(cgh);
 
 		// TODO: constant_buffer
 		auto spheres = spheres_.get_access<access::read, access::global_buffer>(cgh);
-		auto seeds = seeds_.get_access<access::read, access::global_buffer>(cgh);
+		auto seeds = seeds_[k].get_access<access::read, access::global_buffer>(cgh);
 
-		cgh.parallel_for<class smallpt>(range<2>(w, h), [=](id<2> i) {
+		cgh.parallel_for<class smallpt>(range<2>(w, lineOffset[k].second), [=](id<2> i) {
 			Vector cx(cx_);
 			Vector cy(cy_);
 			Vector r(r_);
@@ -413,7 +434,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 
 						Vector d =
 							cx * (((sx + .5f + dd.x) / 2 + i[0]) / w - .5f) +
-							cy * (((sy + .5f + dd.y) / 2 + i[1]) / h - .5f) +
+							cy * (((sy + .5f + dd.y) / 2 + i[1] + lineOffset[k].first) / h - .5f) +
 							cam.d;
 
 						// TODO:
@@ -436,13 +457,21 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 			SYCL_END
 		});
 	});
+	}
 
+	for(auto k = 0; k < numParts; ++k) {
+#if _DEBUG
 	cout << "Waiting for kernel to finish ..." << endl;
-	auto c = colors.get_access<access::read, access::host_buffer>();
+#endif
+	auto c = colors[k].get_access<access::read, access::host_buffer>();
 
+#if _DEBUG
 	cout << "Copying results ..." << endl;
-	for(int y = 0; y < h; ++y) {
-		int i = y*w;
+#endif
+	auto start = lineOffset[k].first;
+	auto end = start + lineOffset[k].second;
+	for(int y = start; y < end; ++y) {
+		int i = (y - start)*w;
 		int ri = (h - y - 1) * w;	// Picture is upside down
 		for(int x = 0; x < w; ++x) {
 			auto& ci = c[i];
@@ -451,6 +480,7 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 			++i;
 			++ri;
 		}
+	}
 	}
 }
 
