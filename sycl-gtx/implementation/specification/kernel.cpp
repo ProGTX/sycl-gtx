@@ -33,7 +33,6 @@ program kernel::get_program() const {
 
 void kernel::set(cl_kernel openclKernelObject) {
 	kern = openclKernelObject;
-	clReleaseKernel(openclKernelObject);
 }
 
 void kernel::set(const context& context, cl_program validProgram) {

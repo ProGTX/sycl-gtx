@@ -31,6 +31,7 @@ context::context(
 		c = clCreateContext(nullptr, num_devices, devices.data(), nullptr, nullptr, &error_code);
 		detail::error::report(error_code);
 		ctx = c;
+		ctx.release_one();
 	}
 }
 

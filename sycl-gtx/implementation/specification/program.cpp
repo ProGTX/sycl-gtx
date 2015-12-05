@@ -34,6 +34,7 @@ void program::compile(string_class compile_options, size_t kernel_name_id, share
 	auto p = clCreateProgramWithSource(ctx.get(), 1, &code_p, &length, &error_code);
 	detail::error::report(error_code);
 	kern->set(ctx, p);
+	kern->prog->prog.release_one();
 
 	auto device_pointers = detail::get_cl_array(devices);
 

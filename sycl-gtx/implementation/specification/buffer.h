@@ -175,6 +175,7 @@ private:
 			(buffer->is_read_only ? CL_MEM_READ_ONLY : CL_MEM_READ_WRITE);
 		buffer->device_data = clCreateBuffer(q->get_context().get(), all_flags, buffer->get_size(), buffer->host_data.get(), &error_code);
 		detail::error::report(error_code);
+		buffer->device_data.release_one();
 	}
 
 	void init() {
