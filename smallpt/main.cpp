@@ -39,8 +39,9 @@ using time_point = std::chrono::high_resolution_clock::time_point;
 auto now = []() {
 	return std::chrono::high_resolution_clock::now();
 };
-auto duration = [](time_point before, time_point after) {
-	return std::chrono::duration_cast<std::chrono::microseconds>(after - before).count();
+auto duration = [](time_point before) {
+	static const float to_seconds = 1e-6f;
+	return std::chrono::duration_cast<std::chrono::microseconds>(now() - before).count() * to_seconds;
 };
 
 struct testInfo {
@@ -49,9 +50,14 @@ struct testInfo {
 	function_ptr test;
 	float lastTime = 0;
 
+	static decltype(now()) startTime;
+	static float totalTime;
+
 	testInfo(string name, function_ptr test)
 		: name(name), test(test) {}
 };
+decltype(now()) testInfo::startTime = now();
+float testInfo::totalTime = 0;
 
 static std::vector<const testInfo> tests = {
 	testInfo("org", compute_org),
@@ -62,9 +68,8 @@ static std::vector<const testInfo> tests = {
 	testInfo("openmp_single", compute_org_sp_openmp),
 };
 static Ray cam(Vec(50, 52, 295.6), Vec(0, -0.042612, -1).norm()); // cam pos, dir
-static const float to_seconds = 1e-6f;
 
-void tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int from, int to) {
+bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int from, int to) {
 	using namespace std;
 
 	cout << "samples per pixel: " << samples << endl;
@@ -91,7 +96,7 @@ void tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 				vectors = empty_vectors;
 				t.test(w, h, samples, cam, cx, cy, r, vectors.data());
 			}
-			time = (duration(start, now()) / (float)iterations);
+			time = (duration(start) / (float)iterations);
 		}
 		catch(cl::sycl::exception& e) {
 			cerr << "SYCL error while testing: " << e.what() << endl;
@@ -101,12 +106,19 @@ void tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 			cerr << "error while testing: " << e.what() << endl;
 			continue;
 		}
-		time *= to_seconds;
 		cout << "time: " << time << endl;
 		//to_file(w, h, vectors.data(), string("image_") + t.name + ".ppm");
 
 		t.lastTime = time;
+
+		testInfo::totalTime = duration(testInfo::startTime);
+		if(testInfo::totalTime > 600) {
+			cout << "exceeded 10 minute limit, stopping" << endl;
+			return false;
+		}
 	}
+	
+	return true;
 }
 
 int main(int argc, char *argv[]) {
@@ -125,15 +137,17 @@ int main(int argc, char *argv[]) {
 	}
 	else {
 		// Test suite
-
-		auto start = now();
 		iterations = 1;
+		bool canContinue;
 
 		for(samples = 10; samples < 10000; samples *= 2) {
-			tester(w, h, samples, cx, cy, iterations, 0, 4);
+			canContinue = tester(w, h, samples, cx, cy, iterations, 3, 4);
+			if(!canContinue) {
+				break;
+			}
 		}
 
-		auto time = duration(start, now()) * to_seconds;
+		auto time = duration(testInfo::startTime);
 		cout << "total test suite duration: " << time << endl;
 	}
 
