@@ -58,6 +58,10 @@ public:
 		call_retain(data);
 	}
 
+	void release_one() {
+		call_release(get());
+	}
+
 	refc& operator=(CL_Type data) {
 		reset(data);
 		return *this;
