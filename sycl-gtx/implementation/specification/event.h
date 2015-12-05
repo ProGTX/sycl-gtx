@@ -18,6 +18,7 @@ class kernel;
 class event {
 private:
 	friend class kernel;
+	// TODO: Release when retrieving from OpenCL functions
 	detail::refc<cl_event, clRetainEvent, clReleaseEvent> evnt;
 
 public:

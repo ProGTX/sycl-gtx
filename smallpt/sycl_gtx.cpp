@@ -372,10 +372,9 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 	}
 
 	// Divide GPU calculation into parts to prevent monitor freezing
-	// TODO: Should be more intelligent depending on number of samples
 	const int numParts =
 		(q.get_device().get_info<info::device::device_type>() == info::device_type::gpu)
-			? 10
+			? std::min(samps / 5 + 1, h / 10)
 			: 1;
 	vector<decltype(colorsBuffer)> colors;
 	vector<decltype(seedsBuffer)> seeds_;
