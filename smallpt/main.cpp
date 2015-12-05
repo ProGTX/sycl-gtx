@@ -121,8 +121,81 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 	return true;
 }
 
+template <class T>
+void printInfo(string description, const T& data, int offset = 0) {
+	string indent;
+	for(int i = 0; i < offset; ++i) {
+		indent += '\t';
+	}
+	std::cout << indent << description << ": " << data << std::endl;
+}
+
+void displayPlaftormInfo() {
+	using namespace std;
+
+	try {
+		using namespace cl::sycl;
+
+		auto platforms = platform::get_platforms();
+
+		int pNum = 0;
+		for(auto& p : platforms) {
+			cout << "- OpenCL platform " << pNum << ':' << endl;
+			++pNum;
+
+			printInfo("name", p.get_info<info::platform::name>(), 1);
+			printInfo("vendor", p.get_info<info::platform::vendor>(), 1);
+			printInfo("version", p.get_info<info::platform::version>(), 1);
+			printInfo("profile", p.get_info<info::platform::profile>(), 1);
+			printInfo("extensions", p.get_info<info::platform::extensions>(), 1);
+
+			auto devices = p.get_devices();
+			int dNum = 0;
+
+			for(auto& d : devices) {
+				cout << "\t-- OpenCL device " << dNum << ':' << endl;
+
+				printInfo("name", d.get_info<info::device::name>(), 2);
+				printInfo("device_type", (cl_device_type)d.get_info<info::device::device_type>(), 2);
+				printInfo("vendor", d.get_info<info::device::vendor>(), 2);
+				printInfo("device_version", d.get_info<info::device::device_version>(), 2);
+				printInfo("driver_version", d.get_info<info::device::driver_version>(), 2);
+				printInfo("opencl_version", d.get_info<info::device::opencl_version>(), 2);
+				printInfo("single_fp_config", d.get_info<info::device::single_fp_config>(), 2);
+				printInfo("double_fp_config", d.get_info<info::device::double_fp_config>(), 2);
+				printInfo("profile", d.get_info<info::device::profile>(), 2);
+				printInfo("error_correction_support", d.get_info<info::device::error_correction_support>(), 2);
+				printInfo("host_unified_memory", d.get_info<info::device::host_unified_memory>(), 2);
+				printInfo("max_clock_frequency", d.get_info<info::device::max_clock_frequency>(), 2);
+				printInfo("max_compute_units", d.get_info<info::device::max_compute_units>(), 2);
+				printInfo("max_work_item_dimensions", d.get_info<info::device::max_work_item_dimensions>(), 2);
+				printInfo("max_work_group_size", d.get_info<info::device::max_work_group_size>(), 2);
+
+				printInfo("address_bits", d.get_info<info::device::address_bits>(), 2);
+				printInfo("max_mem_alloc_size", d.get_info<info::device::max_mem_alloc_size>(), 2);
+				printInfo("global_mem_cache_line_size", d.get_info<info::device::global_mem_cache_line_size>(), 2);
+				printInfo("global_mem_cache_size", d.get_info<info::device::global_mem_cache_size>(), 2);
+				printInfo("global_mem_size", d.get_info<info::device::global_mem_size>(), 2);
+				printInfo("max_constant_buffer_size", d.get_info<info::device::max_constant_buffer_size>(), 2);
+				printInfo("max_constant_args", d.get_info<info::device::max_constant_args>(), 2);
+				printInfo("local_mem_size", d.get_info<info::device::local_mem_size>(), 2);
+				printInfo("extensions", d.get_info<info::device::extensions>(), 2);
+
+				++dNum;
+			}
+		}
+	}
+	catch(cl::sycl::exception& e) {
+		// TODO
+		cout << "OpenCL not available: " << e.what() << endl;
+	}
+}
+
 int main(int argc, char *argv[]) {
 	using namespace std;
+
+	cout << "smallpt SYCL tester" << endl;
+	displayPlaftormInfo();
 
 	bool fromCommand = argc == 2;
 	int w = 1024;
