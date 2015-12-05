@@ -63,8 +63,9 @@ protected:
 	friend class kernel_::source;
 
 	// Associated host memory.
+	// TODO: What if DataType and value_type differ?
 	buffer_(DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
-		:	host_data(ptr_t(host_data, [](DataType* ptr) {})),
+		:	host_data(ptr_t(host_data, [](value_type* ptr) {})),
 			rang(range),
 			is_read_only(is_read_only),
 			is_blocking(is_blocking) {}
@@ -113,11 +114,27 @@ public:
 	// and in effect there is no synchronization with the application code using hostData.
 	buffer_(unique_ptr_class<void>&& hostData, const range<dimensions>& bufferRange);
 	
+	// TODO
 	// Create a new sub-buffer without allocation to have separate accessors later.
 	// b is the buffer with the real data.
 	// baseIndex specifies the origin of the sub-buffer inside the buffer b.
 	// subRange specifies the size of the sub-buffer.
-	buffer_(buffer_& b, const id<dimensions>& baseIndex, const range<dimensions>& subRange);
+	buffer_(buffer_& b, const id<dimensions>& baseIndex, const range<dimensions>& subRange)
+		: rang(subRange), is_read_only(b.is_read_only), is_blocking(b.is_blocking) {
+		value_type* start = b.host_data.get();
+
+		if(dimensions == 1) {
+			start += (size_t)(baseIndex.get(0));
+		}
+		else if(dimensions == 2) {
+			start += (size_t)(baseIndex.get(1)) * (size_t)(rang.get(0)) + (size_t)(baseIndex.get(0));
+		}
+		else if(dimensions == 3) {
+			// TODO
+		}
+
+		host_data = ptr_t(start, [](value_type* ptr) {});
+	}
 
 	// Creates a buffer from an existing OpenCL memory object associated to a context
 	// after waiting for an event signaling the availability of the OpenCL data.
