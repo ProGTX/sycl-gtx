@@ -392,95 +392,95 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 	}
 
 	for(auto k = 0; k < numParts; ++k) {
-	q.submit([&](handler& cgh) {
-		auto c = colors[k].get_access<access::discard_read_write, access::global_buffer>(cgh);
+		q.submit([&](handler& cgh) {
+			auto c = colors[k].get_access<access::discard_read_write, access::global_buffer>(cgh);
 
-		// TODO: constant_buffer
-		auto spheres = spheres_.get_access<access::read, access::global_buffer>(cgh);
-		auto seeds = seeds_[k].get_access<access::read, access::global_buffer>(cgh);
+			// TODO: constant_buffer
+			auto spheres = spheres_.get_access<access::read, access::global_buffer>(cgh);
+			auto seeds = seeds_[k].get_access<access::read, access::global_buffer>(cgh);
 
-		cgh.parallel_for<class smallpt>(range<2>(w, lineOffset[k].second), [=](id<2> i) {
-			Vector cx(cx_);
-			Vector cy(cy_);
-			Vector r(r_);
-			RaySycl cam(cam_);
-			uint2 randomSeed;
-			randomSeed = seeds[i] * (i + 1) + i + 1;
+			cgh.parallel_for<class smallpt>(range<2>(w, lineOffset[k].second), [=](id<2> i) {
+				Vector cx(cx_);
+				Vector cy(cy_);
+				Vector r(r_);
+				RaySycl cam(cam_);
+				uint2 randomSeed;
+				randomSeed = seeds[i] * (i + 1) + i + 1;
 
-			c[i] = 0; // Important to start at zero
+				c[i] = 0; // Important to start at zero
 
-			// 2x2 subpixel rows
-			SYCL_FOR(int1 sy = 0, sy < 2, sy++) {
-				// 2x2 subpixel cols
-				SYCL_FOR(int1 sx = 0, sx < 2, sx++) {
-					SYCL_FOR(int1 s = 0, s < samps, s++) {
-						float2 rnew;
-						rnew.x = 2 * getRandom(randomSeed);
-						rnew.y = 2 * getRandom(randomSeed);
+				// 2x2 subpixel rows
+				SYCL_FOR(int1 sy = 0, sy < 2, sy++) {
+					// 2x2 subpixel cols
+					SYCL_FOR(int1 sx = 0, sx < 2, sx++) {
+						SYCL_FOR(int1 s = 0, s < samps, s++) {
+							float2 rnew;
+							rnew.x = 2 * getRandom(randomSeed);
+							rnew.y = 2 * getRandom(randomSeed);
 
-						float2 dd;
+							float2 dd;
 
-						SYCL_IF(rnew.x < 1)
-							dd.x = sqrt(rnew.x) - 1;
-						SYCL_ELSE
-							dd.x = 1 - sqrt(2 - rnew.x);
+							SYCL_IF(rnew.x < 1)
+								dd.x = sqrt(rnew.x) - 1;
+							SYCL_ELSE
+								dd.x = 1 - sqrt(2 - rnew.x);
+							SYCL_END
+
+							SYCL_IF(rnew.y < 1)
+								dd.y = sqrt(rnew.y) - 1;
+							SYCL_ELSE
+								dd.y = 1 - sqrt(2 - rnew.y);
+							SYCL_END
+
+							Vector d =
+								cx * (((sx + .5f + dd.x) / 2 + i[0]) / w - .5f) +
+								cy * (((sy + .5f + dd.y) / 2 + i[1] + lineOffset[k].first) / h - .5f) +
+								cam.d;
+
+							// TODO:
+							Vector rad;
+							radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()), randomSeed);
+							r += rad*(1.f / samps);
+						} // Camera rays are pushed ^^^^^ forward to start in interior
 						SYCL_END
 
-						SYCL_IF(rnew.y < 1)
-							dd.y = sqrt(rnew.y) - 1;
-						SYCL_ELSE
-							dd.y = 1 - sqrt(2 - rnew.y);
-						SYCL_END
+						clamp(r.x);
+						clamp(r.y);
+						clamp(r.z);
 
-						Vector d =
-							cx * (((sx + .5f + dd.x) / 2 + i[0]) / w - .5f) +
-							cy * (((sy + .5f + dd.y) / 2 + i[1] + lineOffset[k].first) / h - .5f) +
-							cam.d;
+						c[i] += r * .25f;
 
-						// TODO:
-						Vector rad;
-						radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()), randomSeed);
-						r += rad*(1.f / samps);
-					} // Camera rays are pushed ^^^^^ forward to start in interior
+						r = Vector();
+					}
 					SYCL_END
-
-					clamp(r.x);
-					clamp(r.y);
-					clamp(r.z);
-
-					c[i] += r * .25f;
-
-					r = Vector();
 				}
 				SYCL_END
-			}
-			SYCL_END
+			});
 		});
-	});
 	}
 
 	for(auto k = 0; k < numParts; ++k) {
 #if _DEBUG
-	cout << "Waiting for kernel to finish ..." << endl;
+		cout << "Waiting for kernel to finish ..." << endl;
 #endif
-	auto c = colors[k].get_access<access::read, access::host_buffer>();
+		auto c = colors[k].get_access<access::read, access::host_buffer>();
 
 #if _DEBUG
-	cout << "Copying results ..." << endl;
+		cout << "Copying results ..." << endl;
 #endif
-	auto start = lineOffset[k].first;
-	auto end = start + lineOffset[k].second;
-	for(int y = start; y < end; ++y) {
-		int i = (y - start)*w;
-		int ri = (h - y - 1) * w;	// Picture is upside down
-		for(int x = 0; x < w; ++x) {
-			auto& ci = c[i];
-			assign(c_[ri], ci);
+		auto start = lineOffset[k].first;
+		auto end = start + lineOffset[k].second;
+		for(int y = start; y < end; ++y) {
+			int i = (y - start)*w;
+			int ri = (h - y - 1) * w;	// Picture is upside down
+			for(int x = 0; x < w; ++x) {
+				auto& ci = c[i];
+				assign(c_[ri], ci);
 
-			++i;
-			++ri;
+				++i;
+				++ri;
+			}
 		}
-	}
 	}
 }
 

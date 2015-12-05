@@ -47,18 +47,17 @@ struct testInfo {
 	using function_ptr = void(*)(int, int, int, Ray&, Vec&, Vec&, Vec, Vec*);
 	string name;
 	function_ptr test;
-	bool isGpu;
 	float lastTime = 0;
 
-	testInfo(string name, function_ptr test, bool isGpu = false)
-		: name(name), test(test), isGpu(isGpu) {}
+	testInfo(string name, function_ptr test)
+		: name(name), test(test) {}
 };
 
 static std::vector<const testInfo> tests = {
 	testInfo("org", compute_org),
 	testInfo("openmp", compute_org_openmp),
 	testInfo("sycl_cpu", compute_sycl_gtx_cpu),
-	testInfo("sycl_gpu", compute_sycl_gtx_gpu, true),
+	testInfo("sycl_gpu", compute_sycl_gtx_gpu),
 	testInfo("org_single", compute_org_sp),
 	testInfo("openmp_single", compute_org_sp_openmp),
 };
@@ -80,12 +79,7 @@ void tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 
 		// Quality of Service
 		// Prevent the user from waiting too long
-		if(t.isGpu) {
-			if(t.lastTime > 15) {
-				continue;
-			}
-		}
-		else if(t.lastTime > 80) {
+		if(t.lastTime > 80) {
 			continue;
 		}
 
