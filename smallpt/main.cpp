@@ -82,7 +82,7 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 
 		// Quality of Service
 		// Prevent the user from waiting too long
-		if(t.lastTime > 80) {
+		if(t.lastTime > 40) {
 			continue;
 		}
 
@@ -110,8 +110,8 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 		t.lastTime = time;
 
 		testInfo::totalTime = duration(testInfo::startTime);
-		if(testInfo::totalTime > 600) {
-			cout << "exceeded 10 minute limit, stopping" << endl;
+		if(testInfo::totalTime > 300) {
+			cout << "exceeded 5 minute limit, stopping" << endl;
 			return false;
 		}
 	}
@@ -235,7 +235,7 @@ int main(int argc, char *argv[]) {
 	int iterations = 1;
 	bool canContinue;
 
-	for(int samples = 10; samples < 10000; samples *= 2) {
+	for(int samples = 5; samples < 10000; samples *= 2) {
 		canContinue = tester(w, h, samples, cx, cy, iterations, from, to);
 		if(!canContinue) {
 			break;
