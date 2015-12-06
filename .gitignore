@@ -9,3 +9,4 @@ Release/
 cl/
 *.stackdump
 *.ppm
+*.o
