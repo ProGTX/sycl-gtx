@@ -207,34 +207,43 @@ int main(int argc, char *argv[]) {
 
 	getDevices();
 
-	bool fromCommand = argc == 2;
 	int w = 1024;
 	int h = 768;
-	int samples = fromCommand ? atoi(argv[1]) / 4 : 10;
-	int iterations = 1;
 	Vec cx = Vec(w*.5135 / h);
 	Vec cy = (cx%cam.d).norm()*.5135;
 	auto numTests = tests.size();
 
-
-	if(fromCommand) {
-		tester(w, h, samples, cx, cy, iterations, 2, numTests);
-	}
-	else {
-		// Test suite
-		iterations = 1;
-		bool canContinue;
-
-		for(samples = 10; samples < 10000; samples *= 2) {
-			canContinue = tester(w, h, samples, cx, cy, iterations, 2, numTests);
-			if(!canContinue) {
-				break;
-			}
+	int from = 2;
+	int to = numTests;
+	if(argc > 1) {
+		from = atoi(argv[1]);
+		if(argc > 2) {
+			to = atoi(argv[2]);
 		}
-
-		auto time = duration(testInfo::startTime);
-		cout << "total test suite duration: " << time << endl;
 	}
+
+	cout << "Going through tests in range [" << from << ',' << to << ')' << endl;
+
+	if(false) {
+		tester(w, h, 1, cx, cy, 1, from, to);
+		cout << "Press any key to exit" << endl;
+		cin.get();
+		return 0;
+	}
+
+	// Test suite
+	int iterations = 1;
+	bool canContinue;
+
+	for(int samples = 10; samples < 10000; samples *= 2) {
+		canContinue = tester(w, h, samples, cx, cy, iterations, from, to);
+		if(!canContinue) {
+			break;
+		}
+	}
+
+	auto time = duration(testInfo::startTime);
+	cout << "total test suite duration: " << time << endl;
 
 	//cout << "Press any key to exit" << endl;
 	//cin.get();
