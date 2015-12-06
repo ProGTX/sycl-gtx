@@ -129,7 +129,7 @@ void assign_c(int w, int h, std::vector<org_sp::Vec>& c, ::Vec* c_) {
 	}
 }
 } // namespace org_sp
-void compute_org_sp(int w, int h, int samps, Ray &cam_, Vec &cx_, Vec &cy_, Vec r_, Vec *c_) {
+void compute_org_sp(void*, int w, int h, int samps, Ray &cam_, Vec &cx_, Vec &cy_, Vec r_, Vec *c_) {
 	org_sp::Ray cam(cam_);
 	org_sp::Vec cx(cx_);
 	org_sp::Vec cy(cy_);
@@ -140,7 +140,7 @@ void compute_org_sp(int w, int h, int samps, Ray &cam_, Vec &cx_, Vec &cy_, Vec 
 	}
 	org_sp::assign_c(w, h, c, c_);
 }
-void compute_org_sp_openmp(int w, int h, int samps, Ray &cam_, Vec &cx_, Vec &cy_, Vec r_, Vec *c_) {
+void compute_org_sp_openmp(void*, int w, int h, int samps, Ray &cam_, Vec &cx_, Vec &cy_, Vec r_, Vec *c_) {
 	org_sp::Ray cam(cam_);
 	org_sp::Vec cx(cx_);
 	org_sp::Vec cy(cy_);

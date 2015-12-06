@@ -11,12 +11,12 @@
 
 using std::string;
 
-extern void compute_org(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
-extern void compute_org_openmp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
-extern void compute_org_sp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
-extern void compute_org_sp_openmp(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
-extern void compute_sycl_gtx_cpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
-extern void compute_sycl_gtx_gpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_org(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_org_openmp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_org_sp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_org_sp_openmp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_sycl_gtx_cpu(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_sycl_gtx_gpu(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
 
 inline double clamp(double x) {
 	return x < 0 ? 0 : x>1 ? 1 : x;
@@ -45,7 +45,7 @@ auto duration = [](time_point before) {
 };
 
 struct testInfo {
-	using function_ptr = void(*)(int, int, int, Ray&, Vec&, Vec&, Vec, Vec*);
+	using function_ptr = void(*)(void*, int, int, int, Ray&, Vec&, Vec&, Vec, Vec*);
 	string name;
 	function_ptr test;
 	float lastTime = 0;
@@ -94,7 +94,7 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 			auto start = now();
 			for(int i = 0; i < iterations; ++i) {
 				vectors = empty_vectors;
-				t.test(w, h, samples, cam, cx, cy, r, vectors.data());
+				t.test(nullptr, w, h, samples, cam, cx, cy, r, vectors.data());
 			}
 			time = (duration(start) / (float)iterations);
 		}

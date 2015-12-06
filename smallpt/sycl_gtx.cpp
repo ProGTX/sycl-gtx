@@ -333,12 +333,12 @@ void assign(T& target, D& data) {
 
 } // ns_sycl_gtx
 
-void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_, cl::sycl::device_selector& selector) {
+void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_) {
 	using namespace std;
 	using namespace cl::sycl;
 	using namespace ns_sycl_gtx;
 
-	queue q(selector);
+	queue q(*(device*)dev);
 
 	unsigned short Xi[3] = { 0, 0, 0 };
 
@@ -483,12 +483,14 @@ void compute_sycl_gtx(int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Ve
 	}
 }
 
-void compute_sycl_gtx_cpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
+void compute_sycl_gtx_cpu(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
 	cl::sycl::cpu_selector cpu;
-	compute_sycl_gtx(w, h, samps, cam, cx, cy, r, c, cpu);
+	cl::sycl::device dev(cpu);
+	compute_sycl_gtx(&dev, w, h, samps, cam, cx, cy, r, c);
 }
 
-void compute_sycl_gtx_gpu(int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
+void compute_sycl_gtx_gpu(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
 	cl::sycl::gpu_selector gpu;
-	compute_sycl_gtx(w, h, samps, cam, cx, cy, r, c, gpu);
+	cl::sycl::device dev(gpu);
+	compute_sycl_gtx(&dev, w, h, samps, cam, cx, cy, r, c);
 }
