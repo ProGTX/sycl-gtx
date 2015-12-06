@@ -6,9 +6,9 @@ CFLAGS=-c -Wall -std=c++11 $(INC)
 LIB=-L$(INTELOCLSDKROOT)lib\x64
 LDFLAGS=$(LIB) -lOpenCL
 
-SOURCES=data_ref.cpp
+SOURCES=data_ref.cpp kernel_name.cpp synchronizer.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=data_ref
+EXECUTABLE=implementation
 
 all: $(SOURCES) $(EXECUTABLE)
     
