@@ -41,17 +41,17 @@ struct range<3> : detail::point<3> {
 namespace detail {
 
 template <int dimensions>
-static range<dimensions> empty_range();
+inline range<dimensions> empty_range();
 template <>
-static range<1> empty_range() {
+inline range<1> empty_range() {
 	return range<1>(0);
 }
 template <>
-static range<2> empty_range() {
+inline range<2> empty_range() {
 	return range<2>(0, 0);
 }
 template <>
-static range<3> empty_range() {
+inline range<3> empty_range() {
 	return range<3>(0, 0, 0);
 }
 

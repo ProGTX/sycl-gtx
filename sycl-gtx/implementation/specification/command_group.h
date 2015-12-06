@@ -12,15 +12,19 @@ namespace sycl {
 
 // Forward declarations
 class event;
+class handler;
 class kernel;
 class queue;
 
 namespace detail {
 
 // Forward declaration
-class command_group;
+static inline unique_ptr_class<handler> get_handler(queue* q);
 
 namespace command {
+
+// Forward declaration
+class group_;
 
 enum class type_t {
 	unspecified,
@@ -56,7 +60,7 @@ struct buffer_copy {
 };
 
 union metadata {
-	nullptr_t empty;
+	std::nullptr_t empty;
 	buffer_access buf_acc;
 	buffer_copy buf_copy;
 
@@ -78,6 +82,66 @@ struct info {
 
 	static void do_nothing(queue* q, const vector_class<cl_event>&) {}
 };
+
+} // namespace command
+
+
+// A command group in SYCL as it is defined in 2.3.1 includes a kernel to be enqueued along with all the commands
+// for queued data transfers that it needs in order for its execution to be successful.
+class command_group {
+private:
+	friend class kernel;
+	friend class command::group_;
+	friend class queue;
+	using command_t = command::info;
+	using command_f = command_t::command_f;
+
+	vector_class<command_t> commands;
+	std::set<buffer_base*> read_buffers;
+	std::set<buffer_base*> write_buffers;
+	queue* q;
+
+	void enter();
+	void exit();
+
+public:
+	command_group(queue* q)
+		: q(q) {}
+
+	template <typename functorT>
+	command_group(functorT lambda)
+		: q(nullptr) {
+		enter();
+		auto cgh = get_handler(q);
+		lambda(*cgh);
+		exit();
+	}
+
+	// Constructs a command group with the queue the group will enqueue its commands to
+	// and a lambda function or function object containing the body of commands to enqueue.
+	template <typename functorT>
+	command_group(queue& primaryQueue, functorT lambda)
+		: q(&primaryQueue) {
+		enter();
+		auto cgh = get_handler(q);
+		lambda(*cgh);
+		exit();
+	}
+
+	// TODO
+	// Constructs a command group from a primary queue to be used in order to enqueue its commands to
+	// and a lambda function or function object containing the body of commands to enqueue.
+	// If the command group execution fails in the primary queue,
+	// the SYCL runtime will try to re-schedule the whole command group to the secondary queue.
+	template <typename functorT>
+	command_group(queue& primaryQueue, queue& secondaryQueue, functorT lambda);
+
+	void optimize();
+	void flush(vector_class<cl_event> wait_events);
+};
+
+
+namespace command {
 
 class group_ {
 private:
@@ -166,61 +230,6 @@ public:
 };
 
 } // namespace command
-
-
-// A command group in SYCL as it is defined in 2.3.1 includes a kernel to be enqueued along with all the commands
-// for queued data transfers that it needs in order for its execution to be successful.
-class command_group {
-private:
-	friend class kernel;
-	friend class command::group_;
-	friend class queue;
-	using command_f = command::group_::command_f;
-	using command_t = command::info;
-
-	vector_class<command_t> commands;
-	std::set<buffer_base*> read_buffers;
-	std::set<buffer_base*> write_buffers;
-	queue* q;
-
-	void enter();
-	void exit();
-
-public:
-	command_group(queue* q)
-		: q(q) {}
-
-	template <typename functorT>
-	command_group(functorT lambda)
-		: q(nullptr) {
-		enter();
-		handler cgh(q);
-		lambda(cgh);
-		exit();
-	}
-
-	// Constructs a command group with the queue the group will enqueue its commands to
-	// and a lambda function or function object containing the body of commands to enqueue.
-	template <typename functorT>
-	command_group(queue& primaryQueue, functorT lambda)
-		: q(&primaryQueue) {
-		enter();
-		handler cgh(q);
-		lambda(cgh);
-		exit();
-	}
-
-	// TODO
-	// Constructs a command group from a primary queue to be used in order to enqueue its commands to
-	// and a lambda function or function object containing the body of commands to enqueue.
-	// If the command group execution fails in the primary queue,
-	// the SYCL runtime will try to re-schedule the whole command group to the secondary queue.
-	template <typename functorT>
-	command_group(queue& primaryQueue, queue& secondaryQueue, functorT lambda);
-
-	void optimize();
-	void flush(vector_class<cl_event> wait_events);
-};
 
 } // namespace detail
 

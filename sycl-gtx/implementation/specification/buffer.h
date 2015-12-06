@@ -70,7 +70,7 @@ protected:
 			is_read_only(is_read_only),
 			is_blocking(is_blocking) {}
 
-	buffer_(nullptr_t host_data, range<dimensions> range)
+	buffer_(std::nullptr_t host_data, range<dimensions> range)
 		: buffer_(nullptr, range, false) {}
 
 public:

@@ -8,6 +8,7 @@
 #include "../access.h"
 #include "../accessor.h"
 #include "../ranges/id.h"
+#include "../../src_handlers/register_resource.h"
 #include "../../common.h"
 #include "../../data_ref.h"
 
@@ -23,10 +24,12 @@ SYCL_ACCESSOR_CLASS(
 	public accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>
 {
 private:
-	template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
+	template <int, typename, int, access::mode, access::target>
 	friend class accessor_device_ref;
 
 	using return_t = typename acc_device_return<DataType>::type;
+	using base_acc_buffer = accessor_buffer<DataType, dimensions>;
+	using base_acc_device_ref = accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>;
 
 public:
 	accessor_(
@@ -34,8 +37,8 @@ public:
 		handler* commandGroupHandler,
 		range<dimensions> offset,
 		range<dimensions> range
-	)	:	accessor_buffer(bufferRef, commandGroupHandler, offset, range),
-			accessor_device_ref(this, {})
+	)	:	base_acc_buffer(bufferRef, commandGroupHandler, offset, range),
+			base_acc_device_ref(this, {})
 	{}
 	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef, handler* commandGroupHandler)
 		: accessor_(
@@ -45,25 +48,20 @@ public:
 			bufferRef.get_range()
 		) {}
 	accessor_(const accessor_& copy)
-		:	accessor_buffer((const accessor_buffer<DataType, dimensions>&)copy),
-			accessor_device_ref(this, copy)
+		:	base_acc_buffer((const base_acc_buffer&)copy),
+			base_acc_device_ref(this, copy)
 	{}
 	accessor_(accessor_&& move)
-		:	accessor_buffer(std::move((accessor_buffer<DataType, dimensions>)move)),
-			accessor_device_ref(
-				this,
-				std::move(
-					(accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>)move
-				)
-			)
+		:	base_acc_buffer(std::move((base_acc_buffer)move)),
+			base_acc_device_ref(this, std::move((base_acc_device_ref)move))
 	{}
 
 	virtual cl_mem get_cl_mem_object() const override {
-		return get_buffer_object();
+		return base_acc_buffer::get_buffer_object();
 	}
 
 	return_t operator[](id<dimensions> index) const {
-		auto resource_name = kernel_::source::register_resource(*this);
+		auto resource_name = kernel_::register_resource(*this);
 		return return_t(
 			resource_name + "[" + data_ref::get_name(index) + "]"
 		);
@@ -72,11 +70,11 @@ public:
 private:
 	using subscript_return_t = typename subscript_helper<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>::type;
 public:
-	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS();
+	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(base_acc_device_ref::);
 
 protected:
 	virtual void* resource() const override {
-		return buf;
+		return base_acc_buffer::buf;
 	}
 
 	virtual size_t argument_size() const override {

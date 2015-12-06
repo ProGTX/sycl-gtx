@@ -20,8 +20,11 @@ SYCL_ACCESSOR_CLASS(target == access::local),
 	protected counter<accessor_<DataType, dimensions, mode, target>>,
 	public accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>
 {
+private:
+	using base_acc_device_ref = accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>;
+
 protected:
-	template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
+	template <int level, typename, int, access::mode, access::target>
 	friend class accessor_device_ref;
 
 	range<dimensions> allocationSize;
@@ -40,8 +43,8 @@ protected:
 
 public:
 	accessor_(range<dimensions> allocationSize)
-		:	accessor_device_ref(this, {}),
-			allocationSize(allocationSize) {
+	:	base_acc_device_ref(this, {}),
+		allocationSize(allocationSize) {
 		// TODO
 		if(command::group_::in_scope()) {
 			command::group_::add(
@@ -54,7 +57,7 @@ public:
 private:
 	using subscript_return_t = typename subscript_helper<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>::type;
 public:
-	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS();
+	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(base_acc_device_ref::);
 };
 
 } // namespace detail

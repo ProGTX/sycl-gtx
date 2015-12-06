@@ -41,7 +41,7 @@ private:
 public:
 	// The default object is not valid because there is no program or cl_kernel associated with it
 	kernel() = delete;
-	kernel(nullptr_t) = delete;
+	kernel(std::nullptr_t) = delete;
 
 	// Constructs from a valid, initialized OpenCL kernel
 	kernel(cl_kernel openclKernelObject);

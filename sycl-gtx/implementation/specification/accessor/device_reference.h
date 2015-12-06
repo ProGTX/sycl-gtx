@@ -3,6 +3,7 @@
 #include "../access.h"
 #include "../accessor.h"
 #include "../ranges/id.h"
+#include "../../src_handlers/register_resource.h"
 #include "../../common.h"
 #include "../../data_ref.h"
 
@@ -13,6 +14,7 @@ namespace detail {
 // Forward declaration
 template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_device_ref;
+
 
 template <typename DataType>
 struct acc_device_return {
@@ -30,7 +32,7 @@ struct subscript_helper<1, DataType, dimensions, mode, target> {
 
 #define SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR()									\
 	using acc_t = accessor_<DataType, dimensions, mode, target>;				\
-	friend class acc_t;															\
+	friend acc_t;																\
 	friend class accessor_device_ref;											\
 	const acc_t* parent;														\
 	vector_class<string_class> rang;											\
@@ -46,14 +48,14 @@ struct subscript_helper<1, DataType, dimensions, mode, target> {
 		std::swap(first.rang, second.rang);										\
 	}
 
-#define SYCL_DEVICE_REF_SUBSCRIPT_OP(type)						\
+#define SYCL_DEVICE_REF_SUBSCRIPT_OP(prefix, type)				\
 	subscript_return_t operator[](const type& index) const {	\
-		return subscript(index);								\
+		return prefix subscript(index);							\
 	}
 
-#define SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS()	\
-	SYCL_DEVICE_REF_SUBSCRIPT_OP(data_ref);		\
-	SYCL_DEVICE_REF_SUBSCRIPT_OP(size_t);
+#define SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(prefix)	\
+	SYCL_DEVICE_REF_SUBSCRIPT_OP(prefix, data_ref);	\
+	SYCL_DEVICE_REF_SUBSCRIPT_OP(prefix, size_t);
 
 template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_device_ref {
@@ -67,7 +69,7 @@ protected:
 		return subscript_return_t(parent, rang_copy);
 	}
 public:
-	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS();
+	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(this->);
 };
 
 template <typename DataType, int dimensions, access::mode mode, access::target target>
@@ -87,13 +89,13 @@ protected:
 			ind += string_class(" + ") + std::move(rang_copy[i]) + " * " + get_string<decltype(multiplier)>::get(multiplier);
 			multiplier *= parent->access_buffer_range(i);
 		}
-		auto resource_name = kernel_::source::register_resource(*parent);
+		auto resource_name = kernel_::register_resource(*parent);
 		return subscript_return_t(
 			resource_name + "[" + ind + "]"
 		);
 	}
 public:
-	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS();
+	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(this->);
 };
 
 } // namespace detail

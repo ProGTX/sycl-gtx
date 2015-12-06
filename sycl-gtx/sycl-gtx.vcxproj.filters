@@ -248,5 +248,8 @@
     <ClInclude Include="implementation\specification\vector_members.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\src_handlers\register_resource.h">
+      <Filter>Header Files\src_handlers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

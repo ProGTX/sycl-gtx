@@ -26,14 +26,14 @@ template <size_t dimensions>
 struct point : data_ref {
 protected:
 	friend class data_ref;
-	template <size_t dimensions>
+	template <size_t>
 	friend struct point;
 
-	template <int dimensions>
+	template <int>
 	friend struct get_special_id;
-	template <int dimensions>
+	template <int>
 	friend struct get_special_range;
-	template <int dimensions, bool is_id>
+	template <int, bool>
 	friend struct identifier_code;
 
 	static string_class name_from_type(type_t type) {

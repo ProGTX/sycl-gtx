@@ -4,7 +4,6 @@
 
 #include "access.h"
 #include "handler_event.h"
-#include "kernel.h"
 #include "ranges.h"
 #include "../src_handlers/issue_command.h"
 #include "../common.h"
@@ -13,13 +12,21 @@
 namespace cl {
 namespace sycl {
 
-// Forward declaration
+// Forward declarations
+class kernel;
 class queue;
+
+class handler;
+namespace detail {
+static unique_ptr_class<handler> get_handler(queue* q);
+}
 
 // 3.5.3.4 Command group handler class
 class handler {
 private:
 	friend class detail::command_group;
+	friend unique_ptr_class<handler> detail::get_handler(queue* q);
+
 	queue* q;
 	handler_event events;
 
@@ -135,6 +142,7 @@ public:
 
 	// OpenCL interoperability invoke
 
+	template <bool = true>
 	void single_task(kernel syclKernel) {
 		auto kern = shared_ptr_class<kernel>(new kernel(std::move(syclKernel)));
 		issue_enqueue(kern, &issue::enqueue_task);
@@ -152,6 +160,13 @@ public:
 		issue_enqueue(kern, &issue::enqueue_nd_range, ndRange);
 	}
 };
+
+namespace detail {
+// Required for Clang
+static unique_ptr_class<handler> get_handler(queue* q) {
+	return unique_ptr_class<handler>(new handler(q));
+}
+}
 
 } // namespace sycl
 } // namespace cl

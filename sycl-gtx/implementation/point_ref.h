@@ -50,7 +50,7 @@ public:
 	operator data_basic_t() const {
 		return data;
 	}
-	template <class = typename std::enable_if<!is_const>::type>
+	// TODO: Only allow on is_const
 	operator data_basic_t&() {
 		return data;
 	}

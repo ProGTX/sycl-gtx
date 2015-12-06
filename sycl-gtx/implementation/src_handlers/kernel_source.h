@@ -114,6 +114,11 @@ public:
 	static string_class get_name(access::target target);
 };
 
+template <typename DataType, int dimensions, access::mode mode, access::target target>
+static string_class register_resource(const accessor_core<DataType, dimensions, mode, target>& acc) {
+	return source::register_resource(acc);
+}
+
 } // namespace kernel_
 } // namespace detail
 
