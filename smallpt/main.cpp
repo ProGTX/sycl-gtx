@@ -119,6 +119,28 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 	return true;
 }
 
+struct version {
+	int major = 0;
+	int minor = 0;
+
+	version(int major, int minor)
+		: major(major), minor(minor) {}
+	version(const string& v) {
+		// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetPlatformInfo.html
+		using namespace std;
+		string search("OpenCL");
+		auto pos = v.find(search);
+		if(pos != string::npos) {
+			pos += search.length() + 1;	// Plus one for space
+			try {
+				major = (int)v.at(pos) - '0';
+				minor = (int)v.at(pos + 2) - '0';; // Plus one for dot
+			}
+			catch(std::exception& e) {}
+		}
+	}
+};
+
 template <class T>
 void printInfo(string description, const T& data, int offset = 0) {
 	string indent;
@@ -136,12 +158,16 @@ void getDevices() {
 
 		auto platforms = platform::get_platforms();
 
+		version required(1, 2);
+
 		int pNum = 0;
 		for(auto& p : platforms) {
 			cout << "- OpenCL platform " << pNum << ':' << endl;
 			++pNum;
 
 			auto openclVersion = p.get_info<info::platform::version>();
+
+			version platformVersion(openclVersion);
 
 			printInfo("name", p.get_info<info::platform::name>(), 1);
 			printInfo("vendor", p.get_info<info::platform::vendor>(), 1);
@@ -183,7 +209,12 @@ void getDevices() {
 				printInfo("local_mem_size", d.get_info<info::device::local_mem_size>(), 2);
 				printInfo("extensions", d.get_info<info::device::extensions>(), 2);
 
-				tests.emplace_back(name + ' ' + openclVersion, compute_sycl_gtx, new device(std::move(d)));
+				if(
+					platformVersion.major > required.major ||
+					(platformVersion.major == required.major && platformVersion.minor >= required.minor)
+				) {
+					tests.emplace_back(name + ' ' + openclVersion, compute_sycl_gtx, new device(std::move(d)));
+				}
 
 				++dNum;
 			}
