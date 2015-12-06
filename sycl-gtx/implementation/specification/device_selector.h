@@ -28,8 +28,6 @@ protected:
 		: type(type)
 	{}
 public:
-	static const unique_ptr_class<device_selector> default;
-
 	device_selector() : device_selector(info::device_type::all) {}
 	device select_device() const;
 	virtual int operator()(const device& dev) const = 0;
@@ -67,6 +65,14 @@ struct host_selector : device_selector {
 		: device_selector(info::device_type::defaults) {}
 	virtual int operator()(const device& dev) const override;
 };
+
+namespace detail {
+static const unique_ptr_class<device_selector>& default_device_selector() {
+	using ptr_t = unique_ptr_class<device_selector>;
+	static const ptr_t selector(ptr_t(new default_selector()));
+	return selector;
+}
+}
 
 } // namespace sycl
 } // namespace cl

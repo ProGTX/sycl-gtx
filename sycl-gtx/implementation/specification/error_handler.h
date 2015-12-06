@@ -41,22 +41,21 @@ struct thrower {
 		debug("SYCL_ERROR::", error.what());
 		throw error;
 	}
-	template <bool delay_linkage = true>
-	static void report_async(context* thrower, exception_list& list) {
-		thrower->asyncHandler(list);
-	}
+	static void report_async(context* thrower, exception_list& list);
 };
 
 // Synchronous error reporting
 static void report(cl_int error_code, context* thrower = nullptr) {
 	if(error_code != CL_SUCCESS) {
-		thrower::report(thrower::get(error_code, thrower));
+		auto e = thrower::get(error_code, thrower);
+		thrower::report(e);
 	}
 }
 
 // Synchronous error reporting
 static void report(code::value_t error_code, context* thrower = nullptr) {
-	thrower::report(thrower::get(error_code, thrower));
+	auto e = thrower::get(error_code, thrower);
+	thrower::report(e);
 }
 
 } // namespace error

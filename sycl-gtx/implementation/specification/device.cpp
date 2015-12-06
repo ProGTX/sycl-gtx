@@ -13,7 +13,7 @@ device::device(cl_device_id device_id, device_selector* dev_sel)
 }
 
 device::device()
-	: device(nullptr, device_selector::default.get()) {}
+	: device(nullptr, detail::default_device_selector().get()) {}
 
 device::device(cl_device_id device_id)
 	: device(device_id, nullptr) {}

@@ -39,7 +39,7 @@ private:
 		info::gl_context_interop interopFlag,
 		vector_class<device> deviceList = {},
 		const platform* plt = nullptr,
-		const device_selector& deviceSelector = *(device_selector::default)
+		const device_selector& deviceSelector = *(detail::default_device_selector())
 	);
 public:
 	// Default constructor that chooses the context according the heuristics of the default selector.
@@ -92,7 +92,7 @@ private:
 	template <class Contained_, info::context param, size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
 	struct array_traits : detail::array_traits<Contained_, info::context, param, BufferSize> {
 		void get_info(const context* ctx) {
-			Base::get(ctx->ctx.get());
+			this->Base::get(ctx->ctx.get());
 		}
 	};
 
@@ -100,16 +100,17 @@ private:
 	struct traits
 		: array_traits<return_t, param, 1> {
 		return_t get(const context* ctx) {
-			get_info(ctx);
-			return param_value[0];
+			this->get_info(ctx);
+			return this->param_value[0];
 		}
 	};
 	template <typename Contained, info::context param>
 	struct traits<vector_class<Contained>, param>
 		: array_traits<Contained, param> {
+		using Container = typename array_traits<Contained, param>::Container;
 		Container get(const context* ctx) {
-			get_info(ctx);
-			return Container(param_value, param_value + actual_size / type_size);
+			this->get_info(ctx);
+			return Container(this->param_value, this->param_value + this->actual_size / this->type_size);
 		}
 	};
 

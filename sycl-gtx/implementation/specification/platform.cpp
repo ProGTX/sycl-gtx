@@ -15,7 +15,7 @@ platform::platform(cl_platform_id platform_id, device_selector& dev_selector)
 platform::platform()
 	: platform(nullptr) {}
 platform::platform(cl_platform_id platform_id)
-	: platform(platform_id, *device_selector::default.get()) {}
+	: platform(platform_id, *detail::default_device_selector().get()) {}
 platform::platform(device_selector& dev_selector)
 	: platform(nullptr, dev_selector) {}
 

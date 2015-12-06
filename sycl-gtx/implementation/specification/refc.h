@@ -59,7 +59,7 @@ public:
 	}
 
 	void release_one() {
-		call_release(get());
+		call_release(this->get());
 	}
 
 	refc& operator=(CL_Type data) {

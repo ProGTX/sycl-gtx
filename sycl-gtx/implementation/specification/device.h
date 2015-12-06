@@ -77,7 +77,7 @@ private:
 	template <class Contained_, info::device param, size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
 	struct array_traits : detail::array_traits<Contained_, info::device, param, BufferSize> {
 		void get_info(const device* dev) {
-			Base::get(dev->device_id.get());
+			this->Base::get(dev->device_id.get());
 		}
 	};
 
@@ -88,8 +88,8 @@ private:
 	struct traits<return_t, param, typename std::enable_if<std::is_integral<return_t>::value, typename std::false_type::type>::type>
 		: array_traits<return_t, param, 1> {
 		return_t get(const device* dev) {
-			get_info(dev);
-			return param_value[0];
+			this->get_info(dev);
+			return this->param_value[0];
 		}
 	};
 
@@ -106,15 +106,15 @@ private:
 		using return_t = vector_class<EnumClass>;
 		return_t convert() {
 			return_t ret;
-			auto size = actual_size / type_size;
+			auto size = this->actual_size / this->type_size;
 			ret.reserve(size);
 			for(size_t i = 0; i < size; ++i) {
-				ret.push_back((EnumClass)param_value[i]);
+				ret.push_back((EnumClass)this->param_value[i]);
 			}
 			return ret;
 		}
 		return_t get(const device* dev) {
-			get_info(dev);
+			this->get_info(dev);
 			return convert();
 		}
 	};
@@ -123,8 +123,8 @@ private:
 	struct traits<string_class, param>
 		: array_traits<string_class, param> {
 		string_class get(const device* dev) {
-			get_info(dev);
-			return string_class(param_value);
+			this->get_info(dev);
+			return string_class(this->param_value);
 		}
 	};
 
@@ -132,8 +132,8 @@ private:
 	struct traits<id<3>, param>
 		: array_traits<size_t, param, 3> {
 		id<3> get(const device* dev) {
-			get_info(dev);
-			return id<3>(param_value[0], param_value[1], param_value[2]);
+			this->get_info(dev);
+			return id<3>(this->param_value[0], this->param_value[1], this->param_value[2]);
 		}
 	};
 
@@ -143,13 +143,13 @@ private:
 		using return_t = vector_class<Contained_>;	// TODO: Why isn't return_t inherited? May be a bug.
 		return_t get(const device* dev) {
 			// TODO: I have no idea how to handle this case
-			get_info(dev);
-			if(actual_size == 0) {
+			this->get_info(dev);
+			if(this->actual_size == 0) {
 				return_t ret;
 				ret.push_back(info::device_partition_type::no_partition);
 				return ret;
 			}
-			return convert();
+			return this->convert();
 		}
 	};
 

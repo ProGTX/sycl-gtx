@@ -15,6 +15,7 @@ struct param_traits;
 template <typename EnumClass, EnumClass Value>
 using param_traits_t = typename param_traits<EnumClass, Value>::type;
 
+
 namespace detail {
 
 template <typename EnumClass, EnumClass Value, typename ReturnType, typename CLType>
@@ -98,28 +99,6 @@ struct trait_return<true> {
 		return value[0];
 	}
 };
-
-template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize = traits<Contained_>::BUFFER_SIZE>
-struct array_traits : traits<Contained_, BufferSize> {
-	using Base = array_traits<Contained_, EnumClass, param, BufferSize>;
-	using return_t = typename std::conditional<BufferSize == 1, Contained, Contained*>::type;
-	Contained param_value[BUFFER_SIZE];
-	size_t actual_size = 0;
-
-	template <typename cl_input_t>
-	return_t get(cl_input_t data_ptr) {
-		auto error_code = info_function<EnumClass>::get(
-			data_ptr, (param_traits<EnumClass, param>::cl_flag_type)param, BUFFER_SIZE * type_size, param_value, &actual_size
-		);
-		error::report(error_code);
-		return trait_return<BufferSize == 1>::get(param_value);
-	}
-};
-
-// Meant for scalar and string cases
-template <class EnumClass, EnumClass param, size_t BufferSize = traits<param_traits_t<EnumClass, param>>::BUFFER_SIZE>
-struct non_vector_traits
-	: array_traits<param_traits_t<EnumClass, param>, EnumClass, param, BufferSize> {};
 
 } // namespace detail
 
@@ -358,6 +337,39 @@ SYCL_ADD_EVENT_PROFILING_TRAIT(info::event_profiling::command_end,		cl_ulong)
 
 
 #undef SYCL_ADD_TRAIT
+
+
+namespace detail {
+
+template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize = traits<Contained_>::BUFFER_SIZE>
+struct array_traits : traits<Contained_, BufferSize> {
+	using Base = array_traits<Contained_, EnumClass, param, BufferSize>;
+	using RealBase = traits<Contained_, BufferSize>;
+	using Contained = typename RealBase::Contained;
+	using return_t = typename std::conditional<BufferSize == 1, Contained, Contained*>::type;
+	Contained param_value[RealBase::BUFFER_SIZE];
+	size_t actual_size = 0;
+
+	template <typename cl_input_t>
+	return_t get(cl_input_t data_ptr) {
+		auto error_code = info_function<EnumClass>::get(
+			data_ptr,
+			(typename param_traits<EnumClass, param>::cl_flag_type)param,
+			RealBase::BUFFER_SIZE * RealBase::type_size,
+			param_value,
+			&actual_size
+		);
+		error::report(error_code);
+		return trait_return<BufferSize == 1>::get(param_value);
+	}
+};
+
+// Meant for scalar and string cases
+template <class EnumClass, EnumClass param, size_t BufferSize = traits<param_traits_t<EnumClass, param>>::BUFFER_SIZE>
+struct non_vector_traits
+	: array_traits<param_traits_t<EnumClass, param>, EnumClass, param, BufferSize> {};
+
+} // namespace detail
 
 } // namespace sycl
 } // namespace cl

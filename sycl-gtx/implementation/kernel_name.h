@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstddef>
+
+
 namespace cl {
 namespace sycl {
 
