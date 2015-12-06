@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include <unordered_map>
+#include <map>
 
 namespace cl {
 namespace sycl {
@@ -106,7 +106,7 @@ struct code {
 #define SYCL_ADD_ERROR(value)	\
 	{ value, #value }
 
-static const std::unordered_map<code::value_t, string_class> codes = {
+static const std::map<code::value_t, string_class> codes = {
 	SYCL_ADD_ERROR(code::GENERAL_FAILURE),
 	SYCL_ADD_ERROR(code::NOT_IN_COMMAND_GROUP_SCOPE),
 	SYCL_ADD_ERROR(code::TRYING_TO_WRITE_READ_ONLY_BUFFER),

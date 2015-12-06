@@ -5,7 +5,7 @@
 #include "../common.h"
 #include "../counter.h"
 #include "../debug.h"
-#include <unordered_map>
+#include <map>
 
 
 namespace cl {
@@ -44,7 +44,7 @@ private:
 
 	string_class kernel_name;
 	vector_class<string_class> lines;
-	std::unordered_map<void*, buf_info> resources;
+	std::map<void*, buf_info> resources;
 
 	// TODO: Multithreading support
 	SYCL_THREAD_LOCAL static source* scope;

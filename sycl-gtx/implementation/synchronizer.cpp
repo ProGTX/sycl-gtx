@@ -8,7 +8,7 @@ using namespace cl::sycl;
 using namespace detail;
 
 std::set<queue*> synchronizer::queues;
-std::unordered_map<accessor_base*, buffer_base*> synchronizer::host_accessors;
+std::map<accessor_base*, buffer_base*> synchronizer::host_accessors;
 
 void synchronizer::wait_on_queues(buffer_base* buf) {
 	for(auto&& q : queues) {

@@ -13,7 +13,7 @@
 #include "../kernel_name.h"
 #include "../src_handlers/invoke_source.h"
 #include "../src_handlers/kernel_source.h"
-#include <unordered_map>
+#include <map>
 
 namespace cl {
 namespace sycl {
@@ -34,7 +34,7 @@ protected:
 
 	context ctx;
 	vector_class<device> devices;
-	std::unordered_map<size_t, shared_ptr_class<kernel>> kernels;
+	std::map<size_t, shared_ptr_class<kernel>> kernels;
 
 	program(cl_program clProgram, const context& context, vector_class<device> deviceList);
 
