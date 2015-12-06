@@ -482,15 +482,3 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 		}
 	}
 }
-
-void compute_sycl_gtx_cpu(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
-	cl::sycl::cpu_selector cpu;
-	cl::sycl::device dev(cpu);
-	compute_sycl_gtx(&dev, w, h, samps, cam, cx, cy, r, c);
-}
-
-void compute_sycl_gtx_gpu(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c) {
-	cl::sycl::gpu_selector gpu;
-	cl::sycl::device dev(gpu);
-	compute_sycl_gtx(&dev, w, h, samps, cam, cx, cy, r, c);
-}
