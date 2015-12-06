@@ -97,18 +97,20 @@ public:
 		return *this;
 	}
 
-#define SYCL_POINT_REF_ARITH_OP(OP)																\
+#define SYCL_POINT_REF_ARITH_ASSIGN(OP)															\
 	template <typename T, class = if_is_num_assignable<T>>										\
-	point_ref& operator OP=(T n) {																\
+	point_ref& operator OP(T n) {																\
 		if(type == type_t::numeric) {															\
-			data OP= n;																			\
+			data OP n;																			\
 			name = get_string<T>::get(data);													\
 		}																						\
 		else {																					\
-			data_ref::operator OP=(n);															\
+			data_ref::operator OP(n);															\
 		}																						\
 		return *this;																			\
-	}																							\
+	}
+
+#define SYCL_POINT_REF_ARITH_OP(OP)																\
 	template <typename T, class = if_is_numeric<T>>												\
 	value_point_t operator OP(T n) const {														\
 		if(type == type_t::numeric) {															\
@@ -119,8 +121,8 @@ public:
 			return value_point_t(std::move(ret.name), ret.type, true);							\
 		}																						\
 	}																							\
-	template <bool is_const, typename data_basic_t, bool holds_pointer>							\
-	value_point_t operator OP(point_ref<is_const, data_basic_t, holds_pointer> pref) const {	\
+	template <bool is_const_, typename data_basic_t_, bool holds_pointer_>						\
+	value_point_t operator OP(point_ref<is_const_, data_basic_t_, holds_pointer_> pref) const {	\
 		if(type == type_t::numeric && pref.type == type_t::numeric) {							\
 			return value_point_t(data OP pref.data, type, true);								\
 		}																						\
@@ -134,11 +136,11 @@ public:
 	}																							\
 	template <typename T, class = if_is_numeric<T>>												\
 	friend value_point_t operator OP(T n, const point_ref& rhs) {								\
-		if(type == type_t::numeric) {															\
-			return value_point_t(n OP data, type, true);										\
+		if(rhs.type == type_t::numeric) {														\
+			return value_point_t(n OP rhs.data, rhs.type, true);								\
 		}																						\
 		else {																					\
-			auto ret = data_ref::operator OP(n, *this);											\
+			auto ret = rhs.data_ref::operator OP(n, rhs);										\
 			return value_point_t(std::move(ret.name), ret.type, true);							\
 		}																						\
 	}
@@ -154,6 +156,18 @@ public:
 	SYCL_POINT_REF_ARITH_OP(^)
 	SYCL_POINT_REF_ARITH_OP(|)
 
+	SYCL_POINT_REF_ARITH_ASSIGN(+=)
+	SYCL_POINT_REF_ARITH_ASSIGN(-=)
+	SYCL_POINT_REF_ARITH_ASSIGN(*=)
+	SYCL_POINT_REF_ARITH_ASSIGN(/=)
+	SYCL_POINT_REF_ARITH_ASSIGN(%=)
+	SYCL_POINT_REF_ARITH_ASSIGN(>>=)
+	SYCL_POINT_REF_ARITH_ASSIGN(<<=)
+	SYCL_POINT_REF_ARITH_ASSIGN(&=)
+	SYCL_POINT_REF_ARITH_ASSIGN(^=)
+	SYCL_POINT_REF_ARITH_ASSIGN(|=)
+
+#undef SYCL_POINT_REF_ARITH_ASSIGN
 #undef SYCL_POINT_REF_ARITH_OP
 };
 

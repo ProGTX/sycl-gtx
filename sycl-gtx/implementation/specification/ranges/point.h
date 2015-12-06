@@ -19,7 +19,7 @@ struct point_names {
 
 #define SYCL_POINT_OP_EQ(lhs, op)				\
 	for(size_t i = 0; i < dimensions; ++i) {	\
-		lhs values[i] op= rhs.values[i];		\
+		lhs values[i] op rhs.values[i];			\
 	}
 
 template <size_t dimensions>
@@ -64,7 +64,7 @@ protected:
 
 	void set(point& rhs) {
 		set(rhs.type);
-		SYCL_POINT_OP_EQ(this->, );
+		SYCL_POINT_OP_EQ(this->, =);
 	}
 
 	void set(size_t value) {
@@ -102,12 +102,28 @@ protected:
 
 public:
 
-#define SYCL_POINT_ARITH_OP(OP)											\
-	point& operator OP=(const data_ref& rhs) {							\
-		set(type_t::general);											\
-		return data_ref::operator OP=(rhs);								\
+	// Warning: Extremely ugly, split in two parts to appease Clangs aversion to the equality sign
+#define SYCL_POINT_ARITH_OP_P1(OP)										\
+	data_ref operator OP(const data_ref& rhs) const {					\
+		return data_ref::operator OP(rhs);								\
 	}																	\
-	point& operator OP=(const point& rhs) {								\
+	point operator OP(const point& rhs) const {							\
+		point lhs(*this);												\
+		if(type == type_t::numeric && rhs.type == type_t::numeric) {	\
+			SYCL_POINT_OP_EQ(lhs.,  OP);								\
+		}
+#define SYCL_POINT_ARITH_OP_P2(OP)										\
+		else {															\
+			lhs.set(type_t::general);									\
+			((data_ref)lhs).operator OP(rhs);							\
+		}																\
+		return lhs;														\
+	}																	\
+	point& operator OP(const data_ref& rhs) {							\
+		set(type_t::general);											\
+		return data_ref::operator OP(rhs);								\
+	}																	\
+	point& operator OP(const point& rhs) {								\
 		if(type == type_t::numeric && rhs.type == type_t::numeric) {	\
 			SYCL_POINT_OP_EQ(this->, OP);								\
 			if(dimensions == 1) {										\
@@ -115,36 +131,33 @@ public:
 			}															\
 		}																\
 		else {															\
-			return operator OP=((data_ref)rhs);							\
+			return operator OP((data_ref)rhs);							\
 		}																\
-	}																	\
-	point operator OP(const point& rhs) const {							\
-		point lhs(*this);												\
-		if(type == type_t::numeric && rhs.type == type_t::numeric) {	\
-			SYCL_POINT_OP_EQ(lhs.,  OP);								\
-		}																\
-		else {															\
-			lhs.set(type_t::general);									\
-			((data_ref)lhs).operator OP=(rhs);							\
-		}																\
-		return lhs;														\
-	}																	\
-	data_ref operator OP(const data_ref& rhs) const {					\
-		return data_ref::operator OP(rhs);								\
 	}
 
-	SYCL_POINT_ARITH_OP(+)
-	SYCL_POINT_ARITH_OP(-)
-	SYCL_POINT_ARITH_OP(*)
-	SYCL_POINT_ARITH_OP(/)
-	SYCL_POINT_ARITH_OP(%)
-	SYCL_POINT_ARITH_OP(>>)
-	SYCL_POINT_ARITH_OP(<<)
-	SYCL_POINT_ARITH_OP(&)
-	SYCL_POINT_ARITH_OP(^)
-	SYCL_POINT_ARITH_OP(|)
+	SYCL_POINT_ARITH_OP_P1(+)
+	SYCL_POINT_ARITH_OP_P2(+=)
+	SYCL_POINT_ARITH_OP_P1(-)
+	SYCL_POINT_ARITH_OP_P2(-=)
+	SYCL_POINT_ARITH_OP_P1(*)
+	SYCL_POINT_ARITH_OP_P2(*=)
+	SYCL_POINT_ARITH_OP_P1(/)
+	SYCL_POINT_ARITH_OP_P2(/=)
+	SYCL_POINT_ARITH_OP_P1(%)
+	SYCL_POINT_ARITH_OP_P2(%=)
+	SYCL_POINT_ARITH_OP_P1(>>)
+	SYCL_POINT_ARITH_OP_P2(>>=)
+	SYCL_POINT_ARITH_OP_P1(<<)
+	SYCL_POINT_ARITH_OP_P2(<<=)
+	SYCL_POINT_ARITH_OP_P1(&)
+	SYCL_POINT_ARITH_OP_P2(&=)
+	SYCL_POINT_ARITH_OP_P1(^)
+	SYCL_POINT_ARITH_OP_P2(^=)
+	SYCL_POINT_ARITH_OP_P1(|)
+	SYCL_POINT_ARITH_OP_P2(|=)
 
-#undef SYCL_POINT_ARITH_OP
+#undef SYCL_POINT_ARITH_OP_P1
+#undef SYCL_POINT_ARITH_OP_P2
 
 private:
 	template <bool is_const>
