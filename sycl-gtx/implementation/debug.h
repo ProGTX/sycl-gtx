@@ -4,8 +4,10 @@
 #include <sstream>
 
 // Visual Studio 2013 still lacks some support for modern C++
+#ifdef _MSC_VER
 #if _MSC_VER <= 1800
 #define MSVC_LOW 1
+#endif
 #endif
 
 #if MSVC_LOW

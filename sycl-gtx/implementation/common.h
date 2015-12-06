@@ -6,8 +6,10 @@
 #include <cstdio>
 #include <sstream>
 
+#ifdef _MSC_VER
 #if _MSC_VER <= 1800
 #define MSVC_LOW 1
+#endif
 #endif
 
 #if MSVC_LOW
