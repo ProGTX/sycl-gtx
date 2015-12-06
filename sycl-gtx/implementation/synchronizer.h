@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include <set>
-#include <unordered_map>
+#include <map>
 
 namespace cl {
 namespace sycl {
@@ -19,7 +19,7 @@ class buffer_base;
 class synchronizer {
 private:
 	static std::set<queue*> queues;
-	static std::unordered_map<accessor_base*, buffer_base*> host_accessors;
+	static std::map<accessor_base*, buffer_base*> host_accessors;
 
 	static void wait_on_queues(buffer_base* buf);
 	static void flush_queues(buffer_base* buf);

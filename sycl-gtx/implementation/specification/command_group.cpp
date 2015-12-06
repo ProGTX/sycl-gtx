@@ -3,7 +3,7 @@
 #include "accessor.h"
 #include "buffer.h"
 #include "queue.h"
-#include <unordered_map>
+#include <map>
 #include <unordered_set>
 
 using namespace cl::sycl;
@@ -21,9 +21,9 @@ void command_group::optimize() {
 	DSELF();
 
 	auto size_to_keep = commands.size();
-	std::unordered_map<command_t*, bool> keep;
-	keep.reserve(size_to_keep);
-	std::unordered_map<detail::buffer_base*, command_t*> last_read;
+	std::map<command_t*, bool> keep;
+	//keep.reserve(size_to_keep);
+	std::map<detail::buffer_base*, command_t*> last_read;
 	std::unordered_set<detail::buffer_base*> was_written;
 
 	using detail::command::type_t;
