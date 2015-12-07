@@ -87,6 +87,9 @@
     <ClCompile Include="implementation\specification\error_handler.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
+    <ClCompile Include="implementation\specification\buffer_base.cpp">
+      <Filter>Source Files\specification</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sycl.hpp">
