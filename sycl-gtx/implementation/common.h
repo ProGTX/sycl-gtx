@@ -74,8 +74,13 @@ namespace sycl {
 		function_class(Base&& x)
 			: Base(std::move(x)) {}
 		function_class(const function_class&) = default;
+		function_class& operator=(const function_class&) = default;
 		function_class(function_class&& move)
-			: Base((Base&&)std::move(move)) {}
+			: Base(std::move((Base)move)) {}
+		function_class& operator=(function_class&& move) {
+			Base::operator=(std::move((Base)move));
+			return *this;
+		}
 	};
 #else
 	template<class T>

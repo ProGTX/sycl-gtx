@@ -68,6 +68,7 @@ public:
 
 	// Copy and move semantics
 	queue(const queue&) = default;
+	queue& operator=(const queue&) = default;
 #if MSVC_LOW
 	queue(queue&& move)
 		:	SYCL_MOVE_INIT(ctx),
@@ -95,6 +96,7 @@ public:
 	}
 #else
 	queue(queue&&) = default;
+	queue& operator=(queue&&) = default;
 #endif
 
 	bool is_host();

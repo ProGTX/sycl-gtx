@@ -49,9 +49,14 @@ public:
 		call_retain(data);
 	}
 
-	refc(const refc& copy) = default;
+	refc(const refc&) = default;
 	refc(refc&& move)
 		: Base(std::move(move)) {}
+	refc& operator=(const refc&) = default;
+	refc& operator=(refc&& move) {
+		Base::operator=(std::move(move));
+		return *this;
+	}
 
 	void reset(CL_Type data) {
 		Base::reset(data, release);

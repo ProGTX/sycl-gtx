@@ -35,6 +35,7 @@ public:
 
 	// Copy and move semantics
 	device(const device&) = default;
+	device& operator=(const device&) = default;
 #if MSVC_LOW
 	device(device&& move)
 		: SYCL_MOVE_INIT(device_id), SYCL_MOVE_INIT(platfrm) {}
@@ -45,6 +46,7 @@ public:
 	}
 #else
 	device(device&&) = default;
+	device& operator=(device&&) = default;
 #endif
 
 	cl_device_id get() const;

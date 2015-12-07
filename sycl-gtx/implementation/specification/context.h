@@ -62,6 +62,7 @@ public:
 
 	// Copy and move semantics
 	context(const context&) = default;
+	context& operator=(const context&) = default;
 #if MSVC_LOW
 	context(context&& move)
 		: SYCL_MOVE_INIT(ctx), SYCL_MOVE_INIT(target_devices), SYCL_MOVE_INIT(asyncHandler) {}
@@ -73,6 +74,7 @@ public:
 	}
 #else
 	context(context&&) = default;
+	context& operator=(context&&) = default;
 #endif
 
 public:
