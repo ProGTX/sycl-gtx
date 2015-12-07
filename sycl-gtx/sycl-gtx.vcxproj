@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="implementation\data_ref.cpp" />
     <ClCompile Include="implementation\kernel_name.cpp" />
+    <ClCompile Include="implementation\specification\buffer_base.cpp" />
     <ClCompile Include="implementation\specification\command_group.cpp" />
     <ClCompile Include="implementation\specification\context.cpp" />
     <ClCompile Include="implementation\specification\device.cpp" />

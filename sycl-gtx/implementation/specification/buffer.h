@@ -173,7 +173,9 @@ private:
 		const cl_mem_flags all_flags =
 			((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR)	|
 			(buffer->is_read_only ? CL_MEM_READ_ONLY : CL_MEM_READ_WRITE);
-		buffer->device_data = clCreateBuffer(q->get_context().get(), all_flags, buffer->get_size(), buffer->host_data.get(), &error_code);
+		buffer->device_data = buffer_base::cl_create_buffer(
+			q, all_flags, buffer->get_size(), buffer->host_data.get(), error_code
+		);
 		detail::error::report(error_code);
 		buffer->device_data.release_one();
 	}
@@ -235,21 +237,15 @@ private:
 	// TODO
 	virtual void enqueue(queue* q, const vector_class<cl_event>& wait_events, clEnqueueBuffer_f clEnqueueBuffer) override {
 		cl_event evnt;
-		auto num_events_to_wait = wait_events.size();
-
-		cl_int error_code = clEnqueueBuffer(
-			q->get(),
-			device_data.get(),
-			false,
-			// TODO: Sub-buffer access
-			0, get_size(),
+		auto error_code = this->cl_enqueue_buffer(
+			q,
+			get_size(),
 			host_data.get(),
-			num_events_to_wait,
-			(num_events_to_wait == 0 ? nullptr : wait_events.data()),
-			&evnt
+			wait_events,
+			evnt,
+			clEnqueueBuffer
 		);
 		detail::error::report(error_code);
-
 		events.emplace_back(evnt);
 	}
 
