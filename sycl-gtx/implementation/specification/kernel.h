@@ -81,6 +81,9 @@ public:
 	}
 
 private:
+	static cl_event get_cl_event(event* evnt);
+	static cl_command_queue get_cl_queue(queue* q);
+
 	static const cl_event* get_events_ptr(const vector_class<cl_event>& wait_events) {
 		return (wait_events.size() == 0 ? nullptr : wait_events.data());
 	}
@@ -91,10 +94,10 @@ private:
 	void enqueue_range(queue* q, const vector_class<cl_event>& wait_events, event* evnt, range<dimensions> num_work_items, id<dimensions> offset) const {
 		size_t* global_work_size = &num_work_items[0];
 		size_t* offst = &((size_t&)offset[0]);
-		auto ev = evnt->evnt.get();
+		auto ev = get_cl_event(evnt);
 
 		auto error_code = clEnqueueNDRangeKernel(
-			q->get(), kern.get(), dimensions,
+			get_cl_queue(q), kern.get(), dimensions,
 			offst, global_work_size, nullptr,
 			wait_events.size(),
 			get_events_ptr(wait_events),
@@ -120,10 +123,10 @@ private:
 			}
 		}
 
-		auto ev = evnt->evnt.get();
+		auto ev = get_cl_event(evnt);
 
 		auto error_code = clEnqueueNDRangeKernel(
-			q->get(), kern.get(), dimensions,
+			get_cl_queue(q), kern.get(), dimensions,
 			offst, global_work_size, local_work_size,
 			wait_events.size(),
 			get_events_ptr(wait_events),
