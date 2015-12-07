@@ -278,7 +278,7 @@ public:
 		: Base(hostData, bufferRange, m) {}																\
 	buffer(unique_ptr_class<void>&& hostData, const range<dimensions>& bufferRange)						\
 		: Base(hostData, bufferRange) {}																\
-	buffer(buffer& b, const id<dimensions>& baseIndex, const range<dimensions>& subRange)			\
+	buffer(buffer& b, const id<dimensions>& baseIndex, const range<dimensions>& subRange)				\
 		: Base(b, baseIndex, subRange) {}																\
 	buffer(cl_mem mem_object, queue& from_queue, event available_event = {})							\
 		: Base(mem_object, from_queue, available_event) {}
@@ -288,19 +288,20 @@ template <typename DataType>
 struct buffer<DataType, 1> : public detail::buffer_<DataType, 1> {
 private:
 	using Base = detail::buffer_<DataType, 1>;
+
 public:
 #if MSVC_LOW
 	BUFFER_INHERIT_CONSTRUCTORS(1)
 #else
-	using Base::buffer;
+	using Base::buffer_;
 #endif
 	// Create a new allocated 1D buffer initialized from the given elements
 	// ranging from first up to one before last
 	template <class InputIterator>
 	buffer(InputIterator first, InputIterator last)
 		: Base(nullptr, last - first) {
-		host_data = ptr_t(new DataType[last - first]);
-		std::copy(first, last, host_data.get());
+		this->host_data = this->ptr_t(new DataType[last - first]);
+		std::copy(first, last, this->host_data.get());
 	}
 
 	buffer(vector_class<DataType>& host_data)
@@ -310,14 +311,15 @@ public:
 };
 
 template <typename DataType>
-struct buffer<DataType, 2> : public detail::buffer_<DataType, 2>{
-#if MSVC_LOW
+struct buffer<DataType, 2> : public detail::buffer_<DataType, 2> {
 private:
 	using Base = detail::buffer_<DataType, 2>;
+
 public:
+#if MSVC_LOW
 	BUFFER_INHERIT_CONSTRUCTORS(2)
 #else
-	using detail::buffer_<DataType, 2>::buffer;
+	using Base::buffer_;
 #endif
 	buffer(size_t sizeX, size_t sizeY)
 		: buffer(range<2>{ sizeX, sizeY }) {}
@@ -328,14 +330,15 @@ public:
 };
 
 template <typename DataType>
-struct buffer<DataType, 3> : public detail::buffer_<DataType, 3>{
-#if MSVC_LOW
+struct buffer<DataType, 3> : public detail::buffer_<DataType, 3> {
 private:
 	using Base = detail::buffer_<DataType, 3>;
+
 public:
+#if MSVC_LOW
 	BUFFER_INHERIT_CONSTRUCTORS(3)
 #else
-	using detail::buffer_<DataType, 3>::buffer;
+	using Base::buffer_;
 #endif
 	buffer(size_t sizeX, size_t sizeY, size_t sizeZ)
 		: buffer(range<3>{ sizeX, sizeY, sizeZ }) {}
