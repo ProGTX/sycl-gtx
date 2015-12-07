@@ -92,7 +92,7 @@ class command_group {
 private:
 	friend class kernel;
 	friend class command::group_;
-	friend class queue;
+	friend class ::cl::sycl::queue;
 	using command_t = command::info;
 	using command_f = command_t::command_f;
 
@@ -145,7 +145,7 @@ namespace command {
 
 class group_ {
 private:
-	friend class command_group;
+	friend class ::cl::sycl::detail::command_group;
 
 	// TODO: Need to deal better with threads
 	SYCL_THREAD_LOCAL static command_group* last;

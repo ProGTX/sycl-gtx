@@ -18,7 +18,7 @@ class issue_command;
 class buffer_base {
 protected:
 	friend class issue_command;
-	friend class queue;
+	friend class ::cl::sycl::queue;
 
 	detail::refc<cl_mem, clRetainMemObject, clReleaseMemObject> device_data;
 	vector_class<event> events;
