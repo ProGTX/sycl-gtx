@@ -10,6 +10,7 @@
 #include "param_traits.h"
 #include "refc.h"
 #include "../common.h"
+#include "../function_traits.h"
 #include "../kernel_name.h"
 #include "../src_handlers/invoke_source.h"
 #include "../src_handlers/kernel_source.h"
@@ -107,17 +108,24 @@ private:
 			param,
 			detail::traits_buffer_default<ReturnType>::size
 		> {
+		using return_t = typename detail::array_traits<
+			ReturnType,
+			info::program,
+			param,
+			detail::traits_buffer_default<ReturnType>::size
+		>::return_t;
 		return_t get_info(const program* p) {
-			return get(p->prog.get());
+			return this->get(p->prog.get());
 		}
 	};
 
 	template <typename Contained_, info::program param>
 	struct traits<vector_class<Contained_>, param>
 		: detail::array_traits<Contained_, info::program, param> {
+		using Container = typename detail::array_traits<Contained_, info::program, param>::Container;
 		Container get_info(const program* p) {
-			get(p->prog.get());
-			return Container(param_value, param_value + actual_size / type_size);
+			this->get(p->prog.get());
+			return Container(this->param_value, this->param_value + this->actual_size / this->type_size);
 		}
 	};
 
@@ -127,13 +135,13 @@ private:
 		using DoubleContainer = vector_class<vector_class<Contained_>>;
 		DoubleContainer get_info(const program* p) {
 			auto binary_sizes = p->get_info<info::program::binary_sizes>();
-			get(p->prog.get());
+			this->get(p->prog.get());
 
 			DoubleContainer ret;
 			static const auto inner_type_size = sizeof(Contained_);
 			size_t i = 0;
 			for(auto bin_size : binary_sizes) {
-				ret.emplace_back(param_value[i], param_value[i] + bin_size / inner_type_size);
+				ret.emplace_back(this->param_value[i], this->param_value[i] + bin_size / inner_type_size);
 				++i;
 			}
 			return ret;
