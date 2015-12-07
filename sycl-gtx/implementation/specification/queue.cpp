@@ -162,7 +162,7 @@ vector_class<cl_event> queue::get_wait_events(const buffer_set& dependencies, bu
 	vector_class<decltype(buffers_in_use.begin())> remove_dependencies;
 
 	for(auto&& buf : dependencies) {
-		auto& buf_it = buffers_in_use.find(buf);
+		auto buf_it = buffers_in_use.find(buf);
 		if(buf_it != buffers_in_use.end()) {
 			auto size = buf->events.size();
 			if(size == 0) {

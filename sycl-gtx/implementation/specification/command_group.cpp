@@ -121,7 +121,7 @@ void command_group::flush(vector_class<cl_event> wait_events) {
 
 using namespace detail;
 
-command_group* command::group_::last = nullptr;
+SYCL_THREAD_LOCAL command_group* command::group_::last = nullptr;
 
 bool command::group_::in_scope() {
 	return last != nullptr;

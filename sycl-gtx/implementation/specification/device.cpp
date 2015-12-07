@@ -60,12 +60,11 @@ bool device::has_extension(const string_class& extension_name) {
 
 // TODO
 static vector_class<device> create_sub_devices(
+	cl_device_id& did,
 	const cl_device_partition_property* properties,
 	int devices,
 	unsigned int* num_devices
 ) {
-	cl_device_id did;
-	//auto did = device_id.get();
 	cl_device_id* device_ids = new cl_device_id[devices];
 	auto error_code = clCreateSubDevices(did, properties, devices, device_ids, num_devices);
 	detail::error::report(error_code);

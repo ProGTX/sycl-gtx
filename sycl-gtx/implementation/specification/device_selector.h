@@ -67,7 +67,7 @@ struct host_selector : device_selector {
 };
 
 namespace detail {
-static const unique_ptr_class<device_selector>& default_device_selector() {
+static inline const unique_ptr_class<device_selector>& default_device_selector() {
 	using ptr_t = unique_ptr_class<device_selector>;
 	static const ptr_t selector(ptr_t(new default_selector()));
 	return selector;

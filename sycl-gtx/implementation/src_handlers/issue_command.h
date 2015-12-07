@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../specification/kernel.h"
 #include "kernel_source.h"
 #include "../common.h"
 
@@ -7,7 +8,6 @@ namespace cl {
 namespace sycl {
 
 // Forward declarations
-class kernel;
 class program;
 class queue;
 
