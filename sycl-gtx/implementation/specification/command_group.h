@@ -3,6 +3,7 @@
 // 3.5.6 Command group class
 
 #include "access.h"
+#include "buffer_base.h"
 #include "../common.h"
 #include "../debug.h"
 #include <set>
@@ -155,73 +156,28 @@ private:
 
 public:
 	// Add generic command
-	template <class... Args>
 	static void add(
-		fn<Args...> function,
+		fn<shared_ptr_class<kernel>, event*> function,
 		string_class name,
-		Args... params
-	) {
-		last->commands.push_back({
-			name,
-			std::bind(
-				function,
-				std::placeholders::_1,
-				std::placeholders::_2,
-				params...
-			),
-			type_t::unspecified
-		});
-	}
+		shared_ptr_class<kernel> kern,
+		event* evnt
+	);
 
 	// Add buffer access command
-	template <bool = true>
 	static void add(
 		buffer_access buf_acc,
 		string_class name
-	) {
-		last->commands.push_back({
-			name,
-			std::bind(
-				info::do_nothing,
-				std::placeholders::_1,
-				std::placeholders::_2
-			),
-			type_t::get_accessor,
-			metadata(buf_acc)
-		});
-
-		// TODO: Maybe other targets
-		if(buf_acc.target == access::global_buffer) {
-			if(buf_acc.mode != access::discard_write && buf_acc.mode != access::discard_read_write) {
-				last->read_buffers.insert(buf_acc.data);
-			}
-			if(buf_acc.mode != access::read) {
-				last->write_buffers.insert(buf_acc.data);
-			}
-		}
-	}
+	);
 
 	// Add buffer copy command
-	template <class... Args>
 	static void add(
 		buffer_access buf_acc,
 		access::mode copy_mode,
-		fn<Args...> function,
+		fn<buffer_base*, buffer_base::clEnqueueBuffer_f> function,
 		string_class name,
-		Args... params
-	) {
-		last->commands.push_back({
-			name,
-			std::bind(
-				function,
-				std::placeholders::_1,
-				std::placeholders::_2,
-				params...
-			),
-			type_t::copy_data,
-			metadata(buffer_copy{ buf_acc, copy_mode })
-		});
-	}
+		buffer_base* buffer,
+		buffer_base::clEnqueueBuffer_f enqueue_function
+	);
 
 	static bool in_scope();
 	static void check_scope();

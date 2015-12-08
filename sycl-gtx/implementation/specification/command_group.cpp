@@ -132,3 +132,73 @@ void command::group_::check_scope() {
 		detail::error::report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
 	}
 }
+
+// Add generic command
+void command::group_::add(
+	fn<shared_ptr_class<kernel>, event*> function,
+	string_class name,
+	shared_ptr_class<kernel> kern,
+	event* evnt
+) {
+	last->commands.push_back({
+		name,
+		std::bind(
+			function,
+			std::placeholders::_1,
+			std::placeholders::_2,
+			kern,
+			evnt
+		),
+		type_t::unspecified
+	});
+}
+
+// Add buffer access command
+void command::group_::add(
+	buffer_access buf_acc,
+	string_class name
+) {
+	last->commands.push_back({
+		name,
+		std::bind(
+			info::do_nothing,
+			std::placeholders::_1,
+			std::placeholders::_2
+		),
+		type_t::get_accessor,
+		metadata(buf_acc)
+	});
+
+	// TODO: Maybe other targets
+	if(buf_acc.target == access::global_buffer) {
+		if(buf_acc.mode != access::discard_write && buf_acc.mode != access::discard_read_write) {
+			last->read_buffers.insert(buf_acc.data);
+		}
+		if(buf_acc.mode != access::read) {
+			last->write_buffers.insert(buf_acc.data);
+		}
+	}
+}
+
+// Add buffer copy command
+void command::group_::add(
+	buffer_access buf_acc,
+	access::mode copy_mode,
+	fn<buffer_base*, buffer_base::clEnqueueBuffer_f> function,
+	string_class name,
+	buffer_base* buffer,
+	buffer_base::clEnqueueBuffer_f enqueue_function
+) {
+	last->commands.push_back({
+		name,
+		std::bind(
+			function,
+			std::placeholders::_1,
+			std::placeholders::_2,
+			buffer,
+			enqueue_function
+		),
+		type_t::copy_data,
+		metadata(buffer_copy{ buf_acc, copy_mode })
+	});
+}

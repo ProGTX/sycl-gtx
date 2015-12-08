@@ -29,8 +29,6 @@ void issue_command::prepare_kernel(shared_ptr_class<kernel> kern) {
 	}
 }
 
-// Note: MSVC2013 editor reports errors on command::group_::add, but the code compiles and links
-
 void issue_command::write_buffers_to_device(shared_ptr_class<kernel> kern) {
 	for(auto& acc : kern->src.resources) {
 		auto mode = acc.second.acc.mode;
