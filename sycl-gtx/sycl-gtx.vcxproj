@@ -224,6 +224,9 @@
     <ClInclude Include="sycl.hpp" />
     <ClInclude Include="sycl_gtx_flow.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="make\makefile" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\IntelOpenCL.targets" />

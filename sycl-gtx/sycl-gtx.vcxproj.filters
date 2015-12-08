@@ -258,4 +258,7 @@
       <Filter>Header Files\src_handlers</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="make\makefile" />
+  </ItemGroup>
 </Project>
