@@ -44,12 +44,12 @@ public:
 
 	template <int dimensions>
 	static void enqueue_range(shared_ptr_class<kernel> kern, event* evnt, range<dimensions> num_work_items, id<dimensions> offset) {
-		command::group_::add(enqueue_range_command, __func__, kern, evnt, num_work_items, offset);
+		command::group_::add_kernel_enqueue_range(enqueue_range_command, __func__, kern, evnt, num_work_items, offset);
 	}
 
 	template <int dimensions>
 	static void enqueue_nd_range(shared_ptr_class<kernel> kern, event* evnt, nd_range<dimensions> execution_range) {
-		command::group_::add(enqueue_nd_range_command, __func__, kern, evnt, execution_range);
+		command::group_::add_kernel_enqueue_nd_range(enqueue_nd_range_command, __func__, kern, evnt, execution_range);
 	}
 };
 

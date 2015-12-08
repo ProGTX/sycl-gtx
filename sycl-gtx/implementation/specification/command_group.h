@@ -4,6 +4,7 @@
 
 #include "access.h"
 #include "buffer_base.h"
+#include "ranges.h"
 #include "../common.h"
 #include "../debug.h"
 #include <set>
@@ -19,8 +20,10 @@ class queue;
 
 namespace detail {
 
-// Forward declaration
+// Forward declarations
 static inline unique_ptr_class<handler> get_handler(queue* q);
+template <typename, int>
+class buffer_;
 
 namespace command {
 
@@ -154,23 +157,75 @@ private:
 	template <class... Args>
 	using fn = void(*)(queue*, const vector_class<cl_event>&, Args...);
 
+	template <class... Args>
+	using kern_fn = fn<shared_ptr_class<kernel>, event*, Args...>;
+
+	template <type_t type = type_t::unspecified, class F, class... Args>
+	static void add_command(
+		F function,
+		string_class name,
+		Args... params
+	) {
+		last->commands.push_back({
+			name,
+			std::bind(
+				function,
+				std::placeholders::_1,
+				std::placeholders::_2,
+				params...
+			),
+			type
+		});
+	}
+
 public:
-	// Add generic command
-	static void add(
-		fn<shared_ptr_class<kernel>, event*> function,
+	static void add_kernel_enqueue_task(
+		kern_fn<> function,
 		string_class name,
 		shared_ptr_class<kernel> kern,
 		event* evnt
-	);
+	) {
+		add_command(function, name, kern, evnt);
+	}
 
-	// Add buffer access command
-	static void add(
+	template <int dimensions>
+	static void add_kernel_enqueue_range(
+		kern_fn<range<dimensions>, id<dimensions>> function,
+		string_class name,
+		shared_ptr_class<kernel> kern,
+		event* evnt,
+		range<dimensions> num_work_items,
+		id<dimensions> offset
+	) {
+		add_command(function, name, kern, evnt, num_work_items, offset);
+	}
+
+	template <int dimensions>
+	static void add_kernel_enqueue_nd_range(
+		kern_fn<nd_range<dimensions>> function,
+		string_class name,
+		shared_ptr_class<kernel> kern,
+		event* evnt,
+		nd_range<dimensions> execution_range
+	) {
+		add_command(function, name, kern, evnt, execution_range);
+	}
+
+	template <typename DataType, int dimensions>
+	static void add_buffer_init(
+		fn<buffer_<DataType, dimensions>*> function,
+		string_class name,
+		buffer_<DataType, dimensions>* buff
+	) {
+		add_command(function, name, buff);
+	}
+
+	static void add_buffer_access(
 		buffer_access buf_acc,
 		string_class name
 	);
 
-	// Add buffer copy command
-	static void add(
+	static void add_buffer_copy(
 		buffer_access buf_acc,
 		access::mode copy_mode,
 		fn<buffer_base*, buffer_base::clEnqueueBuffer_f> function,

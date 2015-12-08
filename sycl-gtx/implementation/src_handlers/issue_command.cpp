@@ -41,7 +41,7 @@ void issue_command::write_buffers_to_device(shared_ptr_class<kernel> kern) {
 			// Don't need to copy data that won't be used
 			continue;
 		}
-		command::group_::add(
+		command::group_::add_buffer_copy(
 			acc.second.acc,
 			access::write,
 			buffer_base::enqueue_command,
@@ -58,7 +58,7 @@ void issue_command::enqueue_task_command(queue* q, const vector_class<cl_event>&
 }
 
 void issue_command::enqueue_task(shared_ptr_class<kernel> kern, event* evnt) {
-	command::group_::add(enqueue_task_command, __func__, kern, evnt);
+	command::group_::add_kernel_enqueue_task(enqueue_task_command, __func__, kern, evnt);
 }
 
 void issue_command::read_buffers_from_device(shared_ptr_class<kernel> kern) {
@@ -70,7 +70,7 @@ void issue_command::read_buffers_from_device(shared_ptr_class<kernel> kern) {
 			// Don't need to read back read-only buffers
 			continue;
 		}
-		command::group_::add(
+		command::group_::add_buffer_copy(
 			acc.second.acc,
 			access::read,
 			buffer_base::enqueue_command,

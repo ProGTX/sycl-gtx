@@ -182,7 +182,7 @@ private:
 
 	void init() {
 		if(!is_initialized) {
-			command::group_::add(create, __func__, this);
+			command::group_::add_buffer_init(create, __func__, this);
 			is_initialized = true;
 		}
 	}
@@ -210,7 +210,7 @@ private:
 			check_read_only();
 		}
 		init();
-		command::group_::add(buffer_access{ this, (access::mode)mode, (access::target)target }, __func__);
+		command::group_::add_buffer_access(buffer_access{ this, (access::mode)mode, (access::target)target }, __func__);
 		return acc_return_t<mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)), &cgh);
 	}
 

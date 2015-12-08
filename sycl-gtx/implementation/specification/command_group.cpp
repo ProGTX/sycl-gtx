@@ -133,28 +133,7 @@ void command::group_::check_scope() {
 	}
 }
 
-// Add generic command
-void command::group_::add(
-	fn<shared_ptr_class<kernel>, event*> function,
-	string_class name,
-	shared_ptr_class<kernel> kern,
-	event* evnt
-) {
-	last->commands.push_back({
-		name,
-		std::bind(
-			function,
-			std::placeholders::_1,
-			std::placeholders::_2,
-			kern,
-			evnt
-		),
-		type_t::unspecified
-	});
-}
-
-// Add buffer access command
-void command::group_::add(
+void command::group_::add_buffer_access(
 	buffer_access buf_acc,
 	string_class name
 ) {
@@ -180,8 +159,7 @@ void command::group_::add(
 	}
 }
 
-// Add buffer copy command
-void command::group_::add(
+void command::group_::add_buffer_copy(
 	buffer_access buf_acc,
 	access::mode copy_mode,
 	fn<buffer_base*, buffer_base::clEnqueueBuffer_f> function,
