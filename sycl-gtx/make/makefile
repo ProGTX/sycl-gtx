@@ -55,6 +55,3 @@ $(EXECUTABLE): $(OBJECTS)
 clean:
 	$(RM) $(EXECUTABLE)
 	$(RM) $(OBJECTS_RM)
-
-test:
-	@echo --- $(TARGET)
