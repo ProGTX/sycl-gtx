@@ -4,6 +4,7 @@
 
 #include "access.h"
 #include "buffer_base.h"
+#include "command_group.h"
 #include "error_handler.h"
 #include "event.h"
 #include "info.h"

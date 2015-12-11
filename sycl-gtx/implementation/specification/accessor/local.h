@@ -34,7 +34,7 @@ protected:
 	}
 
 	virtual void* resource() const override {
-		return reinterpret_cast<void*>(get_count_id());
+		return reinterpret_cast<void*>(this->get_count_id());
 	}
 
 	virtual size_t argument_size() const override {

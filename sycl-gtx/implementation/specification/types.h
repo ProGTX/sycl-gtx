@@ -118,6 +118,8 @@ private:
 protected:
 	vec(string_class name_)
 		: Base(name_), Members(this) {}
+
+	using data_ref = detail::data_ref;
 public:
 	vec()
 		: Base(), Members(this) {}
