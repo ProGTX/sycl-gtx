@@ -20,11 +20,11 @@ using single_member = base<dataT, 1>;
 
 template <typename dataT, int numElements>
 struct members {
-	members(base<dataT, numElements>* parent, string_class name = "") {}
+	members(base<dataT, numElements>* parent) {}
 };
 
 
-#define SYCL_V(member)								member(name + "." #member)
+#define SYCL_V(member)								member(parent->name + "." #member)
 #define SYCL_V2(m1, m2)								SYCL_V(m1), SYCL_V(m2)
 #define SYCL_V3(m1, m2, m3)							SYCL_V2(m1, m2), SYCL_V(m3)
 #define SYCL_V4(m1, m2, m3, m4)						SYCL_V2(m1, m2), SYCL_V2(m3, m4)
@@ -45,7 +45,7 @@ struct members<dataT, 2> {
 	single_member<dataT> &lo, &hi;
 	single_member<dataT> &s0, &s1;
 
-	members(base<dataT, 2>* parent, string_class name)
+	members(base<dataT, 2>* parent)
 	:	SYCL_V2(x, y),
 		SYCL_R2(x, lo, s0),
 		SYCL_R2(y, hi, s1) {}
@@ -109,7 +109,7 @@ struct members<dataT, 3> {
 	vec<dataT, 3> &xyz, &s012;
 	SYCL_SWIZZLE_3_DATA();
 
-	members(base<dataT, 3>* parent, string_class name)
+	members(base<dataT, 3>* parent)
 	:	SYCL_MEMBERS_3(),
 		SYCL_R2(*parent, xyz, s012),
 		SYCL_SWIZZLE_3_SET_VALUES() {}
@@ -124,7 +124,7 @@ struct members<dataT, 4> {
 	SYCL_SWIZZLE_3_DATA();
 	vec<dataT, 3> yzw;
 
-	members(base<dataT, 4>* parent, string_class name)
+	members(base<dataT, 4>* parent)
 	:	SYCL_MEMBERS_3(),
 		SYCL_R2(hi.y, w, s3),
 		SYCL_V(xyz), s012(xyz),
@@ -181,7 +181,7 @@ struct members<dataT, 8> {
 	SYCL_SWIZZLE_3_VALUE_REFS();
 	vec<dataT, 3> &yzw;
 
-	members(base<dataT, 8>* parent, string_class name)
+	members(base<dataT, 8>* parent)
 	:	SYCL_MEMBERS_8(this->),
 		SYCL_SWIZZLE_3_SET_REFS(this->),
 		yzw(lo.yzw) {}
@@ -199,7 +199,7 @@ struct members<dataT, 16> {
 	SYCL_SWIZZLE_3_VALUE_REFS();
 	vec<dataT, 3> &yzw;
 
-	members(base<dataT, 16>* parent, string_class name)
+	members(base<dataT, 16>* parent)
 	:	SYCL_MEMBERS_8(lo.),
 		s8(hi.x), s9(hi.y), sa(hi.z), sb(hi.w),
 		sc(hi.hi.x), sd(hi.hi.y), se(hi.hi.z), sf(hi.hi.w),

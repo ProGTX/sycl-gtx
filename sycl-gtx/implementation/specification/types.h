@@ -114,25 +114,24 @@ private:
 
 protected:
 	vec(string_class name_)
-		: Base(name_), Members(this, name) {}
+		: Base(name_), Members(this) {}
 public:
 	vec()
-		: Base(), Members(this, name) {}
+		: Base(), Members(this) {}
 	vec(const vec& copy)
-		: Base(copy.name, true), Members(this, name) {}
+		: Base(copy.name, true), Members(this) {}
 	// TODO: Move members
 	vec(vec&& move)
-		: Base(std::move(move.name)), Members(this, name) {}
+		: Base(std::move(move.name)), Members(this) {}
 	template <class T>
 	vec(T n, typename std::enable_if<!std::is_same<T, const vec&>::value>::type* = nullptr)
-		: Base(n), Members(this, name) {}
+		: Base(n), Members(this) {}
 	template <int num = numElements>
 	vec(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
-		: Base(x, y), Members(this, name) {}
+		: Base(x, y), Members(this) {}
 	template <int num = numElements>
 	vec(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
-		: Base(x, y, z), Members(this, name) {}
-
+		: Base(x, y, z), Members(this) {}
 	template <class T>
 	vec& operator=(T&& n) {
 		data_ref::operator=(std::forward<T>(n));
