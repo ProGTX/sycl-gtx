@@ -64,6 +64,9 @@ public:
 		kernel_add(this_name());
 	}
 
+	base(const base&) = default;
+	base& operator=(const base&) = default;
+
 	template <class T>
 	base(T n, typename std::enable_if<!std::is_same<T, const base&>::value>::type* = nullptr)
 		: base(get_name(n), true) {}
@@ -132,6 +135,7 @@ public:
 	template <int num = numElements>
 	vec(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
 		: Base(x, y, z), Members(this) {}
+	vec& operator=(const vec&) = default;
 	template <class T>
 	vec& operator=(T&& n) {
 		data_ref::operator=(std::forward<T>(n));

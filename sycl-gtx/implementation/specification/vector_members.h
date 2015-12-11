@@ -21,6 +21,8 @@ using single_member = base<dataT, 1>;
 template <typename dataT, int numElements>
 struct members {
 	members(base<dataT, numElements>* parent) {}
+	members(const members&) = default;
+	members& operator=(const members&) = default;
 };
 
 
@@ -49,6 +51,8 @@ struct members<dataT, 2> {
 	:	SYCL_V2(x, y),
 		SYCL_R2(x, lo, s0),
 		SYCL_R2(y, hi, s1) {}
+	members(const members&) = default;
+	members& operator=(const members&) = default;
 };
 
 #define SYCL_MEMBERS_3()	\
@@ -113,6 +117,8 @@ struct members<dataT, 3> {
 	:	SYCL_MEMBERS_3(),
 		SYCL_R2(*parent, xyz, s012),
 		SYCL_SWIZZLE_3_SET_VALUES() {}
+	members(const members&) = default;
+	members& operator=(const members&) = default;
 };
 
 template <typename dataT>
@@ -130,6 +136,8 @@ struct members<dataT, 4> {
 		SYCL_V(xyz), s012(xyz),
 		SYCL_SWIZZLE_3_SET_VALUES(),
 		SYCL_V(yzw) {}
+	members(const members&) = default;
+	members& operator=(const members&) = default;
 };
 
 #define SYCL_MEMBERS_8(pf)	\
@@ -185,6 +193,8 @@ struct members<dataT, 8> {
 	:	SYCL_MEMBERS_8(this->),
 		SYCL_SWIZZLE_3_SET_REFS(this->),
 		yzw(lo.yzw) {}
+	members(const members&) = default;
+	members& operator=(const members&) = default;
 };
 
 template <typename dataT>
@@ -205,6 +215,8 @@ struct members<dataT, 16> {
 		sc(hi.hi.x), sd(hi.hi.y), se(hi.hi.z), sf(hi.hi.w),
 		SYCL_SWIZZLE_3_SET_REFS(lo.),
 		yzw(lo.yzw) {}
+	members(const members&) = default;
+	members& operator=(const members&) = default;
 };
 
 #undef SYCL_V
