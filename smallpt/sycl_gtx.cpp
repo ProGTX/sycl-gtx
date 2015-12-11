@@ -45,7 +45,8 @@ struct Vector : public float3 {
 	template <class X, class Y, class Z>
 	Vector(X&& x, Y&& y, Z&& z)
 		: float3(x, y, z) {}
-
+	Vector(const Vector&) = default;
+	Vector& operator=(const Vector&) = default;
 	template <class T>
 	Vector& operator=(T&& t) {
 		float3::operator=(t);
@@ -79,6 +80,7 @@ struct RaySycl {
 		: o(r.o), d(r.d) {}
 	RaySycl(Vector o_, Vector d_)
 		: o(o_), d(d_) {}
+	RaySycl(const RaySycl&) = default;
 	RaySycl& operator=(const RaySycl&) = default;
 };
 
