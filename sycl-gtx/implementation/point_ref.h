@@ -140,7 +140,7 @@ public:
 			return value_point_t(n OP rhs.data, rhs.type, true);								\
 		}																						\
 		else {																					\
-			auto ret = rhs.data_ref::operator OP(n, rhs);										\
+			auto ret = n OP (data_ref)rhs;														\
 			return value_point_t(std::move(ret.name), ret.type, true);							\
 		}																						\
 	}
