@@ -12,7 +12,7 @@
 #include <sycl.hpp>
 
 #include "classes.h"
-#include "msvc.h"
+#include "win.h"
 
 namespace ns_sycl_gtx {
 

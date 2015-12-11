@@ -1,5 +1,5 @@
 #include "classes.h"
-#include "msvc.h"
+#include "win.h"
 
 #include <sycl.hpp>
 

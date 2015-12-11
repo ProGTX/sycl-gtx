@@ -1,7 +1,7 @@
 CC=clang++
 TARGET=Release
 
-INC=-I$(INTELOCLSDKROOT)include
+INC=-I$(INTELOCLSDKROOT)include -I../../sycl-gtx
 CFLAGS=-c -Wall -std=c++11 $(INC)
 
 ifeq ($(TARGET),Release)

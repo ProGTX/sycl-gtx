@@ -29,10 +29,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="msvc.h">
+    <ClInclude Include="classes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="classes.h">
+    <ClInclude Include="win.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

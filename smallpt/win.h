@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #include <random>
 
 #define M_PI 3.14159265358979323846	// MSDN Math Constants
@@ -25,7 +25,6 @@ static void reset() {
 
 // http://stackoverflow.com/a/27198754
 // With modifications to make variables static
-std::uniform_real_distribution<double>;
 static double erand48(unsigned short int X[3]) {
 	return ns_erand::distr(ns_erand::generator());
 }
