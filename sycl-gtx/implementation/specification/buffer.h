@@ -293,7 +293,7 @@ public:
 #if MSVC_LOW
 	BUFFER_INHERIT_CONSTRUCTORS(1)
 #else
-	using Base::buffer_;
+	using Base::Base;
 #endif
 	// Create a new allocated 1D buffer initialized from the given elements
 	// ranging from first up to one before last
@@ -319,7 +319,7 @@ public:
 #if MSVC_LOW
 	BUFFER_INHERIT_CONSTRUCTORS(2)
 #else
-	using Base::buffer_;
+	using Base::Base;
 #endif
 	buffer(size_t sizeX, size_t sizeY)
 		: buffer(range<2>{ sizeX, sizeY }) {}
@@ -338,7 +338,7 @@ public:
 #if MSVC_LOW
 	BUFFER_INHERIT_CONSTRUCTORS(3)
 #else
-	using Base::buffer_;
+	using Base::Base;
 #endif
 	buffer(size_t sizeX, size_t sizeY, size_t sizeZ)
 		: buffer(range<3>{ sizeX, sizeY, sizeZ }) {}

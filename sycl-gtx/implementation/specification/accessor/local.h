@@ -75,7 +75,7 @@ public:
 	SYCL_ADD_ACCESSOR(mode, access::local) {										\
 		using Base = detail::accessor_<DataType, dimensions, mode, access::local>;	\
 	public:																			\
-		using Base::accessor_;														\
+		using Base::Base;														\
 	};
 #endif
 

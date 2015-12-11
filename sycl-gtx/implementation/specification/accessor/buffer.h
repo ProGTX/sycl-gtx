@@ -57,13 +57,13 @@ class handler;
 	SYCL_ADD_ACCESSOR(mode, target) {														\
 		using Base = detail::accessor_<DataType, dimensions, mode, target>;					\
 	public:																					\
-		using Base::accessor_;																\
+		using Base::Base;																	\
 	};
 #define SYCL_ADD_ACCESSOR_HOST_BUFFER(mode)													\
 	SYCL_ADD_ACCESSOR(mode, access::host_buffer) {											\
 		using Base = detail::accessor_<DataType, dimensions, mode, access::host_buffer>;	\
 	public:																					\
-		using Base::accessor_;																\
+		using Base::Base;																	\
 	};
 #endif
 
