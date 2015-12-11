@@ -34,13 +34,13 @@ private:
 public:
 	accessor_(
 		cl::sycl::buffer<DataType, dimensions>& bufferRef,
-		handler* commandGroupHandler,
+		handler& commandGroupHandler,
 		range<dimensions> offset,
 		range<dimensions> range
-	)	:	base_acc_buffer(bufferRef, commandGroupHandler, offset, range),
+	)	:	base_acc_buffer(bufferRef, &commandGroupHandler, offset, range),
 			base_acc_device_ref(this, {})
 	{}
-	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef, handler* commandGroupHandler)
+	accessor_(cl::sycl::buffer<DataType, dimensions>& bufferRef, handler& commandGroupHandler)
 		: accessor_(
 			bufferRef,
 			commandGroupHandler,
