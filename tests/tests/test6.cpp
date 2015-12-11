@@ -28,7 +28,7 @@ bool test6() {
 			});
 		});
 
-		auto local_size = std::min(group_size, size);
+		unsigned int local_size = std::min(group_size, size);
 
 		for(unsigned int N = size; N > 1; N /= local_size) {
 			debug() << "Submitting work";

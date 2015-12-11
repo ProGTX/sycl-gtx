@@ -11,8 +11,8 @@ bool test3() {
 	{
 		queue myQueue;
 
-		buffer<float, 2> A({ N, N });
-		buffer<float, 2> B({ N, N });
+		buffer<float, 2> A(range<2>(N, N));
+		buffer<float, 2> B(range<2>(N, N));
 
 		debug() << "Initializing buffer A";
 		{

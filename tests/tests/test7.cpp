@@ -18,9 +18,9 @@ bool test7() {
 		queue myQueue;
 
 		// Create some 2D buffers of float for our matrices
-		buffer<float, 2> a({ N, M });
-		buffer<float, 2> b({ N, M });
-		buffer<float, 2> c({ N, M });
+		buffer<float, 2> a(range<2>(N, M));
+		buffer<float, 2> b(range<2>(N, M));
+		buffer<float, 2> c(range<2>(N, M));
 
 		// Launch a first asynchronous kernel to initialize a
 		myQueue.submit([&](handler& cgh) {
