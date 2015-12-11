@@ -33,6 +33,7 @@ struct subscript_helper<1, DataType, dimensions, mode, target> {
 #define SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR()									\
 	using acc_t = accessor_<DataType, dimensions, mode, target>;				\
 	friend acc_t;																\
+	template <int, typename, int, access::mode, access::target>					\
 	friend class accessor_device_ref;											\
 	const acc_t* parent;														\
 	vector_class<string_class> rang;											\

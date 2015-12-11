@@ -17,6 +17,7 @@ namespace detail {
 #define SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR()									\
 	using acc_t = accessor_<DataType, dimensions, mode, access::host_buffer>;	\
 	friend acc_t;																\
+	template <int, typename, int, access::mode>									\
 	friend class accessor_host_ref;												\
 	const acc_t* parent;														\
 	std::array<size_t, 3> rang;													\
