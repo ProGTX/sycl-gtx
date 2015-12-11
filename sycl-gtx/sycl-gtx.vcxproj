@@ -158,6 +158,7 @@
     <ClCompile Include="implementation\specification\device_selector.cpp" />
     <ClCompile Include="implementation\specification\error_handler.cpp" />
     <ClCompile Include="implementation\specification\event.cpp" />
+    <ClCompile Include="implementation\specification\handler.cpp" />
     <ClCompile Include="implementation\specification\kernel.cpp" />
     <ClCompile Include="implementation\specification\platform.cpp" />
     <ClCompile Include="implementation\specification\program.cpp" />

@@ -4,6 +4,7 @@
 
 #include "access.h"
 #include "handler_event.h"
+#include "program.h"
 #include "ranges.h"
 #include "../src_handlers/issue_command.h"
 #include "../common.h"
@@ -34,10 +35,12 @@ private:
 	handler(queue* q)
 		: q(q) {}
 
+	static context get_context(queue* q);
+
 	template <class KernelType>
 	shared_ptr_class<kernel> build(KernelType kernFunctor) {
 		detail::command::group_::check_scope();
-		program prog(q->get_context());
+		program prog(get_context(q));
 		prog.build(kernFunctor, "");
 
 		// We know here the program only contains one kernel
@@ -78,7 +81,7 @@ public:
 
 	template <typename KernelName, class KernelType, int dimensions>
 	void parallel_for(range<dimensions> numWorkItems, KernelType kernFunctor) {
-		parallel_for(numWorkItems, id<dimensions>(), kernFunctor);
+		parallel_for<KernelName>(numWorkItems, id<dimensions>(), kernFunctor);
 	}
 
 	// This type of kernel can be invoked with a function accepting either an id or an item as parameter
@@ -114,7 +117,7 @@ public:
 	void single_task(KernelType kernFunctor) {
 		single_task<KernelType, KernelType>(kernFunctor);
 	}
-	template <class KernelType, int dimensions, class = decltype(KernelType::operator(id<dimensions>))>
+	template <class KernelType, int dimensions, class = decltype(KernelType::operator())>
 	void parallel_for(range<dimensions> numWorkItems, KernelType kernFunctor) {
 		parallel_for<KernelType, KernelType, dimensions>(numWorkItems, kernFunctor);
 	}
@@ -122,7 +125,7 @@ public:
 	void parallel_for(range<dimensions> numWorkItems, id<dimensions> workItemOffset, KernelType kernFunctor) {
 		parallel_for<KernelType, KernelType, dimensions>(numWorkItems, workItemOffset, kernFunctor);
 	}
-	template <class KernelType, int dimensions, class = decltype(KernelType::operator())>
+	template <class KernelType, int dimensions, class = decltype(std::declval<KernelType>().operator()(std::declval<nd_item<1>>()))>
 	void parallel_for(nd_range<dimensions> executionRange, KernelType kernFunctor) {
 		parallel_for<KernelType, KernelType, dimensions>(executionRange, kernFunctor);
 	}
@@ -130,11 +133,11 @@ public:
 	void parallel_for(nd_range<dimensions> numWorkItems, id<dimensions> workItemOffset, KernelType kernFunctor) {
 		parallel_for<KernelType, KernelType, dimensions>(numWorkItems, workItemOffset, kernFunctor);
 	}
-	template <class WorkgroupFunctionType, int dimensions, class = decltype(KernelType::operator())>
+	template <class WorkgroupFunctionType, int dimensions, class = decltype(WorkgroupFunctionType::operator())>
 	void parallel_for_work_group(range<dimensions> numWorkGroups, WorkgroupFunctionType kernFunctor) {
 		parallel_for_work_group<WorkgroupFunctionType, WorkgroupFunctionType, dimensions>(numWorkGroups, kernFunctor);
 	}
-	template <class WorkgroupFunctionType, int dimensions, class = decltype(KernelType::operator())>
+	template <class WorkgroupFunctionType, int dimensions, class = decltype(WorkgroupFunctionType::operator())>
 	void parallel_for_work_group(range<dimensions> numWorkGroups, range<dimensions> workGroupSize, WorkgroupFunctionType kernFunctor) {
 		parallel_for_work_group<WorkgroupFunctionType, WorkgroupFunctionType, dimensions>(numWorkGroups, workGroupSize, kernFunctor);
 	}
