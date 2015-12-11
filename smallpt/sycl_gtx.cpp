@@ -326,9 +326,10 @@ void radiance(
 
 template <class T, class D>
 void assign(T& target, D& data) {
-	target.x = data.x;
-	target.y = data.y;
-	target.z = data.z;
+	using type = decltype(target.x);
+	target.x = (type)data.x;
+	target.y = (type)data.y;
+	target.z = (type)data.z;
 }
 
 } // ns_sycl_gtx
@@ -349,7 +350,10 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 	for(int y = 0; y < h; ++y) {
 		Xi[2] = y*y*y;
 		for(int x = 0; x < w; ++x) {
-			seedArray.push_back({ erand48(Xi), erand48(Xi) });
+			cl_uint2 seed;
+			seed.x = (cl_uint)erand48(Xi);
+			seed.y = (cl_uint)erand48(Xi);
+			seedArray.push_back(seed);
 		}
 	}
 	buffer<cl_uint2> seedsBuffer(seedArray);
@@ -366,8 +370,8 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 			assign(si.lo.hi, sj.e);
 			assign(si.hi.lo, sj.c);
 
-			si.lo.lo.w = sj.rad;
-			si.hi.lo.w = sj.refl;
+			si.lo.lo.w = (cl_float)sj.rad;
+			si.hi.lo.w = (cl_float)sj.refl;
 		}
 	}
 

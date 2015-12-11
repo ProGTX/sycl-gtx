@@ -136,7 +136,7 @@ struct version {
 				major = (int)v.at(pos) - '0';
 				minor = (int)v.at(pos + 2) - '0';; // Plus one for dot
 			}
-			catch(std::exception& e) {}
+			catch(std::exception&) {}
 		}
 	}
 };

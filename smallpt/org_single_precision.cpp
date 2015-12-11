@@ -17,8 +17,8 @@
 namespace org_sp {
 struct Vec {
 	float x, y, z;
-	Vec(float x_ = 0, float y_ = 0, float z_ = 0) { x = x_; y = y_; z = z_; }
-	Vec(const ::Vec& v) : Vec(v.x, v.y, v.z) {}
+	Vec(float x_ = 0, float y_ = 0, float z_ = 0) { x = x_; y = y_; z = z_; } 
+	Vec(const ::Vec& v) : Vec((float)v.x, (float)v.y, (float)v.z) {}
 	Vec operator+(const Vec &b) const { return Vec(x + b.x, y + b.y, z + b.z); }
 	Vec operator-(const Vec &b) const { return Vec(x - b.x, y - b.y, z - b.z); }
 	Vec operator*(float b) const { return Vec(x*b, y*b, z*b); }
@@ -41,25 +41,25 @@ struct Sphere {
 		rad(rad_), p(p_), e(e_), c(c_), refl(refl_) {}
 	float intersect(const Ray &r) const { // returns distance, 0 if nohit
 		Vec op = p - r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
-		float t, eps = 1e-2, b = op.dot(r.d), det = b*b - op.dot(op) + rad*rad;
+		float t, eps = 1e-2f, b = op.dot(r.d), det = b*b - op.dot(op) + rad*rad;
 		if(det<0) return 0; else det = sqrt(det);
 		return (t = b - det)>eps ? t : ((t = b + det)>eps ? t : 0);
 	}
 };
 Sphere spheres[] = {//Scene: radius, position, emission, color, material
-	Sphere(1e4, Vec(1e4 + 1, 40.8, 81.6), Vec(), Vec(.75, .25, .25), DIFF),//Left
-	Sphere(1e4, Vec(-1e4 + 99, 40.8, 81.6), Vec(), Vec(.25, .25, .75), DIFF),//Rght
-	Sphere(1e4, Vec(50, 40.8, 1e4), Vec(), Vec(.75, .75, .75), DIFF),//Back
-	Sphere(1e4, Vec(50, 40.8, -1e4 + 170), Vec(), Vec(), DIFF),//Frnt
-	Sphere(1e4, Vec(50, 1e4, 81.6), Vec(), Vec(.75, .75, .75), DIFF),//Botm
-	Sphere(1e4, Vec(50, -1e4 + 81.6, 81.6), Vec(), Vec(.75, .75, .75), DIFF),//Top
-	Sphere(16.5, Vec(27, 16.5, 47), Vec(), Vec(1, 1, 1)*.999, SPEC),//Mirr
-	Sphere(16.5, Vec(73, 16.5, 78), Vec(), Vec(1, 1, 1)*.999, REFR),//Glas
-	Sphere(600, Vec(50, 681.6 - .27, 81.6), Vec(12, 12, 12), Vec(), DIFF) //Lite
+	Sphere(1e4f, Vec(1e4f + 1, 40.8f, 81.6f), Vec(), Vec(.75f, .25f, .25f), DIFF),//Left
+	Sphere(1e4f, Vec(-1e4f + 99, 40.8f, 81.6f), Vec(), Vec(.25f, .25f, .75f), DIFF),//Rght
+	Sphere(1e4f, Vec(50, 40.8f, 1e4f), Vec(), Vec(.75f, .75f, .75f), DIFF),//Back
+	Sphere(1e4f, Vec(50, 40.8f, -1e4f + 170), Vec(), Vec(), DIFF),//Frnt
+	Sphere(1e4f, Vec(50, 1e4f, 81.6f), Vec(), Vec(.75f, .75f, .75f), DIFF),//Botm
+	Sphere(1e4f, Vec(50, -1e4f + 81.6f, 81.6f), Vec(), Vec(.75f, .75f, .75f), DIFF),//Top
+	Sphere(16.5f, Vec(27, 16.5f, 47), Vec(), Vec(1, 1, 1)*.999f, SPEC),//Mirr
+	Sphere(16.5f, Vec(73, 16.5f, 78), Vec(), Vec(1, 1, 1)*.999f, REFR),//Glas
+	Sphere(600, Vec(50, 681.6f - .27f, 81.6f), Vec(12, 12, 12), Vec(), DIFF) //Lite
 };
 inline float clamp(float x) { return x < 0 ? 0 : x>1 ? 1 : x; }
 inline bool intersect(const Ray &r, float &t, int &id) {
-	float n = sizeof(spheres) / sizeof(Sphere), d, inf = t = 1e20;
+	float n = sizeof(spheres) / sizeof(Sphere), d, inf = t = 1e20f; 
 	for(int i = int(n); i--;) if((d = spheres[i].intersect(r)) && d < t) { t = d; id = i; }
 	return t<inf;
 }
@@ -73,7 +73,7 @@ Vec radiance(const Ray &r, int depth, unsigned short *Xi) {
 	if(depth > 255) return obj.e;
 	if(++depth > 5) if(erand48(Xi) < p) f = f*(1 / p); else return obj.e; //R.R.
 	if(obj.refl == DIFF) {                  // Ideal DIFFUSE reflection
-		float r1 = 2 * M_PI*erand48(Xi), r2 = erand48(Xi), r2s = sqrt(r2);
+		float r1 = (float)(2 * M_PI*erand48(Xi)), r2 = (float)erand48(Xi), r2s = sqrt(r2);
 		Vec w = nl, u = ((fabs(w.x) > .1 ? Vec(0, 1) : Vec(1)) % w).norm(), v = w%u;
 		Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
 		return obj.e + f.mult(radiance(Ray(x, d), depth, Xi));
@@ -82,12 +82,12 @@ Vec radiance(const Ray &r, int depth, unsigned short *Xi) {
 		return obj.e + f.mult(radiance(Ray(x, r.d - n * 2 * n.dot(r.d)), depth, Xi));
 	Ray reflRay(x, r.d - n * 2 * n.dot(r.d));     // Ideal dielectric REFRACTION
 	bool into = n.dot(nl) > 0;                // Ray from outside going in?
-	float nc = 1, nt = 1.5, nnt = into ? nc / nt : nt / nc, ddn = r.d.dot(nl), cos2t;
+	float nc = 1, nt = 1.5f, nnt = into ? nc / nt : nt / nc, ddn = r.d.dot(nl), cos2t;
 	if((cos2t = 1 - nnt*nnt*(1 - ddn*ddn)) < 0)    // Total internal reflection
 		return obj.e + f.mult(radiance(reflRay, depth, Xi));
 	Vec tdir = (r.d*nnt - n*((into ? 1 : -1)*(ddn*nnt + sqrt(cos2t)))).norm();
 	float a = nt - nc, b = nt + nc, R0 = a*a / (b*b), c = 1 - (into ? -ddn : tdir.dot(n));
-	float Re = R0 + (1 - R0)*c*c*c*c*c, Tr = 1 - Re, P = .25 + .5*Re, RP = Re / P, TP = Tr / (1 - P);
+	float Re = R0 + (1 - R0)*c*c*c*c*c, Tr = 1 - Re, P = .25f + .5f*Re, RP = Re / P, TP = Tr / (1 - P);
 	return obj.e + f.mult(depth > 2 ? (erand48(Xi) < P ?   // Russian roulette
 		radiance(reflRay, depth, Xi)*RP : radiance(Ray(x, tdir), depth, Xi)*TP) :
 		radiance(reflRay, depth, Xi)*Re + radiance(Ray(x, tdir), depth, Xi)*Tr);
@@ -98,13 +98,13 @@ inline void compute_inner(int y, int w, int h, int samps, Ray &cam, Vec &cx, Vec
 		for(int sy = 0, i = (h - y - 1)*w + x; sy < 2; sy++)     // 2x2 subpixel rows
 			for(int sx = 0; sx < 2; sx++, r = Vec()) {        // 2x2 subpixel cols
 				for(int s = 0; s < samps; s++) {
-					float r1 = 2 * erand48(Xi), dx = r1 < 1 ? sqrt(r1) - 1 : 1 - sqrt(2 - r1);
-					float r2 = 2 * erand48(Xi), dy = r2 < 1 ? sqrt(r2) - 1 : 1 - sqrt(2 - r2);
-					Vec d = cx*(((sx + .5 + dx) / 2 + x) / w - .5) +
-						cy*(((sy + .5 + dy) / 2 + y) / h - .5) + cam.d;
-					r = r + radiance(Ray(cam.o + d * 140, d.norm()), 0, Xi)*(1. / samps);
+					float r1 = (float)(2 * erand48(Xi)), dx = r1 < 1 ? sqrt(r1) - 1 : 1 - sqrt(2 - r1);
+					float r2 = (float)(2 * erand48(Xi)), dy = r2 < 1 ? sqrt(r2) - 1 : 1 - sqrt(2 - r2);
+					Vec d = cx*(((sx + .5f + dx) / 2 + x) / w - .5f) +
+						cy*(((sy + .5f + dy) / 2 + y) / h - .5f) + cam.d;
+					r = r + radiance(Ray(cam.o + d * 140, d.norm()), 0, Xi)*(1.f / samps);
 				} // Camera rays are pushed ^^^^^ forward to start in interior
-				c[i] = c[i] + Vec(clamp(r.x), clamp(r.y), clamp(r.z))*.25;
+				c[i] = c[i] + Vec(clamp(r.x), clamp(r.y), clamp(r.z))*.25f;
 			}
 }
 std::vector<org_sp::Vec> get_c(int w, int h, ::Vec* c_) {
