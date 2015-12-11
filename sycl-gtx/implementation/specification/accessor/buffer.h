@@ -18,26 +18,30 @@ class handler;
 #if MSVC_LOW
 #define SYCL_ADD_ACCESSOR_BUFFER(mode, target)												\
 	SYCL_ADD_ACCESSOR(mode, target) {														\
-		using Base = detail::accessor_<DataType, dimensions, mode, target>;					\
+		using Base = detail::accessor_<														\
+			DataType, dimensions,															\
+			(detail::acc_mode_t)mode, (detail::acc_target_t)target>;						\
 	public:																					\
 		accessor(																			\
 			buffer<DataType, dimensions>& bufferRef,										\
 			handler& commandGroupHandler													\
 		)																					\
-			: Base(bufferRef, &commandGroupHandler) {}										\
+			: Base(bufferRef, commandGroupHandler) {}										\
 		accessor(																			\
 			buffer<DataType, dimensions>& bufferRef,										\
 			handler& commandGroupHandler,													\
 			range<dimensions> offset,														\
 			range<dimensions> range															\
 		)																					\
-			: Base(bufferRef, &commandGroupHandler, offset, range) {}						\
+			: Base(bufferRef, commandGroupHandler, offset, range) {}						\
 		accessor(Base&& move)																\
 			: Base(std::move(move)) {}														\
 	};
 #define SYCL_ADD_ACCESSOR_HOST_BUFFER(mode)													\
 	SYCL_ADD_ACCESSOR(mode, access::host_buffer) {											\
-		using Base = detail::accessor_<DataType, dimensions, mode, access::host_buffer>;	\
+		using Base = detail::accessor_<														\
+			DataType, dimensions,															\
+			(detail::acc_mode_t)mode, (detail::acc_target_t)access::host_buffer>;			\
 	public:																					\
 		accessor(																			\
 			buffer<DataType, dimensions>& bufferRef											\
@@ -55,13 +59,17 @@ class handler;
 #else
 #define SYCL_ADD_ACCESSOR_BUFFER(mode, target)												\
 	SYCL_ADD_ACCESSOR(mode, target) {														\
-		using Base = detail::accessor_<DataType, dimensions, mode, target>;					\
+		using Base = detail::accessor_<														\
+			DataType, dimensions,															\
+			(detail::acc_mode_t)mode, (detail::acc_target_t)target>;						\
 	public:																					\
 		using Base::Base;																	\
 	};
 #define SYCL_ADD_ACCESSOR_HOST_BUFFER(mode)													\
 	SYCL_ADD_ACCESSOR(mode, access::host_buffer) {											\
-		using Base = detail::accessor_<DataType, dimensions, mode, access::host_buffer>;	\
+		using Base = detail::accessor_<														\
+			DataType, dimensions,															\
+			(detail::acc_mode_t)mode, (detail::acc_target_t)access::host_buffer>;			\
 	public:																					\
 		using Base::Base;																	\
 	};

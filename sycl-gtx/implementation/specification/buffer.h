@@ -21,9 +21,9 @@ namespace cl {
 namespace sycl {
 
 // Forward declarations
-template <typename DataType, int dimensions, access::mode mode, access::target target>
+template <typename, int, access::mode, access::target>
 class accessor;
-template <typename DataType, int dimensions = 1>
+template <typename, int = 1>
 struct buffer;
 class handler;
 class queue;
@@ -31,11 +31,9 @@ class queue;
 namespace detail {
 
 // Forward declarations
-#if MSVC_LOW
-template <typename DataType, int dimensions, int mode, int target, typename>
+template <typename, int, acc_mode_t, acc_target_t, typename>
 class accessor_;
-#endif
-template <typename DataType, int dimensions>
+template <typename, int>
 class accessor_buffer;
 class command_group;
 
@@ -194,33 +192,30 @@ private:
 		}
 	}
 
-#if MSVC_LOW
-	// Indirection required because MSVC2013 fails on enum parameter SFINAE
-	// The final accessor class also needs a move constructor from base type: accessor(accessor_&&)
-	template <int mode, int target>
-	using acc_return_t = accessor_<DataType, dimensions, mode, target>;
-#else
 	template <access::mode mode, access::target target>
 	using acc_return_t = accessor<DataType, dimensions, mode, target>;
-#endif
 
-	template <int mode, int target, class = typename std::enable_if<target == access::global_buffer>::type>
-	acc_return_t<mode, target> get_access_device(handler& cgh) {
+	template <acc_mode_t mode, acc_target_t target>
+	acc_return_t<(access::mode)mode, (access::target)target> get_access_device(handler& cgh) {
 		command::group_::check_scope();
-		if(mode != access::read) {
+		if(mode != (acc_mode_t)access::read) {
 			check_read_only();
 		}
 		init();
 		command::group_::add_buffer_access(buffer_access{ this, (access::mode)mode, (access::target)target }, __func__);
-		return acc_return_t<mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)), &cgh);
+		return acc_return_t<(access::mode)mode, (access::target)target>(
+			*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)), cgh
+		);
 	}
 
-	template <int mode, int target, class = typename std::enable_if<target == access::host_buffer>::type>
-	acc_return_t<mode, target> get_access_host() {
-		if(mode != access::read) {
+	template <acc_mode_t mode, acc_target_t target>
+	acc_return_t<(access::mode)mode, (access::target)target> get_access_host() {
+		if(mode != (acc_mode_t)access::read) {
 			check_read_only();
 		}
-		return acc_return_t<mode, target>(*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)));
+		return acc_return_t<(access::mode)mode, (access::target)target>(
+			*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this))
+		);
 	}
 
 public:

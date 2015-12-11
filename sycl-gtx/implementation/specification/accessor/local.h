@@ -17,7 +17,7 @@ namespace sycl {
 namespace detail {
 
 SYCL_ACCESSOR_CLASS(target == access::local),
-	protected counter<accessor_<DataType, dimensions, mode, target>>,
+	protected counter<accessor_<DataType, dimensions, (acc_mode_t)mode, (acc_target_t)target>>,
 	public accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>
 {
 private:
@@ -47,7 +47,7 @@ public:
 		allocationSize(allocationSize) {
 		// TODO
 		if(command::group_::in_scope()) {
-			command::group_::add(
+			command::group_::add_buffer_access(
 				buffer_access{ nullptr, (access::mode)mode, (access::target)target },
 				__func__
 			);
@@ -65,7 +65,7 @@ public:
 #if MSVC_LOW
 #define SYCL_ADD_ACCESSOR_LOCAL(mode)												\
 	SYCL_ADD_ACCESSOR(mode, access::local) {										\
-		using Base = detail::accessor_<DataType, dimensions, mode, access::local>;	\
+		using Base = detail::accessor_<DataType, dimensions, (detail::acc_mode_t)mode, (detail::acc_target_t)access::local>;	\
 	public:																			\
 		accessor(range<dimensions> allocationSize)									\
 			: Base(allocationSize) {}												\
@@ -73,7 +73,7 @@ public:
 #else
 #define SYCL_ADD_ACCESSOR_LOCAL(mode)												\
 	SYCL_ADD_ACCESSOR(mode, access::local) {										\
-		using Base = detail::accessor_<DataType, dimensions, mode, access::local>;	\
+		using Base = detail::accessor_<DataType, dimensions, (detail::acc_mode_t)mode, (detail::acc_target_t)access::local>;	\
 	public:																			\
 		using Base::Base;														\
 	};

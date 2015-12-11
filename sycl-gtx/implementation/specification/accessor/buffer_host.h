@@ -15,7 +15,9 @@ namespace sycl {
 namespace detail {
 
 #define SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR()									\
-	using acc_t = accessor_<DataType, dimensions, mode, access::host_buffer>;	\
+	using acc_t = accessor_<													\
+		DataType, dimensions,													\
+		(acc_mode_t)mode, (acc_target_t)access::host_buffer>;					\
 	friend acc_t;																\
 	template <int, typename, int, access::mode>									\
 	friend class accessor_host_ref;												\
