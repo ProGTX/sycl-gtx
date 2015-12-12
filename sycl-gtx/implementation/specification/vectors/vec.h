@@ -1,16 +1,17 @@
 #pragma once
 
-#include "access.h"
-#include "vec_members.h"
+// 3.7.2 Vector types
+// B.5 vec class
 
-#include "../common.h"
-#include "../counter.h"
-#include "../data_ref.h"
+#include "vec_members.h"
+#include "../access.h"
+#include "../../common.h"
+#include "../../counter.h"
+#include "../../data_ref.h"
+
 
 namespace cl {
 namespace sycl {
-
-// 3.7.2 Vector types
 
 // Forward declaration
 template <typename dataT, int numElements>
@@ -57,6 +58,10 @@ protected:
 		: data_ref(name) {}
 
 public:
+	using element_type = dataT;
+	// Underlying OpenCL type
+	// using vector_t = TODO;
+
 	base()
 		: data_ref(generate_name()) {
 		kernel_add(this_name());

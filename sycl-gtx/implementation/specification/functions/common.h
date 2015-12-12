@@ -2,7 +2,7 @@
 
 // 3.9.5 Common Functions
 
-#include "../vec.h"
+#include "../vectors/vec.h"
 #include "../../data_ref.h"
 
 namespace cl {

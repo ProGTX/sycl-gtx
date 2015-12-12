@@ -37,6 +37,9 @@
     <Filter Include="Source Files\src_handlers">
       <UniqueIdentifier>{792b8cac-84c1-430a-95fe-78a80a268675}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\specification\vectors">
+      <UniqueIdentifier>{43708157-f23f-4b5a-a31b-04408ecdf393}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="implementation\specification\device.cpp">
@@ -254,11 +257,11 @@
     <ClInclude Include="sycl_gtx_compatibility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\vec.h">
-      <Filter>Header Files\specification</Filter>
+    <ClInclude Include="implementation\specification\vectors\vec.h">
+      <Filter>Header Files\specification\vectors</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\vec_members.h">
-      <Filter>Header Files\specification</Filter>
+    <ClInclude Include="implementation\specification\vectors\vec_members.h">
+      <Filter>Header Files\specification\vectors</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
