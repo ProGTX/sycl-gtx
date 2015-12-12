@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0C635CBC-F596-4CB5-B4BB-59A3B1C4AC1C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>sycl</RootNamespace>
+    <ProjectName>sycl</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="CL\cl.h" />
+    <ClInclude Include="CL\cl.hpp" />
+    <ClInclude Include="CL\cl_d3d10.h" />
+    <ClInclude Include="CL\cl_d3d11.h" />
+    <ClInclude Include="CL\cl_dx9_media_sharing.h" />
+    <ClInclude Include="CL\cl_ext.h" />
+    <ClInclude Include="CL\cl_gl.h" />
+    <ClInclude Include="CL\cl_gl_ext.h" />
+    <ClInclude Include="CL\cl_platform.h" />
+    <ClInclude Include="CL\opencl.h" />
+    <ClInclude Include="CL\sycl.hpp" />
+    <ClInclude Include="SYCL\abacus_types.h" />
+    <ClInclude Include="SYCL\accessor.h" />
+    <ClInclude Include="SYCL\accessor_base.h" />
+    <ClInclude Include="SYCL\accessor_common.h" />
+    <ClInclude Include="SYCL\accessor_ops.h" />
+    <ClInclude Include="SYCL\allocator.h" />
+    <ClInclude Include="SYCL\apis.h" />
+    <ClInclude Include="SYCL\base.h" />
+    <ClInclude Include="SYCL\buffer.h" />
+    <ClInclude Include="SYCL\cl_types.h" />
+    <ClInclude Include="SYCL\common.h" />
+    <ClInclude Include="SYCL\compiler_hooks.h" />
+    <ClInclude Include="SYCL\context.h" />
+    <ClInclude Include="SYCL\device.h" />
+    <ClInclude Include="SYCL\device_selector.h" />
+    <ClInclude Include="SYCL\error.h" />
+    <ClInclude Include="SYCL\event.h" />
+    <ClInclude Include="SYCL\group.h" />
+    <ClInclude Include="SYCL\group_base.h" />
+    <ClInclude Include="SYCL\host_fp_math_builtins.h" />
+    <ClInclude Include="SYCL\host_integer_builtins.h" />
+    <ClInclude Include="SYCL\host_integer_lib_builtins.h" />
+    <ClInclude Include="SYCL\host_relational_builtins.h" />
+    <ClInclude Include="SYCL\id.h" />
+    <ClInclude Include="SYCL\image.h" />
+    <ClInclude Include="SYCL\index_array.h" />
+    <ClInclude Include="SYCL\index_array_operators.h" />
+    <ClInclude Include="SYCL\info.h" />
+    <ClInclude Include="SYCL\item.h" />
+    <ClInclude Include="SYCL\item_base.h" />
+    <ClInclude Include="SYCL\kernel.h" />
+    <ClInclude Include="SYCL\libimg\host.h" />
+    <ClInclude Include="SYCL\libimg\kernel.h" />
+    <ClInclude Include="SYCL\libimg\shared.h" />
+    <ClInclude Include="SYCL\libimg\validate.h" />
+    <ClInclude Include="SYCL\multi_pointer.h" />
+    <ClInclude Include="SYCL\nd_range_base.h" />
+    <ClInclude Include="SYCL\platform.h" />
+    <ClInclude Include="SYCL\postdefines.h" />
+    <ClInclude Include="SYCL\predefines.h" />
+    <ClInclude Include="SYCL\private_memory.h" />
+    <ClInclude Include="SYCL\program.h" />
+    <ClInclude Include="SYCL\queue.h" />
+    <ClInclude Include="SYCL\range.h" />
+    <ClInclude Include="SYCL\relational_builtins.h" />
+    <ClInclude Include="SYCL\sampler.h" />
+    <ClInclude Include="SYCL\serial_memop.h" />
+    <ClInclude Include="SYCL\spir_barrier_builtins.h" />
+    <ClInclude Include="SYCL\spir_id_builtins.h" />
+    <ClInclude Include="SYCL\spir_image_builtins.h" />
+    <ClInclude Include="SYCL\spir_math_builtins.h" />
+    <ClInclude Include="SYCL\storage.h" />
+    <ClInclude Include="SYCL\storage_mem.h" />
+    <ClInclude Include="SYCL\stream.h" />
+    <ClInclude Include="SYCL\sycl.hpp" />
+    <ClInclude Include="SYCL\sycl_builtins.h" />
+    <ClInclude Include="SYCL\sycl_interface.h" />
+    <ClInclude Include="SYCL\task.h" />
+    <ClInclude Include="SYCL\vec.h" />
+    <ClInclude Include="SYCL\vector_types.h" />
+    <ClInclude Include="SYCL\vec_common.h" />
+    <ClInclude Include="SYCL\vec_macros.h" />
+    <ClInclude Include="SYCL\vec_swizzles.h" />
+    <ClInclude Include="SYCL\vec_types_defines.h" />
+    <ClInclude Include="sycl_export.h" />
+    <ClInclude Include="sycl_export_link.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SYCL\abacus\abacus_config" />
+    <None Include="SYCL\abacus\abacus_detail_cast" />
+    <None Include="SYCL\abacus\abacus_detail_integer" />
+    <None Include="SYCL\abacus\abacus_detail_relational" />
+    <None Include="SYCL\abacus\abacus_integer" />
+    <None Include="SYCL\abacus\abacus_math" />
+    <None Include="SYCL\abacus\abacus_relational" />
+    <None Include="SYCL\abacus\abacus_type_traits" />
+    <None Include="SYCL\abacus\abacus_vector" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

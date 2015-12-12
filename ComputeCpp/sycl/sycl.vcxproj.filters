@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="SYCL\libimg\host.h">
+      <Filter>SYCL\libimg</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\libimg\shared.h">
+      <Filter>SYCL\libimg</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\libimg\validate.h">
+      <Filter>SYCL\libimg</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\libimg\kernel.h">
+      <Filter>SYCL\libimg</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\abacus_types.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\accessor.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\accessor_base.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\accessor_common.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\accessor_ops.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\allocator.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\apis.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\base.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\buffer.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\cl_types.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\common.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\compiler_hooks.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\context.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\device.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\device_selector.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\error.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\event.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\group.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\group_base.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\host_fp_math_builtins.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\host_integer_builtins.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\host_integer_lib_builtins.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\host_relational_builtins.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\id.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\image.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\index_array.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\index_array_operators.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\info.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\item.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\item_base.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\kernel.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\multi_pointer.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\nd_range_base.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\platform.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\postdefines.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\predefines.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\private_memory.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\program.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\queue.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\range.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\relational_builtins.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\sampler.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\serial_memop.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\spir_barrier_builtins.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\spir_id_builtins.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\spir_image_builtins.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\spir_math_builtins.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\storage.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\storage_mem.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\stream.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\sycl.hpp">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\sycl_builtins.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\sycl_interface.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\task.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\vec.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\vec_common.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\vec_macros.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\vec_swizzles.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\vec_types_defines.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="SYCL\vector_types.h">
+      <Filter>SYCL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\cl.hpp">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\cl_d3d10.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\cl_d3d11.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\cl_dx9_media_sharing.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\cl_ext.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\cl_gl.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\cl_gl_ext.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\cl_platform.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\opencl.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\sycl.hpp">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="CL\cl.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="sycl_export_link.h" />
+    <ClInclude Include="sycl_export.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SYCL\abacus\abacus_config">
+      <Filter>SYCL\abacus</Filter>
+    </None>
+    <None Include="SYCL\abacus\abacus_detail_cast">
+      <Filter>SYCL\abacus</Filter>
+    </None>
+    <None Include="SYCL\abacus\abacus_detail_integer">
+      <Filter>SYCL\abacus</Filter>
+    </None>
+    <None Include="SYCL\abacus\abacus_detail_relational">
+      <Filter>SYCL\abacus</Filter>
+    </None>
+    <None Include="SYCL\abacus\abacus_integer">
+      <Filter>SYCL\abacus</Filter>
+    </None>
+    <None Include="SYCL\abacus\abacus_math">
+      <Filter>SYCL\abacus</Filter>
+    </None>
+    <None Include="SYCL\abacus\abacus_relational">
+      <Filter>SYCL\abacus</Filter>
+    </None>
+    <None Include="SYCL\abacus\abacus_type_traits">
+      <Filter>SYCL\abacus</Filter>
+    </None>
+    <None Include="SYCL\abacus\abacus_vector">
+      <Filter>SYCL\abacus</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="SYCL">
+      <UniqueIdentifier>{a32a604b-bc6a-42e3-8eae-5d0d0a44dcd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SYCL\libimg">
+      <UniqueIdentifier>{98637f2e-df7d-4f7d-908a-237f6e16f889}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SYCL\abacus">
+      <UniqueIdentifier>{004593d8-3e33-4647-92cd-ef26818f8c16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CL">
+      <UniqueIdentifier>{0fd6d7cf-cfcc-4f11-8137-4fd712f20f3b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
