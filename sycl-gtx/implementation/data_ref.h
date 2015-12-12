@@ -45,6 +45,9 @@ public:
 	data_ref(string_class name)
 		: name(name) {}
 
+	data_ref(char* name)
+		: name(name) {}
+
 	data_ref(const char* name)
 		: name(name) {}
 
