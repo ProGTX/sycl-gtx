@@ -49,13 +49,13 @@ SYCL_UTYPE_ONE(long)
 #define SYCL_BEGIN {
 #define SYCL_END }
 
-#define SYCL_IF(condition) if(condition) {
+#define SYCL_IF(condition) if(condition) SYCL_BEGIN
 
-#define SYCL_ELSE } else {
-#define SYCL_ELSE_IF(condition)	} else if(condition) {
+#define SYCL_ELSE SYCL_END else SYCL_BEGIN
+#define SYCL_ELSE_IF(condition)	SYCL_END else if(condition) SYCL_BEGIN
 
-#define SYCL_WHILE(condition) while(condition) {
-#define SYCL_FOR(init, condition, increment) for(init; condition; increment) {
+#define SYCL_WHILE(condition) while(condition) SYCL_BEGIN
+#define SYCL_FOR(init, condition, increment) for(init; condition; increment) SYCL_BEGIN
 
 #define SYCL_BREAK break;
 #define SYCL_CONTINUE continue;
