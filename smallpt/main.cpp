@@ -188,9 +188,11 @@ void getDevices() {
 				printInfo("vendor", d.get_info<info::device::vendor>(), 2);
 				printInfo("device_version", d.get_info<info::device::device_version>(), 2);
 				printInfo("driver_version", d.get_info<info::device::driver_version>(), 2);
+#ifdef SYCL_GTX
 				printInfo("opencl_version", d.get_info<info::device::opencl_version>(), 2);
 				printInfo("single_fp_config", d.get_info<info::device::single_fp_config>(), 2);
 				printInfo("double_fp_config", d.get_info<info::device::double_fp_config>(), 2);
+#endif
 				printInfo("profile", d.get_info<info::device::profile>(), 2);
 				printInfo("error_correction_support", d.get_info<info::device::error_correction_support>(), 2);
 				printInfo("host_unified_memory", d.get_info<info::device::host_unified_memory>(), 2);

@@ -9,10 +9,15 @@
 #include <cstdio>
 #include <iostream>
 
+#define SYCL_SIMPLE_SWIZZLES
 #include <sycl.hpp>
 
 #include "classes.h"
 #include "win.h"
+
+#ifndef SYCL_GTX
+#include "../sycl-gtx/sycl_gtx_compatibility.h"
+#endif
 
 namespace ns_sycl_gtx {
 
@@ -67,12 +72,6 @@ struct Vector : public float3 {
 	}
 };
 
-#else
-
-using Vector = ::Vec;
-
-#endif // SYCL_GTX
-
 struct RaySycl {
 	Vector o, d;
 	RaySycl(const ::Ray& r)
@@ -91,20 +90,20 @@ public:
 	SphereSycl(T&& data)
 		: data(std::forward<T>(data)) {}
 
-	float1& rad() const {
+	float1& rad() {
 		return data.w;
 	}
-	float3& p() const { // position
+	float3& p() { // position
 		return data.xyz;
 	}
 	float3& e() { // emission
-		return data.lo.hi.xyz;
+		return data.lo().hi().xyz;
 	}
-	float3& c() const { // color
-		return data.hi.xyz;
+	float3& c() { // color
+		return data.hi().xyz;
 	}
-	float1 refl() const { // reflection type (Refl_t)
-		return data.hi.w;
+	float1 refl() { // reflection type (Refl_t)
+		return data.hi().w;
 	}
 
 	void intersect(float1& return_, const RaySycl& r) const { // returns distance, 0 if no hit
@@ -116,12 +115,12 @@ public:
 
 		SYCL_IF(det < 0)
 			return_ = 0;
-		SYCL_ELSE {
+		SYCL_ELSE{
 			det = sqrt(det);
 			t = b - det;
 			SYCL_IF(t > eps)
 				return_ = t;
-			SYCL_ELSE {
+			SYCL_ELSE{
 				t = b + det;
 				SYCL_IF(t > eps)
 					return_ = t;
@@ -134,6 +133,62 @@ public:
 		SYCL_END
 	}
 };
+
+#else
+
+struct Vector : public ::Vec_<float> {
+private:
+	using Base = ::Vec_<float>;
+public:
+	Vector(float x_ = 0, float y_ = 0, float z_ = 0)
+		: Base(x_, y_, z_) {}
+	template <class type>
+	Vector(const ::Vec_<type>& base)
+		: Vector((float)base.x, (float)base.y, (float)base.z) {}
+	Vector(float3 data)
+		: Vector(data.x(), data.y(), data.z()) {}
+};
+
+using RaySycl = ::Ray_<float>;
+
+struct SphereSycl {
+private:
+	::Sphere_<float> data;
+	using VecType = ::Vec_<float>;
+
+public:
+	SphereSycl(float16 data)
+		: data(
+			data.lo().lo().w(),
+			Vector(data.lo().lo().xyz()),
+			Vector(data.lo().hi().xyz()),
+			Vector(data.hi().lo().xyz()),
+			(Refl_t)static_cast<int>(data.hi().lo().w().m_data[0])
+		) {	}
+
+	float1& rad() {
+		return data.rad;
+	}
+	VecType& p() { // position
+		return data.p;
+	}
+	VecType& e() { // emission
+		return data.e;
+	}
+	VecType& c() { // color
+		return data.c;
+	}
+	Refl_t refl() { // reflection type (Refl_t)
+		return data.refl;
+	}
+
+	void intersect(float1& return_, const RaySycl& r) const { // returns distance, 0 if no hit
+		return_ = data.intersect(r);
+	}
+};
+
+#endif // SYCL_GTX
+
 
 inline void clamp(float1& x) {
 	SYCL_IF(x < 0)
@@ -167,9 +222,9 @@ inline bool1 intersect(spheres_t spheres, const RaySycl& r, float1& t, int1& id)
 float1 getRandom(uint2& seed) {
 	// Note: Should not be declared static
 	const float1 invMaxInt = 1.0f / 4294967296.0f;
-	uint1 x = seed.x * 17 + seed.y * 13123;
-	seed.x = (x << 13) ^ x;
-	seed.y ^= x << 7;
+	uint1 x = seed.x() * 17 + seed.y() * 13123;
+	seed.x() = (x << 13) ^ x;
+	seed.y() = seed.y() ^ x << 7;
 	return (float1)(x * (x * x * 15731 + 74323) + 871483) * invMaxInt;
 }
 
@@ -207,7 +262,7 @@ void radiance(
 		Vector n = Vector(x - obj.p()).norm();
 		Vector nl = n;
 		SYCL_IF(n.dot(r.d) > 0)
-			nl *= -1;
+			nl = nl * -1;
 		SYCL_END
 
 		Vector f = obj.c();
@@ -221,12 +276,12 @@ void radiance(
 			p = f.z;
 		SYCL_END
 
-		cl += cf.mult(obj.e());
+		cl = cl + cf.mult(obj.e());
 
 		depth += 1; 
 		SYCL_IF(depth > 5) {
 			SYCL_IF(getRandom(randomSeed) < p) {
-				f *= 1 / p;
+				f = f * (1 / p);
 			}
 			SYCL_ELSE {
 				return_ = cl;
@@ -239,13 +294,13 @@ void radiance(
 		cf = cf.mult(f);
 
 		SYCL_IF(obj.refl() == (float)DIFF) { // Ideal DIFFUSE reflection 
-			float1 r1 = 2 * M_PI * getRandom(randomSeed);
+			float1 r1 = (float1)(2 * M_PI * getRandom(randomSeed));
 			float1 r2 = getRandom(randomSeed);
-			float1 r2s = sqrt(r2);
+			float1 r2s = cl::sycl::sqrt(r2);
 			Vector w = nl;
 			
 			Vector u(0, 0, 0);
-			SYCL_IF(fabs(w.x) > .1f)
+			SYCL_IF(cl::sycl::fabs(w.x) > .1f)
 				u.y = 1;
 			SYCL_ELSE
 				u.x = 1;
@@ -253,7 +308,7 @@ void radiance(
 			u = (u % w).norm();
 
 			Vector v = w % u;
-			Vector d = Vector(u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
+			Vector d = Vector(u*cl::sycl::cos(r1)*r2s + v*cl::sycl::sin(r1)*r2s + w*cl::sycl::sqrt(1 - r2)).norm();
 
 			// Recursion
 			r = RaySycl(x, d);
@@ -269,7 +324,7 @@ void radiance(
 		reflRay = RaySycl(x, r.d - n * 2 * n.dot(r.d));	// Ideal dielectric REFRACTION
 		bool1 into = n.dot(nl) > 0;	// Ray from outside going in?
 		float1 nc = 1;
-		float1 nt = 1.5;
+		float1 nt = 1.5f;
 
 		float1 nnt;
 		SYCL_IF(into)
@@ -292,7 +347,7 @@ void radiance(
 			tmp = -1;
 		SYCL_END
 
-		tdir = Vector(r.d*nnt - n*(tmp*(ddn*nnt + sqrt(cos2t)))).norm();
+		tdir = Vector(r.d*nnt - n*(tmp*(ddn*nnt + cl::sycl::sqrt(cos2t)))).norm();
 		float1 a = nt - nc;
 		float1 b = nt + nc;
 		float1 R0 = a*a / (b*b);
@@ -306,17 +361,17 @@ void radiance(
 
 		float1 Re = R0 + (1 - R0)*c*c*c*c*c;
 		float1 Tr = 1 - Re;
-		float1 P = .25 + .5*Re;
+		float1 P = .25f + .5f*Re;
 		float1 RP = Re / P;
 		float1 TP = Tr / (1 - P);
 
 		// Tail recursion
 		SYCL_IF(getRandom(randomSeed) < P) {
-			cf *= RP;
+			cf = cf * RP;
 			r = reflRay;
 		}
 		SYCL_ELSE {
-			cf *= TP;
+			cf = cf * TP;
 			r = RaySycl(x, tdir);
 		}
 		SYCL_END
@@ -345,33 +400,40 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 
 	buffer<float3> colorsBuffer(range<1>(w*h));
 
-	vector<cl_uint2> seedArray;
+	vector<::cl_uint2> seedArray;
 	seedArray.reserve(w*h);
 	for(int y = 0; y < h; ++y) {
 		Xi[2] = y*y*y;
 		for(int x = 0; x < w; ++x) {
-			cl_uint2 seed;
-			seed.x = (cl_uint)erand48(Xi);
-			seed.y = (cl_uint)erand48(Xi);
+			::cl_uint2 seed;
+			seed.s[0] = (::cl_uint)erand48(Xi);
+			seed.s[1] = (::cl_uint)erand48(Xi);
 			seedArray.push_back(seed);
 		}
 	}
-	buffer<cl_uint2> seedsBuffer(seedArray);
+	buffer<::cl_uint2> seedsBuffer(seedArray);
 
-	buffer<float16> spheres_(ns_sycl_gtx::numSpheres);
+	auto spheres_ = buffer<float16>(range<1>(ns_sycl_gtx::numSpheres));
 	{
+		auto assign = [](float4& target, ::Vec& data) {
+			using type = float4::element_type;
+			target.x() = (type)data.x;
+			target.y() = (type)data.y;
+			target.z() = (type)data.z;
+		};
+
 		auto s = spheres_.get_access<access::mode::discard_write, access::target::host_buffer>();
 		// See SphereSycl
 		for(int i = 0; i < ns_sycl_gtx::numSpheres; ++i) {
 			auto& si = s[i];
 			auto& sj = ns_sycl_gtx::spheres[i];
 
-			assign(si.lo.lo, sj.p);
-			assign(si.lo.hi, sj.e);
-			assign(si.hi.lo, sj.c);
+			assign(si.lo().lo(), sj.p);
+			assign(si.lo().hi(), sj.e);
+			assign(si.hi().lo(), sj.c);
 
-			si.lo.lo.w = (cl_float)sj.rad;
-			si.hi.lo.w = (cl_float)sj.refl;
+			si.lo().lo().w() = (::cl_float)sj.rad;
+			si.hi().lo().w() = (::cl_float)sj.refl;
 		}
 	}
 
@@ -406,9 +468,10 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 				Vector cx(cx_);
 				Vector cy(cy_);
 				Vector r(r_);
-				RaySycl cam(cam_);
+				RaySycl cam(Vector(cam_.o), Vector(cam_.d));
 				uint2 randomSeed;
-				randomSeed = seeds[i] * (i + 1) + i + 1;
+				randomSeed.x() = seeds[i].s[0] * i[0] + i[0] + 1;
+				randomSeed.y() = seeds[i].s[1] * i[1] + i[1] + 1;
 
 				c[i] = 0; // Important to start at zero
 
@@ -418,32 +481,32 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 					SYCL_FOR(int1 sx = 0, sx < 2, sx++) {
 						SYCL_FOR(int1 s = 0, s < samps, s++) {
 							float2 rnew;
-							rnew.x = 2 * getRandom(randomSeed);
-							rnew.y = 2 * getRandom(randomSeed);
+							rnew.x() = 2 * getRandom(randomSeed);
+							rnew.y() = 2 * getRandom(randomSeed);
 
 							float2 dd;
 
-							SYCL_IF(rnew.x < 1)
-								dd.x = sqrt(rnew.x) - 1;
+							SYCL_IF(rnew.x() < 1)
+								dd.x() = cl::sycl::sqrt(rnew.x()) - 1;
 							SYCL_ELSE
-								dd.x = 1 - sqrt(2 - rnew.x);
+								dd.x() = 1 - cl::sycl::sqrt(2 - rnew.x());
 							SYCL_END
 
-							SYCL_IF(rnew.y < 1)
-								dd.y = sqrt(rnew.y) - 1;
+							SYCL_IF(rnew.y() < 1)
+								dd.y() = cl::sycl::sqrt(rnew.y()) - 1;
 							SYCL_ELSE
-								dd.y = 1 - sqrt(2 - rnew.y);
+								dd.y() = 1 - cl::sycl::sqrt(2 - rnew.y());
 							SYCL_END
 
 							Vector d =
-								cx * (((sx + .5f + dd.x) / 2 + i[0]) / w - .5f) +
-								cy * (((sy + .5f + dd.y) / 2 + i[1] + lineOffset[k].first) / h - .5f) +
+								cx * (((sx + .5f + dd.x()) / 2 + i[0]) / w - .5f) +
+								cy * (((sy + .5f + dd.y()) / 2 + i[1] + lineOffset[k].first) / h - .5f) +
 								cam.d;
 
 							// TODO:
 							Vector rad;
 							radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()), randomSeed);
-							r += rad*(1.f / samps);
+							r = r + rad*(1.f / samps);
 						} // Camera rays are pushed ^^^^^ forward to start in interior
 						SYCL_END
 
@@ -451,7 +514,11 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 						clamp(r.y);
 						clamp(r.z);
 
-						c[i] += r * .25f;
+						r = r * .25f;
+						auto& ci = c[i];
+						ci.x() = ci.x() + r.x;
+						ci.y() = ci.y() + r.y;
+						ci.z() = ci.z() + r.z;
 
 						r = Vector();
 					}
@@ -461,6 +528,13 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 			});
 		});
 	}
+
+	auto assign = [](::Vec& target, float3& data) {
+		target.x = (double)data.x();
+		target.y = (double)data.y();
+		target.z = (double)data.z();
+	};
+
 
 	for(auto k = 0; k < numParts; ++k) {
 #if _DEBUG
