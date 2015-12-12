@@ -8,7 +8,7 @@
 int main() {
 	using namespace std;
 
-	debug() << "SYCL 1.2 Final Specification, Provisional Implementation.";
+	cout << "SYCL 1.2 Final Specification, Provisional Implementation." << endl;
 	
 	std::map<std::string, bool(*)()> tests{
 		{ "test1", test1 },
@@ -27,9 +27,7 @@ int main() {
 	bool result = false;
 
 	for(auto&& test : tests) {
-		debug();
-		debug() << "starting" << test.first;
-		debug();
+		cout << "starting " << test.first << endl;
 #if TRY_CATCH_ERRORS
 		try {
 #endif
@@ -37,14 +35,13 @@ int main() {
 #if TRY_CATCH_ERRORS
 		}
 		catch(cl::sycl::exception& e) {
-			debug() << "cl::sycl::exception while testing" << test.first << e.what();
+			cout << "cl::sycl::exception while testing " << test.first << ' ' << e.what() << endl;
 		}
 		catch(std::exception& e) {
-			debug() << "std::exception while testing" << test.first << e.what();
+			cout << "std::exception while testing " << test.first << ' ' << e.what() << endl;
 		}
 #endif
-		debug();
-		debug() << test.first << (result ? "successful" : "failed");
+		cout << test.first << (result ? " successful" : " failed") << endl;
 	}
 
 	cout << "Press any key to exit ..." << endl;
