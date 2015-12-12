@@ -108,6 +108,7 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 			cerr << "error while testing: " << e.what() << endl;
 			continue;
 		}
+#endif
 		cout << "time: " << time << endl;
 		//to_file(w, h, vectors.data(), string("image_") + t.name + ".ppm");
 
