@@ -88,13 +88,17 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 
 		cout << "Running test: " << t.name << endl;
 		ns_erand::reset();
+#ifndef _DEBUG
 		try {
+#endif
 			auto start = now();
 			for(int i = 0; i < iterations; ++i) {
 				vectors = empty_vectors;
 				t.test(t.dev.get(), w, h, samples, cam, cx, cy, r, vectors.data());
 			}
 			time = (duration(start) / (float)iterations);
+
+#ifndef _DEBUG
 		}
 		catch(cl::sycl::exception& e) {
 			cerr << "SYCL error while testing: " << e.what() << endl;
