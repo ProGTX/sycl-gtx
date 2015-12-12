@@ -16,6 +16,7 @@
 #include "implementation/specification/program.h"
 #include "implementation/specification/queue.h"
 #include "implementation/specification/ranges.h"
+#include "implementation/specification/vectors/swizzled_vec.h"
 #include "implementation/specification/vectors/vec.h"
 #include "implementation/specification/workitem_functions.h"
 

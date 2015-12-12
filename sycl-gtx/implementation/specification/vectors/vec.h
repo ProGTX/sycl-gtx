@@ -4,7 +4,6 @@
 // B.5 vec class
 
 #include "helpers.h"
-#include "swizzled_vec.h"
 #include "vec_members.h"
 #include "../access.h"
 #include "../../common.h"
@@ -15,16 +14,21 @@
 namespace cl {
 namespace sycl {
 
-// Forward declaration
-template <typename dataT, int numElements>
+// Forward declarations
+template <typename, int>
 class vec;
+
+template <typename dataT, int numElements>
+using swizzled_vec = vec<dataT, numElements>;
 
 namespace detail {
 namespace vectors {
 
 // Forward declaration
-template <typename dataT, int numElements>
+template <typename, int>
 struct data;
+template <int, int, int...>
+struct swizzled;
 
 #define SYCL_ENABLE_IF_DIM(dim)	\
 typename std::enable_if<num == dim>::type* = nullptr
@@ -96,7 +100,17 @@ public:
 	}
 
 	template <int... indices>
-	swizzled_vec<dataT, sizeof...(indices)> swizzle() const {}
+	swizzled_vec<dataT, sizeof...(indices)> swizzle() const {
+		static const auto size = sizeof...(indices);
+		static_assert(size > 0, "Cannot swizzle to zero elements");
+
+		// One extra for final null char
+		char access_name[size + 1];
+		swizzled<0, indices...>::get(access_name);
+		access_name[size] = 0;
+
+		return swizzled_vec<dataT, size>(name + ".s" + access_name, true);
+	}
 
 	// TODO: Swizzle methods
 	//swizzled_vec<T, out_dims> swizzle<int s1, ...>();
@@ -123,8 +137,10 @@ private:
 	using Base = detail::vectors::base<dataT, numElements>;
 	using Members = detail::vectors::members<dataT, numElements>;
 
+	friend Base;
+
 protected:
-	vec(string_class name_)
+	vec(string_class name_, bool from_existing = true)
 		: Base(name_), Members(this) {}
 
 	using data_ref = detail::data_ref;
