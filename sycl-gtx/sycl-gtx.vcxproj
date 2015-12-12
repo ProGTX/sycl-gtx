@@ -223,6 +223,7 @@
     <ClInclude Include="implementation\specification\ranges\nd_range.h" />
     <ClInclude Include="implementation\specification\ranges\range.h" />
     <ClInclude Include="implementation\specification\refc.h" />
+    <ClInclude Include="implementation\specification\vectors\helpers.h" />
     <ClInclude Include="implementation\specification\vectors\vec.h" />
     <ClInclude Include="implementation\specification\vectors\vec_members.h" />
     <ClInclude Include="implementation\specification\workitem_functions.h" />
