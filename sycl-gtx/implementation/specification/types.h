@@ -107,7 +107,7 @@ class vec : public detail::vectors::base<dataT, numElements>, public detail::vec
 private:
 	template <typename, int>
 	friend struct detail::vectors::members;
-	template <typename, int, detail::acc_mode_t, detail::acc_target_t, typename>
+	template <typename, int, access::mode, access::target, typename>
 	friend class detail::accessor_;
 	template <int, typename, int, access::mode, access::target>
 	friend class detail::accessor_device_ref;

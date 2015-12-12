@@ -17,7 +17,7 @@ void issue_command::prepare_kernel(shared_ptr_class<kernel> kern) {
 	cl_int error_code;
 	int i = 0;
 	for(auto& acc : kern->src.resources) {
-		if(acc.second.acc.target == access::local) {
+		if(acc.second.acc.target == access::target::local) {
 			error_code = clSetKernelArg(k, i, acc.second.size, nullptr);
 		}
 		else {
@@ -33,17 +33,17 @@ void issue_command::write_buffers_to_device(shared_ptr_class<kernel> kern) {
 	for(auto& acc : kern->src.resources) {
 		auto mode = acc.second.acc.mode;
 		if(
-			mode == access::write				||
-			mode == access::discard_write		||
-			mode == access::discard_read_write	||
-			acc.second.acc.target == access::local
+			mode == access::mode::write				||
+			mode == access::mode::discard_write		||
+			mode == access::mode::discard_read_write	||
+			acc.second.acc.target == access::target::local
 		) {
 			// Don't need to copy data that won't be used
 			continue;
 		}
 		command::group_::add_buffer_copy(
 			acc.second.acc,
-			access::write,
+			access::mode::write,
 			buffer_base::enqueue_command,
 			__func__,
 			acc.second.acc.data,
@@ -64,15 +64,15 @@ void issue_command::enqueue_task(shared_ptr_class<kernel> kern, event* evnt) {
 void issue_command::read_buffers_from_device(shared_ptr_class<kernel> kern) {
 	for(auto& acc : kern->src.resources) {
 		if(
-			acc.second.acc.mode == access::read ||
-			acc.second.acc.target == access::local
+			acc.second.acc.mode == access::mode::read ||
+			acc.second.acc.target == access::target::local
 		) {
 			// Don't need to read back read-only buffers
 			continue;
 		}
 		command::group_::add_buffer_copy(
 			acc.second.acc,
-			access::read,
+			access::mode::read,
 			buffer_base::enqueue_command,
 			__func__,
 			acc.second.acc.data,

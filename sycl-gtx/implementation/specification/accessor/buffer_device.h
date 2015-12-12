@@ -17,11 +17,11 @@ namespace sycl {
 namespace detail {
 
 SYCL_ACCESSOR_CLASS(
-	target == access::constant_buffer	||
-	target == access::global_buffer
+	target == access::target::constant_buffer	||
+	target == access::target::global_buffer
 ),
 	public accessor_buffer<DataType, dimensions>,
-	public accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>
+	public accessor_device_ref<dimensions, DataType, dimensions, mode, target>
 {
 private:
 	template <int, typename, int, access::mode, access::target>
@@ -29,7 +29,7 @@ private:
 
 	using return_t = typename acc_device_return<DataType>::type;
 	using base_acc_buffer = accessor_buffer<DataType, dimensions>;
-	using base_acc_device_ref = accessor_device_ref<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>;
+	using base_acc_device_ref = accessor_device_ref<dimensions, DataType, dimensions, mode, target>;
 
 public:
 	accessor_(
@@ -68,7 +68,7 @@ public:
 	}
 
 private:
-	using subscript_return_t = typename subscript_helper<dimensions, DataType, dimensions, (access::mode)mode, (access::target)target>::type;
+	using subscript_return_t = typename subscript_helper<dimensions, DataType, dimensions, mode, target>::type;
 public:
 	SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(base_acc_device_ref::);
 

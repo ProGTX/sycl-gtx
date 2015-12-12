@@ -53,7 +53,7 @@ void command_group::optimize() {
 		else if(command.type == type_t::copy_data) {
 			auto ptr = command.data.buf_copy.buf.data;
 
-			if(command.data.buf_copy.mode == access::read) {
+			if(command.data.buf_copy.mode == access::mode::read) {
 				auto it = last_read.find(ptr);
 
 				// Keep only the last read
@@ -64,7 +64,7 @@ void command_group::optimize() {
 
 				last_read[ptr] = &command;
 			}
-			else if(command.data.buf_copy.mode == access::write) {
+			else if(command.data.buf_copy.mode == access::mode::write) {
 				auto it = was_written.find(ptr);
 
 				// Keep only the first write
@@ -149,11 +149,11 @@ void command::group_::add_buffer_access(
 	});
 
 	// TODO: Maybe other targets
-	if(buf_acc.target == access::global_buffer) {
-		if(buf_acc.mode != access::discard_write && buf_acc.mode != access::discard_read_write) {
+	if(buf_acc.target == access::target::global_buffer) {
+		if(buf_acc.mode != access::mode::discard_write && buf_acc.mode != access::mode::discard_read_write) {
 			last->read_buffers.insert(buf_acc.data);
 		}
-		if(buf_acc.mode != access::read) {
+		if(buf_acc.mode != access::mode::read) {
 			last->write_buffers.insert(buf_acc.data);
 		}
 	}

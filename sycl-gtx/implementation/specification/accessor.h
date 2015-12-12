@@ -18,18 +18,6 @@ namespace kernel_ {
 class accessor_base {
 };
 
-
-#if MSVC_LOW
-// Indirection required because MSVC2013 fails on enum parameter SFINAE
-// The final accessor class also needs a move constructor from base type: accessor(accessor_&&)
-using acc_mode_t = int;
-using acc_target_t = int;
-#else
-using acc_mode_t = access::mode;
-using acc_target_t = access::target;
-#endif
-
-
 // 3.6.4.3 Core accessors class
 template <typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_core : public accessor_base {
@@ -66,27 +54,36 @@ protected:
 template <bool>
 struct select_target;
 
-// This does not compile with enums (at least in MSVC 2013), use ints instead
-template <typename DataType, int dimensions, acc_mode_t mode, acc_target_t target, typename = select_target<true>>
+template <
+	typename DataType,
+	int dimensions,
+	access::mode mode,
+	access::target target,
+	typename = select_target<true>
+>
 class accessor_;
 
-#define SYCL_ACCESSOR_CLASS(condition)																\
-	template <typename DataType, int dimensions, acc_mode_t mode, acc_target_t target>				\
-	class accessor_<DataType, dimensions, mode, target, select_target<(condition)>>					\
-		: public accessor_core<DataType, dimensions, (access::mode)mode, (access::target)target>
+#define SYCL_ACCESSOR_CLASS(condition)														\
+	template <typename DataType, int dimensions, access::mode mode, access::target target>	\
+	class accessor_<DataType, dimensions, mode, target, select_target<(condition)>>			\
+		: public accessor_core<DataType, dimensions, mode, target>
 
 } // namespace detail
 
 
-template <typename DataType, int dimensions = 1, access::mode mode = access::read_write, access::target target = access::global_buffer>
+template <
+	typename DataType,
+	int dimensions = 1,
+	access::mode mode = access::mode::read_write,
+	access::target target = access::target::global_buffer
+>
 class accessor;
 
-#define SYCL_ADD_ACCESSOR(mode, target)								\
-	template <typename DataType, int dimensions>					\
-	class accessor<DataType, dimensions, mode, target>				\
-		: public detail::accessor_<									\
-			DataType, dimensions,									\
-			(detail::acc_mode_t)mode, (detail::acc_target_t)target>
+#define SYCL_ADD_ACCESSOR(mode, target)					\
+	template <typename DataType, int dimensions>		\
+	class accessor<DataType, dimensions, mode, target>	\
+		: public detail::accessor_<						\
+			DataType, dimensions, mode, target>
 
 } // namespace sycl
 } // namespace cl

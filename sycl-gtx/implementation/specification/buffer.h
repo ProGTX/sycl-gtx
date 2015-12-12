@@ -31,7 +31,7 @@ class queue;
 namespace detail {
 
 // Forward declarations
-template <typename, int, acc_mode_t, acc_target_t, typename>
+template <typename, int, access::mode, access::target, typename>
 class accessor_;
 template <typename, int>
 class accessor_buffer;
@@ -195,31 +195,31 @@ private:
 	template <access::mode mode, access::target target>
 	using acc_return_t = accessor<DataType, dimensions, mode, target>;
 
-	template <acc_mode_t mode, acc_target_t target>
-	acc_return_t<(access::mode)mode, (access::target)target> get_access_device(handler& cgh) {
+	template <access::mode mode, access::target target>
+	acc_return_t<mode, target> get_access_device(handler& cgh) {
 		command::group_::check_scope();
-		if(mode != (acc_mode_t)access::read) {
+		if(mode != access::mode::read) {
 			check_read_only();
 		}
 		init();
-		command::group_::add_buffer_access(buffer_access{ this, (access::mode)mode, (access::target)target }, __func__);
-		return acc_return_t<(access::mode)mode, (access::target)target>(
+		command::group_::add_buffer_access(buffer_access{ this, mode, target }, __func__);
+		return acc_return_t<mode, target>(
 			*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)), cgh
 		);
 	}
 
-	template <acc_mode_t mode, acc_target_t target>
-	acc_return_t<(access::mode)mode, (access::target)target> get_access_host() {
-		if(mode != (acc_mode_t)access::read) {
+	template <access::mode mode, access::target target>
+	acc_return_t<mode, target> get_access_host() {
+		if(mode != access::mode::read) {
 			check_read_only();
 		}
-		return acc_return_t<(access::mode)mode, (access::target)target>(
+		return acc_return_t<mode, target>(
 			*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this))
 		);
 	}
 
 public:
-	template <access::mode mode, access::target target = access::global_buffer>
+	template <access::mode mode, access::target target = access::target::global_buffer>
 	accessor<DataType, dimensions, mode, target> get_access(handler& cgh) {
 		return get_access_device<mode, target>(cgh);
 	}

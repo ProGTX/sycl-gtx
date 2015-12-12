@@ -14,23 +14,22 @@ namespace cl {
 namespace sycl {
 namespace detail {
 
-#define SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR()									\
-	using acc_t = accessor_<													\
-		DataType, dimensions,													\
-		(acc_mode_t)mode, (acc_target_t)access::host_buffer>;					\
-	friend acc_t;																\
-	template <int, typename, int, access::mode>									\
-	friend class accessor_host_ref;												\
-	const acc_t* parent;														\
-	std::array<size_t, 3> rang;													\
-	accessor_host_ref(const acc_t* parent, std::array<size_t, 3> rang)			\
-		: parent(parent), rang(rang) {}											\
-	accessor_host_ref(const acc_t* parent, const accessor_host_ref& copy)		\
-		: parent(parent), rang(copy.rang) {}									\
-	accessor_host_ref(const acc_t* parent, accessor_host_ref&& move)			\
-		: parent(parent), rang(std::move(move.rang)) {}							\
-	friend void swap(accessor_host_ref& first, accessor_host_ref& second) {		\
-		std::swap(first.rang, second.rang);										\
+#define SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR()								\
+	using acc_t = accessor_<												\
+		DataType, dimensions, mode, access::target::host_buffer>;			\
+	friend acc_t;															\
+	template <int, typename, int, access::mode>								\
+	friend class accessor_host_ref;											\
+	const acc_t* parent;													\
+	std::array<size_t, 3> rang;												\
+	accessor_host_ref(const acc_t* parent, std::array<size_t, 3> rang)		\
+		: parent(parent), rang(rang) {}										\
+	accessor_host_ref(const acc_t* parent, const accessor_host_ref& copy)	\
+		: parent(parent), rang(copy.rang) {}								\
+	accessor_host_ref(const acc_t* parent, accessor_host_ref&& move)		\
+		: parent(parent), rang(std::move(move.rang)) {}						\
+	friend void swap(accessor_host_ref& first, accessor_host_ref& second) {	\
+		std::swap(first.rang, second.rang);									\
 	}
 
 template <int level, typename DataType, int dimensions, access::mode mode>
@@ -64,15 +63,15 @@ public:
 	}
 };
 
-SYCL_ACCESSOR_CLASS(target == access::host_buffer),
+SYCL_ACCESSOR_CLASS(target == access::target::host_buffer),
 	public accessor_buffer<DataType, dimensions>,
-	public accessor_host_ref<dimensions, DataType, dimensions, (access::mode)mode>
+	public accessor_host_ref<dimensions, DataType, dimensions, mode>
 {
 	template <int, typename, int, access::mode>
 	friend class accessor_host_ref;
 
 	using base_acc_buffer = accessor_buffer<DataType, dimensions>;
-	using base_acc_host_ref = accessor_host_ref<dimensions, DataType, dimensions, (access::mode)mode>;
+	using base_acc_host_ref = accessor_host_ref<dimensions, DataType, dimensions, mode>;
 public:
 	accessor_(
 		buffer<DataType, dimensions>& bufferRef,

@@ -15,7 +15,7 @@ enum class fence_space : char {
 
 
 // 3.4.6.1 Access modes
-enum mode {
+enum class mode {
 	read,				// read-only access
 	write,				// write-only access, previous contents NOT discarded
 	read_write,			// read and write access
@@ -25,7 +25,7 @@ enum mode {
 };
 
 // 3.4.6.2 Access targets
-enum target {
+enum class target {
 	global_buffer,		// access buffer via __global memory
 	constant_buffer,	// access buffer via __constant memory
 	local,				// access work-group-local memory
@@ -38,22 +38,22 @@ enum target {
 static debug& operator<<(debug& d, mode m) {
 	std::string str("mode::");
 	switch(m) {
-		case read:
+		case mode::read:
 			str += "read";
 			break;
-		case write:
+		case mode::write:
 			str += "write";
 			break;
-		case read_write:
+		case mode::read_write:
 			str += "read_write";
 			break;
-		case discard_write:
+		case mode::discard_write:
 			str += "discard_write";
 			break;
-		case discard_read_write:
+		case mode::discard_read_write:
 			str += "discard_read_write";
 			break;
-		case atomic:
+		case mode::atomic:
 			str += "atomic";
 			break;
 	}
@@ -64,25 +64,25 @@ static debug& operator<<(debug& d, mode m) {
 static debug& operator<<(debug& d, target t) {
 	std::string str("target::");
 	switch(t) {
-		case global_buffer:
+		case target::global_buffer:
 			str += "global_buffer";
 			break;
-		case constant_buffer:
+		case target::constant_buffer:
 			str += "constant_buffer";
 			break;
-		case local:
+		case target::local:
 			str += "local";
 			break;
-		case image:
+		case target::image:
 			str += "image";
 			break;
-		case host_buffer:
+		case target::host_buffer:
 			str += "host_buffer";
 			break;
-		case host_image:
+		case target::host_image:
 			str += "host_image";
 			break;
-		case image_array:
+		case target::image_array:
 			str += "image_array";
 			break;
 	}
