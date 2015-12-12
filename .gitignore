@@ -10,3 +10,7 @@ cl/
 *.stackdump
 *.ppm
 *.o
+ComputeCpp/sycl/SYCL/
+ComputeCpp/sycl/sycl_export.h
+ComputeCpp/sycl/sycl_export_link.h
+*.a
