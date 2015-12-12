@@ -24,7 +24,7 @@ cl_int buffer_base::cl_enqueue_buffer(
 		0,
 		size,
 		host_ptr,
-		num_events_to_wait,
+		(cl_uint)num_events_to_wait,
 		(num_events_to_wait == 0 ? nullptr : wait_events.data()),
 		&evnt
 	);

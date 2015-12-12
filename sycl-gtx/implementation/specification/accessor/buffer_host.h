@@ -56,8 +56,8 @@ public:
 		index = 0;
 		int multiplier = 1;
 		for(int i = 0; i < dimensions; ++i) {
-			index += rang[i] * multiplier;
-			multiplier *= parent->access_buffer_range(i);
+			index += (int)(rang[i] * multiplier);
+			multiplier *= (int)parent->access_buffer_range(i);
 		}
 		return parent->access_host_data()[index];
 	}

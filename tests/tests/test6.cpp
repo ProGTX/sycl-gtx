@@ -28,9 +28,9 @@ bool test6() {
 			});
 		});
 
-		unsigned int local_size = std::min(group_size, size);
+		size_t local_size = std::min(group_size, size);
 
-		for(unsigned int N = size; N > 1; N /= local_size) {
+		for(size_t N = size; N > 1; N /= local_size) {
 			debug() << "Submitting work";
 			myQueue.submit([&](handler& cgh) {
 				auto input = P->get_access<access::mode::read>(cgh);

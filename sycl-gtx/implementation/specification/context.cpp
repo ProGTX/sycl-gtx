@@ -14,11 +14,11 @@ context::context(
 	const device_selector& deviceSelector
 ) : ctx(c), target_devices(deviceList), asyncHandler(asyncHandler) {
 	if(c == nullptr) {
-		cl_uint num_devices = target_devices.size();
+		cl_uint num_devices = (cl_uint)target_devices.size();
 
 		if(num_devices == 0) {
 			target_devices = device_selector::get_platform().get_devices(deviceSelector.type);
-			num_devices = target_devices.size();
+			num_devices = (cl_uint)target_devices.size();
 		}
 
 		vector_class<cl_device_id> devices;
