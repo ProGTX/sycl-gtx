@@ -4,6 +4,7 @@
 // B.5 vec class
 
 #include "helpers.h"
+#include "swizzled_vec.h"
 #include "vec_members.h"
 #include "../access.h"
 #include "../../common.h"
@@ -94,11 +95,14 @@ public:
 		return numElements * sizeof(typename data<dataT, numElements>::type);
 	}
 
+	template <int... indices>
+	swizzled_vec<dataT, sizeof...(indices)> swizzle() const {}
+
 	// TODO: Swizzle methods
 	//swizzled_vec<T, out_dims> swizzle<int s1, ...>();
 #ifdef SYCL_SIMPLE_SWIZZLES
-	swizzled_vec<T, 4> xyzw();
-	...
+	//swizzled_vec<T, 4> xyzw();
+	//...
 #endif // #ifdef SYCL_SIMPLE_SWIZZLES
 };
 

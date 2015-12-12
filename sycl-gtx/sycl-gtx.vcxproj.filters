@@ -266,6 +266,9 @@
     <ClInclude Include="implementation\specification\vectors\helpers.h">
       <Filter>Header Files\specification\vectors</Filter>
     </ClInclude>
+    <ClInclude Include="implementation\specification\vectors\swizzled_vec.h">
+      <Filter>Header Files\specification\vectors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="make\makefile" />
