@@ -24,14 +24,14 @@ bool test10() {
 	buffer<float3> vectors(size);
 
 	myQueue.submit([&](handler& cgh) {
-		auto v = vectors.get_access<access::discard_write>(cgh);
+		auto v = vectors.get_access<access::mode::discard_write>(cgh);
 			
 		cgh.parallel_for<class addition>(range<1>(size), [=](id<> i) {
 			v[i] = float3(testVector.x, testVector.y, testVector.z);
 		});
 	});
 
-	auto v = vectors.get_access<access::read, access::host_buffer>();
+	auto v = vectors.get_access<access::mode::read, access::target::host_buffer>();
 
 	for(auto i = 0; i < size; ++i) {
 		auto vi = v[i];

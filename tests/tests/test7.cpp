@@ -25,7 +25,7 @@ bool test7() {
 		// Launch a first asynchronous kernel to initialize a
 		myQueue.submit([&](handler& cgh) {
 			// The kernel writes a, so get a write accessor on it
-			auto A = a.get_access<access::write>(cgh);
+			auto A = a.get_access<access::mode::write>(cgh);
 
 			// Enqueue a parallel kernel iterating on a N*M 2D iteration space
 			cgh.parallel_for<class init_a>(range<2>(N, M), [=](id<2> index) {
@@ -36,7 +36,7 @@ bool test7() {
 		// Launch an asynchronous kernel to initialize b
 		myQueue.submit([&](handler& cgh) {
 			// The kernel write b, so get a write accessor on it
-			auto B = b.get_access<access::write>(cgh);
+			auto B = b.get_access<access::mode::write>(cgh);
 			// From the access pattern above,
 			// the SYCL runtime detect this command_group is independent from the first one
 			// and can be scheduled independently
@@ -50,9 +50,9 @@ bool test7() {
 		// Launch an asynchronous kernel to compute matrix addition c = a + b
 		myQueue.submit([&](handler& cgh) {
 			// In the kernel a and b are read, but c is written
-			auto A = a.get_access<access::read>(cgh);
-			auto B = b.get_access<access::read>(cgh);
-			auto C = c.get_access<access::write>(cgh);
+			auto A = a.get_access<access::mode::read>(cgh);
+			auto B = b.get_access<access::mode::read>(cgh);
+			auto C = c.get_access<access::mode::write>(cgh);
 			// From these accessors, the SYCL runtime will ensure that when
 			// this kernel is run, the kernels computing a and b completed
 
@@ -65,7 +65,7 @@ bool test7() {
 		debug() << "Done, checking results";
 		// Ask for access to read c from the host-side.
 		// The SYCL runtime ensures that c is ready when the accessor is returned
-		auto C = c.get_access<access::read, access::host_buffer>();
+		auto C = c.get_access<access::mode::read, access::target::host_buffer>();
 		for(size_t i = 0; i < N; ++i) {
 			for(size_t j = 0; j < M; ++j) {
 				// Compare the result to the analytic value

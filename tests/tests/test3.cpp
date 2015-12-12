@@ -16,7 +16,7 @@ bool test3() {
 
 		debug() << "Initializing buffer A";
 		{
-			auto ah = A.get_access<access::read_write, access::host_buffer>();
+			auto ah = A.get_access<access::mode::read_write, access::target::host_buffer>();
 			for(int i = 0; i < N; ++i) {
 				for(int j = 0; j < N; ++j) {
 					ah[i][j] = (float)(i + j * N);
@@ -27,8 +27,8 @@ bool test3() {
 		// Rotate A and store result to B
 		debug() << "Submitting work";
 		myQueue.submit([&](handler& cgh) {
-			auto a = A.get_access<access::read>(cgh);
-			auto b = B.get_access<access::write>(cgh);
+			auto a = A.get_access<access::mode::read>(cgh);
+			auto b = B.get_access<access::mode::write>(cgh);
 
 			cgh.parallel_for<class rotation>(range<2>(N, N), [=](id<2> i) {
 				b[N - i[1] - 1][i[0]] = a[i];
@@ -36,8 +36,8 @@ bool test3() {
 		});
 
 		debug() << "Done, checking results";
-		auto ah = A.get_access<access::read_write, access::host_buffer>();
-		auto bh = B.get_access<access::read, access::host_buffer>();
+		auto ah = A.get_access<access::mode::read_write, access::target::host_buffer>();
+		auto bh = B.get_access<access::mode::read, access::target::host_buffer>();
 		for(int i = 0; i < N; ++i) {
 			for(int j = 0; j < N; ++j) {
 				auto expected = ah[i][j];

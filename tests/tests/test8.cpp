@@ -27,7 +27,7 @@ bool test8() {
 		// create a command_group to issue commands to the queue
 		myQueue.submit([&](handler& cgh) {
 			// request access to the buffer
-			auto writeResult = resultBuf.get_access<access::write>(cgh);
+			auto writeResult = resultBuf.get_access<access::mode::write>(cgh);
 
 			// enqueue a prallel_for task
 			cgh.parallel_for<class simple_test>(range<1>(size), [=](id<1> idx) {

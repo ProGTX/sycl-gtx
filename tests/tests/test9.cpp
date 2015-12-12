@@ -6,7 +6,7 @@ template <typename F, typename std::enable_if<std::is_floating_point<F>::value>:
 bool check_sum(cl::sycl::buffer<F, 1>& data) {
 	using namespace cl::sycl;
 
-	auto d = data.get_access<access::read, access::host_buffer>();
+	auto d = data.get_access<access::mode::read, access::target::host_buffer>();
 	F sum = 0;
 	for(size_t i = 0; i < data.get_count(); ++i) {
 		sum += (F)1;
@@ -24,7 +24,7 @@ template <typename I, typename std::enable_if<std::is_integral<I>::value>::type*
 bool check_sum(cl::sycl::buffer<I, 1>& data) {
 	using namespace cl::sycl;
 
-	auto d = data.get_access<access::read, access::host_buffer>();
+	auto d = data.get_access<access::mode::read, access::target::host_buffer>();
 	I sum = 0;
 	for(size_t i = 0; i < data.get_count(); ++i) {
 		sum += (I)1;
@@ -238,7 +238,7 @@ bool test9() {
 
 		// Init
 		myQueue.submit([&](handler& cgh) {
-			auto d = data[0].get_access<access::write>(cgh);
+			auto d = data[0].get_access<access::mode::write>(cgh);
 
 			cgh.parallel_for<class init>(range<1>(size), [=](id<1> index) {
 				d[index] = 1;

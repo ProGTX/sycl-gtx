@@ -40,7 +40,7 @@ bool test11() {
 	uint32_t startSeed_y = 32536;
 
 	myQueue.submit([&](handler& cgh) {
-		auto n = numbers.get_access<access::discard_write>(cgh);
+		auto n = numbers.get_access<access::mode::discard_write>(cgh);
 
 		cgh.single_task<class generate>([=]() {
 			uint2 seed(startSeed_x, startSeed_y);
@@ -52,7 +52,7 @@ bool test11() {
 	});
 
 	float eps = 1e-3f;	// Don't need very high accuracy
-	auto n = numbers.get_access<access::read, access::host_buffer>();
+	auto n = numbers.get_access<access::mode::read, access::target::host_buffer>();
 	cl_uint2 seed = { startSeed_x, startSeed_y };
 
 	// TODO: Better automatic testing

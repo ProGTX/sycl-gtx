@@ -21,7 +21,7 @@ bool test6() {
 
 		// Init
 		myQueue.submit([&](handler& cgh) {
-			auto p = P->get_access<access::write>(cgh);
+			auto p = P->get_access<access::mode::write>(cgh);
 
 			cgh.parallel_for<class init>(range<1>(size), [=](id<1> index) {
 				p[index] = index;
@@ -33,11 +33,11 @@ bool test6() {
 		for(unsigned int N = size; N > 1; N /= local_size) {
 			debug() << "Submitting work";
 			myQueue.submit([&](handler& cgh) {
-				auto input = P->get_access<access::read>(cgh);
-				auto output = Q->get_access<access::write>(cgh);
+				auto input = P->get_access<access::mode::read>(cgh);
+				auto output = Q->get_access<access::mode::write>(cgh);
 
 				local_size = std::min(local_size, N);
-				auto local = accessor<float, 1, access::read_write, access::local>(local_size);
+				auto local = accessor<float, 1, access::mode::read_write, access::target::local>(local_size);
 
 				DSELF() << N << local_size;
 				cgh.parallel_for<class reduction_sum>(nd_range<1>(N / 2, local_size / 2), [=](nd_item<1> index) {
@@ -77,7 +77,7 @@ bool test6() {
 		}
 
 		debug() << "Done, checking results";
-		auto p = P->get_access<access::read, access::host_buffer>();
+		auto p = P->get_access<access::mode::read, access::target::host_buffer>();
 		type_t sum = ((type_t)size / 2) * (type_t)(size - 1);
 		if(p[0] != sum) {
 			debug() << "wrong sum, should be" << sum << "- is" << p[0];

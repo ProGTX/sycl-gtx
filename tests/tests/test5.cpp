@@ -7,7 +7,7 @@ using namespace cl::sycl;
 
 class example_functor {
 public:
-	using rw_acc_t = accessor<int, 1, access::read_write, access::global_buffer>;
+	using rw_acc_t = accessor<int, 1, access::mode::read_write, access::target::global_buffer>;
 
 private:
 	rw_acc_t ptr;
@@ -42,7 +42,7 @@ bool test5() {
 		int random_num = 0;
 
 		myQueue.submit([&](handler& cgh) {
-			auto ptr = buf.get_access<access::read_write>(cgh);
+			auto ptr = buf.get_access<access::mode::read_write>(cgh);
 
 			auto functor = example_functor(ptr);
 
@@ -56,7 +56,7 @@ bool test5() {
 
 		});
 
-		auto hostPtr = buf.get_access<access::read_write, access::host_buffer>();
+		auto hostPtr = buf.get_access<access::mode::read_write, access::target::host_buffer>();
 
 		if(hostPtr[5] != random_num) {
 			debug()
