@@ -31,7 +31,7 @@ Sphere spheres[numSpheres] = {//Scene: radius, position, emission, color, materi
 	Sphere(600, Vec(50, 681.6 - .27, 81.6), Vec(12, 12, 12), Vec(), DIFF) //Lite
 };
 
-using spheres_t = accessor<float16, 1, access::read, access::global_buffer>;
+using spheres_t = accessor<float16, 1, access::mode::read, access::target::global_buffer>;
 
 #ifdef SYCL_GTX
 struct Vector : public float3 {
@@ -360,7 +360,7 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 
 	buffer<float16> spheres_(ns_sycl_gtx::numSpheres);
 	{
-		auto s = spheres_.get_access<access::discard_write, access::host_buffer>();
+		auto s = spheres_.get_access<access::mode::discard_write, access::target::host_buffer>();
 		// See SphereSycl
 		for(int i = 0; i < ns_sycl_gtx::numSpheres; ++i) {
 			auto& si = s[i];
@@ -396,11 +396,11 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 
 	for(auto k = 0; k < numParts; ++k) {
 		q.submit([&](handler& cgh) {
-			auto c = colors[k].get_access<access::discard_read_write, access::global_buffer>(cgh);
+			auto c = colors[k].get_access<access::mode::discard_read_write, access::target::global_buffer>(cgh);
 
 			// TODO: constant_buffer
-			auto spheres = spheres_.get_access<access::read, access::global_buffer>(cgh);
-			auto seeds = seeds_[k].get_access<access::read, access::global_buffer>(cgh);
+			auto spheres = spheres_.get_access<access::mode::read, access::target::global_buffer>(cgh);
+			auto seeds = seeds_[k].get_access<access::mode::read, access::target::global_buffer>(cgh);
 
 			cgh.parallel_for<class smallpt>(range<2>(w, lineOffset[k].second), [=](id<2> i) {
 				Vector cx(cx_);
@@ -466,7 +466,7 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 #if _DEBUG
 		cout << "Waiting for kernel to finish ..." << endl;
 #endif
-		auto c = colors[k].get_access<access::read, access::host_buffer>();
+		auto c = colors[k].get_access<access::mode::read, access::target::host_buffer>();
 
 #if _DEBUG
 		cout << "Copying results ..." << endl;
