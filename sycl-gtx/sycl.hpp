@@ -16,7 +16,7 @@
 #include "implementation/specification/program.h"
 #include "implementation/specification/queue.h"
 #include "implementation/specification/ranges.h"
-#include "implementation/specification/types.h"
+#include "implementation/specification/vec.h"
 #include "implementation/specification/workitem_functions.h"
 
 #include "implementation/flow_control.h"

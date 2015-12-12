@@ -1,9 +1,7 @@
 #pragma once
 
-// 3.7 Data Types
-
 #include "access.h"
-#include "vector_members.h"
+#include "vec_members.h"
 
 #include "../common.h"
 #include "../counter.h"
