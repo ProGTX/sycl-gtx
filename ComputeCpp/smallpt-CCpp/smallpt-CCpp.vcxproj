@@ -78,8 +78,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreLinkEvent>
-      <Command>copy ..\sycl\$(Configuration)\SYCL.dll $(SolutionDir)\$(Configuration)\sycl.dll /Y
-copy ..\sycl\$(Configuration)\SYCL.lib $(SolutionDir)\$(Configuration)\sycl.lib /Y</Command>
+      <Command>copy ..\sycl\$(Configuration)\SYCL_d.lib $(OutDir)\sycl.lib /Y</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -93,7 +92,7 @@ copy ..\sycl\$(Configuration)\SYCL.lib $(SolutionDir)\$(Configuration)\sycl.lib 
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreLinkEvent>
-      <Command>copy ..\sycl\$(Configuration)\SYCL.lib $(SolutionDir)\$(Configuration)\sycl.lib /Y</Command>
+      <Command>copy ..\sycl\$(Configuration)\SYCL_d.lib $(OutDir)\sycl.lib /Y</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
