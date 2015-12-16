@@ -32,7 +32,7 @@ void event::wait(const vector_class<event>& event_list) {
 		events.push_back(e.evnt.get());
 	}
 
-	auto error_code = clWaitForEvents((cl_uint)size, events.data());
+	auto error_code = clWaitForEvents((::cl_uint)size, events.data());
 	detail::error::report(error_code);
 }
 

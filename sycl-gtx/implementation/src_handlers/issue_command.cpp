@@ -14,7 +14,7 @@ void issue_command::compile_command(queue* q, const vector_class<cl_event>& wait
 void issue_command::prepare_kernel(shared_ptr_class<kernel> kern) {
 	DSELF() << kern->src.kernel_name;
 	auto k = kern->get();
-	cl_int error_code;
+	::cl_int error_code;
 	int i = 0;
 	for(auto& acc : kern->src.resources) {
 		if(acc.second.acc.target == access::target::local) {

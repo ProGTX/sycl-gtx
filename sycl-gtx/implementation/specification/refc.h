@@ -13,10 +13,10 @@ namespace sycl {
 namespace detail {
 
 template <class CL_Type>
-using cl_resource_f = cl_int(CL_API_CALL*)(CL_Type);
+using cl_resource_f = ::cl_int(CL_API_CALL*)(CL_Type);
 
 template <class CL_Type>
-cl_int CL_API_CALL cl_do_nothing(CL_Type) {
+::cl_int CL_API_CALL cl_do_nothing(CL_Type) {
 	return CL_SUCCESS;
 }
 

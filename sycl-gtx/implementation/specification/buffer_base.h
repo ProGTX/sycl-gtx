@@ -38,7 +38,7 @@ protected:
 	) {
 		buffer->enqueue(q, wait_events, clEnqueueBuffer);
 	}
-	cl_int cl_enqueue_buffer(
+	::cl_int cl_enqueue_buffer(
 		queue* q,
 		size_t size,
 		void* host_ptr,
@@ -47,7 +47,7 @@ protected:
 		clEnqueueBuffer_f clEnqueueBuffer
 	);
 
-	static cl_mem cl_create_buffer(queue* q, const cl_mem_flags& flags, size_t size, void* host_ptr, cl_int& error_code);
+	static cl_mem cl_create_buffer(queue* q, const cl_mem_flags& flags, size_t size, void* host_ptr, ::cl_int& error_code);
 };
 
 } // namespace detail

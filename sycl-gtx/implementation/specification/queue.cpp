@@ -20,7 +20,7 @@ cl_command_queue queue::create_queue(bool display_info, bool register_with_synch
 		display_device_info();
 	}
 
-	cl_int error_code;
+	::cl_int error_code;
 	auto q = clCreateCommandQueue(ctx.get(), dev.get(), (enable_profiling ? CL_QUEUE_PROFILING_ENABLE : 0), &error_code);
 	detail::error::report(error_code);
 

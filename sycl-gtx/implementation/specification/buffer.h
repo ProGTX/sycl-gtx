@@ -168,7 +168,7 @@ public:
 
 private:
 	static void create(queue* q, const vector_class<cl_event>& wait_events, buffer_* buffer) {
-		cl_int error_code;
+		::cl_int error_code;
 		const cl_mem_flags all_flags =
 			((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR)	|
 			(buffer->is_read_only ? CL_MEM_READ_ONLY : CL_MEM_READ_WRITE);

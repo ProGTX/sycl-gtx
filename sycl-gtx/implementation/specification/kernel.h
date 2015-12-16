@@ -99,7 +99,7 @@ private:
 		auto error_code = clEnqueueNDRangeKernel(
 			get_cl_queue(q), kern.get(), dimensions,
 			offst, global_work_size, nullptr,
-			(cl_uint)wait_events.size(),
+			(::cl_uint)wait_events.size(),
 			get_events_ptr(wait_events),
 			&ev
 		);
@@ -128,7 +128,7 @@ private:
 		auto error_code = clEnqueueNDRangeKernel(
 			get_cl_queue(q), kern.get(), dimensions,
 			offst, global_work_size, local_work_size,
-			(cl_uint)wait_events.size(),
+			(::cl_uint)wait_events.size(),
 			get_events_ptr(wait_events),
 			&ev
 		);

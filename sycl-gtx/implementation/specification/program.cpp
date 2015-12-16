@@ -29,7 +29,7 @@ void program::compile(string_class compile_options, size_t kernel_name_id, share
 
 	const char* code_p = code.c_str();
 	size_t length = code.size();
-	cl_int error_code;
+	::cl_int error_code;
 
 	auto p = clCreateProgramWithSource(ctx.get(), 1, &code_p, &length, &error_code);
 	detail::error::report(error_code);
@@ -39,7 +39,7 @@ void program::compile(string_class compile_options, size_t kernel_name_id, share
 	auto device_pointers = detail::get_cl_array(devices);
 
 	error_code = clCompileProgram(
-		kern->prog.get()->get(), (cl_uint)devices.size(), device_pointers.data(), compile_options.c_str(),
+		kern->prog.get()->get(), (::cl_uint)devices.size(), device_pointers.data(), compile_options.c_str(),
 		0, nullptr, nullptr, nullptr, nullptr
 	);
 
@@ -99,14 +99,14 @@ void program::link(string_class linking_options) {
 
 	auto device_pointers = detail::get_cl_array(devices);
 	auto program_pointers = get_program_pointers();
-	cl_int error_code;
+	::cl_int error_code;
 
 	prog = clLinkProgram(
 		ctx.get(),
-		(cl_uint)device_pointers.size(),
+		(::cl_uint)device_pointers.size(),
 		device_pointers.data(),
 		linking_options.c_str(),
-		(cl_uint)program_pointers.size(),
+		(::cl_uint)program_pointers.size(),
 		program_pointers.data(),
 		nullptr,
 		nullptr,

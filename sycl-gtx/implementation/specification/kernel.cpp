@@ -27,7 +27,7 @@ void kernel::enqueue_task(queue* q, const vector_class<cl_event>& wait_events, e
 
 	auto error_code = clEnqueueTask(
 		q->get(), kern.get(),
-		(cl_uint)wait_events.size(),
+		(::cl_uint)wait_events.size(),
 		get_events_ptr(wait_events),
 		&ev
 	);

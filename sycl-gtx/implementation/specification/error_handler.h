@@ -31,7 +31,7 @@ static const async_handler default_async_handler = [](cl::sycl::exception_list l
 namespace error {
 
 struct thrower {
-	static exception get(cl_int error_code, context* thrower) {
+	static exception get(::cl_int error_code, context* thrower) {
 		return cl_exception(error_code, thrower);
 	}
 	static exception get(code::value_t error_code, context* thrower) {
@@ -45,7 +45,7 @@ struct thrower {
 };
 
 // Synchronous error reporting
-static void report(cl_int error_code, context* thrower = nullptr) {
+static void report(::cl_int error_code, context* thrower = nullptr) {
 	if(error_code != CL_SUCCESS) {
 		auto e = thrower::get(error_code, thrower);
 		thrower::report(e);

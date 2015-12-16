@@ -44,16 +44,16 @@ public:
 struct cl_exception : exception {
 private:
 	friend struct detail::error::thrower;
-	cl_int error_code;
+	::cl_int error_code;
 
-	cl_exception(cl_int error_code, context* thrower = nullptr)
+	cl_exception(::cl_int error_code, context* thrower = nullptr)
 		: exception(detail::error_string(error_code), thrower), error_code(error_code) {}
 public:
 	cl_exception()
 		: cl_exception(CL_SUCCESS, nullptr) {}
 
 	// Thrown as a result of an OpenCL API error code
-	cl_int get_cl_code() const {
+	::cl_int get_cl_code() const {
 		return error_code;
 	}
 };

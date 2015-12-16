@@ -52,12 +52,12 @@ template <size_t BufferSize>
 struct traits<string_class, BufferSize> : traits_helper<char, BufferSize, string_class>{};
 
 template <typename cl_input_t>
-using opencl_info_f = cl_int(CL_API_CALL*)(cl_input_t, cl_uint, size_t, void*, size_t*);
+using opencl_info_f = ::cl_int(CL_API_CALL*)(cl_input_t, cl_uint, size_t, void*, size_t*);
 
 template <typename cl_input_t, opencl_info_f<cl_input_t> F>
 struct info_function_helper {
 	template <class... Args>
-	static cl_int get(Args... args) {
+	static ::cl_int get(Args... args) {
 		return F(args...);
 	}
 };
@@ -315,8 +315,8 @@ SYCL_ADD_PROGRAM_TRAIT(info::program::kernel_names,		string_class)
 	SYCL_ADD_TRAIT(info::event, Value, ReturnType, cl_event_info)
 
 SYCL_ADD_EVENT_TRAIT(info::event::command_type,				cl_command_type)
-SYCL_ADD_EVENT_TRAIT(info::event::command_execution_status, cl_int)
-SYCL_ADD_EVENT_TRAIT(info::event::reference_count,			cl_int)
+SYCL_ADD_EVENT_TRAIT(info::event::command_execution_status, ::cl_int)
+SYCL_ADD_EVENT_TRAIT(info::event::reference_count,			::cl_int)
 
 // Not part of the SYCL specification
 SYCL_ADD_EVENT_TRAIT(info::event::command_queue,			cl_command_queue)

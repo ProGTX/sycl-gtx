@@ -83,7 +83,7 @@ string_class source::get_name(access::target target) {
 }
 
 void source::init_kernel(program& p, shared_ptr_class<kernel> kern) {
-	cl_int error_code;
+	::cl_int error_code;
 	cl_kernel k = clCreateKernel(p.get(), kernel_name.c_str(), &error_code);
 	detail::error::report(error_code);
 	kern->set(k);
