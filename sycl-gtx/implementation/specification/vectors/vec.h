@@ -5,6 +5,7 @@
 
 #include "helpers.h"
 #include "vec_members.h"
+#include "cl_vec.h"
 #include "../access.h"
 #include "../../common.h"
 #include "../../counter.h"
@@ -25,8 +26,6 @@ namespace detail {
 namespace vectors {
 
 // Forward declaration
-template <typename, int>
-struct data;
 template <int, int, int...>
 struct swizzled;
 
@@ -37,13 +36,13 @@ typename std::enable_if<num == dim>::type* = nullptr
 template <typename dataT, int numElements>
 class base : protected counter<base<dataT, numElements>>, public data_ref {
 private:
-	template <typename, int>
-	friend struct members;
 	template <typename>
 	friend struct ::cl::sycl::detail::type_string;
 
+	static const int half_size = (numElements + 1) / 2;
+
 	static string_class type_name() {
-		return type_string<dataT>::get() + (numElements == 1 ? "" : get_string<int>::get(numElements));
+		return cl_base<dataT, numElements, 0>::type_name();
 	}
 
 	string_class generate_name() const {
@@ -96,7 +95,7 @@ public:
 		return numElements;
 	}
 	size_t get_size() const {
-		return numElements * sizeof(typename data<dataT, numElements>::type);
+		return numElements * sizeof(typename cl_type<dataT, numElements>::type);
 	}
 
 	template <int... indices>
@@ -109,7 +108,14 @@ public:
 		swizzled<0, indices...>::get(access_name);
 		access_name[size] = 0;
 
-		return swizzled_vec<dataT, size>(name + ".s" + access_name, true);
+		return swizzled_vec<dataT, size>(name + ".s" + access_name);
+	}
+
+	swizzled_vec<dataT, half_size> lo() const {
+		return swizzled_vec<dataT, half_size>(name + ".lo");
+	}
+	swizzled_vec<dataT, half_size> hi() const {
+		return swizzled_vec<dataT, half_size>(name + ".hi");
 	}
 
 	// TODO: Swizzle methods
@@ -127,23 +133,22 @@ public:
 template <typename dataT, int numElements>
 class vec : public detail::vectors::base<dataT, numElements>, public detail::vectors::members<dataT, numElements> {
 private:
-	template <typename, int>
-	friend struct detail::vectors::members;
 	template <typename, int, access::mode, access::target, typename>
 	friend class detail::accessor_;
 	template <int, typename, int, access::mode, access::target>
 	friend class detail::accessor_device_ref;
+	template <typename, int>
+	friend class detail::vectors::base;
 
 	using Base = detail::vectors::base<dataT, numElements>;
 	using Members = detail::vectors::members<dataT, numElements>;
 
-	friend Base;
-
 protected:
-	vec(string_class name_, bool from_existing = true)
+	vec(string_class name_)
 		: Base(name_), Members(this) {}
 
 	using data_ref = detail::data_ref;
+	using genvector = detail::vectors::cl_base<dataT, numElements, numElements>;
 public:
 	vec()
 		: Base(), Members(this) {}
@@ -167,89 +172,79 @@ public:
 		data_ref::operator=(std::forward<T>(n));
 		return *this;
 	}
+
+	// TODO
+	operator genvector() const {
+		return genvector();
+	}
+
+	vec operator*(const vec& v) const {
+		auto r = data_ref::operator*(v);
+		return vec(r);
+	}
+	vec operator+(const vec& v) const {
+		auto r = data_ref::operator+(v);
+		return vec(r);
+	}
 };
 
 
 // 3.10.1 Description of the built-in types available for SYCL host and device
 
-#define SYCL_VEC_SIGNED(basetype, numElements) \
-using basetype##numElements = vec<basetype, numElements>;
-#define SYCL_VEC_UNSIGNED(type, numElements) \
-using u##type##numElements = vec<unsigned type, numElements>;
+#define	SYCL_VEC_SCALAR(base)						\
+	using base##1 = vec<base, 1>;					\
+	using cl_##base = detail::vectors::cl_base<		\
+		base, 1, 1>;
 
-#define SYCL_VEC_SIGNED_EXTRA(basetype, numElements)		\
-	SYCL_VEC_SIGNED(basetype, numElements)					\
-	template <>												\
-	struct detail::vectors::data<basetype, numElements> {	\
-		using type = cl_##basetype##numElements;			\
-	};
-#define SYCL_ADD_SIGNED_SCALAR_vec(basetype)				\
-	SYCL_VEC_SIGNED(basetype, 1)							\
-	template <>												\
-	struct detail::vectors::data<basetype, 1> {				\
-		using type = cl_##basetype;							\
-	};
+#define	SYCL_VEC_USCALAR(base)						\
+	SYCL_VEC_SCALAR(base)							\
+	using u##base##1 = vec<unsigned base, 1>;		\
+	using cl_u##base = detail::vectors::cl_base<	\
+		unsigned base, 1, 1>;
 
-#define SYCL_VEC_UNSIGNED_EXTRA(basetype, numElements)				\
-	SYCL_VEC_UNSIGNED(basetype, numElements)						\
-	template <>														\
-	struct detail::vectors::data<unsigned basetype, numElements> {	\
-		using type = cl_u##basetype##numElements;					\
-	};
-#define SYCL_ADD_UNSIGNED_SCALAR_vec(basetype)						\
-	SYCL_VEC_UNSIGNED(basetype, 1)									\
-	template <>														\
-	struct detail::vectors::data<unsigned basetype, 1> {			\
-		using type = cl_u##basetype;								\
-	};
+#define	SYCL_VEC_VECTOR(base, num)						\
+	using base##num = vec<base, num>;					\
+	using cl_##base##num = detail::vectors::cl_base<	\
+		base, num, num>;
 
-#define SYCL_ADD_SIGNED_vec(type)		\
-	SYCL_VEC_SIGNED_EXTRA(type, 2)		\
-	SYCL_VEC_SIGNED_EXTRA(type, 3)		\
-	SYCL_VEC_SIGNED_EXTRA(type, 4)		\
-	SYCL_VEC_SIGNED_EXTRA(type, 8)		\
-	SYCL_VEC_SIGNED_EXTRA(type, 16)
-#define SYCL_ADD_UNSIGNED_vec(type)		\
-	SYCL_VEC_UNSIGNED_EXTRA(type, 2)	\
-	SYCL_VEC_UNSIGNED_EXTRA(type, 3)	\
-	SYCL_VEC_UNSIGNED_EXTRA(type, 4)	\
-	SYCL_VEC_UNSIGNED_EXTRA(type, 8)	\
-	SYCL_VEC_UNSIGNED_EXTRA(type, 16)
+#define	SYCL_VEC_UVECTOR(base, num)						\
+	SYCL_VEC_VECTOR(base, num)							\
+	using u##base##num = vec<unsigned base, num>;			\
+	using cl_u##base##num = detail::vectors::cl_base<	\
+		unsigned base, num, num>;
 
-SYCL_ADD_SIGNED_vec(int)
-SYCL_ADD_SIGNED_vec(char)
-SYCL_ADD_SIGNED_vec(short)
-SYCL_ADD_SIGNED_vec(long)
-SYCL_ADD_SIGNED_vec(float)
-SYCL_ADD_SIGNED_vec(double)
+#define SYCL_ADD_VEC_VECTOR(base)	\
+	SYCL_VEC_SCALAR(base)			\
+	SYCL_VEC_VECTOR(base, 2)		\
+	SYCL_VEC_VECTOR(base, 3)		\
+	SYCL_VEC_VECTOR(base, 4)		\
+	SYCL_VEC_VECTOR(base, 8)		\
+	SYCL_VEC_VECTOR(base, 16)
 
-SYCL_ADD_SIGNED_SCALAR_vec(bool)
-SYCL_ADD_SIGNED_SCALAR_vec(int)
-SYCL_ADD_SIGNED_SCALAR_vec(char)
-SYCL_ADD_SIGNED_SCALAR_vec(short)
-SYCL_ADD_SIGNED_SCALAR_vec(long)
-SYCL_ADD_SIGNED_SCALAR_vec(float)
-SYCL_ADD_SIGNED_SCALAR_vec(double)
+#define SYCL_ADD_VEC_UVECTOR(base)	\
+	SYCL_VEC_USCALAR(base)			\
+	SYCL_VEC_UVECTOR(base, 2)		\
+	SYCL_VEC_UVECTOR(base, 3)		\
+	SYCL_VEC_UVECTOR(base, 4)		\
+	SYCL_VEC_UVECTOR(base, 8)		\
+	SYCL_VEC_UVECTOR(base, 16)
 
-SYCL_ADD_UNSIGNED_vec(int)
-SYCL_ADD_UNSIGNED_vec(char)
-SYCL_ADD_UNSIGNED_vec(short)
-SYCL_ADD_UNSIGNED_vec(long)
+SYCL_VEC_SCALAR(bool)
+SYCL_ADD_VEC_UVECTOR(int)
+SYCL_ADD_VEC_UVECTOR(char)
+SYCL_ADD_VEC_UVECTOR(short)
+SYCL_ADD_VEC_UVECTOR(long)
+SYCL_ADD_VEC_VECTOR(float)
+SYCL_ADD_VEC_VECTOR(double)
 
-SYCL_ADD_UNSIGNED_SCALAR_vec(int)
-SYCL_ADD_UNSIGNED_SCALAR_vec(char)
-SYCL_ADD_UNSIGNED_SCALAR_vec(short)
-SYCL_ADD_UNSIGNED_SCALAR_vec(long)
+#undef SYCL_VEC_SCALAR
+#undef SYCL_VEC_USCALAR
+#undef SYCL_VEC_VECTOR
+#undef SYCL_VEC_UVECTOR
+#undef SYCL_ADD_VEC_VECTOR
+#undef SYCL_ADD_VEC_UVECTOR
 
 #undef SYCL_ENABLE_IF_DIM
-#undef SYCL_VEC_SIGNED
-#undef SYCL_VEC_SIGNED_EXTRA
-#undef SYCL_ADD_SIGNED_vec
-#undef SYCL_ADD_SIGNED_SCALAR_vec
-#undef SYCL_VEC_UNSIGNED
-#undef SYCL_VEC_UNSIGNED_EXTRA
-#undef SYCL_ADD_UNSIGNED_vec
-#undef SYCL_ADD_UNSIGNED_SCALAR_vec
 
 } // namespace sycl
 } // namespace cl
