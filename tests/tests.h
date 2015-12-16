@@ -1,5 +1,6 @@
 #pragma once
 
+#define SYCL_SIMPLE_SWIZZLES
 #include <sycl.hpp>
 #include <implementation/debug.h>
 

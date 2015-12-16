@@ -10,9 +10,9 @@ using cl::sycl::uint2;
 template <class Float, class Uint1, class Uint2>
 Float getRandom(Uint2& seed) {
 	static const Float invMaxInt = 1.0f / 4294967296.0f;
-	Uint1 x = seed.x * 17 + seed.y * 13123;
-	seed.x = (x << 13) ^ x;
-	seed.y ^= x << 7;
+	Uint1 x = seed.x() * 17 + seed.y() * 13123;
+	seed.x() = (x << 13) ^ x;
+	seed.y() ^= x << 7;
 	return (Float)(x * (x * x * 15731 + 74323) + 871483) * invMaxInt;
 }
 
@@ -22,7 +22,7 @@ float1 deviceRandom(uint2& seed) {
 }
 
 float hostRandom(cl_uint2& seed) {
-	return getRandom<float, cl_uint>(seed);
+	return getRandom<float, cl::sycl::cl_uint>(seed);
 }
 
 bool test11() {
@@ -53,7 +53,7 @@ bool test11() {
 
 	float eps = 1e-3f;	// Don't need very high accuracy
 	auto n = numbers.get_access<access::mode::read, access::target::host_buffer>();
-	cl_uint2 seed = { startSeed_x, startSeed_y };
+	::cl_uint2 seed = { startSeed_x, startSeed_y };
 
 	// TODO: Better automatic testing
 	for(auto i = 0; i < size; ++i) {
