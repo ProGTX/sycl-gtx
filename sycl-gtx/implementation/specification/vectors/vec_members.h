@@ -4,25 +4,107 @@ namespace cl {
 namespace sycl {
 
 // Forward declaration
-template <typename dataT, int numElements>
+template <typename, int>
 class vec;
+
 
 namespace detail {
 namespace vectors {
 
-// Forward declaration
-template <typename dataT, int numElements>
+#define SYCL_SIMPLE_SWIZZLES
+
+// Forward declarations
+template <typename, int>
 class base;
+template <typename dataT, int numElements>
+using swizzled_vec = vec<dataT, numElements>;
+
+template <typename dataT, int parentElems, int selfElems = parentElems>
+struct members;
+
+template <typename dataT, int parentElems>
+struct members<dataT, parentElems, 1> {
+#ifndef SYCL_SIMPLE_SWIZZLES
+	members(base<dataT, parentElems>* parent) {}
+#else
+protected:
+	base<dataT, parentElems>* parent;
+
+public:
+	members(base<dataT, parentElems>* parent)
+		: parent(parent) {}
+
+	swizzled_vec<dataT, 1> x() const {
+		return this->parent->swizzle<0>();
+}
+#endif
+};
+
+template <typename dataT, int parentElems>
+struct members<dataT, parentElems, 2> : members<dataT, parentElems, 1> {
+	members(base<dataT, parentElems>* parent)
+		: members<dataT, parentElems, 1>(parent) {}
+
+#ifdef SYCL_SIMPLE_SWIZZLES
+	swizzled_vec<dataT, 1> y() const {
+		return this->parent->swizzle<1>();
+	}
+#endif
+};
+
+template <typename dataT, int parentElems>
+struct members<dataT, parentElems, 3> : members<dataT, parentElems, 2> {
+	members(base<dataT, parentElems>* parent)
+		: members<dataT, parentElems, 2>(parent) {}
+
+#ifdef SYCL_SIMPLE_SWIZZLES
+	swizzled_vec<dataT, 1> z() const {
+		return this->parent->swizzle<2>();
+	}
+
+	swizzled_vec<dataT, 3> xyz() const {
+		return this->parent->swizzle<0, 1, 2>();
+	}
+#endif
+};
+
+template <typename dataT, int parentElems>
+struct members<dataT, parentElems, 4> : members<dataT, parentElems, 3> {
+	members(base<dataT, parentElems>* parent)
+		: members<dataT, parentElems, 3>(parent) {}
+
+#ifdef SYCL_SIMPLE_SWIZZLES
+	swizzled_vec<dataT, 1> w() const {
+		return this->parent->swizzle<3>();
+	}
+#endif
+};
+
+template <typename dataT, int parentElems>
+struct members<dataT, parentElems, 8> {
+	members(base<dataT, parentElems>* parent) {}
+
+#ifdef SYCL_SIMPLE_SWIZZLES
+#endif
+};
+
+template <typename dataT, int parentElems>
+struct members<dataT, parentElems, 16> {
+	members(base<dataT, parentElems>* parent) {}
+
+#ifdef SYCL_SIMPLE_SWIZZLES
+#endif
+};
 
 
 template <typename dataT>
 using single_member = base<dataT, 1>;
 
 template <typename dataT, int numElements>
-struct members {
-	members(base<dataT, numElements>* parent) {}
-	members(const members&) = default;
-	members& operator=(const members&) = default;
+struct members_old {
+	members_old(base<dataT, numElements>* parent) {}
+	members_old(const members_old&) = default;
+	members_old& operator=(const members_old&) = default;
 };
 
 
@@ -39,20 +121,20 @@ struct members {
 #define SYCL_R2(org, r1, r2)	r1(org), r2(org)
 #define SYCL_R2_LO(pf, r1, r2)	r1(pf lo.r1), r2(pf lo.r1)
 
-// TODO: All members
+// TODO: All members_old
 
 template <typename dataT>
-struct members<dataT, 2> {
+struct members_old<dataT, 2> {
 	single_member<dataT> x, y;
 	single_member<dataT> &lo, &hi;
 	single_member<dataT> &s0, &s1;
 
-	members(base<dataT, 2>* parent)
+	members_old(base<dataT, 2>* parent)
 	:	SYCL_V2(x, y),
 		SYCL_R2(x, lo, s0),
 		SYCL_R2(y, hi, s1) {}
-	members(const members&) = default;
-	members& operator=(const members&) = default;
+	members_old(const members_old&) = default;
+	members_old& operator=(const members_old&) = default;
 };
 
 #define SYCL_MEMBERS_3()	\
@@ -106,23 +188,23 @@ SYCL_V9(zxx, zxy, zxz,						\
 		s220(zzx), s221(zzy), s222(zzz)
 
 template <typename dataT>
-struct members<dataT, 3> {
+struct members_old<dataT, 3> {
 	vec<dataT, 2> lo, hi;
 	single_member<dataT> &x, &y, &z;
 	single_member<dataT> &s0, &s1, &s2;
 	vec<dataT, 3> &xyz, &s012;
 	SYCL_SWIZZLE_3_DATA();
 
-	members(base<dataT, 3>* parent)
+	members_old(base<dataT, 3>* parent)
 	:	SYCL_MEMBERS_3(),
 		SYCL_R2(*parent, xyz, s012),
 		SYCL_SWIZZLE_3_SET_VALUES() {}
-	members(const members&) = default;
-	members& operator=(const members&) = default;
+	members_old(const members_old&) = default;
+	members_old& operator=(const members_old&) = default;
 };
 
 template <typename dataT>
-struct members<dataT, 4> {
+struct members_old<dataT, 4> {
 	vec<dataT, 2> lo, hi;
 	single_member<dataT> &x, &y, &z, &w;
 	single_member<dataT> &s0, &s1, &s2, &s3;
@@ -130,14 +212,14 @@ struct members<dataT, 4> {
 	SYCL_SWIZZLE_3_DATA();
 	vec<dataT, 3> yzw;
 
-	members(base<dataT, 4>* parent)
+	members_old(base<dataT, 4>* parent)
 	:	SYCL_MEMBERS_3(),
 		SYCL_R2(hi.y, w, s3),
 		SYCL_V(xyz), s012(xyz),
 		SYCL_SWIZZLE_3_SET_VALUES(),
 		SYCL_V(yzw) {}
-	members(const members&) = default;
-	members& operator=(const members&) = default;
+	members_old(const members_old&) = default;
+	members_old& operator=(const members_old&) = default;
 };
 
 #define SYCL_MEMBERS_8(pf)	\
@@ -181,7 +263,7 @@ SYCL_SWIZZLE_3_REFS_9(pf, y, s1),	\
 SYCL_SWIZZLE_3_REFS_9(pf, z, s2)
 
 template <typename dataT>
-struct members<dataT, 8> {
+struct members_old<dataT, 8> {
 	vec<dataT, 4> lo, hi;
 	single_member<dataT> &x, &y, &z, &w;
 	single_member<dataT> &s0, &s1, &s2, &s3, &s4, &s5, &s6, &s7;
@@ -189,16 +271,16 @@ struct members<dataT, 8> {
 	SYCL_SWIZZLE_3_VALUE_REFS();
 	vec<dataT, 3> &yzw;
 
-	members(base<dataT, 8>* parent)
+	members_old(base<dataT, 8>* parent)
 	:	SYCL_MEMBERS_8(this->),
 		SYCL_SWIZZLE_3_SET_REFS(this->),
 		yzw(lo.yzw) {}
-	members(const members&) = default;
-	members& operator=(const members&) = default;
+	members_old(const members_old&) = default;
+	members_old& operator=(const members_old&) = default;
 };
 
 template <typename dataT>
-struct members<dataT, 16> {
+struct members_old<dataT, 16> {
 	vec<dataT, 8> lo, hi;
 	single_member<dataT> &x, &y, &z, &w;
 	single_member<dataT>	&s0, &s1, &s2, &s3,
@@ -209,14 +291,14 @@ struct members<dataT, 16> {
 	SYCL_SWIZZLE_3_VALUE_REFS();
 	vec<dataT, 3> &yzw;
 
-	members(base<dataT, 16>* parent)
+	members_old(base<dataT, 16>* parent)
 	:	SYCL_MEMBERS_8(lo.),
 		s8(hi.x), s9(hi.y), sa(hi.z), sb(hi.w),
 		sc(hi.hi.x), sd(hi.hi.y), se(hi.hi.z), sf(hi.hi.w),
 		SYCL_SWIZZLE_3_SET_REFS(lo.),
 		yzw(lo.yzw) {}
-	members(const members&) = default;
-	members& operator=(const members&) = default;
+	members_old(const members_old&) = default;
+	members_old& operator=(const members_old&) = default;
 };
 
 #undef SYCL_V
