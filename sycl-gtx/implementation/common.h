@@ -147,36 +147,33 @@ struct type_string {
 };
 
 #define SYCL_GET_TYPE_STRING(type)	\
-template <>						  	\
-struct type_string<type> {			\
-	static string_class get() {		\
-		return #type;				\
-	}								\
-};
+	template <>					  	\
+	struct type_string<type> {		\
+		static string_class get() {	\
+			return #type;			\
+		}							\
+	};
 
-#define SYCL_GET_TYPE_STRING_UNSIGNED(type)	\
-template <>									\
-struct type_string<unsigned type> {			\
-	static string_class get() {				\
-		return "u"#type;					\
-	}										\
-};
+#define SYCL_GET_UTYPE_STRING(type)	\
+	SYCL_GET_TYPE_STRING(type)				\
+	template <>								\
+	struct type_string<unsigned type> {		\
+		static string_class get() {			\
+			return "u"#type;				\
+		}									\
+	};
 
 SYCL_GET_TYPE_STRING(bool)
-SYCL_GET_TYPE_STRING(int)
-SYCL_GET_TYPE_STRING(char)
-SYCL_GET_TYPE_STRING(short)
-SYCL_GET_TYPE_STRING(long)
+SYCL_GET_UTYPE_STRING(int)
+SYCL_GET_UTYPE_STRING(char)
+SYCL_GET_UTYPE_STRING(short)
+SYCL_GET_UTYPE_STRING(long)
 SYCL_GET_TYPE_STRING(float)
 SYCL_GET_TYPE_STRING(double)
 
-SYCL_GET_TYPE_STRING_UNSIGNED(int)
-SYCL_GET_TYPE_STRING_UNSIGNED(char)
-SYCL_GET_TYPE_STRING_UNSIGNED(short)
-SYCL_GET_TYPE_STRING_UNSIGNED(long)
-
 #undef SYCL_GET_TYPE_STRING
-#undef SYCL_GET_TYPE_STRING_UNSIGNED
+#undef SYCL_GET_UTYPE_STRING
+
 
 template <typename T>
 struct data_size {
