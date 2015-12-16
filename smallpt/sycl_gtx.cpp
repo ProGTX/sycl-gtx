@@ -38,89 +38,59 @@ Sphere spheres[numSpheres] = {//Scene: radius, position, emission, color, materi
 
 using spheres_t = accessor<float16, 1, access::mode::read, access::target::global_buffer>;
 
-#ifdef SYCL_GTX
-struct Vector : public float3 {
-	Vector()
-		: float3(0, 0, 0) {}
-	Vector(const Vec& v)
-		: float3((float)v.x, (float)v.y, (float)v.z) {}
-	template <class T>
-	Vector(T n)
-		: float3(n) {}
-	template <class X, class Y, class Z>
-	Vector(X&& x, Y&& y, Z&& z)
-		: float3(x, y, z) {}
-
-	template <class T>
-	Vector& operator=(T&& t) {
-		float3::operator=(t);
-		return *this;
-	}
-
-	Vector mult(const Vector &b) const {
-		return Vector(x*b.x, y*b.y, z*b.z);
-	}
-	Vector& norm() {
-		operator*=(1 / sqrt(x*x + y*y + z*z));
-		return *this;
-	}
-	float1 dot(const Vector &b) const {
-		return x*b.x + y*b.y + z*b.z;
-	}
-	Vector operator%(Vector&b) {
-		return Vector(y*b.z - z*b.y, z*b.x - x*b.z, x*b.y - y*b.x);
-	}
-};
-
-struct RaySycl {
-	Vector o, d;
-	RaySycl(const ::Ray& r)
-		: o(r.o), d(r.d) {}
-	RaySycl(Vector o_, Vector d_)
-		: o(o_), d(d_) {}
-	RaySycl& operator=(const RaySycl&) = default;
-};
-
-struct SphereSycl {
+struct Vector : public ::Vec_<float1> {
 private:
-	float16 data;
+	using Base = ::Vec_<float1>;
+public:
+	Vector(float x_ = 0, float y_ = 0, float z_ = 0)
+		: Base(x_, y_, z_) {}
+	Vector(const ::Vec_<double>& base)
+		: Base((float)base.x, (float)base.y, (float)base.z) {}
+	Vector(const Base& base)
+		: Base(base) {}
+	Vector(float3 data)
+		: Base(data.x(), data.y(), data.z()) {}
+
+	Vector& norm() {
+		return *this = *this * (1 / cl::sycl::sqrt(x*x + y*y + z*z));
+	}
+};
+
+using RaySycl = ::Ray_<float1>;
+
+struct SphereSycl : public ::Sphere_<float1> {
+private:
+	using Base = ::Sphere_<float1>;
 
 public:
-	template <class T>
-	SphereSycl(T&& data)
-		: data(std::forward<T>(data)) {}
+	float1 rad;
 
-	float1& rad() {
-		return data.w;
-	}
-	float3& p() { // position
-		return data.xyz;
-	}
-	float3& e() { // emission
-		return data.lo().hi().xyz;
-	}
-	float3& c() { // color
-		return data.hi().xyz;
-	}
-	float1 refl() { // reflection type (Refl_t)
-		return data.hi().w;
-	}
+	SphereSycl(cl::sycl::float16 data)
+	:	Base(
+			data.lo().lo().w(),
+			Vector(data.lo().lo().xyz()),
+			Vector(data.lo().hi().xyz()),
+			Vector(data.hi().lo().xyz()),
+			Refl_t::DIFF // Not important
+		),
+		rad(data.hi().lo().w()) {}
 
-	void intersect(float1& return_, const RaySycl& r) const { // returns distance, 0 if no hit
-		Vector op = p() - r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
+	float1 intersect(const Ray_<float1>& r) const { // returns distance, 0 if no hit
+		float1 return_;
+		Vector op = p - r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
 		float1 t;
 		float1 eps = 1e-2f;
 		float1 b = op.dot(r.d);
-		float1 det = b*b - op.dot(op) + rad()*rad();
+		float1 det = b*b - op.dot(op) + rad*rad;
 
 		SYCL_IF(det < 0)
 			return_ = 0;
-		SYCL_ELSE{
-			det = sqrt(det);
+		SYCL_ELSE {
+			det = cl::sycl::sqrt(det);
 			t = b - det;
 			SYCL_IF(t > eps)
 				return_ = t;
-			SYCL_ELSE{
+			SYCL_ELSE {
 				t = b + det;
 				SYCL_IF(t > eps)
 					return_ = t;
@@ -131,64 +101,10 @@ public:
 			SYCL_END
 		}
 		SYCL_END
+
+		return return_;
 	}
 };
-
-#else
-
-struct Vector : public ::Vec_<float> {
-private:
-	using Base = ::Vec_<float>;
-public:
-	Vector(float x_ = 0, float y_ = 0, float z_ = 0)
-		: Base(x_, y_, z_) {}
-	template <class type>
-	Vector(const ::Vec_<type>& base)
-		: Vector((float)base.x, (float)base.y, (float)base.z) {}
-	Vector(float3 data)
-		: Vector(data.x(), data.y(), data.z()) {}
-};
-
-using RaySycl = ::Ray_<float>;
-
-struct SphereSycl {
-private:
-	::Sphere_<float> data;
-	using VecType = ::Vec_<float>;
-
-public:
-	SphereSycl(float16 data)
-		: data(
-			data.lo().lo().w(),
-			Vector(data.lo().lo().xyz()),
-			Vector(data.lo().hi().xyz()),
-			Vector(data.hi().lo().xyz()),
-			(Refl_t)static_cast<int>(data.hi().lo().w().m_data[0])
-		) {	}
-
-	float1& rad() {
-		return data.rad;
-	}
-	VecType& p() { // position
-		return data.p;
-	}
-	VecType& e() { // emission
-		return data.e;
-	}
-	VecType& c() { // color
-		return data.c;
-	}
-	Refl_t refl() { // reflection type (Refl_t)
-		return data.refl;
-	}
-
-	void intersect(float1& return_, const RaySycl& r) const { // returns distance, 0 if no hit
-		return_ = data.intersect(r);
-	}
-};
-
-#endif // SYCL_GTX
-
 
 inline void clamp(float1& x) {
 	SYCL_IF(x < 0)
@@ -206,7 +122,7 @@ inline bool1 intersect(spheres_t spheres, const RaySycl& r, float1& t, int1& id)
 	int1 i = ns_sycl_gtx::numSpheres;
 	SYCL_WHILE(i > 0) {
 		i -= 1;
-		SphereSycl(spheres[i]).intersect(d, r);
+		d = SphereSycl(float16(spheres[i])).intersect(r);
 		SYCL_IF(d != 0 && d < t) {
 			t = d;
 			id = i;
@@ -245,7 +161,7 @@ void radiance(
 	// cl is accumulated color
 	// cf is accumulated reflectance
 
-	RaySycl reflRay(0, 0);
+	RaySycl reflRay(Vector(0), Vector(0));
 	Vector x, tdir;
 
 	SYCL_WHILE(true) {
@@ -256,16 +172,16 @@ void radiance(
 		}
 		SYCL_END
 
-		SphereSycl obj(spheres[id]); // the hit object
+		auto obj = SphereSycl(float16(spheres[id])); // the hit object
 		x = r.o + r.d*t;
 
-		Vector n = Vector(x - obj.p()).norm();
+		Vector n = Vector(x - obj.p).norm();
 		Vector nl = n;
 		SYCL_IF(n.dot(r.d) > 0)
 			nl = nl * -1;
 		SYCL_END
 
-		Vector f = obj.c();
+		Vector f = obj.c;
 
 		float1 p;	// max refl
 		SYCL_IF(f.x > f.y && f.x > f.z)
@@ -276,7 +192,7 @@ void radiance(
 			p = f.z;
 		SYCL_END
 
-		cl = cl + cf.mult(obj.e());
+		cl = cl + cf.mult(obj.e);
 
 		depth += 1; 
 		SYCL_IF(depth > 5) {
@@ -293,7 +209,7 @@ void radiance(
 
 		cf = cf.mult(f);
 
-		SYCL_IF(obj.refl() == (float)DIFF) { // Ideal DIFFUSE reflection 
+		SYCL_IF(obj.refl == (float)DIFF) { // Ideal DIFFUSE reflection 
 			float1 r1 = (float1)(2 * M_PI * getRandom(randomSeed));
 			float1 r2 = getRandom(randomSeed);
 			float1 r2s = cl::sycl::sqrt(r2);
@@ -314,7 +230,7 @@ void radiance(
 			r = RaySycl(x, d);
 			SYCL_CONTINUE
 		}
-		SYCL_ELSE_IF(obj.refl() == (float)SPEC) { // Ideal SPECULAR reflection 
+		SYCL_ELSE_IF(obj.refl == (float)SPEC) { // Ideal SPECULAR reflection 
 			// Recursion
 			r = RaySycl(x, r.d - n * 2 * n.dot(r.d));
 			SYCL_CONTINUE
@@ -379,14 +295,6 @@ void radiance(
 	SYCL_END
 }
 
-template <class T, class D>
-void assign(T& target, D& data) {
-	using type = decltype(target.x);
-	target.x = (type)data.x;
-	target.y = (type)data.y;
-	target.z = (type)data.z;
-}
-
 } // ns_sycl_gtx
 
 void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_) {
@@ -400,22 +308,22 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 
 	buffer<float3> colorsBuffer(range<1>(w*h));
 
-	vector<::cl_uint2> seedArray;
+	vector<cl::sycl::cl_uint2> seedArray;
 	seedArray.reserve(w*h);
 	for(int y = 0; y < h; ++y) {
 		Xi[2] = y*y*y;
 		for(int x = 0; x < w; ++x) {
-			::cl_uint2 seed;
-			seed.s[0] = (::cl_uint)erand48(Xi);
-			seed.s[1] = (::cl_uint)erand48(Xi);
+			cl::sycl::cl_uint2 seed;
+			seed.x() = (::cl_uint)erand48(Xi);
+			seed.y() = (::cl_uint)erand48(Xi);
 			seedArray.push_back(seed);
 		}
 	}
-	buffer<::cl_uint2> seedsBuffer(seedArray);
+	buffer<cl::sycl::cl_uint2> seedsBuffer(seedArray);
 
 	auto spheres_ = buffer<float16>(range<1>(ns_sycl_gtx::numSpheres));
 	{
-		auto assign = [](float4& target, ::Vec& data) {
+		auto assign = [](cl::sycl::cl_float4& target, ::Vec& data) {
 			using type = float4::element_type;
 			target.x() = (type)data.x;
 			target.y() = (type)data.y;
@@ -470,8 +378,8 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 				Vector r(r_);
 				RaySycl cam(Vector(cam_.o), Vector(cam_.d));
 				uint2 randomSeed;
-				randomSeed.x() = seeds[i].s[0] * i[0] + i[0] + 1;
-				randomSeed.y() = seeds[i].s[1] * i[1] + i[1] + 1;
+				randomSeed.x() = uint2(seeds[i]).x() * i[0] + i[0] + 1;
+				randomSeed.y() = uint2(seeds[i]).y() * i[1] + i[1] + 1;
 
 				c[i] = 0; // Important to start at zero
 
@@ -529,12 +437,11 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 		});
 	}
 
-	auto assign = [](::Vec& target, float3& data) {
+	auto assign = [](::Vec& target, cl::sycl::cl_float3& data) {
 		target.x = (double)data.x();
 		target.y = (double)data.y();
 		target.z = (double)data.z();
 	};
-
 
 	for(auto k = 0; k < numParts; ++k) {
 #if _DEBUG
