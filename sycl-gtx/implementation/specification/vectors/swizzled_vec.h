@@ -17,17 +17,20 @@ static void to_char(char* name) {
 }
 
 template <int index, int current, int... others>
-struct swizzled {
-	static void get(char* name) {
-		to_char<index, current>(name);
-		swizzled<index + 1, others...>::get(name);
-	}
-};
+struct swizzled;
 
 template <int index, int current>
 struct swizzled<index, current> {
 	static void get(char* name) {
 		to_char<index, current>(name);
+	}
+};
+
+template <int index, int current, int... others>
+struct swizzled {
+	static void get(char* name) {
+		to_char<index, current>(name);
+		swizzled<index + 1, others...>::get(name);
 	}
 };
 
