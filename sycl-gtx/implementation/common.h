@@ -212,6 +212,9 @@ struct get_string<float> {
 	}
 };
 
+template <typename dataT, int numElements>
+struct cl_type;
+
 } // namespace detail
 
 } // namespace sycl
