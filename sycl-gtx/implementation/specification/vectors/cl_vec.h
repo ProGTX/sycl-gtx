@@ -23,6 +23,10 @@ struct cl_base<dataT, 1, 1> {
 private:
 	dataT elem;
 public:
+	cl_base() {}
+	cl_base(dataT value)
+		: elem(value) {}
+
 	operator dataT&() {
 		return elem;
 	}
@@ -50,6 +54,29 @@ protected:
 	}
 
 public:
+	cl_base() {}
+	cl_base(const cl_base&) = default;
+	cl_base(genvector v) {
+		auto start = reinterpret_cast<dataT*>(&v);
+		std::copy(start, start + parentElems, this->elems);
+	}
+#if MSVC_LOW							
+	cl_base(cl_base&& move) {
+		std::swap(this->elems, move.elems);
+	}
+	cl_base& operator=(cl_base&& move) {
+		std::swap(this->elems, move.elems);
+		return *this;
+	}
+#else
+	cl_base(cl_base&&) = default;
+	cl_base& operator=(cl_base&&) = default;
+#endif
+	cl_base& operator=(const cl_base&) = default;
+	cl_base& operator=(genvector v) {
+		std::copy(&v, &v + parentElems, this->elems);
+	}
+
 	operator genvector&() {
 		return *reinterpret_cast<genvector*>(elems);
 	}
@@ -58,8 +85,28 @@ public:
 	}
 };
 
+
+#define SYCL_CL_VEC_INHERIT_CONSTRUCTORS	\
+	cl_base() {}							\
+	cl_base(const cl_base&) = default;		\
+	cl_base(genvector v)					\
+		: Base(v) {}						\
+	cl_base(cl_base&& move) {				\
+		std::swap(this->elems, move.elems);	\
+	}
+
+
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 2> : cl_base<dataT, parentElems, 0> {
+protected:
+	using Base = cl_base<dataT, parentElems, 0>;
+public:
+#if MSVC_LOW
+	SYCL_CL_VEC_INHERIT_CONSTRUCTORS
+#else
+	using Base::Base;
+#endif
+
 	dataT& x() {
 		return this->elems[0];
 	}
@@ -76,6 +123,15 @@ struct cl_base<dataT, parentElems, 2> : cl_base<dataT, parentElems, 0> {
 
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 3> : cl_base<dataT, parentElems, 2> {
+protected:
+	using Base = cl_base<dataT, parentElems, 2>;
+public:
+#if MSVC_LOW
+	SYCL_CL_VEC_INHERIT_CONSTRUCTORS
+#else
+	using Base::Base;
+#endif
+
 	dataT& z() {
 		return this->elems[2];
 	}
@@ -90,10 +146,16 @@ struct cl_base<dataT, parentElems, 3> : cl_base<dataT, parentElems, 2> {
 
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 4> : cl_base<dataT, parentElems, 3> {
-protected:
-	using cl_base_3 = cl_base<dataT, 3, 3>;
-
+private:
+	using Base = cl_base<dataT, parentElems, 3>;
+	using cl_base_3 = Base::cl_base_3;
 public:
+#if MSVC_LOW
+	SYCL_CL_VEC_INHERIT_CONSTRUCTORS
+#else
+	using Base::Base;
+#endif
+
 	dataT& w() {
 		return this->elems[3];
 	}
@@ -111,6 +173,15 @@ public:
 
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 8> : cl_base<dataT, parentElems, 0> {
+private:
+	using Base = cl_base<dataT, parentElems, 0>;
+public:
+#if MSVC_LOW
+	SYCL_CL_VEC_INHERIT_CONSTRUCTORS
+#else
+	using Base::Base;
+#endif
+
 	cl_base<dataT, 4, 4> lo() {
 		return *reinterpret_cast<cl_base<dataT, 4, 4>*>(this);
 	}
@@ -124,6 +195,15 @@ struct cl_base<dataT, parentElems, 8> : cl_base<dataT, parentElems, 0> {
 
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 16> : cl_base<dataT, parentElems, 0> {
+private:
+	using Base = cl_base<dataT, parentElems, 0>;
+public:
+#if MSVC_LOW
+	SYCL_CL_VEC_INHERIT_CONSTRUCTORS
+#else
+	using Base::Base;
+#endif
+
 	cl_base<dataT, 8, 8> lo() {
 		return *reinterpret_cast<cl_base<dataT, 8, 8>*>(this);
 	}
