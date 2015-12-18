@@ -21,7 +21,7 @@ float1 deviceRandom(uint2& seed) {
 	return getRandom<float1, uint1>(seed);
 }
 
-float hostRandom(cl_uint2& seed) {
+float hostRandom(cl::sycl::cl_uint2& seed) {
 	return getRandom<float, cl::sycl::cl_uint>(seed);
 }
 
@@ -36,14 +36,13 @@ bool test11() {
 	buffer<float> numbers(size);
 
 	// TODO: Should not be zero
-	uint32_t startSeed_x = 24325;
-	uint32_t startSeed_y = 32536;
+	::cl_uint2 startSeed = { 24325, 32536 };
 
 	myQueue.submit([&](handler& cgh) {
 		auto n = numbers.get_access<access::mode::discard_write>(cgh);
 
 		cgh.single_task<class generate>([=]() {
-			uint2 seed(startSeed_x, startSeed_y);
+			uint2 seed(startSeed.x, startSeed.y);
 			SYCL_FOR(int1 i = 0, i < size, ++i) {
 				n[i] = deviceRandom(seed);
 			}
@@ -53,7 +52,7 @@ bool test11() {
 
 	float eps = 1e-3f;	// Don't need very high accuracy
 	auto n = numbers.get_access<access::mode::read, access::target::host_buffer>();
-	::cl_uint2 seed = { startSeed_x, startSeed_y };
+	cl::sycl::cl_uint2 seed = startSeed;
 
 	// TODO: Better automatic testing
 	for(auto i = 0; i < size; ++i) {
