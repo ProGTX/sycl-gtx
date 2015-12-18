@@ -15,6 +15,7 @@ namespace vectors {
 template <typename, int>
 class base;
 
+
 template <typename dataT, int parentElems, int selfElems = parentElems>
 struct cl_base;
 
@@ -85,7 +86,6 @@ public:
 	}
 };
 
-
 #define SYCL_CL_VEC_INHERIT_CONSTRUCTORS	\
 	cl_base() {}							\
 	cl_base(const cl_base&) = default;		\
@@ -95,11 +95,20 @@ public:
 		std::swap(this->elems, move.elems);	\
 	}
 
+#define SYCL_CL_REF(return_, name, code)	\
+	return_& name() {						\
+		return code;						\
+	}										\
+	const return_& name() const {			\
+		return code;						\
+	}
+
 
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 2> : cl_base<dataT, parentElems, 0> {
 protected:
 	using Base = cl_base<dataT, parentElems, 0>;
+	using cl_base_2 = cl_base<dataT, 2, 2>;
 public:
 #if MSVC_LOW
 	SYCL_CL_VEC_INHERIT_CONSTRUCTORS
@@ -107,24 +116,18 @@ public:
 	using Base::Base;
 #endif
 
-	dataT& x() {
-		return this->elems[0];
-	}
-	const dataT& x() const {
-		return this->elems[0];
-	}
-	dataT& y() {
-		return this->elems[1];
-	}
-	const dataT& y() const {
-		return this->elems[1];
-	}
+	SYCL_CL_REF(dataT, x, this->elems[0]);
+	SYCL_CL_REF(dataT, y, this->elems[1]);
+	SYCL_CL_REF(dataT, lo, x());
+	SYCL_CL_REF(dataT, hi, y());
+	SYCL_CL_REF(cl_base_2, xy, *reinterpret_cast<cl_base_2*>(this));
 };
 
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 3> : cl_base<dataT, parentElems, 2> {
 protected:
 	using Base = cl_base<dataT, parentElems, 2>;
+	using cl_base_3 = cl_base<dataT, 3, 3>;
 public:
 #if MSVC_LOW
 	SYCL_CL_VEC_INHERIT_CONSTRUCTORS
@@ -132,23 +135,29 @@ public:
 	using Base::Base;
 #endif
 
-	dataT& z() {
-		return this->elems[2];
-	}
-	const dataT& z() const {
-		return this->elems[2];
+	SYCL_CL_REF(dataT, z, this->elems[2]);
+	SYCL_CL_REF(Base::cl_base_2, lo, this->xy());
+	SYCL_CL_REF(dataT, hi, z());
+	SYCL_CL_REF(cl_base_3, xyz, *reinterpret_cast<cl_base_3*>(this));
+};
+
+
+#define	SYCL_CL_HI(cl_base_half, half)					\
+	cl_base_half hi() const {							\
+		cl_base_half ret;								\
+		using type = decltype(this->elems + 0);			\
+		reinterpret_cast<type&>(ret.elems) =			\
+			reinterpret_cast<type>(this->elems + half);	\
+		return ret;										\
 	}
 
-	cl_base<dataT, parentElems, 3> xyz() {
-		return *this;
-	}
-};
 
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 4> : cl_base<dataT, parentElems, 3> {
 private:
 	using Base = cl_base<dataT, parentElems, 3>;
 	using cl_base_3 = Base::cl_base_3;
+	using cl_base_4 = cl_base<dataT, 4, 4>;
 public:
 #if MSVC_LOW
 	SYCL_CL_VEC_INHERIT_CONSTRUCTORS
@@ -156,18 +165,15 @@ public:
 	using Base::Base;
 #endif
 
-	dataT& w() {
-		return this->elems[3];
-	}
-	const dataT& w() const {
-		return this->elems[3];
-	}
+	SYCL_CL_REF(dataT, w, this->elems[3]);
+	SYCL_CL_HI(Base::cl_base_2, 2);
+	SYCL_CL_REF(cl_base_4, xyzw, *reinterpret_cast<cl_base_4*>(this));
 
 	operator cl_base_3&() {
-		return *reinterpret_cast<cl_base_3*>(this);
+		return this->xyz();
 	}
 	operator const cl_base_3&() const {
-		return *reinterpret_cast<cl_base_3*>(this);
+		return this->xyz();
 	}
 };
 
@@ -175,6 +181,7 @@ template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 8> : cl_base<dataT, parentElems, 0> {
 private:
 	using Base = cl_base<dataT, parentElems, 0>;
+	using cl_base_4 = cl_base<dataT, 4, 4>;
 public:
 #if MSVC_LOW
 	SYCL_CL_VEC_INHERIT_CONSTRUCTORS
@@ -182,21 +189,15 @@ public:
 	using Base::Base;
 #endif
 
-	cl_base<dataT, 4, 4> lo() {
-		return *reinterpret_cast<cl_base<dataT, 4, 4>*>(this);
-	}
-	cl_base<dataT, 4, 4> hi() {
-		cl_base<dataT, 4, 4> ret;
-		using type = decltype(elems + 0);
-		reinterpret_cast<type&>(ret.elems) = reinterpret_cast<type>(elems + 4);
-		return ret;
-	}
+	SYCL_CL_REF(cl_base_4, lo, *reinterpret_cast<cl_base_4*>(this));
+	SYCL_CL_HI(cl_base_4, 4);
 };
 
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 16> : cl_base<dataT, parentElems, 0> {
 private:
 	using Base = cl_base<dataT, parentElems, 0>;
+	using cl_base_8 = cl_base<dataT, 8, 8>;
 public:
 #if MSVC_LOW
 	SYCL_CL_VEC_INHERIT_CONSTRUCTORS
@@ -204,16 +205,13 @@ public:
 	using Base::Base;
 #endif
 
-	cl_base<dataT, 8, 8> lo() {
-		return *reinterpret_cast<cl_base<dataT, 8, 8>*>(this);
-	}
-	cl_base<dataT, 8, 8> hi() {
-		cl_base<dataT, 8, 8> ret;
-		using type = decltype(elems + 0);
-		reinterpret_cast<type&>(ret.elems) = reinterpret_cast<type>(elems + 8);
-		return ret;
-	}
+	SYCL_CL_REF(cl_base_8, lo, *reinterpret_cast<cl_base_8*>(this));
+	SYCL_CL_HI(cl_base_8, 8);
 };
+
+#undef SYCL_CL_REF
+#undef SYCL_CL_HI
+#undef SYCL_CL_VEC_INHERIT_CONSTRUCTORS
 
 } // namespace vectors
 } // namespace detail
