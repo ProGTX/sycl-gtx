@@ -22,8 +22,8 @@ bool test10() {
 	const int size = 10;
 	cl::sycl::cl_float3 testVector;
 	testVector.x() = 1;
-	testVector.x() = 2;
-	testVector.x() = 3;
+	testVector.y() = 2;
+	testVector.z() = 3;
 	buffer<float3> vectors(size);
 
 	myQueue.submit([&](handler& cgh) {
@@ -36,9 +36,17 @@ bool test10() {
 
 	auto v = vectors.get_access<access::mode::read, access::target::host_buffer>();
 
+	auto floatEqual = [](float& first, float& second) {
+		static const double eps = 1e5f;
+		return first > second - eps && first < second + eps;
+	};
+
 	for(auto i = 0; i < size; ++i) {
 		auto vi = v[i];
-		if(vi.x() != 1 || vi.y() != 2 || vi.z() != 3) {
+		if(	!floatEqual(vi.x(), testVector.x()) ||
+			!floatEqual(vi.y(), testVector.y()) ||
+			!floatEqual(vi.z(), testVector.z())
+		) {
 			cout << i << " -> expected " << to_string(testVector) << ", got " << to_string(vi) << endl;
 			return false;
 		}
