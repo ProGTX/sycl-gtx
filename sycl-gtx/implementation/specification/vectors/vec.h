@@ -108,14 +108,14 @@ public:
 		swizzled<0, indices...>::get(access_name);
 		access_name[size] = 0;
 
-		return swizzled_vec<dataT, size>(name + ".s" + access_name);
+		return swizzled_vec<dataT, size>(this->name + ".s" + access_name);
 	}
 
 	swizzled_vec<dataT, half_size> lo() const {
-		return swizzled_vec<dataT, half_size>(name + ".lo");
+		return swizzled_vec<dataT, half_size>(this->name + ".lo");
 	}
 	swizzled_vec<dataT, half_size> hi() const {
-		return swizzled_vec<dataT, half_size>(name + ".hi");
+		return swizzled_vec<dataT, half_size>(this->name + ".hi");
 	}
 
 	// TODO: Swizzle methods
