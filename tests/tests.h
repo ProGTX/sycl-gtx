@@ -15,3 +15,4 @@ bool test8();	// Milestone 2
 bool test9();
 bool test10();
 bool test11();
+bool test12();

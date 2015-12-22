@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tests\test1.cpp" />
+    <ClCompile Include="tests\test12.cpp" />
     <ClCompile Include="tests\test2.cpp" />
     <ClCompile Include="tests\test3.cpp" />
     <ClCompile Include="tests\test4.cpp" />
