@@ -10,10 +10,10 @@
 template <class type>
 struct Vec_ {
   type x, y, z;
-  Vec_(type x_=0, type y_=0, type z_=0){ x=x_; y=y_; z=z_; }
+  Vec_(const type& x_ = 0, const type& y_ = 0, const type& z_ = 0) { x = x_; y = y_; z = z_; }
   Vec_ operator+(const Vec_ &b) const { return Vec_(x+b.x,y+b.y,z+b.z); }
   Vec_ operator-(const Vec_ &b) const { return Vec_(x-b.x,y-b.y,z-b.z); }
-  Vec_ operator*(type b) const { return Vec_(x*b,y*b,z*b); }
+  Vec_ operator*(const type& b) const { return Vec_(x*b, y*b, z*b); }
   Vec_ mult(const Vec_ &b) const { return Vec_(x*b.x,y*b.y,z*b.z); }
   Vec_& norm(){ return *this = *this * (1/sqrt(x*x+y*y+z*z)); }
   type dot(const Vec_ &b) const { return x*b.x+y*b.y+z*b.z; } // cross:
@@ -27,7 +27,7 @@ struct Sphere_ {
   type rad;       // radius
   Vec_<type> p, e, c;      // position, emission, color
   Refl_t refl;      // reflection type (DIFFuse, SPECular, REFRactive)
-  Sphere_(type rad_, Vec_<type> p_, Vec_<type> e_, Vec_<type> c_, Refl_t refl_):
+  Sphere_(const type& rad_, Vec_<type> p_, Vec_<type> e_, Vec_<type> c_, Refl_t refl_) :
     rad(rad_), p(p_), e(e_), c(c_), refl(refl_) {}
   type intersect(const Ray_<type> &r) const { // returns distance, 0 if nohit
     Vec_<type> op = p-r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0

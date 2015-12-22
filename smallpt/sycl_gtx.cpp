@@ -122,7 +122,7 @@ inline bool1 intersect(spheres_t spheres, const RaySycl& r, float1& t, int1& id)
 	int1 i = ns_sycl_gtx::numSpheres;
 	SYCL_WHILE(i > 0) {
 		i -= 1;
-		d = SphereSycl(float16(spheres[i])).intersect(r);
+		d = SphereSycl(spheres[i]).intersect(r);
 		SYCL_IF(d != 0 && d < t) {
 			t = d;
 			id = i;
@@ -172,7 +172,7 @@ void radiance(
 		}
 		SYCL_END
 
-		auto obj = SphereSycl(float16(spheres[id])); // the hit object
+		auto obj = SphereSycl(spheres[id]); // the hit object
 		x = r.o + r.d*t;
 
 		Vector n = Vector(x - obj.p).norm();
@@ -378,8 +378,8 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 				Vector r(r_);
 				RaySycl cam(Vector(cam_.o), Vector(cam_.d));
 				uint2 randomSeed;
-				randomSeed.x() = uint2(seeds[i]).x() * i[0] + i[0] + 1;
-				randomSeed.y() = uint2(seeds[i]).y() * i[1] + i[1] + 1;
+				randomSeed.x() = seeds[i].x() * i[0] + i[0] + 1;
+				randomSeed.y() = seeds[i].y() * i[1] + i[1] + 1;
 
 				c[i] = 0; // Important to start at zero
 
@@ -423,7 +423,7 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 						clamp(r.z);
 
 						r = r * .25f;
-						auto& ci = c[i];
+						auto ci = c[i];
 						ci.x() = ci.x() + r.x;
 						ci.y() = ci.y() + r.y;
 						ci.z() = ci.z() + r.z;
