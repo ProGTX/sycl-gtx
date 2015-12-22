@@ -16,6 +16,17 @@ template <typename, int>
 class base;
 
 
+// In OpenCL, 3 and 4 element vectors have the same size
+template <int parentElems>
+struct num_elems {
+	static const int value = parentElems;
+};
+template <>
+struct num_elems<3> {
+	static const int value = 4;
+};
+
+
 template <typename dataT, int parentElems, int selfElems = parentElems>
 struct cl_base;
 
@@ -48,7 +59,8 @@ protected:
 
 	using genvector = typename detail::cl_type<dataT, parentElems>::type;
 
-	dataT elems[parentElems];
+	static const int size = num_elems<parentElems>::value;
+	dataT elems[size];
 
 	static string_class type_name() {
 		return type_string<dataT>::get() + (parentElems == 1 ? "" : get_string<int>::get(parentElems));
@@ -59,7 +71,7 @@ public:
 	cl_base(const cl_base&) = default;
 	cl_base(genvector v) {
 		auto start = reinterpret_cast<dataT*>(&v);
-		std::copy(start, start + parentElems, this->elems);
+		std::copy(start, start + size, this->elems);
 	}
 #if MSVC_LOW							
 	cl_base(cl_base&& move) {
@@ -75,7 +87,7 @@ public:
 #endif
 	cl_base& operator=(const cl_base&) = default;
 	cl_base& operator=(genvector v) {
-		std::copy(&v, &v + parentElems, this->elems);
+		std::copy(&v, &v + size, this->elems);
 	}
 
 	operator genvector&() {
