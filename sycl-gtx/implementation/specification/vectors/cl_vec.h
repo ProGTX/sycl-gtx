@@ -168,6 +168,7 @@ template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 4> : cl_base<dataT, parentElems, 3> {
 private:
 	using Base = cl_base<dataT, parentElems, 3>;
+	using cl_base_2 = Base::cl_base_2;
 	using cl_base_3 = Base::cl_base_3;
 	using cl_base_4 = cl_base<dataT, 4, 4>;
 public:
@@ -178,8 +179,8 @@ public:
 #endif
 
 	SYCL_CL_REF(dataT, w, this->elems[3]);
-	SYCL_CL_HI(Base::cl_base_2, 2);
 	SYCL_CL_REF(cl_base_4, xyzw, *reinterpret_cast<cl_base_4*>(this));
+	SYCL_CL_REF(cl_base_2, hi, *reinterpret_cast<cl_base_2*>(reinterpret_cast<dataT*>(this->elems) + 2));
 
 	operator cl_base_3&() {
 		return this->xyz();
@@ -202,7 +203,7 @@ public:
 #endif
 
 	SYCL_CL_REF(cl_base_4, lo, *reinterpret_cast<cl_base_4*>(this));
-	SYCL_CL_HI(cl_base_4, 4);
+	SYCL_CL_REF(cl_base_4, hi, *reinterpret_cast<cl_base_4*>(reinterpret_cast<dataT*>(this->elems) + 4));
 };
 
 template <typename dataT, int parentElems>
@@ -218,11 +219,10 @@ public:
 #endif
 
 	SYCL_CL_REF(cl_base_8, lo, *reinterpret_cast<cl_base_8*>(this));
-	SYCL_CL_HI(cl_base_8, 8);
+	SYCL_CL_REF(cl_base_8, hi, *reinterpret_cast<cl_base_8*>(reinterpret_cast<dataT*>(this->elems) + 8));
 };
 
 #undef SYCL_CL_REF
-#undef SYCL_CL_HI
 #undef SYCL_CL_VEC_INHERIT_CONSTRUCTORS
 
 } // namespace vectors
