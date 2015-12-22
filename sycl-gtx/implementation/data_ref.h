@@ -42,6 +42,12 @@ public:
 		return get_string<T>::get(n);
 	}
 
+	template <typename T, typename std::enable_if<std::is_enum<T>::value>::type* = nullptr>
+	static string_class get_name(const T& n) {
+		auto value = static_cast<typename std::underlying_type<T>::type>(n);
+		return get_string<decltype(value)>::get(value);
+	}
+
 	data_ref(string_class name)
 		: name(name) {}
 
