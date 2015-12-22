@@ -189,7 +189,7 @@ struct base_host_data {
 
 template <typename T>
 struct get_string {
-	static string_class get(T t) {
+	static string_class get(const T& t) {
 		std::stringstream s;
 		s << t;
 		return s.str();

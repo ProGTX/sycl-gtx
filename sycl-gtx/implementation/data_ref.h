@@ -38,7 +38,7 @@ public:
 	}
 
 	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
-	static string_class get_name(T n) {
+	static string_class get_name(const T& n) {
 		return get_string<T>::get(n);
 	}
 
@@ -52,7 +52,7 @@ public:
 		: name(name) {}
 
 	template <class T>
-	data_ref(T type)
+	data_ref(T&& type)
 		: name(get_name(type)) {}
 
 	data_ref(const data_ref& copy) = default;
@@ -78,18 +78,18 @@ public:
 
 #define SYCL_ASSIGNMENT_OPERATOR(op)					\
 	template <class T>									\
-	data_ref& operator op(T n) {			 			\
+	data_ref& operator op(const T& n) {			 		\
 		kernel_add(name + " " #op " " + get_name(n));	\
 		return *this;						 			\
 	}
 
 #define SYCL_DATA_REF_OPERATOR(op)																	\
 	template <class T>																				\
-	data_ref operator op(T n) const {																\
+	data_ref operator op(const T& n) const {														\
 		return data_ref(open_parenthesis + name + " " #op " " + get_name(n) + ')');					\
 	}																								\
 	template <typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>	\
-	friend data_ref operator op(T n, data_ref dref) {												\
+	friend data_ref operator op(const T& n, const data_ref& dref) {									\
 		return data_ref(open_parenthesis + get_name(n) + " " #op " " + dref.name + ')');			\
 	}
 

@@ -63,6 +63,8 @@ protected:
 		: data_ref(name) {}
 
 public:
+	// TODO: Proper move semantics
+
 	using element_type = dataT;
 	// Underlying OpenCL type
 	// using vector_t = TODO;
@@ -76,15 +78,15 @@ public:
 	base& operator=(const base&) = default;
 
 	template <class T>
-	base(T n, typename std::enable_if<!std::is_same<T, const base&>::value>::type* = nullptr)
+	base(const T& n, typename std::enable_if<!std::is_same<T, const base&>::value>::type* = nullptr)
 		: base(get_name(n), true) {}
 
 	template <int num = numElements>
-	base(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
+	base(const data_ref& x, const data_ref& y, SYCL_ENABLE_IF_DIM(2))
 		: base(open_parenthesis + type_name() + ")(" + x.name + ", " + y.name + ')', true) {}
 
 	template <int num = numElements>
-	base(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
+	base(const data_ref& x, const data_ref& y, const data_ref& z, SYCL_ENABLE_IF_DIM(3))
 		: base(open_parenthesis + type_name() + ")(" + x.name + ", " + y.name + ", " + z.name + ')', true) {}
 
 	operator vec<dataT, numElements>&() {
@@ -150,21 +152,25 @@ protected:
 	using data_ref = detail::data_ref;
 	using genvector = detail::vectors::cl_base<dataT, numElements, numElements>;
 public:
+	// TODO: Proper move semantics
+
 	vec()
 		: Base(), Members(this) {}
 	vec(const vec& copy)
 		: Base(copy.name, true), Members(this) {}
-	// TODO: Move members
 	vec(vec&& move)
 		: Base(std::move(move.name)), Members(this) {}
 	template <class T>
-	vec(T n, typename std::enable_if<!std::is_same<T, const vec&>::value>::type* = nullptr)
+	vec(const T& n, typename std::enable_if<!std::is_same<T, const vec&>::value>::type* = nullptr)
 		: Base(n), Members(this) {}
+	template <class T>
+	vec(T&& n, typename std::enable_if<!std::is_same<T, vec&&>::value>::type* = nullptr)
+		: Base(std::move(n)), Members(this) {}
 	template <int num = numElements>
-	vec(data_ref x, data_ref y, SYCL_ENABLE_IF_DIM(2))
+	vec(const data_ref& x, const data_ref& y, SYCL_ENABLE_IF_DIM(2))
 		: Base(x, y), Members(this) {}
 	template <int num = numElements>
-	vec(data_ref x, data_ref y, data_ref z, SYCL_ENABLE_IF_DIM(3))
+	vec(const data_ref& x, const data_ref& y, const data_ref& z, SYCL_ENABLE_IF_DIM(3))
 		: Base(x, y, z), Members(this) {}
 	vec& operator=(const vec&) = default;
 	template <class T>
@@ -180,11 +186,11 @@ public:
 
 	vec operator*(const vec& v) const {
 		auto r = data_ref::operator*(v);
-		return vec(r);
+		return vec(std::move(r));
 	}
 	vec operator+(const vec& v) const {
 		auto r = data_ref::operator+(v);
-		return vec(r);
+		return vec(std::move(r));
 	}
 };
 
@@ -209,7 +215,7 @@ public:
 
 #define	SYCL_VEC_UVECTOR(base, num)						\
 	SYCL_VEC_VECTOR(base, num)							\
-	using u##base##num = vec<unsigned base, num>;			\
+	using u##base##num = vec<unsigned base, num>;		\
 	using cl_u##base##num = detail::vectors::cl_base<	\
 		unsigned base, num, num>;
 
