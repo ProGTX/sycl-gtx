@@ -30,14 +30,15 @@ bool test10() {
 		auto v = vectors.get_access<access::mode::discard_write>(cgh);
 			
 		cgh.parallel_for<class addition>(range<1>(size), [=](id<> i) {
-			v[i] = float3(testVector.x(), testVector.y(), testVector.z());
+			v[i] = float3(testVector.x(), testVector.y(), 0);
+			v[i].z() = testVector.z();
 		});
 	});
 
 	auto v = vectors.get_access<access::mode::read, access::target::host_buffer>();
 
 	auto floatEqual = [](float& first, float& second) {
-		static const double eps = 1e5f;
+		static const double eps = 1e-5f;
 		return first > second - eps && first < second + eps;
 	};
 
