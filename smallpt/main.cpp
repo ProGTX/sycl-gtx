@@ -109,11 +109,13 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 			continue;
 		}
 #endif
+
+#if 1
+		to_file(w, h, vectors.data(), string("image_") + t.name + ".ppm");
+#endif
+
 		cout << "time: " << time << endl;
-		//to_file(w, h, vectors.data(), string("image_") + t.name + ".ppm");
-
 		t.lastTime = time;
-
 		testInfo::totalTime = duration(testInfo::startTime);
 		if(testInfo::totalTime > 300) {
 			cout << "exceeded 5 minute limit, stopping" << endl;
