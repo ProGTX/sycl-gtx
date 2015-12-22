@@ -64,16 +64,18 @@ private:
 
 public:
 	float1 rad;
+	float1 refl;
 
 	SphereSycl(cl::sycl::float16 data)
 	:	Base(
-			data.lo().lo().w(),
+			0, // Not important
 			Vector(data.lo().lo().xyz()),
 			Vector(data.lo().hi().xyz()),
 			Vector(data.hi().lo().xyz()),
 			Refl_t::DIFF // Not important
 		),
-		rad(data.hi().lo().w()) {}
+		rad(data.lo().lo().w()),
+		refl(data.hi().lo().w()) {}
 
 	float1 intersect(const Ray_<float1>& r) const { // returns distance, 0 if no hit
 		float1 return_;
