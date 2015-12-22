@@ -32,6 +32,10 @@ template <typename dataT, int numElements>
 struct acc_device_return<vec<dataT, numElements>> {
 	using type = vec<dataT, numElements>;
 };
+template <typename dataT, int numElements>
+struct acc_device_return<vectors::cl_base<dataT, numElements, numElements>> {
+	using type = vec<dataT, numElements>;
+};
 
 } // namespace detail
 
