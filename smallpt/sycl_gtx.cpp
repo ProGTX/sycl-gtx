@@ -66,7 +66,7 @@ public:
 	float1 rad;
 	float1 refl;
 
-	SphereSycl(cl::sycl::float16 data)
+	SphereSycl(const cl::sycl::float16& data)
 	:	Base(
 			0, // Not important
 			Vector(data.lo().lo().xyz()),
@@ -211,7 +211,7 @@ void radiance(
 
 		cf = cf.mult(f);
 
-		SYCL_IF(obj.refl == (float)DIFF) { // Ideal DIFFUSE reflection 
+		SYCL_IF(obj.refl == (::cl_float)DIFF) { // Ideal DIFFUSE reflection 
 			float1 r1 = (float1)(2 * M_PI * getRandom(randomSeed));
 			float1 r2 = getRandom(randomSeed);
 			float1 r2s = cl::sycl::sqrt(r2);
@@ -232,7 +232,7 @@ void radiance(
 			r = RaySycl(x, d);
 			SYCL_CONTINUE
 		}
-		SYCL_ELSE_IF(obj.refl == (float)SPEC) { // Ideal SPECULAR reflection 
+		SYCL_ELSE_IF(obj.refl == (::cl_float)SPEC) { // Ideal SPECULAR reflection 
 			// Recursion
 			r = RaySycl(x, r.d - n * 2 * n.dot(r.d));
 			SYCL_CONTINUE
