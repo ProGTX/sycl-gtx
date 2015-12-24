@@ -3,8 +3,6 @@
 // 3.7.2 Vector types
 // Swizzled intermediate vectors
 
-#include "vec.h"
-
 namespace cl {
 namespace sycl {
 
