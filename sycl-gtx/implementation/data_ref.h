@@ -26,7 +26,8 @@ public:
 		id_global,
 		id_local,
 		range_global,
-		range_local
+		range_local,
+		expression,
 	};
 
 	static const string_class open_parenthesis;

@@ -38,6 +38,8 @@ class base : protected counter<base<dataT, numElements>>, public data_ref {
 private:
 	template <typename>
 	friend struct ::cl::sycl::detail::type_string;
+	template <typename, int>
+	friend class vec;
 
 	static const int half_size = (numElements + 1) / 2;
 
@@ -54,13 +56,12 @@ private:
 	}
 
 protected:
-	base(string_class assign, bool generate_new)
-		: data_ref(generate_name()) {
-		kernel_add(this_name() + " = " + assign);
+	base(string_class assign, bool generate_new = false)
+		: data_ref(generate_new ? generate_name() : assign) {
+		if(generate_new) {
+			kernel_add(this_name() + " = " + assign);
+		}
 	}
-
-	base(string_class name)
-		: data_ref(name) {}
 
 public:
 	using element_type = dataT;
@@ -151,12 +152,25 @@ private:
 	using Base = detail::vectors::base<dataT, numElements>;
 	using Members = detail::vectors::members<dataT, numElements>;
 
-protected:
-	vec(string_class name_)
-		: Base(name_), Members(this) {}
-
-	using data_ref = detail::data_ref;
 	using genvector = detail::vectors::cl_base<dataT, numElements, numElements>;
+	using data_ref = detail::data_ref;
+	using type_t = data_ref::type_t;
+
+	template <typename T>
+	vec& assign(const T& copy) {
+		if(this->type == type_t::expression) {
+			Base b(this->name, true);
+			this->name = std::move(b.name);
+			this->type = type_t::general;
+		}
+		Base::operator=(copy);
+		return *this;
+	}
+
+	vec(string_class name_, type_t type = type_t::general)
+		: Base(name_), Members(this) {
+		this->type = type;
+	}
 
 public:
 	vec()
@@ -166,29 +180,26 @@ public:
 	vec(const data_ref& copy)
 		: Base(copy.name, true), Members(this) {}
 	vec(vec&& move)
-		: Base(std::move(move.name)), Members(this) {}
+		: Base(std::move(move.name)), Members(this) {
+		this->type = move.type;
+	}
 	vec(data_ref&& move)
 		: Base(std::move(move.name), true), Members(this) {}
 
 	vec& operator=(const vec& copy) {
-		Base::operator=((Base)copy);
-		return *this;
+		return assign((Base)copy);
 	}
 	vec& operator=(const data_ref& copy) {
-		Base::operator=(copy);
-		return *this;
+		return assign(copy);
 	}
 	vec& operator=(vec&& move) {
-		Base::operator=((Base)move);
-		return *this;
+		return assign((Base)move);
 	}
 	vec& operator=(data_ref&& move) {
-		Base::operator=(move);
-		return *this;
+		return assign(move);
 	}
 	vec& operator=(const dataT& n) {
-		Base::operator=(n);
-		return *this;
+		return assign(n);
 	}
 
 	template <int num = numElements>
@@ -203,35 +214,23 @@ public:
 		return genvector();
 	}
 
-
 	// TODO: Operators
-
-	vec operator*(const vec& v) const {
-		auto r = data_ref::operator*(v);
-		return vec(r);
-	}
-	vec operator*(const dataT& n) const {
-		auto r = data_ref::operator*(n);
-		return vec(r);
-	}
-
-	vec operator+(const vec& v) const {
-		auto r = data_ref::operator+(v);
-		return vec(r);
-	}
-	vec operator+(const dataT& n) const {
-		auto r = data_ref::operator+(n);
-		return vec(r);
+#define SYCL_VEC_OP(op)										\
+	vec operator op(const vec& v) const {					\
+		auto r = data_ref::operator op(v);					\
+		return vec(std::move(r.name), type_t::expression);	\
+	}														\
+	vec operator op(const data_ref& d) const {				\
+		auto r = data_ref::operator op(d);					\
+		return vec(std::move(r.name), type_t::expression);	\
 	}
 
-	vec operator-(const vec& v) const {
-		auto r = data_ref::operator-(v);
-		return vec(r);
-	}
-	vec operator-(const dataT& n) const {
-		auto r = data_ref::operator-(n);
-		return vec(r);
-	}
+	SYCL_VEC_OP(+)
+	SYCL_VEC_OP(-)
+	SYCL_VEC_OP(*)
+
+#undef SYCL_VEC_OP
+
 };
 
 
@@ -248,12 +247,25 @@ private:
 	using Base = detail::vectors::base<dataT, 1>;
 	using Members = detail::vectors::members<dataT, 1>;
 
-protected:
-	vec(string_class name_)
-		: Base(name_), Members(this) {}
-
-	using data_ref = detail::data_ref;
 	using genvector = detail::vectors::cl_base<dataT, 1, 1>;
+	using data_ref = detail::data_ref;
+	using type_t = data_ref::type_t;
+
+	template <typename T>
+	vec& assign(const T& copy) {
+		if(this->type == type_t::expression) {
+			Base b(this->name, true);
+			this->name = std::move(b.name);
+			this->type = type_t::general;
+		}
+		Base::operator=(copy);
+		return *this;
+	}
+
+	vec(string_class name_, type_t type = type_t::general)
+		: Base(name_), Members(this) {
+		this->type = type;
+	}
 
 public:
 	vec()
@@ -263,31 +275,28 @@ public:
 	vec(const data_ref& copy)
 		: Base(copy.name, true), Members(this) {}
 	vec(vec&& move)
-		: Base(std::move(move.name)), Members(this) {}
+		: Base(std::move(move.name)), Members(this) {
+		this->type = move.type;
+	}
 	vec(data_ref&& move)
 		: Base(std::move(move.name), true), Members(this) {}
-	vec(const dataT&& n)
+	vec(const dataT& n)
 		: Base(detail::get_string<dataT>::get(n), true), Members(this) {}
 
 	vec& operator=(const vec& copy) {
-		Base::operator=((Base)copy);
-		return *this;
+		return assign((Base)copy);
 	}
 	vec& operator=(const data_ref& copy) {
-		Base::operator=(copy);
-		return *this;
+		return assign(copy);
 	}
 	vec& operator=(vec&& move) {
-		Base::operator=((Base)move);
-		return *this;
+		return assign((Base)move);
 	}
 	vec& operator=(data_ref&& move) {
-		Base::operator=(move);
-		return *this;
+		return assign(move);
 	}
 	vec& operator=(const dataT& n) {
-		Base::operator=(n);
-		return *this;
+		return assign(n);
 	}
 
 	// TODO
@@ -295,23 +304,19 @@ public:
 		return genvector();
 	}
 
-
 	// TODO: Operators
-
-	vec operator*(const vec& v) const {
-		auto r = data_ref::operator*(v);
-		return vec(r);
+#define SYCL_VEC_OP(op)										\
+	vec operator op(const data_ref& d) const {				\
+		auto r = data_ref::operator op(d);					\
+		return vec(std::move(r.name), type_t::expression);	\
 	}
 
-	vec operator+(const vec& v) const {
-		auto r = data_ref::operator+(v);
-		return vec(r);
-	}
+	SYCL_VEC_OP(+)
+	SYCL_VEC_OP(-)
+	SYCL_VEC_OP(*)
 
-	vec operator-(const vec& v) const {
-		auto r = data_ref::operator-(v);
-		return vec(r);
-	}
+#undef SYCL_VEC_OP
+
 };
 
 
