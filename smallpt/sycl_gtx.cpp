@@ -302,23 +302,6 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 
 	queue q(*(device*)dev);
 
-	unsigned short Xi[3] = { 0, 0, 0 };
-
-	buffer<float3> colorsBuffer(range<1>(w*h));
-
-	vector<cl::sycl::cl_uint2> seedArray;
-	seedArray.reserve(w*h);
-	for(int y = 0; y < h; ++y) {
-		Xi[2] = y*y*y;
-		for(int x = 0; x < w; ++x) {
-			cl::sycl::cl_uint2 seed;
-			seed.x() = (::cl_uint)erand48(Xi);
-			seed.y() = (::cl_uint)erand48(Xi);
-			seedArray.push_back(seed);
-		}
-	}
-	buffer<cl::sycl::cl_uint2> seedsBuffer(seedArray);
-
 	auto spheres_ = buffer<float16>(range<1>(ns_sycl_gtx::numSpheres));
 	{
 		auto assign = [](cl::sycl::cl_float4& target, ::Vec& data) {
@@ -348,8 +331,10 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 		(q.get_device().get_info<info::device::device_type>() == info::device_type::gpu)
 			? std::min(samps / 5 + 1, h / 10)
 			: 1;
-	vector<decltype(colorsBuffer)> colors;
-	vector<decltype(seedsBuffer)> seeds_;
+
+	unsigned short Xi[3] = { 0, 0, 0 };
+	vector<buffer<float3>> colors;
+	vector<buffer<cl::sycl::cl_uint2>> seeds_;
 	vector<pair<int, int>> lineOffset;
 	for(int k = 0; k < numParts; ++k) {
 		int start = h*k / numParts;
@@ -358,8 +343,20 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, V
 		range<1> length(height*w);
 
 		lineOffset.emplace_back(start, height);
-		colors.emplace_back(colorsBuffer, id<1>(start*w), length);
-		seeds_.emplace_back(seedsBuffer, id<1>(start*w), length);
+		colors.emplace_back(length);
+		seeds_.emplace_back(length);
+
+		auto seeds = seeds_.back().get_access<access::mode::discard_write, access::target::host_buffer>();
+
+		for(int y = 0; y < height; ++y) {
+			Xi[2] = y*y*y;
+			for(int x = 0; x < w; ++x) {
+				cl::sycl::cl_uint2 seed;
+				seed.x() = (::cl_uint)erand48(Xi);
+				seed.y() = (::cl_uint)erand48(Xi);
+				seeds[y*w + x] = seed;
+			}
+		}
 	}
 
 	for(auto k = 0; k < numParts; ++k) {
