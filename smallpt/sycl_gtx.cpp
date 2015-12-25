@@ -50,10 +50,6 @@ public:
 		: Base(base) {}
 	Vector(float3 data)
 		: Base(data.x(), data.y(), data.z()) {}
-
-	Vector& norm() {
-		return *this = *this * (1 / cl::sycl::sqrt(x*x + y*y + z*z));
-	}
 };
 
 using RaySycl = ::Ray_<float1>;
