@@ -139,6 +139,7 @@ template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 3> : cl_base<dataT, parentElems, 2> {
 protected:
 	using Base = cl_base<dataT, parentElems, 2>;
+	using cl_base_2 = typename Base::cl_base_2;
 	using cl_base_3 = cl_base<dataT, 3, 3>;
 public:
 #if MSVC_LOW
@@ -148,7 +149,7 @@ public:
 #endif
 
 	SYCL_CL_REF(dataT, z, this->elems[2]);
-	SYCL_CL_REF(Base::cl_base_2, lo, this->xy());
+	SYCL_CL_REF(cl_base_2, lo, this->xy());
 	SYCL_CL_REF(dataT, hi, z());
 	SYCL_CL_REF(cl_base_3, xyz, *reinterpret_cast<cl_base_3*>(this));
 };
@@ -168,8 +169,8 @@ template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 4> : cl_base<dataT, parentElems, 3> {
 private:
 	using Base = cl_base<dataT, parentElems, 3>;
-	using cl_base_2 = Base::cl_base_2;
-	using cl_base_3 = Base::cl_base_3;
+	using cl_base_2 = typename Base::cl_base_2;
+	using cl_base_3 = typename Base::cl_base_3;
 	using cl_base_4 = cl_base<dataT, 4, 4>;
 public:
 #if MSVC_LOW

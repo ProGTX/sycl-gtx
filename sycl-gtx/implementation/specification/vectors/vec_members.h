@@ -36,7 +36,7 @@ public:
 
 	swizzled_vec<dataT, 1> x() const {
 		return this->parent->swizzle<0>();
-}
+	}
 #endif
 };
 
