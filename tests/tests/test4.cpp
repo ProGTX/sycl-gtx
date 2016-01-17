@@ -11,6 +11,11 @@ bool test4() {
 		queue myQueue;
 
 		buffer<int> V(N);
+		buffer<int> stride_(1);
+		{
+			auto s = stride_.get_access<access::mode::discard_write, access::target::host_buffer>();
+			s[0] = 1;
+		}
 
 		myQueue.submit([&](handler& cgh) {
 			auto v = V.get_access<access::mode::read_write>(cgh);
@@ -20,11 +25,14 @@ bool test4() {
 				v[index] = index;
 			});
 
+			auto s = stride_.get_access<access::mode::read_write>(cgh);
+
 			// Calculate reduction sum
 			for(size_t stride = 1; stride < N; stride *= 2) {
 				cgh.parallel_for<class reduction_sum>(range<1>(N / 2 / stride), [=](id<1> index) {
-					auto i = 2 * stride * index;
-					v[i] += v[i + stride];
+					auto i = 2 * s[0] * index;
+					v[i] += v[i + s[0]];
+					s[0] *= 2;
 				});
 			}
 		});
