@@ -5,7 +5,10 @@
 // For the original code, see github.com/munificient/smallpt
 // For the original license, see smallpt.LICENSE.txt
 
+#ifndef sqrt_f
 #include <math.h>
+#define sqrt_f sqrt
+#endif
 
 template <class type>
 struct Vec_ {
@@ -37,6 +40,4 @@ struct Sphere_ {
   }
 };
 
-using Vec = Vec_<double>;
-using Ray = Ray_<double>;
-using Sphere = Sphere_<double>;
+#undef sqrt_f

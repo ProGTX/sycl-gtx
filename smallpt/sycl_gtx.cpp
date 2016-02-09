@@ -15,6 +15,10 @@
 #include "classes.h"
 #include "win.h"
 
+using Vec = Vec_<double>;
+using Ray = Ray_<double>;
+using Sphere = Sphere_<double>;
+
 #ifndef SYCL_GTX
 #include "../sycl-gtx/sycl_gtx_compatibility.h"
 #endif

@@ -13,6 +13,10 @@
 #include "win.h"
 #include "classes.h"
 
+using Vec = Vec_<double>;
+using Ray = Ray_<double>;
+using Sphere = Sphere_<double>;
+
 namespace org {
 Sphere spheres[] = {//Scene: radius, position, emission, color, material
 	Sphere(1e5, Vec(1e5 + 1, 40.8, 81.6), Vec(), Vec(.75, .25, .25), DIFF),//Left

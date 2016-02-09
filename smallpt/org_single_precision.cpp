@@ -14,6 +14,10 @@
 #include "win.h"
 #include <vector>
 
+using Vec = Vec_<double>;
+using Ray = Ray_<double>;
+using Sphere = Sphere_<double>;
+
 namespace org_sp {
 struct Vec {
 	float x, y, z;
