@@ -1,3 +1,5 @@
+#pragma once
+
 /******************************************************************************
 *
 * Modified version for SYCL of Kevin Beason smallpt
@@ -7,7 +9,16 @@
 
 #include <SYCL/sycl.hpp>
 
-using namespace cl::sycl;
+#define sqrt_f cl::sycl::sqrt
+#include "classes.h"
+#include "win.h"
+
+using Vec = Vec_<float>;
+using Ray = Ray_<float>;
+using Sphere = Sphere_<float>;
+
+using namespace cl;
+using namespace sycl;
 
 class RNG {
 public:
@@ -30,45 +41,6 @@ public:
 	}
 };
 
-struct Vec {     // Usage: time ./smallpt 5000 && xv image.ppm
-	float x, y, z; // position, also color (r,g,b)
-	Vec(float x_ = 0, float y_ = 0, float z_ = 0) : x(x_), y(y_), z(z_) {}
-	Vec operator+(const Vec &b) const { return Vec(x + b.x, y + b.y, z + b.z); }
-	Vec operator-(const Vec &b) const { return Vec(x - b.x, y - b.y, z - b.z); }
-	Vec operator*(float b) const { return Vec(x * b, y * b, z * b); }
-	Vec mult(const Vec &b) const { return Vec(x * b.x, y * b.y, z * b.z); }
-	Vec &norm() {
-		return *this = *this * (1 / sqrt(x * x + y * y + z * z));
-	}
-	float dot(const Vec &b) const {
-		return x * b.x + y * b.y + z * b.z;
-	} // cross:
-	Vec operator%(Vec &b) {
-		return Vec(y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x);
-	}
-};
-struct Ray {
-	Vec o, d;
-	Ray(Vec o_, Vec d_) : o(o_), d(d_) {}
-};
-enum Refl_t { DIFF, SPEC, REFR }; // material types, used in radiance()
-struct Sphere {
-	float rad;   // radius
-	Vec p, e, c; // position, emission, color
-	Refl_t refl; // reflection type (DIFFuse, SPECular, REFRactive)
-	Sphere(float rad_, Vec p_, Vec e_, Vec c_, Refl_t refl_)
-		: rad(rad_), p(p_), e(e_), c(c_), refl(refl_) {}
-	inline float intersect(const Ray &r) const { // returns distance, 0 if nohit
-		Vec op = p - r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
-		float t, eps = 1.5e-2f, b = op.dot(r.d),
-			det = b * b - op.dot(op) + rad * rad;
-		if(det < 0)
-			return 0;
-		else
-			det = sqrt(det);
-		return (t = b - det) > eps ? t : ((t = b + det) > eps ? t : 0);
-	}
-};
 const Sphere spheres_glob[] = {
 	// Scene: radius, position, emission, color, material
 	Sphere(1e4, Vec(1e4 + 1, 40.8, 81.6), Vec(), Vec(.75, .25, .25),
@@ -87,7 +59,7 @@ const Sphere spheres_glob[] = {
 };
 inline float clamp(float x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
 inline int toInt(float x) {
-	return int(pow(clamp(x), 1 / 2.2f) * 255 + .5f);
+	return int(sycl::pow(clamp(x), 1 / 2.2f) * 255 + .5f);
 }
 
 template<typename T>
@@ -129,12 +101,12 @@ Vec radiance(const Ray &r_, int depth_, T spheres,
 		} // R.R.
 		cf = cf.mult(f);
 		if(obj.refl == DIFF) { // Ideal DIFFUSE reflection
-			float r1 = 2 * M_PI * rng(), r2 = rng(), r2s = sqrt(r2);
+			float r1 = 2 * M_PI * rng(), r2 = rng(), r2s = sycl::sqrt(r2);
 			Vec w = nl,
-				u = ((fabs(w.x) > .1 ? Vec(0, 1) : Vec(1)) % w).norm(),
+				u = ((sycl::fabs(w.x) > .1 ? Vec(0, 1) : Vec(1)) % w).norm(),
 				v = w % u;
-			Vec d = (u * cos(r1) * r2s + v * sin(r1) * r2s +
-				w * sqrt(1 - r2)).norm();
+			Vec d = (u * sycl::cos(r1) * r2s + v * sycl::sin(r1) * r2s +
+				w * sycl::sqrt(1 - r2)).norm();
 			r = Ray(x, d);
 			continue;
 		}
@@ -153,7 +125,7 @@ Vec radiance(const Ray &r_, int depth_, T spheres,
 		}
 		Vec tdir =
 			(r.d * nnt -
-			n * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t)))).norm();
+			n * ((into ? 1 : -1) * (ddn * nnt + sycl::sqrt(cos2t)))).norm();
 		float a = nt - nc, b = nt + nc, R0 = a * a / (b * b),
 			c = 1 - (into ? -ddn : tdir.dot(n));
 		float Re = R0 + (1 - R0) * c * c * c * c * c, Tr = 1 - Re,
@@ -182,21 +154,21 @@ public:
 	spheres_access spheres_; // spheres
 	int w, h, samps;
 
+	Ray cam;
+	Vec cx, cy, r;
+
 	void operator()(item<2> item_) {
 		const Sphere *spheres = &spheres_[0];
 		const int x = item_[0];
 		const int y = item_[1];
-		Vec r;
-		Ray cam(Vec(50, 52, 295.6), Vec(0, -0.042612, -1).norm()); // cam pos, dir
-		Vec cx = Vec(w * .5135 / h), cy = (cx % cam.d).norm() * .5135;
 		RNG rng(1 + (y * w) + x); // initialise our own rng with rand() seed
 		for(int sy = 0, i = (h - y - 1) * w + x; sy < 2; sy++) // 2x2 subpixel rows
 			for(int sx = 0; sx < 2; sx++, r = Vec()) {           // 2x2 subpixel cols
 				for(int s = 0; s < samps; s++) {
-					float r1 = 2 * rng(), dx = r1 < 1 ? sqrt(r1) - 1
-						: 1 - sqrt(2 - r1);
-					float r2 = 2 * rng(), dy = r2 < 1 ? sqrt(r2) - 1
-						: 1 - sqrt(2 - r2);
+					float r1 = 2 * rng(), dx = r1 < 1 ? sycl::sqrt(r1) - 1
+						: 1 - sycl::sqrt(2 - r1);
+					float r2 = 2 * rng(), dy = r2 < 1 ? sycl::sqrt(r2) - 1
+						: 1 - sycl::sqrt(2 - r2);
 					Vec d = cx * (((sx + .5 + dx) / 2 + x) / w - .5) +
 						cy * (((sy + .5 + dy) / 2 + y) / h - .5) + cam.d;
 					r = r +
@@ -208,11 +180,9 @@ public:
 	}
 };
 
-int main(int argc, char *argv[]) {
+void compute_sycl(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c) {
 	gpu_selector s_;
 	queue q_(s_);
-	int w = 1024, h = 768, samps = argc == 2 ? atoi(argv[1]) / 4 : 1; // # samples
-	Vec *c = new Vec[w * h];
 	{
 		// data is wrapped in SYCL buffers.
 		buffer<Vec, 1> color_buffer(c, range<1>(w * h));
@@ -223,15 +193,14 @@ int main(int argc, char *argv[]) {
 				color_buffer.get_access<access::mode::write>(ch),
 				spheres_buffer.get_access<access::mode::read,
 				access::target::constant_buffer>(ch),
-				w, h, samps };
+				w, h, samps,
+				cam_,
+				cx_, cy_, r_
+			};
 			nd_range<2> ndr(range<2>(w, h), range<2>(8, 8));
 			ch.parallel_for(ndr, ray_);
 		};
 		// submitting the command group to the SYCL command queue for execution.
 		q_.submit(cg);
 	}
-	FILE *f = fopen("image.ppm", "w"); // Write image to PPM file.
-	fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
-	for(int i = 0; i < w * h; i++)
-		fprintf(f, "%d %d %d ", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
 }

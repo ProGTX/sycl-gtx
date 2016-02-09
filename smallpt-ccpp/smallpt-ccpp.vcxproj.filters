@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="smallpt.h">
-      <Filter>Header Files</Filter>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\smallpt\main.cpp">
+    <ClCompile Include="..\smallpt\smallpt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
