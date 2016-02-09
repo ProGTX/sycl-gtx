@@ -11,6 +11,9 @@
 
 
 using std::string;
+using Vec = Vec_<double>;
+using Ray = Ray_<double>;
+using Sphere = Sphere_<double>;
 
 extern void compute_org(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
 extern void compute_org_openmp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
@@ -122,7 +125,7 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 
