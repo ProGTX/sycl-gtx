@@ -1,6 +1,3 @@
-#include "classes.h"
-#include "win.h"
-
 #include <sycl.hpp>
 
 #include <chrono>
@@ -10,21 +7,46 @@
 #include <memory>
 
 
-using std::string;
-using Vec = Vec_<double>;
-using Ray = Ray_<double>;
-using Sphere = Sphere_<double>;
+#ifdef SYCL_GTX
+
+#include "classes.h"
+#include "win.h"
+
+using float_type = double;
+
+using Vec = Vec_<float_type>;
+using Ray = Ray_<float_type>;
+using Sphere = Sphere_<float_type>;
 
 extern void compute_org(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
 extern void compute_org_openmp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
 extern void compute_org_sp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
 extern void compute_org_sp_openmp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
 extern void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_);
+static auto compute_sycl = compute_sycl_gtx;
 
-inline double clamp(double x) {
+#else
+
+#define sqrt_f cl::sycl::sqrt
+#include "classes.h"
+#include "win.h"
+
+using float_type = float;
+
+using Vec = Vec_<float_type>;
+using Ray = Ray_<float_type>;
+using Sphere = Sphere_<float_type>;
+
+extern void compute_sycl(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_);
+#endif
+
+
+using std::string;
+
+inline float_type clamp(float_type x) {
 	return x < 0 ? 0 : x>1 ? 1 : x;
 }
-inline int toInt(double x) {
+inline int toInt(float_type x) {
 	return int(pow(clamp(x), 1 / 2.2) * 255 + .5);
 }
 
@@ -107,13 +129,13 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 			cerr << "SYCL error while testing: " << e.what() << endl;
 			continue;
 		}
-		catch(exception& e) {
+		catch(std::exception& e) {
 			cerr << "error while testing: " << e.what() << endl;
 			continue;
 		}
 #endif
 
-#if 1
+#ifdef _DEBUG
 		to_file(w, h, vectors.data(), string("image_") + t.name + ".ppm");
 #endif
 
@@ -125,7 +147,7 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 			return false;
 		}
 	}
-
+	
 	return true;
 }
 
@@ -225,7 +247,7 @@ void getDevices() {
 					platformVersion.major > required.major ||
 					(platformVersion.major == required.major && platformVersion.minor >= required.minor)
 				) {
-					tests.emplace_back(name + ' ' + openclVersion, compute_sycl_gtx, new device(std::move(d)));
+					tests.emplace_back(name + ' ' + openclVersion, compute_sycl, new device(std::move(d)));
 				}
 
 				++dNum;
@@ -243,10 +265,12 @@ int main(int argc, char *argv[]) {
 
 	cout << "smallpt SYCL tester" << endl;
 
+#ifdef SYCL_GTX
 	tests.emplace_back("org_single", compute_org_sp);
 	tests.emplace_back("openmp_single", compute_org_sp_openmp);
 	tests.emplace_back("org", compute_org);
 	tests.emplace_back("openmp", compute_org_openmp);
+#endif
 
 	getDevices();
 
@@ -256,7 +280,11 @@ int main(int argc, char *argv[]) {
 	Vec cy = (cx%cam.d).norm()*.5135;
 	auto numTests = tests.size();
 
+#ifdef SYCL_GTX
 	int from = 2;
+#else
+	int from = 0;
+#endif
 	int to = numTests;
 	if(argc > 1) {
 		from = atoi(argv[1]);
