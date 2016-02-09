@@ -15,24 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\smallpt\classes.h">
+    <ClCompile Include="smallpt.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\smallpt\win.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\smallpt\main.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\smallpt\org_single_precision.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\smallpt\original.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\smallpt\sycl_gtx.cpp">
+    <ClCompile Include="..\smallpt\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
