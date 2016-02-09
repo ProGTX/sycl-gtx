@@ -18,7 +18,7 @@ struct Vec_ {
   Vec_ operator-(const Vec_ &b) const { return Vec_(x-b.x,y-b.y,z-b.z); }
   Vec_ operator*(const type& b) const { return Vec_(x*b, y*b, z*b); }
   Vec_ mult(const Vec_ &b) const { return Vec_(x*b.x,y*b.y,z*b.z); }
-  Vec_& norm(){ return *this = *this * (1/sqrt(x*x+y*y+z*z)); }
+  Vec_& norm() { return *this = *this * (1 / sqrt_f(x*x + y*y + z*z)); }
   type dot(const Vec_ &b) const { return x*b.x+y*b.y+z*b.z; } // cross:
   Vec_ operator%(Vec_&b){return Vec_(y*b.z-z*b.y,z*b.x-x*b.z,x*b.y-y*b.x);}
 };
@@ -35,7 +35,7 @@ struct Sphere_ {
   type intersect(const Ray_<type> &r) const { // returns distance, 0 if nohit
     Vec_<type> op = p-r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
     type t, eps=(type)1e-4, b=op.dot(r.d), det=b*b-op.dot(op)+rad*rad;
-    if (det<0) return 0; else det=sqrt(det);
+    if(det<0) return 0; else det = sqrt_f(det);
     return (t=b-det)>eps ? t : ((t=b+det)>eps ? t : 0);
   }
 };
