@@ -18,13 +18,13 @@
     <ClCompile Include="original.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="sycl_gtx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="org_single_precision.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="smallpt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

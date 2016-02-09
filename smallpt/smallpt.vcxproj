@@ -139,7 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="smallpt.cpp" />
     <ClCompile Include="org_single_precision.cpp" />
     <ClCompile Include="original.cpp" />
     <ClCompile Include="sycl_gtx.cpp" />
