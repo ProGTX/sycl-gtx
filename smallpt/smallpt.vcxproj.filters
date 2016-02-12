@@ -24,15 +24,15 @@
     <ClCompile Include="original.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sycl_gtx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="classes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClCompile Include="smallpt.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sycl_gtx.h">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClInclude Include="win.h">

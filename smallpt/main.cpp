@@ -1,6 +1,7 @@
 
 #define float_type double
 #include "smallpt.h"
+#include "sycl_gtx.h"
 
 extern void compute_org(void*, int w, int h, int samps, Ray cam, Vec cx, Vec cy, Vec r, Vec* c);
 extern void compute_org_openmp(void*, int w, int h, int samps, Ray cam, Vec cx, Vec cy, Vec r, Vec* c);

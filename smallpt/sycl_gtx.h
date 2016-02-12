@@ -1,3 +1,5 @@
+#pragma once
+
 // smallpt, a Path Tracer by Kevin Beason, 2008
 //
 // Modified by Peter Žužek
@@ -15,20 +17,26 @@
 #include "classes.h"
 #include "win.h"
 
-using Vec = Vec_<double>;
-using Ray = Ray_<double>;
-using Sphere = Sphere_<double>;
+
+#ifndef float_type
+#define float_type double
+#endif
+
+using Vec = Vec_<float_type>;
+using Ray = Ray_<float_type>;
+using Sphere = Sphere_<float_type>;
 
 #ifndef SYCL_GTX
 #include "../sycl-gtx/sycl_gtx_compatibility.h"
 #endif
+
 
 namespace ns_sycl_gtx {
 
 using namespace cl::sycl;
 
 static const int numSpheres = 9;
-Sphere spheres[numSpheres] = {//Scene: radius, position, emission, color, material
+static Sphere spheres[numSpheres] = {//Scene: radius, position, emission, color, material
 	Sphere(1e4, Vec(1e4 + 1, 40.8, 81.6), Vec(), Vec(.75, .25, .25), DIFF),//Left
 	Sphere(1e4, Vec(-1e4 + 99, 40.8, 81.6), Vec(), Vec(.25, .25, .75), DIFF),//Rght
 	Sphere(1e4, Vec(50, 40.8, 1e4), Vec(), Vec(.75, .75, .75), DIFF),//Back
@@ -42,15 +50,17 @@ Sphere spheres[numSpheres] = {//Scene: radius, position, emission, color, materi
 
 using spheres_t = accessor<float16, 1, access::mode::read, access::target::global_buffer>;
 
+
 struct Vector : public ::Vec_<float1> {
 private:
 	using Base = ::Vec_<float1>;
 public:
 	Vector(float x_ = 0, float y_ = 0, float z_ = 0)
 		: Base(x_, y_, z_) {}
-	Vector(const ::Vec_<double>& base)
+	Vector(const ::Vec_<float_type>& base)
 		: Base((float)base.x, (float)base.y, (float)base.z) {}
-	Vector(const Base& base)
+	template <typename t = float1>
+	Vector(const Base& base, typename std::enable_if<!std::is_same<t, float_type>::value>::type* = nullptr)
 		: Base(base) {}
 	Vector(float3 data)
 		: Base(data.x(), data.y(), data.z()) {}
@@ -137,7 +147,7 @@ inline bool1 intersect(spheres_t spheres, const RaySycl& r, float1& t, int1& id)
 }
 
 // http://stackoverflow.com/a/16077942
-float1 getRandom(uint2& seed) {
+static float1 getRandom(uint2& seed) {
 	// Note: Should not be declared static
 	const float1 invMaxInt = 1.0f / 4294967296.0f;
 	uint1 x = seed.x() * 17 + seed.y() * 13123;
@@ -146,7 +156,7 @@ float1 getRandom(uint2& seed) {
 	return (float1)(x * (x * x * 15731 + 74323) + 871483) * invMaxInt;
 }
 
-void radiance(
+static void radiance(
 	Vector& return_,
 	spheres_t spheres,
 	RaySycl r,
@@ -299,7 +309,7 @@ void radiance(
 
 } // ns_sycl_gtx
 
-void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec cy_, Vec r_, Vec* c_) {
+static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec cy_, Vec r_, Vec* c_) {
 	using namespace std;
 	using namespace cl::sycl;
 	using namespace ns_sycl_gtx;
@@ -308,7 +318,12 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec
 
 	auto spheres_ = buffer<float16>(range<1>(ns_sycl_gtx::numSpheres));
 	{
+		// TODO: Conform to the SYCL spec
+#ifdef SYCL_GTX
 		auto assign = [](cl::sycl::cl_float4& target, ::Vec& data) {
+#else
+		auto assign = [](cl::sycl::cl_float4 target, ::Vec& data) {
+#endif
 			using type = float4::element_type;
 			target.x() = (type)data.x;
 			target.y() = (type)data.y;
@@ -340,25 +355,31 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec
 	vector<buffer<float3>> colors;
 	vector<buffer<cl::sycl::cl_uint2>> seeds_;
 	vector<pair<int, int>> lineOffset;
-	for(int k = 0; k < numParts; ++k) {
-		int start = h*k / numParts;
-		int end = h*(k + 1) / numParts;
-		int height = end - start;
-		range<1> length(height*w);
+	auto starts_ = buffer<int>(range<1>(numParts));
+	{
+		auto starts = starts_.get_access<access::mode::discard_write, access::target::host_buffer>();
 
-		lineOffset.emplace_back(start, height);
-		colors.emplace_back(length);
-		seeds_.emplace_back(length);
+		for(int k = 0; k < numParts; ++k) {
+			int start = h*k / numParts;
+			int end = h*(k + 1) / numParts;
+			int height = end - start;
+			range<1> length(height*w);
 
-		auto seeds = seeds_.back().get_access<access::mode::discard_write, access::target::host_buffer>();
+			lineOffset.emplace_back(start, height);
+			colors.emplace_back(length);
+			seeds_.emplace_back(length);
+			starts[k] = start;
 
-		for(int y = 0; y < height; ++y) {
-			Xi[2] = y*y*y;
-			for(int x = 0; x < w; ++x) {
-				cl::sycl::cl_uint2 seed;
-				seed.x() = (::cl_uint)erand48(Xi);
-				seed.y() = (::cl_uint)erand48(Xi);
-				seeds[y*w + x] = seed;
+			auto seeds = seeds_.back().get_access<access::mode::discard_write, access::target::host_buffer>();
+
+			for(int y = 0; y < height; ++y) {
+				Xi[2] = y*y*y;
+				for(int x = 0; x < w; ++x) {
+					cl::sycl::cl_uint2 seed;
+					seed.x() = (::cl_uint)erand48(Xi);
+					seed.y() = (::cl_uint)erand48(Xi);
+					seeds[y*w + x] = seed;
+				}
 			}
 		}
 	}
@@ -370,6 +391,7 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec
 			// TODO: constant_buffer
 			auto spheres = spheres_.get_access<access::mode::read, access::target::global_buffer>(cgh);
 			auto seeds = seeds_[k].get_access<access::mode::read, access::target::global_buffer>(cgh);
+			auto starts = starts_.get_access<access::mode::read, access::target::global_buffer>(cgh);
 
 			cgh.parallel_for<class smallpt>(range<2>(w, lineOffset[k].second), [=](id<2> i) {
 				Vector cx(cx_);
@@ -407,7 +429,7 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec
 
 							Vector d =
 								cx * (((sx + .5f + dd.x()) / 2 + i[0]) / w - .5f) +
-								cy * (((sy + .5f + dd.y()) / 2 + i[1] + lineOffset[k].first) / h - .5f) +
+								cy * (((sy + .5f + dd.y()) / 2 + i[1] + starts[k]) / h - .5f) +
 								cam.d;
 
 							// TODO:
@@ -417,9 +439,9 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec
 						} // Camera rays are pushed ^^^^^ forward to start in interior
 						SYCL_END
 
-						clamp(r.x);
-						clamp(r.y);
-						clamp(r.z);
+						ns_sycl_gtx::clamp(r.x);
+						ns_sycl_gtx::clamp(r.y);
+						ns_sycl_gtx::clamp(r.z);
 
 						r = r * .25f;
 						auto ci = c[i];
@@ -437,9 +459,9 @@ void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec
 	}
 
 	auto assign = [](::Vec& target, cl::sycl::cl_float3& data) {
-		target.x = (double)data.x();
-		target.y = (double)data.y();
-		target.z = (double)data.z();
+		target.x = (float_type)data.x();
+		target.y = (float_type)data.y();
+		target.z = (float_type)data.z();
 	};
 
 	for(auto k = 0; k < numParts; ++k) {

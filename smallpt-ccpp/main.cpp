@@ -8,6 +8,7 @@
 #define float_type float
 #define sqrt_f cl::sycl::sqrt
 #include <smallpt.h>
+#include <sycl_gtx.h>
 
 using namespace cl;
 using namespace sycl;
@@ -199,7 +200,8 @@ int main(int argc, char** argv) {
 	using namespace std;
 	vector<testInfo> tests;
 
-	getDevices(tests, { compute_sycl });
+	// TODO: compute_sycl_gtx does not work with ComputeCpp yet
+	getDevices(tests, { compute_sycl, /*compute_sycl_gtx*/ });
 
 	return mainTester(argc, argv, tests);
 }
