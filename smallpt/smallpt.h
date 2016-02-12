@@ -64,16 +64,15 @@ struct testInfo {
 	testInfo(const testInfo&) = delete;
 	testInfo(testInfo&& move)
 		: name(std::move(move.name)), test(move.test), dev(std::move(move.dev)) {}
+
+	bool isOpenCL() {
+		return dev.get() != nullptr;
+	}
 };
 
 static decltype(now())& startTime() {
 	static decltype(now()) s(now());
 	return s;
-}
-
-static float& totalTime() {
-	static float tt(0);
-	return tt;
 }
 
 static Ray& cam() {
@@ -86,8 +85,18 @@ static string& imagePrefix() {
 	return ip;
 }
 
+static bool& isOpenclAvailable() {
+	static bool ocl(false);
+	return ocl;
+}
+
 static bool tester(std::vector<testInfo>& tests, int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int from, int to) {
 	using namespace std;
+
+	if(tests.empty()) {
+		cout << "no tests" << endl;
+		return false;
+	}
 
 	cout << "samples per pixel: " << samples << endl;
 
@@ -96,12 +105,26 @@ static bool tester(std::vector<testInfo>& tests, int w, int h, int samples, Vec&
 	vector<Vec> vectors;
 	float time;
 
+	const float perTestLimit = 40;
+	const float globalLimit = 420;
+	float totalTime = 0;
+
 	for(int ti = from; ti < to; ++ti) {
 		auto& t = tests[ti];
 
 		// Quality of Service
-		// Prevent the user from waiting too long
-		if(t.lastTime > 40) {
+		// Prevents the test from taking too long, but also allows it to use up as much time as possible
+		// OpenCL tests are preferred
+		bool overHalf = 2 * totalTime > globalLimit;
+		if(t.lastTime > perTestLimit &&
+			(
+				(!isOpenclAvailable() && overHalf)	||
+				(isOpenclAvailable() &&
+					!t.isOpenCL() ||
+					(t.isOpenCL() && overHalf)
+				)
+			)
+		) {
 			continue;
 		}
 
@@ -130,14 +153,14 @@ static bool tester(std::vector<testInfo>& tests, int w, int h, int samples, Vec&
 #endif
 
 #ifdef _DEBUG
-		to_file(w, h, vectors.data(), string("image_") + t.name + ".ppm");
+		to_file(w, h, vectors.data(), imagePrefix() + ' ' + t.name + ".ppm");
 #endif
 
 		cout << "time: " << time << endl;
 		t.lastTime = time;
-		totalTime() = duration(startTime());
-		if(totalTime() > 300) {
-			cout << "exceeded 5 minute limit, stopping" << endl;
+		totalTime = duration(startTime());
+		if(totalTime > globalLimit) {
+			cout << "exceeded " + std::to_string((int)globalLimit) + "s limit, stopping" << endl;
 			return false;
 		}
 	}
@@ -262,10 +285,14 @@ static void getDevices(std::vector<testInfo>& tests, std::vector<testInfo::funct
 				tests.emplace_back(string("T") + std::to_string(i) + ' ' + t.name, ptr, t.dev);
 			}
 		}
+
+		isOpenclAvailable() = true;
 	}
 	catch(cl::sycl::exception& e) {
 		// TODO
 		cout << "OpenCL not available: " << e.what() << endl;
+		
+		isOpenclAvailable() = false;
 	}
 }
 
@@ -304,7 +331,7 @@ static int mainTester(int argc, char *argv[], std::vector<testInfo>& tests, stri
 	int iterations = 1;
 	bool canContinue;
 
-	for(int samples = 5; samples < 10000; samples *= 2) {
+	for(int samples = 4; samples < 10000; samples *= 2) {
 		canContinue = tester(tests, w, h, samples, cx, cy, iterations, from, to);
 		if(!canContinue) {
 			break;
