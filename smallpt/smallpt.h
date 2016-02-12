@@ -16,9 +16,13 @@
 #include "classes.h"
 #include "win.h"
 
+#ifndef modify_sample_rate
+#define modify_sample_rate 1
+#endif
+
 using Vec = Vec_<float_type>;
 using Ray = Ray_<float_type>;
-using Sphere = Sphere_<float_type>;
+using Sphere = Sphere_<float_type, modify_sample_rate>;
 
 
 using std::string;

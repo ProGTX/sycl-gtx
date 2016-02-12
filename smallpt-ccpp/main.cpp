@@ -7,6 +7,7 @@
 
 #define float_type float
 #define sqrt_f cl::sycl::sqrt
+#define modify_sample_rate 100
 #include <smallpt.h>
 #include <sycl_gtx.h>
 
@@ -34,21 +35,16 @@ public:
 	}
 };
 
-const Sphere spheres_glob[] = {
-	// Scene: radius, position, emission, color, material
-	Sphere(1e4, Vec(1e4 + 1, 40.8, 81.6), Vec(), Vec(.75, .25, .25),
-	DIFF), // Left
-	Sphere(1e4, Vec(-1e4 + 99, 40.8, 81.6), Vec(), Vec(.25, .25, .75),
-	DIFF),                                                     // Rght
-	Sphere(1e4, Vec(50, 40.8, 1e4), Vec(), Vec(.75, .75, .75), DIFF), // Back
-	Sphere(1e4, Vec(50, 40.8, -1e4 + 170), Vec(), Vec(), DIFF),       // Frnt
-	Sphere(1e4, Vec(50, 1e4, 81.6), Vec(), Vec(.75, .75, .75), DIFF), // Botm
-	Sphere(1e4, Vec(50, -1e4 + 81.6, 81.6), Vec(), Vec(.75, .75, .75),
-	DIFF),                                                      // Top
-	Sphere(16.5, Vec(27, 16.5, 47), Vec(), Vec(1, 1, 1) * .999, SPEC), // Mirr
-	Sphere(16.5, Vec(73, 16.5, 78), Vec(), Vec(1, 1, 1) * .999, REFR), // Glas
-	Sphere(600, Vec(50, 681.6 - .27, 81.6), Vec(12, 12, 12), Vec(),
-	DIFF) // Lite
+const Sphere spheres_glob[] = {//Scene: radius, position, emission, color, material
+	Sphere(1e4, Vec(1e4 + 1, 40.8, 81.6), Vec(), Vec(.75, .25, .25), DIFF),//Left
+	Sphere(1e4, Vec(-1e4 + 99, 40.8, 81.6), Vec(), Vec(.25, .25, .75), DIFF),//Rght
+	Sphere(1e4, Vec(50, 40.8, 1e4), Vec(), Vec(.75, .75, .75), DIFF),//Back
+	Sphere(1e4, Vec(50, 40.8, -1e4 + 170), Vec(), Vec(), DIFF),//Frnt
+	Sphere(1e4, Vec(50, 1e4, 81.6), Vec(), Vec(.75, .75, .75), DIFF),//Botm
+	Sphere(1e4, Vec(50, -1e4 + 81.6, 81.6), Vec(), Vec(.75, .75, .75), DIFF),//Top
+	Sphere(16.5, Vec(27, 16.5, 47), Vec(), Vec(1, 1, 1)*.999, SPEC),//Mirr
+	Sphere(16.5, Vec(73, 16.5, 78), Vec(), Vec(1, 1, 1)*.999, REFR),//Glas
+	Sphere(600, Vec(50, 681.6 - .27, 81.6), Vec(12, 12, 12), Vec(), DIFF) //Lite
 };
 inline int toInt(float x) {
 	return int(sycl::pow(clamp(x), 1 / 2.2f) * 255 + .5f);

@@ -25,7 +25,7 @@ struct Vec_ {
 template <class type>
 struct Ray_ { Vec_<type> o, d; Ray_(Vec_<type> o_, Vec_<type> d_) : o(o_), d(d_) {} };
 enum Refl_t { DIFF, SPEC, REFR };  // material types, used in radiance()
-template <class type>
+template <class type, int modify_sample_rate_ = 1>
 struct Sphere_ {
   type rad;       // radius
   Vec_<type> p, e, c;      // position, emission, color
@@ -34,7 +34,7 @@ struct Sphere_ {
     rad(rad_), p(p_), e(e_), c(c_), refl(refl_) {}
   type intersect(const Ray_<type> &r) const { // returns distance, 0 if nohit
     Vec_<type> op = p-r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
-    type t, eps=(type)1e-4, b=op.dot(r.d), det=b*b-op.dot(op)+rad*rad;
+    type t, eps = (type)(1e-4 * modify_sample_rate_), b = op.dot(r.d), det = b*b - op.dot(op) + rad*rad;
     if(det<0) return 0; else det = sqrt_f(det);
     return (t=b-det)>eps ? t : ((t=b+det)>eps ? t : 0);
   }

@@ -21,10 +21,13 @@
 #ifndef float_type
 #define float_type double
 #endif
+#ifndef modify_sample_rate
+#define modify_sample_rate 1
+#endif
 
 using Vec = Vec_<float_type>;
 using Ray = Ray_<float_type>;
-using Sphere = Sphere_<float_type>;
+using Sphere = Sphere_<float_type, modify_sample_rate>;
 
 #ifndef SYCL_GTX
 #include "../sycl-gtx/sycl_gtx_compatibility.h"
