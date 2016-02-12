@@ -167,13 +167,14 @@ void printInfo(string description, const T& data, int offset = 0) {
 	std::cout << indent << description << ": " << data << std::endl;
 }
 
-static void getDevices(std::vector<testInfo>& tests, testInfo::function_ptr compute_sycl_ptr) {
+static void getDevices(std::vector<testInfo>& tests, std::vector<testInfo::function_ptr> compute_sycl_ptrs) {
 	using namespace std;
 
 	try {
 		using namespace cl::sycl;
 
 		auto platforms = platform::get_platforms();
+		std::vector<testInfo> tests_;
 
 		version required(1, 2);
 
@@ -238,10 +239,18 @@ static void getDevices(std::vector<testInfo>& tests, testInfo::function_ptr comp
 					if(name.find("HD Graphics 4600") == string::npos)
 #endif
 #endif
-					tests.emplace_back(name + ' ' + openclVersion, compute_sycl_ptr, std::shared_ptr<device>(new device(std::move(d))));
+					tests_.emplace_back(name + ' ' + openclVersion, nullptr, std::shared_ptr<device>(new device(std::move(d))));
 				}
 
 				++dNum;
+			}
+		}
+
+		int i = 0;
+		for(auto ptr : compute_sycl_ptrs) {
+			++i;
+			for(auto& t : tests_) {
+				tests.emplace_back(string("T") + std::to_string(i) + ' ' + t.name, ptr, t.dev);
 			}
 		}
 	}

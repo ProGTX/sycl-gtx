@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 	tests.emplace_back("org", compute_org);
 	tests.emplace_back("openmp", compute_org_openmp);
 
-	getDevices(tests, compute_sycl_gtx);
+	getDevices(tests, { compute_sycl_gtx });
 
 	return mainTester(argc, argv, tests);
 }

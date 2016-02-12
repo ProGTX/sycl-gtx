@@ -199,7 +199,7 @@ int main(int argc, char** argv) {
 	using namespace std;
 	vector<testInfo> tests;
 
-	getDevices(tests, compute_sycl);
+	getDevices(tests, { compute_sycl });
 
 	return mainTester(argc, argv, tests);
 }
