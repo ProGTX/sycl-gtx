@@ -24,5 +24,5 @@ int main(int argc, char *argv[]) {
 
 	getDevices(tests, { compute_sycl_gtx });
 
-	return mainTester(argc, argv, tests);
+	return mainTester(argc, argv, tests, "sycl_gtx");
 }

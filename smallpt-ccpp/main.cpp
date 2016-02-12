@@ -199,5 +199,5 @@ int main(int argc, char** argv) {
 	// TODO: compute_sycl_gtx does not work with ComputeCpp yet
 	getDevices(tests, { compute_sycl, /*compute_sycl_gtx*/ });
 
-	return mainTester(argc, argv, tests);
+	return mainTester(argc, argv, tests, "ComputeCpp");
 }

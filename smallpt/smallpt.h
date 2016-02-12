@@ -81,6 +81,11 @@ static Ray& cam() {
 	return c;
 }
 
+static string& imagePrefix() {
+	static string ip;
+	return ip;
+}
+
 static bool tester(std::vector<testInfo>& tests, int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int from, int to) {
 	using namespace std;
 
@@ -264,10 +269,12 @@ static void getDevices(std::vector<testInfo>& tests, std::vector<testInfo::funct
 	}
 }
 
-static int mainTester(int argc, char *argv[], std::vector<testInfo>& tests) {
+static int mainTester(int argc, char *argv[], std::vector<testInfo>& tests, string image_prefix) {
 	using namespace std;
 
 	cout << "smallpt SYCL tester" << endl;
+
+	imagePrefix() = image_prefix;
 
 	int w = 1024;
 	int h = 768;
