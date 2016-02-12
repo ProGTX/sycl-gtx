@@ -178,6 +178,8 @@
       <DeviceAdditionalIncludeDirectories>$(COMPUTECPPROOT)\include;$(COMPUTECPPROOT)\include\image_library;$(ProjectDir)</DeviceAdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <Optimization>MaxSpeed</Optimization>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </SYCLCpp>
   </ItemDefinitionGroup>
   <ItemGroup>
