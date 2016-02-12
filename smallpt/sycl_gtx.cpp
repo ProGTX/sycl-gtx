@@ -299,7 +299,7 @@ void radiance(
 
 } // ns_sycl_gtx
 
-void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_) {
+void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec cy_, Vec r_, Vec* c_) {
 	using namespace std;
 	using namespace cl::sycl;
 	using namespace ns_sycl_gtx;

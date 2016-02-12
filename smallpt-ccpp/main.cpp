@@ -171,7 +171,7 @@ public:
 	}
 };
 
-void compute_sycl(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c) {
+void compute_sycl(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec cy_, Vec r_, Vec* c) {
 	queue q(*(device*)dev);
 	{
 		// data is wrapped in SYCL buffers.

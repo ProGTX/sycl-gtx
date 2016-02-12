@@ -48,13 +48,13 @@ static auto duration = [](time_point before) {
 };
 
 struct testInfo {
-	using function_ptr = void(*)(void*, int, int, int, Ray&, Vec&, Vec&, Vec, Vec*);
+	using function_ptr = void(*)(void*, int, int, int, Ray, Vec, Vec, Vec, Vec*);
 	string name;
 	function_ptr test;
-	std::unique_ptr<cl::sycl::device> dev;
+	std::shared_ptr<cl::sycl::device> dev;
 	float lastTime = 0;
 
-	testInfo(string name, function_ptr test, cl::sycl::device* dev = nullptr)
+	testInfo(string name, function_ptr test, std::shared_ptr<cl::sycl::device> dev = nullptr)
 		: name(name), test(test), dev(dev) {}
 
 	testInfo(const testInfo&) = delete;
@@ -238,7 +238,7 @@ static void getDevices(std::vector<testInfo>& tests, testInfo::function_ptr comp
 					if(name.find("HD Graphics 4600") == string::npos)
 #endif
 #endif
-					tests.emplace_back(name + ' ' + openclVersion, compute_sycl_ptr, new device(std::move(d)));
+					tests.emplace_back(name + ' ' + openclVersion, compute_sycl_ptr, std::shared_ptr<device>(new device(std::move(d))));
 				}
 
 				++dNum;
