@@ -1,5 +1,3 @@
-#pragma once
-
 /******************************************************************************
 *
 * Modified version for SYCL of Kevin Beason smallpt
@@ -7,15 +5,9 @@
 *
 ******************************************************************************/
 
-#include <SYCL/sycl.hpp>
-
+#define float_type float
 #define sqrt_f cl::sycl::sqrt
-#include "classes.h"
-#include "win.h"
-
-using Vec = Vec_<float>;
-using Ray = Ray_<float>;
-using Sphere = Sphere_<float>;
+#include <smallpt.h>
 
 using namespace cl;
 using namespace sycl;
@@ -57,7 +49,6 @@ const Sphere spheres_glob[] = {
 	Sphere(600, Vec(50, 681.6 - .27, 81.6), Vec(12, 12, 12), Vec(),
 	DIFF) // Lite
 };
-inline float clamp(float x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
 inline int toInt(float x) {
 	return int(sycl::pow(clamp(x), 1 / 2.2f) * 255 + .5f);
 }
@@ -181,8 +172,7 @@ public:
 };
 
 void compute_sycl(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c) {
-	gpu_selector s_;
-	queue q_(s_);
+	queue q(*(device*)dev);
 	{
 		// data is wrapped in SYCL buffers.
 		buffer<Vec, 1> color_buffer(c, range<1>(w * h));
@@ -201,6 +191,15 @@ void compute_sycl(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& 
 			ch.parallel_for(ndr, ray_);
 		};
 		// submitting the command group to the SYCL command queue for execution.
-		q_.submit(cg);
+		q.submit(cg);
 	}
+}
+
+int main(int argc, char** argv) {
+	using namespace std;
+	vector<testInfo> tests;
+
+	getDevices(tests, compute_sycl);
+
+	return mainTester(argc, argv, tests);
 }
