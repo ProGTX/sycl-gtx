@@ -177,7 +177,7 @@
       <ComputeCppRootDir>$(COMPUTECPPROOT)</ComputeCppRootDir>
       <DeviceAdditionalIncludeDirectories>$(COMPUTECPPROOT)\include;$(COMPUTECPPROOT)\include\image_library;$(ProjectDir)</DeviceAdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </SYCLCpp>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -145,8 +145,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="classes.h" />
-    <ClCompile Include="smallpt.h" />
-    <ClCompile Include="sycl_gtx.h" />
+    <ClInclude Include="smallpt.h" />
+    <ClInclude Include="sycl_gtx.h" />
     <ClInclude Include="win.h" />
   </ItemGroup>
   <ItemGroup>

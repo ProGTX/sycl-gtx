@@ -15,8 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <SYCLCpp Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
+    </SYCLCpp>
   </ItemGroup>
 </Project>
