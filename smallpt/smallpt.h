@@ -1,3 +1,5 @@
+#pragma once
+
 #include <sycl.hpp>
 
 #include <chrono>
@@ -7,38 +9,16 @@
 #include <memory>
 
 
-#ifdef SYCL_GTX
-
-#include "classes.h"
-#include "win.h"
-
-using float_type = double;
-
-using Vec = Vec_<float_type>;
-using Ray = Ray_<float_type>;
-using Sphere = Sphere_<float_type>;
-
-extern void compute_org(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
-extern void compute_org_openmp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
-extern void compute_org_sp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
-extern void compute_org_sp_openmp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
-extern void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_);
-static auto compute_sycl = compute_sycl_gtx;
-
-#else
-
-#define sqrt_f cl::sycl::sqrt
-#include "classes.h"
-#include "win.h"
-
-using float_type = float;
-
-using Vec = Vec_<float_type>;
-using Ray = Ray_<float_type>;
-using Sphere = Sphere_<float_type>;
-
-extern void compute_sycl(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_);
+#ifndef float_type
+#define float_type double
 #endif
+
+#include "classes.h"
+#include "win.h"
+
+using Vec = Vec_<float_type>;
+using Ray = Ray_<float_type>;
+using Sphere = Sphere_<float_type>;
 
 
 using std::string;
@@ -46,11 +26,9 @@ using std::string;
 inline float_type clamp(float_type x) {
 	return x < 0 ? 0 : x>1 ? 1 : x;
 }
-inline int toInt(float_type x) {
-	return int(pow(clamp(x), 1 / 2.2) * 255 + .5);
-}
+inline int toInt(float_type x);
 
-void to_file(int w, int h, Vec* c, string filename) {
+static void to_file(int w, int h, Vec* c, string filename) {
 	FILE* f = fopen(filename.c_str(), "w");         // Write image to PPM file.
 	fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
 	for(int i = 0; i < w*h; i++) {
@@ -61,10 +39,10 @@ void to_file(int w, int h, Vec* c, string filename) {
 
 using time_point = std::chrono::high_resolution_clock::time_point;
 
-auto now = []() {
+static auto now = []() {
 	return std::chrono::high_resolution_clock::now();
 };
-auto duration = [](time_point before) {
+static auto duration = [](time_point before) {
 	static const float to_seconds = 1e-6f;
 	return std::chrono::duration_cast<std::chrono::microseconds>(now() - before).count() * to_seconds;
 };
@@ -76,9 +54,6 @@ struct testInfo {
 	std::unique_ptr<cl::sycl::device> dev;
 	float lastTime = 0;
 
-	static decltype(now()) startTime;
-	static float totalTime;
-
 	testInfo(string name, function_ptr test, cl::sycl::device* dev = nullptr)
 		: name(name), test(test), dev(dev) {}
 
@@ -86,13 +61,23 @@ struct testInfo {
 	testInfo(testInfo&& move)
 		: name(std::move(move.name)), test(move.test), dev(std::move(move.dev)) {}
 };
-decltype(now()) testInfo::startTime = now();
-float testInfo::totalTime = 0;
 
-static std::vector<const testInfo> tests;
-static Ray cam(Vec(50, 52, 295.6), Vec(0, -0.042612, -1).norm()); // cam pos, dir
+static decltype(now())& startTime() {
+	static decltype(now()) s(now());
+	return s;
+}
 
-bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int from, int to) {
+static float& totalTime() {
+	static float tt(0);
+	return tt;
+}
+
+static Ray& cam() {
+	static Ray c(Vec(50, 52, 295.6), Vec(0, -0.042612, -1).norm()); // cam pos, dir
+	return c;
+}
+
+static bool tester(std::vector<testInfo>& tests, int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int from, int to) {
 	using namespace std;
 
 	cout << "samples per pixel: " << samples << endl;
@@ -119,7 +104,7 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 			auto start = now();
 			for(int i = 0; i < iterations; ++i) {
 				vectors = empty_vectors;
-				t.test(t.dev.get(), w, h, samples, cam, cx, cy, r, vectors.data());
+				t.test(t.dev.get(), w, h, samples, cam(), cx, cy, r, vectors.data());
 			}
 			time = (duration(start) / (float)iterations);
 
@@ -141,8 +126,8 @@ bool tester(int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int fro
 
 		cout << "time: " << time << endl;
 		t.lastTime = time;
-		testInfo::totalTime = duration(testInfo::startTime);
-		if(testInfo::totalTime > 300) {
+		totalTime() = duration(startTime());
+		if(totalTime() > 300) {
 			cout << "exceeded 5 minute limit, stopping" << endl;
 			return false;
 		}
@@ -182,7 +167,7 @@ void printInfo(string description, const T& data, int offset = 0) {
 	std::cout << indent << description << ": " << data << std::endl;
 }
 
-void getDevices() {
+static void getDevices(std::vector<testInfo>& tests, testInfo::function_ptr compute_sycl_ptr) {
 	using namespace std;
 
 	try {
@@ -215,7 +200,7 @@ void getDevices() {
 
 				auto name = d.get_info<info::device::name>();
 
-				printInfo("name", d.get_info<info::device::name>(), 2);
+				printInfo("name", name, 2);
 				printInfo("device_type", (cl_device_type)d.get_info<info::device::device_type>(), 2);
 				printInfo("vendor", d.get_info<info::device::vendor>(), 2);
 				printInfo("device_version", d.get_info<info::device::device_version>(), 2);
@@ -247,7 +232,7 @@ void getDevices() {
 					platformVersion.major > required.major ||
 					(platformVersion.major == required.major && platformVersion.minor >= required.minor)
 				) {
-					tests.emplace_back(name + ' ' + openclVersion, compute_sycl, new device(std::move(d)));
+					tests.emplace_back(name + ' ' + openclVersion, compute_sycl_ptr, new device(std::move(d)));
 				}
 
 				++dNum;
@@ -260,31 +245,18 @@ void getDevices() {
 	}
 }
 
-int main(int argc, char *argv[]) {
+static int mainTester(int argc, char *argv[], std::vector<testInfo>& tests) {
 	using namespace std;
 
 	cout << "smallpt SYCL tester" << endl;
 
-#ifdef SYCL_GTX
-	tests.emplace_back("org_single", compute_org_sp);
-	tests.emplace_back("openmp_single", compute_org_sp_openmp);
-	tests.emplace_back("org", compute_org);
-	tests.emplace_back("openmp", compute_org_openmp);
-#endif
-
-	getDevices();
-
 	int w = 1024;
 	int h = 768;
 	Vec cx = Vec(w*.5135 / h);
-	Vec cy = (cx%cam.d).norm()*.5135;
+	Vec cy = (cx%cam().d).norm()*.5135;
 	auto numTests = tests.size();
 
-#ifdef SYCL_GTX
-	int from = 2;
-#else
 	int from = 0;
-#endif
 	int to = numTests;
 	if(argc > 1) {
 		from = atoi(argv[1]);
@@ -296,7 +268,7 @@ int main(int argc, char *argv[]) {
 	cout << "Going through tests in range [" << from << ',' << to << ')' << endl;
 
 	if(false) {
-		tester(w, h, 1, cx, cy, 1, from, to);
+		tester(tests, w, h, 1, cx, cy, 1, from, to);
 		cout << "Press any key to exit" << endl;
 		cin.get();
 		return 0;
@@ -307,13 +279,13 @@ int main(int argc, char *argv[]) {
 	bool canContinue;
 
 	for(int samples = 5; samples < 10000; samples *= 2) {
-		canContinue = tester(w, h, samples, cx, cy, iterations, from, to);
+		canContinue = tester(tests, w, h, samples, cx, cy, iterations, from, to);
 		if(!canContinue) {
 			break;
 		}
 	}
 
-	auto time = duration(testInfo::startTime);
+	auto time = duration(startTime());
 	cout << "total test suite duration: " << time << endl;
 
 	//cout << "Press any key to exit" << endl;

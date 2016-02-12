@@ -1,0 +1,27 @@
+
+#define float_type double
+#include "smallpt.h"
+
+extern void compute_org(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_org_openmp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_org_sp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_org_sp_openmp(void*, int w, int h, int samps, Ray& cam, Vec& cx, Vec& cy, Vec r, Vec* c);
+extern void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray& cam_, Vec& cx_, Vec& cy_, Vec r_, Vec* c_);
+
+inline int toInt(float_type x) {
+	return int(pow(clamp(x), 1 / 2.2) * 255 + .5);
+}
+
+int main(int argc, char *argv[]) {
+	using namespace std;
+	vector<testInfo> tests;
+
+	//tests.emplace_back("org_single", compute_org_sp);
+	//tests.emplace_back("openmp_single", compute_org_sp_openmp);
+	tests.emplace_back("org", compute_org);
+	tests.emplace_back("openmp", compute_org_openmp);
+
+	getDevices(tests, compute_sycl_gtx);
+
+	return mainTester(argc, argv, tests);
+}

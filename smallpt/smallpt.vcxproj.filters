@@ -24,8 +24,11 @@
     <ClCompile Include="org_single_precision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="smallpt.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="smallpt.h">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

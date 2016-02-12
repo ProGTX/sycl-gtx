@@ -139,7 +139,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="smallpt.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="smallpt.h" />
     <ClCompile Include="org_single_precision.cpp" />
     <ClCompile Include="original.cpp" />
     <ClCompile Include="sycl_gtx.cpp" />
