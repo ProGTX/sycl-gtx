@@ -140,13 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="smallpt.h" />
     <ClCompile Include="org_single_precision.cpp" />
     <ClCompile Include="original.cpp" />
     <ClCompile Include="sycl_gtx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="classes.h" />
+    <ClCompile Include="smallpt.h" />
     <ClInclude Include="win.h" />
   </ItemGroup>
   <ItemGroup>

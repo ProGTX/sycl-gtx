@@ -15,26 +15,26 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="org_single_precision.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="original.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sycl_gtx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="org_single_precision.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="smallpt.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="classes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClCompile Include="smallpt.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
     <ClInclude Include="win.h">
       <Filter>Header Files</Filter>
     </ClInclude>

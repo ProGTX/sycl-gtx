@@ -232,6 +232,12 @@ static void getDevices(std::vector<testInfo>& tests, testInfo::function_ptr comp
 					platformVersion.major > required.major ||
 					(platformVersion.major == required.major && platformVersion.minor >= required.minor)
 				) {
+#ifndef SYCL_GTX
+#ifdef _DEBUG
+					// There seem to be some problems with ComputeCpp and HD 4600
+					if(name.find("HD Graphics 4600") == string::npos)
+#endif
+#endif
 					tests.emplace_back(name + ' ' + openclVersion, compute_sycl_ptr, new device(std::move(d)));
 				}
 
