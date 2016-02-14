@@ -181,8 +181,7 @@ void compute_sycl(void* dev, int w, int h, int samps, Ray cam_, Vec cx_, Vec cy_
 				spheres_buffer.get_access<access::mode::read,
 				access::target::constant_buffer>(ch),
 				w, h, samps,
-				cam_,
-				cx_, cy_, r_
+				cam_, cx_, cy_, r_
 			};
 			nd_range<2> ndr(range<2>(w, h), range<2>(8, 8));
 			ch.parallel_for(ndr, ray_);

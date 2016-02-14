@@ -72,22 +72,16 @@ public:
 using RaySycl = ::Ray_<float1>;
 
 struct SphereSycl : public ::Sphere_<float1> {
-private:
-	using Base = ::Sphere_<float1>;
-
-public:
-	float1 rad;
 	float1 refl;
 
-	SphereSycl(const cl::sycl::float16& data)
-	:	Base(
-			0, // Not important
+	SphereSycl(const float16& data)
+	: ::Sphere_<float1>(
+			data.lo().lo().w(),
 			Vector(data.lo().lo().xyz()),
 			Vector(data.lo().hi().xyz()),
 			Vector(data.hi().lo().xyz()),
 			Refl_t::DIFF // Not important
 		),
-		rad(data.lo().lo().w()),
 		refl(data.hi().lo().w()) {}
 
 	float1 intersect(const Ray_<float1>& r) const { // returns distance, 0 if no hit
