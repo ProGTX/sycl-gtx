@@ -316,9 +316,12 @@ static int mainTester(int argc, char *argv[], std::vector<testInfo>& tests, stri
 	int maxMinutes = 5;
 
 	if(argc > 1) {
-		from = atoi(argv[1]);
+		maxMinutes = atoi(argv[1]);
 		if(argc > 2) {
-			to = atoi(argv[2]);
+			from = atoi(argv[2]);
+			if(argc > 3) {
+				to = atoi(argv[3]);
+			}
 		}
 	}
 
