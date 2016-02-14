@@ -195,6 +195,13 @@ int main(int argc, char** argv) {
 	using namespace std;
 	vector<testInfo> tests;
 
+	// Host fallback
+	host_selector hs;
+	tests.emplace_back(string("T0") + ' ' + "ComputeCpp", compute_sycl, std::shared_ptr<device>(new device(hs)));
+	string fakeName;
+	version deviceVersion("");
+	displayDevice(*tests.back().dev, -1, fakeName, deviceVersion, 1);
+
 	// TODO: compute_sycl_gtx does not work with ComputeCpp yet
 	getDevices(tests, { compute_sycl, /*compute_sycl_gtx*/ });
 
