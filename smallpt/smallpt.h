@@ -85,18 +85,18 @@ static string& imagePrefix() {
 	return ip;
 }
 
-static bool& isOpenclAvailable() {
-	static bool ocl(false);
-	return ocl;
-}
-
-static bool tester(std::vector<testInfo>& tests, int w, int h, int samples, Vec& cx, Vec& cy, int iterations, int from, int to) {
+static bool tester(
+	std::vector<testInfo>& tests, int maxMinutes,
+	int w, int h, int samples, Vec& cx, Vec& cy,
+	int iterations, int from, int to
+) {
 	using namespace std;
 
-	if(tests.empty()) {
+	if(to - from <= 0) {
 		cout << "no tests" << endl;
 		return false;
 	}
+	bool isOpenCLAvailable = tests[to - 1].isOpenCL();
 
 	cout << "samples per pixel: " << samples << endl;
 
@@ -106,7 +106,7 @@ static bool tester(std::vector<testInfo>& tests, int w, int h, int samples, Vec&
 	float time;
 
 	const float perTestLimit = 40;
-	const float globalLimit = 420;
+	const float globalLimit = 60.f * maxMinutes;
 	float totalTime = 0;
 
 	for(int ti = from; ti < to; ++ti) {
@@ -118,8 +118,8 @@ static bool tester(std::vector<testInfo>& tests, int w, int h, int samples, Vec&
 		bool overHalf = 2 * totalTime > globalLimit;
 		if(t.lastTime > perTestLimit &&
 			(
-				(!isOpenclAvailable() && overHalf)	||
-				(isOpenclAvailable() &&
+				(!isOpenCLAvailable && overHalf)	||
+				(isOpenCLAvailable &&
 					!t.isOpenCL() ||
 					(t.isOpenCL() && overHalf)
 				)
@@ -159,6 +159,7 @@ static bool tester(std::vector<testInfo>& tests, int w, int h, int samples, Vec&
 		cout << "time: " << time << endl;
 		t.lastTime = time;
 		totalTime = duration(startTime());
+		cout << "total time: " << std::to_string(totalTime) << endl;
 		if(totalTime > globalLimit) {
 			cout << "exceeded " + std::to_string((int)globalLimit) + "s limit, stopping" << endl;
 			return false;
@@ -290,14 +291,10 @@ static void getDevices(std::vector<testInfo>& tests, std::vector<testInfo::funct
 				tests.emplace_back(string("T") + std::to_string(i) + ' ' + t.name, ptr, t.dev);
 			}
 		}
-
-		isOpenclAvailable() = true;
 	}
 	catch(cl::sycl::exception& e) {
 		// TODO
 		cout << "OpenCL not available: " << e.what() << endl;
-		
-		isOpenclAvailable() = false;
 	}
 }
 
@@ -316,6 +313,8 @@ static int mainTester(int argc, char *argv[], std::vector<testInfo>& tests, stri
 
 	int from = 0;
 	int to = numTests;
+	int maxMinutes = 5;
+
 	if(argc > 1) {
 		from = atoi(argv[1]);
 		if(argc > 2) {
@@ -323,10 +322,11 @@ static int mainTester(int argc, char *argv[], std::vector<testInfo>& tests, stri
 		}
 	}
 
+	cout << "Global time limit in minutes: " << maxMinutes << endl;
 	cout << "Going through tests in range [" << from << ',' << to << ')' << endl;
 
 	if(false) {
-		tester(tests, w, h, 1, cx, cy, 1, from, to);
+		tester(tests, maxMinutes, w, h, 1, cx, cy, 1, from, to);
 		cout << "Press any key to exit" << endl;
 		cin.get();
 		return 0;
@@ -337,7 +337,7 @@ static int mainTester(int argc, char *argv[], std::vector<testInfo>& tests, stri
 	bool canContinue;
 
 	for(int samples = 4; samples < 10000; samples *= 2) {
-		canContinue = tester(tests, w, h, samples, cx, cy, iterations, from, to);
+		canContinue = tester(tests, maxMinutes, w, h, samples, cx, cy, iterations, from, to);
 		if(!canContinue) {
 			break;
 		}
