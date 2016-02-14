@@ -337,29 +337,32 @@ static int mainTester(int argc, char *argv[], std::vector<testInfo>& tests, stri
 
 	cout << "Global time limit in minutes: " << maxMinutes << endl;
 	cout << "Going through tests in range [" << from << ',' << to << ')' << endl;
+
 	startTime();
 
 	if(false) {
-		tester(tests, maxMinutes, w, h, 1, cx, cy, 1, from, to);
-		cout << "Press any key to exit" << endl;
-		cin.get();
-		return 0;
+		from = 0;
+		to = 1;
+		auto prefix = imagePrefix();
+
+		imagePrefix() = prefix + "_64";
+		tester(tests, maxMinutes, w, h, 64, cx, cy, 1, from, to);
 	}
+	else {
+		// Test suite
+		int iterations = 1;
+		bool canContinue;
 
-	// Test suite
-	int iterations = 1;
-	bool canContinue;
-
-	for(int samples = 4; samples < 10000; samples *= 2) {
-		canContinue = tester(tests, maxMinutes, w, h, samples, cx, cy, iterations, from, to);
-		if(!canContinue) {
-			break;
+		for(int samples = 4; samples < 10000; samples *= 2) {
+			canContinue = tester(tests, maxMinutes, w, h, samples, cx, cy, iterations, from, to);
+			if(!canContinue) {
+				break;
+			}
 		}
 	}
 
 	auto time = duration(startTime());
 	cout << "total test suite duration: " << time << endl;
-
 	//cout << "Press any key to exit" << endl;
 	//cin.get();
 
