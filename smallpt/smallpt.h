@@ -200,6 +200,46 @@ void printInfo(string description, const T& data, int offset = 0) {
 	std::cout << indent << description << ": " << data << std::endl;
 }
 
+static void displayDevice(
+	const cl::sycl::device& d, int dNum, string& name, version& deviceVersion, int tabOffset = 2
+) {
+	using namespace std;
+	using namespace cl::sycl;
+	cout << "\t-- OpenCL device " << dNum << ':' << endl;
+
+	name = d.get_info<info::device::name>();
+	auto deviceVersionString = d.get_info<info::device::device_version>();
+	deviceVersion = deviceVersionString;
+
+	printInfo("name", name, tabOffset);
+	printInfo("device_type", (cl_device_type)d.get_info<info::device::device_type>(), tabOffset);
+	printInfo("vendor", d.get_info<info::device::vendor>(), tabOffset);
+	printInfo("device_version", deviceVersionString, tabOffset);
+	printInfo("driver_version", d.get_info<info::device::driver_version>(), tabOffset);
+#ifdef SYCL_GTX
+	printInfo("opencl_version", d.get_info<info::device::opencl_version>(), tabOffset);
+	printInfo("single_fp_config", d.get_info<info::device::single_fp_config>(), tabOffset);
+	printInfo("double_fp_config", d.get_info<info::device::double_fp_config>(), tabOffset);
+#endif
+	printInfo("profile", d.get_info<info::device::profile>(), tabOffset);
+	printInfo("error_correction_support", d.get_info<info::device::error_correction_support>(), tabOffset);
+	printInfo("host_unified_memory", d.get_info<info::device::host_unified_memory>(), tabOffset);
+	printInfo("max_clock_frequency", d.get_info<info::device::max_clock_frequency>(), tabOffset);
+	printInfo("max_compute_units", d.get_info<info::device::max_compute_units>(), tabOffset);
+	printInfo("max_work_item_dimensions", d.get_info<info::device::max_work_item_dimensions>(), tabOffset);
+	printInfo("max_work_group_size", d.get_info<info::device::max_work_group_size>(), tabOffset);
+
+	printInfo("address_bits", d.get_info<info::device::address_bits>(), tabOffset);
+	printInfo("max_mem_alloc_size", d.get_info<info::device::max_mem_alloc_size>(), tabOffset);
+	printInfo("global_mem_cache_line_size", d.get_info<info::device::global_mem_cache_line_size>(), tabOffset);
+	printInfo("global_mem_cache_size", d.get_info<info::device::global_mem_cache_size>(), tabOffset);
+	printInfo("global_mem_size", d.get_info<info::device::global_mem_size>(), tabOffset);
+	printInfo("max_constant_buffer_size", d.get_info<info::device::max_constant_buffer_size>(), tabOffset);
+	printInfo("max_constant_args", d.get_info<info::device::max_constant_args>(), tabOffset);
+	printInfo("local_mem_size", d.get_info<info::device::local_mem_size>(), tabOffset);
+	printInfo("extensions", d.get_info<info::device::extensions>(), tabOffset);
+}
+
 static void getDevices(std::vector<testInfo>& tests, std::vector<testInfo::function_ptr> compute_sycl_ptrs) {
 	using namespace std;
 
@@ -229,39 +269,9 @@ static void getDevices(std::vector<testInfo>& tests, std::vector<testInfo::funct
 			int dNum = 0;
 
 			for(auto& d : devices) {
-				cout << "\t-- OpenCL device " << dNum << ':' << endl;
-
-				auto name = d.get_info<info::device::name>();
-				auto deviceVersionString = d.get_info<info::device::device_version>();
-				version deviceVersion(deviceVersionString);
-
-				printInfo("name", name, 2);
-				printInfo("device_type", (cl_device_type)d.get_info<info::device::device_type>(), 2);
-				printInfo("vendor", d.get_info<info::device::vendor>(), 2);
-				printInfo("device_version", deviceVersionString, 2);
-				printInfo("driver_version", d.get_info<info::device::driver_version>(), 2);
-#ifdef SYCL_GTX
-				printInfo("opencl_version", d.get_info<info::device::opencl_version>(), 2);
-				printInfo("single_fp_config", d.get_info<info::device::single_fp_config>(), 2);
-				printInfo("double_fp_config", d.get_info<info::device::double_fp_config>(), 2);
-#endif
-				printInfo("profile", d.get_info<info::device::profile>(), 2);
-				printInfo("error_correction_support", d.get_info<info::device::error_correction_support>(), 2);
-				printInfo("host_unified_memory", d.get_info<info::device::host_unified_memory>(), 2);
-				printInfo("max_clock_frequency", d.get_info<info::device::max_clock_frequency>(), 2);
-				printInfo("max_compute_units", d.get_info<info::device::max_compute_units>(), 2);
-				printInfo("max_work_item_dimensions", d.get_info<info::device::max_work_item_dimensions>(), 2);
-				printInfo("max_work_group_size", d.get_info<info::device::max_work_group_size>(), 2);
-
-				printInfo("address_bits", d.get_info<info::device::address_bits>(), 2);
-				printInfo("max_mem_alloc_size", d.get_info<info::device::max_mem_alloc_size>(), 2);
-				printInfo("global_mem_cache_line_size", d.get_info<info::device::global_mem_cache_line_size>(), 2);
-				printInfo("global_mem_cache_size", d.get_info<info::device::global_mem_cache_size>(), 2);
-				printInfo("global_mem_size", d.get_info<info::device::global_mem_size>(), 2);
-				printInfo("max_constant_buffer_size", d.get_info<info::device::max_constant_buffer_size>(), 2);
-				printInfo("max_constant_args", d.get_info<info::device::max_constant_args>(), 2);
-				printInfo("local_mem_size", d.get_info<info::device::local_mem_size>(), 2);
-				printInfo("extensions", d.get_info<info::device::extensions>(), 2);
+				string name;
+				version deviceVersion("");
+				displayDevice(d, dNum, name, deviceVersion);
 
 #ifndef SYCL_GTX
 				// TODO: ComputeCpp returns wrong values
