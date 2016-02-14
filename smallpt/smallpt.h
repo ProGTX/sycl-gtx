@@ -216,7 +216,6 @@ static void getDevices(std::vector<testInfo>& tests, std::vector<testInfo::funct
 			++pNum;
 
 			auto openclVersion = p.get_info<info::platform::version>();
-
 			version platformVersion(openclVersion);
 
 			printInfo("name", p.get_info<info::platform::name>(), 1);
@@ -232,11 +231,13 @@ static void getDevices(std::vector<testInfo>& tests, std::vector<testInfo::funct
 				cout << "\t-- OpenCL device " << dNum << ':' << endl;
 
 				auto name = d.get_info<info::device::name>();
+				auto deviceVersionString = d.get_info<info::device::device_version>();
+				version deviceVersion(deviceVersionString);
 
 				printInfo("name", name, 2);
 				printInfo("device_type", (cl_device_type)d.get_info<info::device::device_type>(), 2);
 				printInfo("vendor", d.get_info<info::device::vendor>(), 2);
-				printInfo("device_version", d.get_info<info::device::device_version>(), 2);
+				printInfo("device_version", deviceVersionString, 2);
 				printInfo("driver_version", d.get_info<info::device::driver_version>(), 2);
 #ifdef SYCL_GTX
 				printInfo("opencl_version", d.get_info<info::device::opencl_version>(), 2);
@@ -261,9 +262,13 @@ static void getDevices(std::vector<testInfo>& tests, std::vector<testInfo::funct
 				printInfo("local_mem_size", d.get_info<info::device::local_mem_size>(), 2);
 				printInfo("extensions", d.get_info<info::device::extensions>(), 2);
 
+#ifndef SYCL_GTX
+				// TODO: ComputeCpp returns wrong values
+				deviceVersion = platformVersion;
+#endif
 				if(
-					platformVersion.major > required.major ||
-					(platformVersion.major == required.major && platformVersion.minor >= required.minor)
+					deviceVersion.major > required.major ||
+					(deviceVersion.major == required.major && deviceVersion.minor >= required.minor)
 				) {
 #ifndef SYCL_GTX
 #ifdef _DEBUG
