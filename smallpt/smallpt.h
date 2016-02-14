@@ -337,6 +337,7 @@ static int mainTester(int argc, char *argv[], std::vector<testInfo>& tests, stri
 
 	cout << "Global time limit in minutes: " << maxMinutes << endl;
 	cout << "Going through tests in range [" << from << ',' << to << ')' << endl;
+	startTime();
 
 	if(false) {
 		tester(tests, maxMinutes, w, h, 1, cx, cy, 1, from, to);
