@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClInclude Include="Filter.h" />
     <ClInclude Include="PPM.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
