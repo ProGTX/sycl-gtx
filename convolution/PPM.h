@@ -14,8 +14,8 @@ struct Pixel {
 	Pixel(int r, int g, int b)
 		: r((float)r / levels), g((float)g / levels), b((float)b / levels) {}
 
-	int operator[](int i) {
-		float* c = nullptr;
+	int operator[](int i) const {
+		const float* c = nullptr;
 		if(i == 0) {
 			c = &r;
 		}
@@ -58,7 +58,7 @@ struct PPM {
 		return image;
 	}
 
-	void store(string filename) {
+	void store(string filename) const {
 		using namespace std;
 
 		stringstream file;
