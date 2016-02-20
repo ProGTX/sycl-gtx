@@ -13,10 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="CL">
+      <UniqueIdentifier>{44f7e82a-5aba-4425-a641-f7cff095b5fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  <ItemGroup>
+    <None Include="global_opt.cl">
+      <Filter>CL</Filter>
+    </None>
+    <None Include="local_opt.cl">
+      <Filter>CL</Filter>
+    </None>
+  </ItemGroup>
   </ItemGroup>
 </Project>
