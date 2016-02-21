@@ -42,7 +42,8 @@ struct PPM {
 			istringstream stream(line);
 			stream >> image.width >> image.height;
 			getline(file, line); // 3
-			size = image.width*image.height;
+
+			size = image.width * image.height;
 			lines.resize(size);
 			image.data.reserve(size);
 
