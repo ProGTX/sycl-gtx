@@ -14,18 +14,8 @@ struct Pixel {
 	Pixel(int r, int g, int b)
 		: r((float)r / levels), g((float)g / levels), b((float)b / levels) {}
 
-	int operator[](int i) const {
-		const float* c = nullptr;
-		if(i == 0) {
-			c = &r;
-		}
-		else if(i == 1) {
-			c = &g;
-		}
-		else if(i == 2) {
-			c = &b;
-		}
-		return (int)(*c * (float)levels);
+	static int toInt(float value) {
+		return (int)(value * levels);
 	}
 };
 
@@ -40,18 +30,44 @@ struct PPM {
 
 	static PPM load(string filename) {
 		using namespace std;
-		auto file = ifstream(filename);
 		auto image = PPM();
 
-		string tmpStr;
-		file >> tmpStr >> image.width >> image.height >> tmpStr;
-		auto size = image.width*image.height;
-		image.data.reserve(size);
+		vector<string> lines;
+		int size;
+		{
+			auto file = ifstream(filename);
+			string line;
+			getline(file, line); // 1
+			getline(file, line); // 2
+			istringstream stream(line);
+			stream >> image.width >> image.height;
+			getline(file, line); // 3
+			size = image.width*image.height;
+			lines.resize(size);
+			image.data.reserve(size);
+
+			for(int i = 0; i < size; ++i) {
+				getline(file, lines[i]);
+			}
+		}
+
+		size_t previous;
+		size_t current;
+		auto fetch = [&previous, &current](const string& line) {
+			previous = current + 1;
+			current = line.find(' ', previous);
+			return atoi(line.substr(previous, current - previous).c_str()); 
+		};
 
 		int r, g, b;
-
 		for(int i = 0; i < size; ++i) {
-			file >> r >> g >> b;
+			auto& line = lines[i];
+			current = -1;
+
+			r = fetch(line);
+			g = fetch(line);
+			b = fetch(line);
+
 			image.data.emplace_back(r, g, b);
 		}
 
@@ -61,12 +77,12 @@ struct PPM {
 	void store(string filename) const {
 		using namespace std;
 
-		stringstream file;
-		file << "P3" << endl << width << ' ' << height << endl << Pixel::levels << endl;
-
+		FILE* file = fopen(filename.c_str(), "w");
+		fprintf(file, "P3\n%d %d\n%d\n", width, height, 255);
 		for(int i = 0; i < width*height; ++i) {
-			file << data[i][0] << ' ' << data[i][1] << ' ' << data[i][2] << endl;
+			auto& p = data[i];
+			fprintf(file, "%d %d %d\n", Pixel::toInt(p.r), Pixel::toInt(p.g), Pixel::toInt(p.b));
 		}
-		ofstream(filename) << file.str();
+		fclose(file);
 	}
 };
