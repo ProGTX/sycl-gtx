@@ -11,7 +11,8 @@ struct OpenCL {
 	static string read(string filename);
 
 	static void global(
-		int numInvocations, cl_device_id dev, string filename, int size,
+		int numInvocations, cl_device_id dev, string filename,
+		int dataSize, int filterSize,
 		const float* input, float* output, const float* filter
 	);
 };
