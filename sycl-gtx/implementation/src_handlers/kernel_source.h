@@ -34,7 +34,7 @@ private:
 		buffer_access acc;
 		string_class resource_name;
 		string_class type_name;
-		size_t size;
+		::size_t size;
 	};
 
 	static const string_class resource_name_root;

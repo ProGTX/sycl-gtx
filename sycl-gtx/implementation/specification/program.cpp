@@ -19,7 +19,7 @@ program::program(const context& context, cl_program clProgram)
 	: program(clProgram, context, context.get_devices()) {}
 
 
-void program::compile(string_class compile_options, size_t kernel_name_id, shared_ptr_class<kernel> kern) {
+void program::compile(string_class compile_options, ::size_t kernel_name_id, shared_ptr_class<kernel> kern) {
 	kernels.emplace(kernel_name_id, kern);
 	auto& src = kern->src;
 	auto code = src.get_code();
@@ -28,7 +28,7 @@ void program::compile(string_class compile_options, size_t kernel_name_id, share
 	debug() << code;
 
 	const char* code_p = code.c_str();
-	size_t length = code.size();
+	::size_t length = code.size();
 	::cl_int error_code;
 
 	auto p = clCreateProgramWithSource(ctx.get(), 1, &code_p, &length, &error_code);
@@ -59,7 +59,7 @@ void program::report_compile_error(shared_ptr_class<kernel> kern, device& dev) c
 	// http://stackoverflow.com/a/9467325/793006
 
 	// Determine the size of the log
-	size_t log_size;
+	::size_t log_size;
 	clGetProgramBuildInfo(kern->prog.get()->get(), dev.get(), CL_PROGRAM_BUILD_LOG, 0, nullptr, &log_size);
 
 	// Allocate memory for the log

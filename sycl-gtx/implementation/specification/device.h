@@ -76,7 +76,7 @@ public:
 	) const;
 
 private:
-	template <class Contained_, info::device param, size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
+	template <class Contained_, info::device param, ::size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
 	struct array_traits : detail::array_traits<Contained_, info::device, param, BufferSize> {
 		void get_info(const device* dev) {
 			this->Base::get(dev->device_id.get());
@@ -110,7 +110,7 @@ private:
 			return_t ret;
 			auto size = this->actual_size / this->type_size;
 			ret.reserve(size);
-			for(size_t i = 0; i < size; ++i) {
+			for(::size_t i = 0; i < size; ++i) {
 				ret.push_back((EnumClass)this->param_value[i]);
 			}
 			return ret;
@@ -132,7 +132,7 @@ private:
 
 	template <info::device param>
 	struct traits<id<3>, param>
-		: array_traits<size_t, param, 3> {
+		: array_traits<::size_t, param, 3> {
 		id<3> get(const device* dev) {
 			this->get_info(dev);
 			return id<3>(this->param_value[0], this->param_value[1], this->param_value[2]);

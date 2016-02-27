@@ -26,33 +26,33 @@ struct param_traits_helper {
 
 template <typename ReturnType>
 struct traits_buffer_default {
-	static const size_t size = 1;
+	static const ::size_t size = 1;
 };
 template <typename Contained>
 struct traits_buffer_default<vector_class<Contained>> {
-	static const size_t size = 1024;
+	static const ::size_t size = 1024;
 };
 template <>
 struct traits_buffer_default<string_class> {
-	static const size_t size = 8192;
+	static const ::size_t size = 8192;
 };
 
-template <typename Contained_, size_t BufferSize, class Container_ = vector_class<Contained_>>
+template <typename Contained_, ::size_t BufferSize, class Container_ = vector_class<Contained_>>
 struct traits_helper {
 	using Container = Container_;
 	using Contained = Contained_;
 	static const int BUFFER_SIZE = BufferSize;
-	static const size_t type_size = sizeof(Contained);
+	static const ::size_t type_size = sizeof(Contained);
 };
 
-template <typename Contained_, size_t BufferSize = traits_buffer_default<vector_class<Contained_>>::size>
+template <typename Contained_, ::size_t BufferSize = traits_buffer_default<vector_class<Contained_>>::size>
 struct traits : traits_helper<Contained_, BufferSize> {};
 
-template <size_t BufferSize>
+template <::size_t BufferSize>
 struct traits<string_class, BufferSize> : traits_helper<char, BufferSize, string_class>{};
 
 template <typename cl_input_t>
-using opencl_info_f = ::cl_int(CL_API_CALL*)(cl_input_t, cl_uint, size_t, void*, size_t*);
+using opencl_info_f = ::cl_int(CL_API_CALL*)(cl_input_t, cl_uint, ::size_t, void*, ::size_t*);
 
 template <typename cl_input_t, opencl_info_f<cl_input_t> F>
 struct info_function_helper {
@@ -156,7 +156,7 @@ SYCL_ADD_DEVICE_TRAIT(info::device::vendor_id,							cl_uint)
 SYCL_ADD_DEVICE_TRAIT(info::device::max_compute_units,					cl_uint)
 SYCL_ADD_DEVICE_TRAIT(info::device::max_work_item_dimensions,			cl_uint)
 SYCL_ADD_DEVICE_TRAIT(info::device::max_work_item_sizes,				id<3>)
-SYCL_ADD_DEVICE_TRAIT(info::device::max_work_group_size,				size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::max_work_group_size,				::size_t)
 
 SYCL_ADD_DEVICE_TRAIT(info::device::preferred_vector_width_char,		cl_uint)
 SYCL_ADD_DEVICE_TRAIT(info::device::preferred_vector_width_short,		cl_uint)
@@ -181,16 +181,16 @@ SYCL_ADD_DEVICE_TRAIT(info::device::max_mem_alloc_size,					cl_ulong)
 SYCL_ADD_DEVICE_TRAIT(info::device::image_support,						cl_bool)
 SYCL_ADD_DEVICE_TRAIT(info::device::max_read_image_args,				cl_uint)
 SYCL_ADD_DEVICE_TRAIT(info::device::max_write_image_args,				cl_uint)
-SYCL_ADD_DEVICE_TRAIT(info::device::image2d_max_height,					size_t)
-SYCL_ADD_DEVICE_TRAIT(info::device::image2d_max_width,					size_t)
-SYCL_ADD_DEVICE_TRAIT(info::device::image3d_max_height,					size_t)
-SYCL_ADD_DEVICE_TRAIT(info::device::image3d_max_width,					size_t)
-SYCL_ADD_DEVICE_TRAIT(info::device::image3d_max_depth,					size_t)
-SYCL_ADD_DEVICE_TRAIT(info::device::image_max_buffer_size,				size_t)
-SYCL_ADD_DEVICE_TRAIT(info::device::image_max_array_size,				size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::image2d_max_height,					::size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::image2d_max_width,					::size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::image3d_max_height,					::size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::image3d_max_width,					::size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::image3d_max_depth,					::size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::image_max_buffer_size,				::size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::image_max_array_size,				::size_t)
 
 SYCL_ADD_DEVICE_TRAIT(info::device::max_samplers,						cl_uint)
-SYCL_ADD_DEVICE_TRAIT(info::device::max_parameter_size,					size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::max_parameter_size,					::size_t)
 SYCL_ADD_DEVICE_TRAIT(info::device::mem_base_addr_align,				cl_uint)
 
 SYCL_ADD_DEVICE_TRAIT(info::device::single_fp_config,					info::device_fp_config)
@@ -207,7 +207,7 @@ SYCL_ADD_DEVICE_TRAIT(info::device::local_mem_size,						cl_ulong)
 
 SYCL_ADD_DEVICE_TRAIT(info::device::error_correction_support,			cl_bool)
 SYCL_ADD_DEVICE_TRAIT(info::device::host_unified_memory,				cl_bool)
-SYCL_ADD_DEVICE_TRAIT(info::device::profiling_timer_resolution,			size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::profiling_timer_resolution,			::size_t)
 SYCL_ADD_DEVICE_TRAIT(info::device::endian_little,						cl_bool)
 SYCL_ADD_DEVICE_TRAIT(info::device::is_available,						cl_bool)
 SYCL_ADD_DEVICE_TRAIT(info::device::is_compiler_available,				cl_bool)
@@ -225,7 +225,7 @@ SYCL_ADD_DEVICE_TRAIT(info::device::device_version,						string_class)
 SYCL_ADD_DEVICE_TRAIT(info::device::opencl_version,						string_class)
 SYCL_ADD_DEVICE_TRAIT(info::device::extensions,							string_class)
 
-SYCL_ADD_DEVICE_TRAIT(info::device::printf_buffer_size,					size_t)
+SYCL_ADD_DEVICE_TRAIT(info::device::printf_buffer_size,					::size_t)
 SYCL_ADD_DEVICE_TRAIT(info::device::preferred_interop_user_sync,		cl_bool)
 SYCL_ADD_DEVICE_TRAIT(info::device::parent_device,						cl_device_id)
 SYCL_ADD_DEVICE_TRAIT(info::device::partition_max_sub_devices,			cl_uint)
@@ -258,13 +258,13 @@ SYCL_ADD_QUEUE_TRAIT(info::queue::properties,		info::queue_profiling)
 
 SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::type,						cl_mem_object_type)
 SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::flags,						cl_mem_flags)
-SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::size,						size_t)
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::size,						::size_t)
 SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::host_pointer,				void*)
 SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::map_count,					cl_uint)
 SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::reference_count,			cl_uint)
 SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::context,					cl_context)
 SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::associated_memory_object,	cl_mem)
-SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::offset,						size_t)
+SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::offset,						::size_t)
 
 #undef SYCL_ADD_BUFFER_TRAIT
 
@@ -300,9 +300,9 @@ SYCL_ADD_PROGRAM_TRAIT(info::program::devices,			vector_class<cl_device_id>)
 // Not part of the SYCL specification
 SYCL_ADD_PROGRAM_TRAIT(info::program::num_devices,		cl_uint)
 SYCL_ADD_PROGRAM_TRAIT(info::program::source,			string_class)
-SYCL_ADD_PROGRAM_TRAIT(info::program::binary_sizes,		vector_class<size_t>)
+SYCL_ADD_PROGRAM_TRAIT(info::program::binary_sizes,		vector_class<::size_t>)
 SYCL_ADD_PROGRAM_TRAIT(info::program::binaries,			vector_class<vector_class<unsigned char>>)
-SYCL_ADD_PROGRAM_TRAIT(info::program::num_kernels,		size_t)
+SYCL_ADD_PROGRAM_TRAIT(info::program::num_kernels,		::size_t)
 SYCL_ADD_PROGRAM_TRAIT(info::program::kernel_names,		string_class)
 
 #undef SYCL_ADD_PROGRAM_TRAIT
@@ -341,14 +341,14 @@ SYCL_ADD_EVENT_PROFILING_TRAIT(info::event_profiling::command_end,		cl_ulong)
 
 namespace detail {
 
-template <class Contained_, class EnumClass, EnumClass param, size_t BufferSize = traits<Contained_>::BUFFER_SIZE>
+template <class Contained_, class EnumClass, EnumClass param, ::size_t BufferSize = traits<Contained_>::BUFFER_SIZE>
 struct array_traits : traits<Contained_, BufferSize> {
 	using Base = array_traits<Contained_, EnumClass, param, BufferSize>;
 	using RealBase = traits<Contained_, BufferSize>;
 	using Contained = typename RealBase::Contained;
 	using return_t = typename std::conditional<BufferSize == 1, Contained, Contained*>::type;
 	Contained param_value[RealBase::BUFFER_SIZE];
-	size_t actual_size = 0;
+	::size_t actual_size = 0;
 
 	template <typename cl_input_t>
 	return_t get(cl_input_t data_ptr) {
@@ -365,7 +365,7 @@ struct array_traits : traits<Contained_, BufferSize> {
 };
 
 // Meant for scalar and string cases
-template <class EnumClass, EnumClass param, size_t BufferSize = traits<param_traits_t<EnumClass, param>>::BUFFER_SIZE>
+template <class EnumClass, EnumClass param, ::size_t BufferSize = traits<param_traits_t<EnumClass, param>>::BUFFER_SIZE>
 struct non_vector_traits
 	: array_traits<param_traits_t<EnumClass, param>, EnumClass, param, BufferSize> {};
 

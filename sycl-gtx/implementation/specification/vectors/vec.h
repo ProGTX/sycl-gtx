@@ -100,10 +100,10 @@ public:
 		return *reinterpret_cast<vec<dataT, numElements>*>(this);
 	}
 
-	size_t get_count() const {
+	::size_t get_count() const {
 		return numElements;
 	}
-	size_t get_size() const {
+	::size_t get_size() const {
 		return numElements * sizeof(typename cl_type<dataT, numElements>::type);
 	}
 

@@ -77,7 +77,7 @@ protected:
 		return base_acc_buffer::buf;
 	}
 
-	virtual size_t argument_size() const override {
+	virtual ::size_t argument_size() const override {
 		return sizeof(cl_mem);
 	}
 };

@@ -29,7 +29,7 @@ protected:
 
 	range<dimensions> allocationSize;
 
-	size_t access_buffer_range(int n) const {
+	::size_t access_buffer_range(int n) const {
 		return allocationSize.get(n);
 	}
 
@@ -37,7 +37,7 @@ protected:
 		return reinterpret_cast<void*>(this->get_count_id());
 	}
 
-	virtual size_t argument_size() const override {
+	virtual ::size_t argument_size() const override {
 		return data_size<DataType>::get() * allocationSize.size();
 	}
 

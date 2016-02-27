@@ -92,8 +92,8 @@ private:
 
 	template <int dimensions>
 	void enqueue_range(queue* q, const vector_class<cl_event>& wait_events, event* evnt, range<dimensions> num_work_items, id<dimensions> offset) const {
-		size_t* global_work_size = &num_work_items[0];
-		size_t* offst = &((size_t&)offset[0]);
+		::size_t* global_work_size = &num_work_items[0];
+		::size_t* offst = &((::size_t&)offset[0]);
 		auto ev = get_cl_event(evnt);
 
 		auto error_code = clEnqueueNDRangeKernel(
@@ -108,11 +108,11 @@ private:
 
 	template <int dimensions>
 	void enqueue_nd_range(queue* q, const vector_class<cl_event>& wait_events, event* evnt, nd_range<dimensions> execution_range) const {
-		size_t* local_work_size = &execution_range.get_local()[0];
-		size_t* offst = &((size_t&)execution_range.get_offset()[0]);
+		::size_t* local_work_size = &execution_range.get_local()[0];
+		::size_t* offst = &((::size_t&)execution_range.get_offset()[0]);
 
-		size_t global_work_size[dimensions];
-		size_t* start = &execution_range.get_global()[0];
+		::size_t global_work_size[dimensions];
+		::size_t* start = &execution_range.get_global()[0];
 		std::copy(start, start + dimensions, global_work_size);
 
 		// Adjust global work size

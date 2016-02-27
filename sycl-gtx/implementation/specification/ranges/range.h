@@ -12,27 +12,27 @@ struct range;
 
 template <>
 struct range<1> : detail::point<1> {
-	range(size_t x)
+	range(::size_t x)
 		: point<1>(x, 0, 0) {}
-	size_t size() const {
+	::size_t size() const {
 		return values[0];
 	}
 };
 
 template <>
 struct range<2> : detail::point<2> {
-	range(size_t x, size_t y)
+	range(::size_t x, ::size_t y)
 		: point<2>(x, y, 0) {}
-	size_t size() const {
+	::size_t size() const {
 		return values[0] * values[1];
 	}
 };
 
 template <>
 struct range<3> : detail::point<3> {
-	range(size_t x, size_t y, size_t z)
+	range(::size_t x, ::size_t y, ::size_t z)
 		: point<3>(x, y, z) {}
-	size_t size() const {
+	::size_t size() const {
 		return values[0] * values[1] * values[2];
 	}
 };

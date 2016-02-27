@@ -8,7 +8,7 @@ namespace cl {
 namespace sycl {
 namespace detail {
 
-template <bool is_const, typename data_basic_t = size_t, bool holds_pointer = true>
+template <bool is_const, typename data_basic_t = ::size_t, bool holds_pointer = true>
 struct point_ref : data_ref {
 protected:
 	template <bool, typename, bool>

@@ -109,7 +109,7 @@ namespace detail {
 
 // http://stackoverflow.com/a/3418285
 static bool string_replace_one(string_class& str, const string_class& from, const string_class& to) {
-	size_t start_pos = str.find(from);
+	::size_t start_pos = str.find(from);
 	if(start_pos == string_class::npos) {
 		return false;
 	}
@@ -177,7 +177,7 @@ SYCL_GET_TYPE_STRING(double)
 
 template <typename T>
 struct data_size {
-	static size_t get() {
+	static ::size_t get() {
 		return sizeof(T);
 	}
 };
