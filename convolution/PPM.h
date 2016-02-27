@@ -76,7 +76,17 @@ struct PPM {
 
 			data.emplace_back(r, g, b);
 		}
+	}
 
+	PPM(const vector<float>& internal, int width, int height)
+		: width(width), height(height)
+	{
+		int size = internal.size();
+		data.reserve((size / 4) * 3);
+
+		for(int i = 0; i < size; i += 4) {
+			data.emplace_back(internal[i], internal[i + 1], internal[i + 2]);
+		}
 	}
 
 	void store(string filename) const {
@@ -89,5 +99,17 @@ struct PPM {
 			fprintf(file, "%d %d %d\n", Pixel::toInt(p.r), Pixel::toInt(p.g), Pixel::toInt(p.b));
 		}
 		fclose(file);
+	}
+
+	vector<float> toInternal() const {
+		vector<float> internal;
+		internal.reserve(data.size() * 4);
+		for(auto& p : data) {
+			internal.push_back(p.r);
+			internal.push_back(p.g);
+			internal.push_back(p.b);
+			internal.push_back(0);
+		}
+		return internal;
 	}
 };
