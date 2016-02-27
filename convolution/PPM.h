@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+
 struct Pixel {
 	static const int levels = 255;
 	float r = 0;
@@ -13,6 +14,9 @@ struct Pixel {
 
 	Pixel(int r, int g, int b)
 		: r((float)r / levels), g((float)g / levels), b((float)b / levels) {}
+
+	Pixel(float r, float g, float b)
+		: r(r), g(g), b(b) {}
 
 	static int toInt(float value) {
 		return (int)(value * levels);
