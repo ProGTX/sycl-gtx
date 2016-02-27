@@ -32,9 +32,10 @@ struct PPM {
 	int height;
 	vector<Pixel> data;
 
-	static PPM load(string filename) {
+	PPM() {}
+
+	PPM(string filename) {
 		using namespace std;
-		auto image = PPM();
 
 		vector<string> lines;
 		int size;
@@ -44,12 +45,12 @@ struct PPM {
 			getline(file, line); // 1
 			getline(file, line); // 2
 			istringstream stream(line);
-			stream >> image.width >> image.height;
+			stream >> width >> height;
 			getline(file, line); // 3
 
-			size = image.width * image.height;
+			size = width * height;
 			lines.resize(size);
-			image.data.reserve(size);
+			data.reserve(size);
 
 			for(int i = 0; i < size; ++i) {
 				getline(file, lines[i]);
@@ -73,10 +74,9 @@ struct PPM {
 			g = fetch(line);
 			b = fetch(line);
 
-			image.data.emplace_back(r, g, b);
+			data.emplace_back(r, g, b);
 		}
 
-		return image;
 	}
 
 	void store(string filename) const {
