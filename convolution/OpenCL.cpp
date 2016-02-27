@@ -34,10 +34,8 @@ void OpenCL::global(
 	cl::Context context({ device });
 
 	cl::Program::Sources sources;
-	{
-		string kernel_code = read(filename);
-		sources.push_back({ kernel_code.c_str(), kernel_code.length() });
-	}
+	string kernel_code = read(filename);
+	sources.push_back({ kernel_code.c_str(), kernel_code.length() });
 
 	cl::Program program(context, sources);
 	if(program.build({ device }) != CL_SUCCESS) {
