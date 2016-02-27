@@ -137,6 +137,11 @@
     <ClInclude Include="PPM.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\sycl-gtx\sycl-gtx.vcxproj">
+      <Project>{e99f5dfc-113a-4bc3-8253-90a6ac0c9a9d}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
