@@ -123,10 +123,10 @@ public:
 		value_type* start = b.host_data.get();
 
 		if(dimensions == 1) {
-			start += (size_t)(baseIndex.get(0));
+			start += (::size_t)(baseIndex.get(0));
 		}
 		else if(dimensions == 2) {
-			start += (size_t)(baseIndex.get(1)) * (size_t)(rang.get(0)) + (size_t)(baseIndex.get(0));
+			start += (::size_t)(baseIndex.get(1)) * (::size_t)(rang.get(0)) + (::size_t)(baseIndex.get(0));
 		}
 		else if(dimensions == 3) {
 			// TODO
@@ -153,8 +153,8 @@ public:
 	}
 
 	// Total number of elements in the buffer
-	size_t get_count() const {
-		size_t count = rang.get(0);
+	::size_t get_count() const {
+		::size_t count = rang.get(0);
 		for(int i = 1; i < dimensions; ++i) {
 			count *= rang.get(i);
 		}
@@ -162,7 +162,7 @@ public:
 	}
 
 	// Total number of bytes in the buffer
-	size_t get_size() const {
+	::size_t get_size() const {
 		return get_count() * data_size<DataType>::get();
 	}
 
@@ -317,11 +317,11 @@ public:
 #else
 	using Base::Base;
 #endif
-	buffer(size_t sizeX, size_t sizeY)
+	buffer(::size_t sizeX, ::size_t sizeY)
 		: buffer(range<2>{ sizeX, sizeY }) {}
-	buffer(DataType* host_data, size_t sizeX, size_t sizeY)
+	buffer(DataType* host_data, ::size_t sizeX, ::size_t sizeY)
 		: buffer(host_data, { sizeX, sizeY }) {}
-	buffer(const DataType* host_data, size_t sizeX, size_t sizeY)
+	buffer(const DataType* host_data, ::size_t sizeX, ::size_t sizeY)
 		: buffer(host_data, { sizeX, sizeY }) {}
 };
 
@@ -336,11 +336,11 @@ public:
 #else
 	using Base::Base;
 #endif
-	buffer(size_t sizeX, size_t sizeY, size_t sizeZ)
+	buffer(::size_t sizeX, ::size_t sizeY, ::size_t sizeZ)
 		: buffer(range<3>{ sizeX, sizeY, sizeZ }) {}
-	buffer(DataType* host_data, size_t sizeX, size_t sizeY, size_t sizeZ)
+	buffer(DataType* host_data, ::size_t sizeX, ::size_t sizeY, ::size_t sizeZ)
 		: buffer(host_data, { sizeX, sizeY, sizeZ }) {}
-	buffer(const DataType* host_data, size_t sizeX, size_t sizeY, size_t sizeZ)
+	buffer(const DataType* host_data, ::size_t sizeX, ::size_t sizeY, ::size_t sizeZ)
 		: buffer(host_data, { sizeX, sizeY, sizeZ }) {}
 };
 

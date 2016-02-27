@@ -35,14 +35,14 @@ protected:
 
 	context ctx;
 	vector_class<device> devices;
-	std::map<size_t, shared_ptr_class<kernel>> kernels;
+	std::map<::size_t, shared_ptr_class<kernel>> kernels;
 
 	program(cl_program clProgram, const context& context, vector_class<device> deviceList);
 
 	void init_kernels();
 	vector_class<cl_program> get_program_pointers() const;
 
-	void compile(string_class compile_options, size_t kernel_name_id, shared_ptr_class<kernel> kern);
+	void compile(string_class compile_options, ::size_t kernel_name_id, shared_ptr_class<kernel> kern);
 	void report_compile_error(shared_ptr_class<kernel> kern, device& dev) const;
 
 	template <class KernelType>
@@ -139,7 +139,7 @@ private:
 
 			DoubleContainer ret;
 			static const auto inner_type_size = sizeof(Contained_);
-			size_t i = 0;
+			::size_t i = 0;
 			for(auto bin_size : binary_sizes) {
 				ret.emplace_back(this->param_value[i], this->param_value[i] + bin_size / inner_type_size);
 				++i;
@@ -156,7 +156,7 @@ public:
 
 	// TODO
 	vector_class<vector_class<unsigned char>> get_binaries() const;
-	vector_class<size_t> get_binary_sizes() const;
+	vector_class<::size_t> get_binary_sizes() const;
 	vector_class<device> get_devices() const;
 	string_class get_build_options() const;
 

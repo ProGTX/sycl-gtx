@@ -18,15 +18,15 @@ struct point_names {
 
 
 #define SYCL_POINT_OP_EQ(lhs, op)				\
-	for(size_t i = 0; i < dimensions; ++i) {	\
+	for(::size_t i = 0; i < dimensions; ++i) {	\
 		lhs values[i] op rhs.values[i];			\
 	}
 
-template <size_t dimensions>
+template <::size_t dimensions>
 struct point : data_ref {
 protected:
 	friend class data_ref;
-	template <size_t>
+	template <::size_t>
 	friend struct point;
 
 	template <int>
@@ -55,7 +55,7 @@ protected:
 		return name;
 	}
 
-	size_t values[dimensions];
+	::size_t values[dimensions];
 
 	void set(type_t type_) {
 		type = type_;
@@ -67,8 +67,8 @@ protected:
 		SYCL_POINT_OP_EQ(this->, =);
 	}
 
-	void set(size_t value) {
-		for(size_t i = 0; i < dimensions; ++i) {
+	void set(::size_t value) {
+		for(::size_t i = 0; i < dimensions; ++i) {
 			values[i] = value;
 		}
 	}
@@ -85,7 +85,7 @@ protected:
 		}
 	}
 
-	point(size_t x, size_t y, size_t z)
+	point(::size_t x, ::size_t y, ::size_t z)
 		: data_ref("") {
 		type = type_t::numeric;
 		values[0] = x;
@@ -96,7 +96,7 @@ protected:
 			}
 		}
 		else {
-			name = get_string<size_t>::get(x);
+			name = get_string<::size_t>::get(x);
 		}
 	}
 
@@ -127,7 +127,7 @@ public:
 		if(type == type_t::numeric && rhs.type == type_t::numeric) {	\
 			SYCL_POINT_OP_EQ(this->, OP);								\
 			if(dimensions == 1) {										\
-				name = get_string<size_t>::get(values[0]);				\
+				name = get_string<::size_t>::get(values[0]);				\
 			}															\
 		}																\
 		else {															\
@@ -165,10 +165,10 @@ private:
 		auto name_ = name;
 
 		if(is_identifier()) {
-			name_ += get_string<size_t>::get(dimension);
+			name_ += get_string<::size_t>::get(dimension);
 		}
 		else if(type == type_t::numeric && name.empty()) {
-			name_ = get_string<size_t>::get(values[dimension]);
+			name_ = get_string<::size_t>::get(values[dimension]);
 		}
 		
 		return point_ref<is_const>(values[dimension], name_, type);

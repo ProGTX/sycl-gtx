@@ -57,7 +57,7 @@ struct subscript_helper<1, DataType, dimensions, mode, target> {
 
 #define SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(prefix)	\
 	SYCL_DEVICE_REF_SUBSCRIPT_OP(prefix, data_ref);	\
-	SYCL_DEVICE_REF_SUBSCRIPT_OP(prefix, size_t);
+	SYCL_DEVICE_REF_SUBSCRIPT_OP(prefix, ::size_t);
 
 template <int level, typename DataType, int dimensions, access::mode mode, access::target target>
 class accessor_device_ref {

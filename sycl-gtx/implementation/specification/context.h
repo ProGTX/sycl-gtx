@@ -91,7 +91,7 @@ public:
 	vector_class<device> get_devices() const;
 
 private:
-	template <class Contained_, info::context param, size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
+	template <class Contained_, info::context param, ::size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
 	struct array_traits : detail::array_traits<Contained_, info::context, param, BufferSize> {
 		void get_info(const context* ctx) {
 			this->Base::get(ctx->ctx.get());

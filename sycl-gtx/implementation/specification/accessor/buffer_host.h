@@ -21,8 +21,8 @@ namespace detail {
 	template <int, typename, int, access::mode>								\
 	friend class accessor_host_ref;											\
 	const acc_t* parent;													\
-	std::array<size_t, 3> rang;												\
-	accessor_host_ref(const acc_t* parent, std::array<size_t, 3> rang)		\
+	std::array<::size_t, 3> rang;												\
+	accessor_host_ref(const acc_t* parent, std::array<::size_t, 3> rang)		\
 		: parent(parent), rang(rang) {}										\
 	accessor_host_ref(const acc_t* parent, const accessor_host_ref& copy)	\
 		: parent(parent), rang(copy.rang) {}								\
@@ -78,7 +78,7 @@ public:
 		range<dimensions> offset,
 		range<dimensions> range
 	)	:	base_acc_buffer(bufferRef, nullptr, offset, range),
-			base_acc_host_ref(this, std::array<size_t, 3> { 0, 0, 0 })
+			base_acc_host_ref(this, std::array<::size_t, 3> { 0, 0, 0 })
 	{
 		synchronizer::add(this, base_acc_buffer::buf);
 	}

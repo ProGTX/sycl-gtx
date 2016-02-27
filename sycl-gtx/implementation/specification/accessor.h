@@ -27,7 +27,7 @@ public:
 	using const_reference = const value_type&;
 
 	// Returns the size of the underlying buffer in number of elements.
-	size_t get_size() const;
+	::size_t get_size() const;
 
 	// Returns the cl_mem object corresponding to the access.
 	// TODO: Only available when target is cl_image or cl_buffer
@@ -46,7 +46,7 @@ protected:
 		return nullptr;
 	}
 
-	virtual size_t argument_size() const {
+	virtual ::size_t argument_size() const {
 		return 0;
 	}
 };

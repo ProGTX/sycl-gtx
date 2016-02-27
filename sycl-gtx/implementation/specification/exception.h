@@ -75,11 +75,11 @@ public:
 	using value_type = exception_ptr;
 	using reference = value_type&;
 	using const_reference = const value_type&;
-	using size_type = size_t;
+	using size_type = ::size_t;
 	using iterator = list_t::const_iterator; // TODO: non const
 	using const_iterator = list_t::const_iterator;
 
-	size_t size() const {
+	::size_t size() const {
 		return list.size();
 	}
 

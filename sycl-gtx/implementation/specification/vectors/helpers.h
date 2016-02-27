@@ -18,7 +18,7 @@ namespace detail {
 
 template <typename dataT, int numElements>
 struct data_size<vec<dataT, numElements>> {
-	static size_t get() {
+	static ::size_t get() {
 		return sizeof(typename base_host_data<vec<dataT, numElements>>::type);
 	}
 };
