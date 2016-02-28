@@ -23,8 +23,8 @@ string OpenCL::read(string filename) {
 }
 
 void OpenCL::global(
-	int numInvocations, cl_device_id dev, string filename,
-	int dataSize, int filterSize,
+	int numInvocations, cl_device_id dev, string filename, string compileOptions,
+	int dataSize, int filterDataSize,
 	const float* input, float* output, const float* filter
 ) {
 	using namespace std;
@@ -38,7 +38,7 @@ void OpenCL::global(
 	sources.push_back({ kernel_code.c_str(), kernel_code.length() });
 
 	cl::Program program(context, sources);
-	if(program.build({ device }) != CL_SUCCESS) {
+	if(program.build({ device }, compileOptions.c_str()) != CL_SUCCESS) {
 		auto log = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device, &error);
 		cerr << "Error building:" << endl << log << endl;
 		throw runtime_error(string("Error building: ") + to_string(error));
