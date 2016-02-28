@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -22,6 +23,7 @@ struct Pixel {
 };
 
 struct PPM {
+	using ifstream = std::ifstream;
 	using string = std::string;
 	template <class T>
 	using vector = std::vector<T>;
@@ -30,7 +32,11 @@ struct PPM {
 	int height;
 	vector<Pixel> data;
 
+private:
+	void P3(ifstream& file);
+	void P6(ifstream& file);
 
+public:
 	PPM() {}
 	PPM(string filename);
 	PPM(const vector<float>& internal, int width, int height);

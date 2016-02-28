@@ -1,31 +1,20 @@
 #include "PPM.h"
 
-#include <fstream>
 #include <sstream>
-
 
 using namespace std;
 
 
-PPM::PPM(string filename) {
+void PPM::P3(ifstream& file) {
 	vector<string> lines;
 	int size;
-	{
-		auto file = ifstream(filename);
-		string line;
-		getline(file, line); // 1
-		getline(file, line); // 2
-		istringstream stream(line);
-		stream >> width >> height;
-		getline(file, line); // 3
 
-		size = width * height;
-		lines.resize(size);
-		data.reserve(size);
+	size = width * height;
+	lines.resize(size);
+	data.reserve(size);
 
-		for(int i = 0; i < size; ++i) {
-			getline(file, lines[i]);
-		}
+	for(int i = 0; i < size; ++i) {
+		getline(file, lines[i]);
 	}
 
 	size_t previous;
@@ -46,6 +35,37 @@ PPM::PPM(string filename) {
 		b = fetch(line);
 
 		data.emplace_back(r, g, b);
+	}
+}
+
+void PPM::P6(ifstream& file) {
+}
+
+PPM::PPM(string filename) {
+	auto file = ifstream(filename);
+	string line;
+
+	auto tryGetLine = [&]() {
+		do {
+			getline(file, line); // 1
+		}
+		while(line[0] == '#');
+	};
+
+	tryGetLine(); // Format
+	bool isBinary = line.find("P6") != string::npos;
+
+	tryGetLine(); // Width and height
+	istringstream stream(line);
+	stream >> width >> height;
+
+	tryGetLine(); // Levels, ignore
+
+	if(isBinary) {
+		P6(file);
+	}
+	else {
+		P3(file);
 	}
 }
 
