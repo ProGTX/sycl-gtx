@@ -208,13 +208,25 @@ void OpenCL::common(
 	checkError(error);
 	error = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void*)&bufFilter);
 	checkError(error);
-	size_t global_work_size[] = {
-		width, height
-	};
+
+	size_t localWorkSize[] = { 16, 16 };
+	size_t globalWorkSize[] = { width, height };
+
+	if(isLocal) {
+		auto localMemSize =
+			(localWorkSize[0] + 2 * (filterSize / 2)) *
+			(localWorkSize[1] + 2 * (filterSize / 2));
+		localMemSize *= 4 * sizeof(float);
+
+		error = clSetKernelArg(kernel, 3, localMemSize, nullptr);
+		checkError(error);
+	}
 
 	for(int i = 0; i < numInvocations; ++i) {
 		error = clEnqueueNDRangeKernel(
-			queue, kernel, 2, nullptr, global_work_size, nullptr, 0, nullptr, nullptr
+			queue, kernel, 2,
+			nullptr, globalWorkSize, (isLocal ? localWorkSize : nullptr),
+			0, nullptr, nullptr
 		);
 		checkError(error);
 		error = clFinish(queue);
