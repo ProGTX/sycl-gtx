@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <vector>
+
 
 
 using namespace std;
@@ -118,46 +120,67 @@ void OpenCL::global(
 	using namespace std;
 	cl_int error;
 
-	cl::Device device(dev);
-	cl::Context context({ device });
+	auto context = clCreateContext(nullptr, 1, &dev, nullptr, nullptr, &error);
 
-	cl::Program::Sources sources;
-	string kernel_code = read(filename);
-	sources.push_back({ kernel_code.c_str(), kernel_code.length() });
+	string kernelCode = read(filename);
 
-	cl::Program program(context, sources, &error);
+	auto codePtr = kernelCode.c_str();
+	auto codeLength = kernelCode.length();
+	auto program = clCreateProgramWithSource(context, 1, &codePtr, &codeLength, &error);
 	checkError(error);
-	if(program.build({ device }, compileOptions.c_str()) != CL_SUCCESS) {
-		auto log = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device, &error);
-		cerr << "Error building:" << endl << log << endl;
+
+	error = clBuildProgram(program, 1, &dev, compileOptions.c_str(), nullptr, nullptr);
+	if(error != CL_SUCCESS) {
+		size_t length;
+		error = clGetProgramBuildInfo(program, dev, CL_PROGRAM_BUILD_LOG, 0, nullptr, &length);
+		checkError(error);
+
+		auto log = vector<char>(length);
+		error = clGetProgramBuildInfo(program, dev, CL_PROGRAM_BUILD_LOG, length, log.data(), nullptr);
+		cerr << "Error building:" << endl << string(log.data()) << endl;
 		checkError(error);
 	}
 
-	cl::Buffer bufInput(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * dataSize, (void*)input, &error);
+	auto bufInput = clCreateBuffer(
+		context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * dataSize, (void*)input, &error
+	);
 	checkError(error);
-	cl::Buffer bufOutput(context, CL_MEM_WRITE_ONLY, sizeof(float) * dataSize, &error);
+	auto bufOutput = clCreateBuffer(
+		context, CL_MEM_WRITE_ONLY, sizeof(float) * dataSize, nullptr, &error
+	);
 	checkError(error);
-	cl::Buffer bufFilter(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * filterDataSize, (void*)filter, &error);
+	auto bufFilter = clCreateBuffer(
+		context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * filterDataSize, (void*)filter, &error
+	);
 	checkError(error);
 
-	cl::CommandQueue queue(context, device, 0, &error);
+	auto queue = clCreateCommandQueue(context, dev, 0, &error);
 	checkError(error);
 
-	cl::Kernel convolution = cl::Kernel(program, "convolute", &error);
+	auto kernel = clCreateKernel(program, "convolute", &error);
 	checkError(error);
-	error = convolution.setArg(0, bufInput());
+
+	error = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void*)&bufInput);
 	checkError(error);
-	error = convolution.setArg(1, bufOutput());
+	error = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void*)&bufOutput);
 	checkError(error);
-	error = convolution.setArg(2, bufFilter());
+	error = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void*)&bufFilter);
 	checkError(error);
+	size_t global_work_size[] = {
+		width, height
+	};
+
 	for(int i = 0; i < numInvocations; ++i) {
-		error = queue.enqueueNDRangeKernel(convolution, cl::NullRange, cl::NDRange(width, height));
+		error = clEnqueueNDRangeKernel(
+			queue, kernel, 2, nullptr, global_work_size, nullptr, 0, nullptr, nullptr
+		);
 		checkError(error);
-		error = queue.finish();
+		error = clFinish(queue);
 		checkError(error);
 	}
 
-	error = queue.enqueueReadBuffer(bufOutput, CL_TRUE, 0, sizeof(float) * dataSize, output);
+	error = clEnqueueReadBuffer(
+		queue, bufOutput, CL_TRUE, 0, sizeof(float) * dataSize, output, 0, nullptr, nullptr
+	);
 	checkError(error);
 }
