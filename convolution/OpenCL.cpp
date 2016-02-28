@@ -112,9 +112,9 @@ void OpenCL::checkError(cl_int error) {
 }
 
 void OpenCL::global(
-	int numInvocations, cl_device_id dev, string filename, string compileOptions,
+	int numInvocations, cl_device_id dev, string filename,
 	int width, int height,
-	int dataSize, int filterDataSize,
+	int dataSize, int filterSize, int filterDataSize,
 	const float* input, float* output, const float* filter
 ) {
 	using namespace std;
@@ -129,7 +129,16 @@ void OpenCL::global(
 	auto program = clCreateProgramWithSource(context, 1, &codePtr, &codeLength, &error);
 	checkError(error);
 
-	error = clBuildProgram(program, 1, &dev, compileOptions.c_str(), nullptr, nullptr);
+	char compileOptions[1024];
+	sprintf(
+		compileOptions,
+		"-D IMAGE_W=%d -D IMAGE_H=%d -D FILTER_SIZE=%d "
+		"-D HALF_FILTER_SIZE=%d -D TWICE_HALF_FILTER_SIZE=%d -D HALF_FILTER_SIZE_IMAGE_W=%d",
+		width, height, filterSize,
+		filterSize / 2, (filterSize / 2) * 2, (filterSize / 2) * width
+	);
+
+	error = clBuildProgram(program, 1, &dev, compileOptions, nullptr, nullptr);
 	if(error != CL_SUCCESS) {
 		size_t length;
 		error = clGetProgramBuildInfo(program, dev, CL_PROGRAM_BUILD_LOG, 0, nullptr, &length);

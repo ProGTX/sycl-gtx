@@ -14,9 +14,9 @@ struct OpenCL {
 	static void checkError(cl_int error);
 
 	static void global(
-		int numInvocations, cl_device_id dev, string filename, string compileOptions,
+		int numInvocations, cl_device_id dev, string filename,
 		int width, int height,
-		int dataSize, int filterDataSize,
+		int dataSize, int filterSize, int filterDataSize,
 		const float* input, float* output, const float* filter
 	);
 };
