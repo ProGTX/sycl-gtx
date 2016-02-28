@@ -111,6 +111,7 @@ void OpenCL::checkError(cl_int error) {
 
 void OpenCL::global(
 	int numInvocations, cl_device_id dev, string filename, string compileOptions,
+	int width, int height,
 	int dataSize, int filterDataSize,
 	const float* input, float* output, const float* filter
 ) {
@@ -148,7 +149,7 @@ void OpenCL::global(
 	convolution.setArg(1, output);
 	convolution.setArg(2, filter);
 	for(int i = 0; i < numInvocations; ++i) {
-		error = queue.enqueueNDRangeKernel(convolution, cl::NullRange, cl::NDRange(dataSize), cl::NullRange);
+		error = queue.enqueueNDRangeKernel(convolution, cl::NullRange, cl::NDRange(width, height));
 		checkError(error);
 		error = queue.finish();
 		checkError(error);
