@@ -16,7 +16,7 @@ string OpenCL::read(string filename) {
 
 	while(file.good()) {
 		getline(file, line);
-		stream << line;
+		stream << line << endl;
 	}
 
 	return stream.str();
