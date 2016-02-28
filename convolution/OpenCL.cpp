@@ -44,14 +44,11 @@ void OpenCL::global(
 		throw runtime_error(string("Error building: ") + to_string(error));
 	}
 
-	cl::Buffer bufInput(context, CL_MEM_READ_ONLY, sizeof(float) * dataSize);
-	cl::Buffer bufOutput(context, CL_MEM_WRITE_ONLY, sizeof(float) * dataSize);
-	cl::Buffer bufFilter(context, CL_MEM_READ_ONLY, sizeof(float) * filterSize);
+	cl::Buffer bufInput(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * dataSize, (void*)input, &error);
+	cl::Buffer bufOutput(context, CL_MEM_WRITE_ONLY, sizeof(float) * dataSize, &error);
+	cl::Buffer bufFilter(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * filterDataSize, (void*)filter, &error);
 
 	cl::CommandQueue queue(context, device);
-
-	queue.enqueueWriteBuffer(bufFilter, CL_FALSE, 0, sizeof(float) * filterSize, filter);
-	queue.enqueueWriteBuffer(bufInput, CL_TRUE, 0, sizeof(float) * dataSize, input);
 
 	cl::Kernel convolution = cl::Kernel(program, "convolute");
 	convolution.setArg(0, input);
