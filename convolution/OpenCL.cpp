@@ -145,9 +145,12 @@ void OpenCL::global(
 
 	cl::Kernel convolution = cl::Kernel(program, "convolute", &error);
 	checkError(error);
-	convolution.setArg(0, input);
-	convolution.setArg(1, output);
-	convolution.setArg(2, filter);
+	error = convolution.setArg(0, bufInput());
+	checkError(error);
+	error = convolution.setArg(1, bufOutput());
+	checkError(error);
+	error = convolution.setArg(2, bufFilter());
+	checkError(error);
 	for(int i = 0; i < numInvocations; ++i) {
 		error = queue.enqueueNDRangeKernel(convolution, cl::NullRange, cl::NDRange(width, height));
 		checkError(error);
