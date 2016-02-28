@@ -117,6 +117,37 @@ void OpenCL::global(
 	int dataSize, int filterSize, int filterDataSize,
 	const float* input, float* output, const float* filter
 ) {
+	common(
+		numInvocations, dev, filename,
+		width, height,
+		dataSize, filterSize, filterDataSize,
+		input, output, filter,
+		false
+	);
+}
+
+void OpenCL::local(
+	int numInvocations, cl_device_id dev, string filename,
+	int width, int height,
+	int dataSize, int filterSize, int filterDataSize,
+	const float* input, float* output, const float* filter
+) {
+	common(
+		numInvocations, dev, filename,
+		width, height,
+		dataSize, filterSize, filterDataSize,
+		input, output, filter,
+		true
+	);
+}
+
+void OpenCL::common(
+	int numInvocations, cl_device_id dev, string filename,
+	int width, int height,
+	int dataSize, int filterSize, int filterDataSize,
+	const float* input, float* output, const float* filter,
+	bool isLocal
+) {
 	using namespace std;
 	cl_int error;
 
