@@ -126,6 +126,7 @@
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenCL.cpp" />
+    <ClCompile Include="PPM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="global_opt.cl" />
