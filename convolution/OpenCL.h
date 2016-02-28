@@ -10,6 +10,9 @@ struct OpenCL {
 
 	static string read(string filename);
 
+	static const char* getErrorString(cl_int error);
+	static void checkError(cl_int error);
+
 	static void global(
 		int numInvocations, cl_device_id dev, string filename, string compileOptions,
 		int dataSize, int filterDataSize,
