@@ -102,6 +102,7 @@ const char* OpenCL::getErrorString(cl_int error) {
 }
 
 void OpenCL::checkError(cl_int error) {
+#ifdef _DEBUG
 	using namespace std;
 	if(error != CL_SUCCESS) {
 		stringstream message;
@@ -109,6 +110,7 @@ void OpenCL::checkError(cl_int error) {
 		cerr << message.str() << endl;
 		throw runtime_error(message.str());
 	}
+#endif
 }
 
 void OpenCL::global(
