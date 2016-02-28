@@ -14,14 +14,14 @@ struct OpenCL {
 	static void checkError(cl_int error);
 
 	static void global(
-		int numInvocations, cl_device_id dev, string filename,
+		int numInvocations, cl_device_id dev,
 		int width, int height,
 		int dataSize, int filterSize, int filterDataSize,
 		const float* input, float* output, const float* filter
 	);
 
 	static void local(
-		int numInvocations, cl_device_id dev, string filename,
+		int numInvocations, cl_device_id dev,
 		int width, int height,
 		int dataSize, int filterSize, int filterDataSize,
 		const float* input, float* output, const float* filter

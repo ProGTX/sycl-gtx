@@ -114,13 +114,13 @@ void OpenCL::checkError(cl_int error) {
 }
 
 void OpenCL::global(
-	int numInvocations, cl_device_id dev, string filename,
+	int numInvocations, cl_device_id dev,
 	int width, int height,
 	int dataSize, int filterSize, int filterDataSize,
 	const float* input, float* output, const float* filter
 ) {
 	common(
-		numInvocations, dev, filename,
+		numInvocations, dev, "global_opt.cl",
 		width, height,
 		dataSize, filterSize, filterDataSize,
 		input, output, filter,
@@ -129,13 +129,13 @@ void OpenCL::global(
 }
 
 void OpenCL::local(
-	int numInvocations, cl_device_id dev, string filename,
+	int numInvocations, cl_device_id dev,
 	int width, int height,
 	int dataSize, int filterSize, int filterDataSize,
 	const float* input, float* output, const float* filter
 ) {
 	common(
-		numInvocations, dev, filename,
+		numInvocations, dev, "local_opt.cl",
 		width, height,
 		dataSize, filterSize, filterDataSize,
 		input, output, filter,
