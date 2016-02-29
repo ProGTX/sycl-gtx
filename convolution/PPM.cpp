@@ -1,17 +1,14 @@
 #include "PPM.h"
 
 #include <sstream>
+#include <streambuf>
 
 using namespace std;
 
 
-void PPM::P3(ifstream& file) {
+void PPM::P3(ifstream& file, int size) {
 	vector<string> lines;
-	int size;
-
-	size = width * height;
 	lines.resize(size);
-	data.reserve(size);
 
 	for(int i = 0; i < size; ++i) {
 		getline(file, lines[i]);
@@ -38,22 +35,40 @@ void PPM::P3(ifstream& file) {
 	}
 }
 
-void PPM::P6(ifstream& file) {
+void PPM::P6(string filename, int size, int start) {
+	size *= 3;
+	vector<char> input;
+	input.resize(size);
+
+	// http://codereview.stackexchange.com/a/22907
+	auto file = ifstream(filename, ios::binary);
+	file.seekg(start, ios::beg);
+	file.read(input.data(), size);
+
+	int r, g, b;
+	for(int i = 0; i < size; i += 3) {
+		r = (int)input[i];
+		g = (int)input[i + 1];
+		b = (int)input[i + 2];
+		data.emplace_back(r, g, b);
+	}
 }
 
 PPM::PPM(string filename) {
 	auto file = ifstream(filename);
 	string line;
+	int offset = 0;
 
 	auto tryGetLine = [&]() {
 		do {
-			getline(file, line); // 1
+			getline(file, line);
+			offset += line.length() + 1; // +1 for the eaten newline
 		}
 		while(line[0] == '#');
 	};
 
 	tryGetLine(); // Format
-	bool isBinary = line.find("P6") != string::npos;
+	isBinary = line.find("P6") != string::npos;
 
 	tryGetLine(); // Width and height
 	istringstream stream(line);
@@ -61,11 +76,14 @@ PPM::PPM(string filename) {
 
 	tryGetLine(); // Levels, ignore
 
+	auto size = width * height;
+	data.reserve(size);
+
 	if(isBinary) {
-		P6(file);
+		P6(filename, size, offset);
 	}
 	else {
-		P3(file);
+		P3(file, size);
 	}
 }
 

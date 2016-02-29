@@ -33,8 +33,10 @@ struct PPM {
 	vector<Pixel> data;
 
 private:
-	void P3(ifstream& file);
-	void P6(ifstream& file);
+	bool isBinary;
+
+	void P3(ifstream& file, int size);
+	void P6(string filename, int size, int start);
 
 public:
 	PPM() {}
