@@ -98,13 +98,57 @@ PPM::PPM(const vector<float>& internal, int width, int height)
 }
 
 void PPM::store(string filename) const {
-	FILE* file = fopen(filename.c_str(), "w");
-	fprintf(file, "P3\n%d %d\n%d\n", width, height, 255);
-	for(int i = 0; i < width*height; ++i) {
-		auto& p = data[i];
-		fprintf(file, "%d %d %d\n", Pixel::toInt(p.r), Pixel::toInt(p.g), Pixel::toInt(p.b));
+	int size = width * height;
+	vector<char> output;
+
+	// Estimation for non binary: three colors, each color at most three digits plus a space
+	static const int maxLine = 3 * 4;
+
+	{
+		stringstream headerStream;
+		headerStream << 'P' << (isBinary ? 6 : 3) << '\n' << width << ' ' << height << "\n255\n";
+		auto header = headerStream.str();
+		output.insert(output.end(), header.begin(), header.end());
 	}
-	fclose(file);
+	int offset = output.size();
+
+	if(isBinary) {
+		output.reserve(size * 3 + offset);
+	}
+	else {
+		output.reserve(size * maxLine + offset);
+	}
+
+	char temp[maxLine + 1]; // +1 for zero termination
+	auto tempLength = [&temp]() {
+		int i = 0;
+		while(temp[i] != 0) {
+			++i;
+		}
+		return i;
+	};
+
+	int r, g, b;
+	for(int i = 0; i < size; ++i) {
+		auto& p = data[i];
+
+		r = Pixel::toInt(p.r);
+		g = Pixel::toInt(p.g);
+		b = Pixel::toInt(p.b);
+
+		if(isBinary) {
+			output.push_back(r);
+			output.push_back(g);
+			output.push_back(b);
+		}
+		else {
+			sprintf(temp, "%d %d %d\n", r, g, b);
+			output.insert(output.end(), temp, temp + tempLength());
+		}
+	}
+
+	auto file = ofstream(filename, ios::binary);
+	file.write(output.data(), output.size());
 }
 
 vector<float> PPM::toInternal() const {
