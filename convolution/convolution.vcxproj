@@ -127,6 +127,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenCL.cpp" />
     <ClCompile Include="PPM.cpp" />
+    <ClCompile Include="Sycl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="global_opt.cl" />
@@ -136,6 +137,7 @@
     <ClInclude Include="Filter.h" />
     <ClInclude Include="OpenCL.h" />
     <ClInclude Include="PPM.h" />
+    <ClInclude Include="Sycl.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
