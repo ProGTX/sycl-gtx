@@ -88,7 +88,7 @@ public:
 	// unless there is another final data address given after construction of the buffer.
 	// The default value of the allocator is going to be the buffer_allocator which will be of type DataType.
 	buffer_(const DataType* hostData, range<dimensions> range)
-		: buffer_(hostData, range, true) {}
+		: buffer_(const_cast<DataType*>(hostData), range, true) {}
 
 	// Create a new buffer of the given size with storage managed by the SYCL runtime.
 	// The default behavior is to use the default host buffer allocator,
