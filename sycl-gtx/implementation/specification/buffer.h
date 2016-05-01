@@ -40,15 +40,16 @@ class command_group;
 #undef SYCL_ADD_ACCESS_MODE_HELPER
 
 
-template <typename DataType, int dimensions>
+template <typename DataType_, int dimensions>
 class buffer_ : public buffer_base {
 public:
-	using value_type = typename base_host_data<DataType>::type;
+	using value_type = typename base_host_data<DataType_>::type;
 	using reference = value_type&;
 	using const_reference = const value_type&;
 
 protected:
-	using ptr_t = shared_ptr_class<value_type>;
+	using DataType = value_type;
+	using ptr_t = shared_ptr_class<DataType>;
 
 	range<dimensions> rang;
 	ptr_t host_data;
@@ -58,12 +59,11 @@ protected:
 	bool is_initialized = false;
 
 	friend class accessor_base;
-	friend class accessor_buffer<DataType, dimensions>;
+	friend class accessor_buffer<DataType_, dimensions>;
 	friend class kernel_::source;
 
 	// Associated host memory.
-	// TODO: What if DataType and value_type differ?
-	buffer_(DataType* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
+	buffer_(value_type* host_data, range<dimensions> range, bool is_read_only, bool is_blocking = true)
 		:	host_data(ptr_t(host_data, [](value_type* ptr) {})),
 			rang(range),
 			is_read_only(is_read_only),
@@ -88,7 +88,7 @@ public:
 	// unless there is another final data address given after construction of the buffer.
 	// The default value of the allocator is going to be the buffer_allocator which will be of type DataType.
 	buffer_(const DataType* hostData, range<dimensions> range)
-		: buffer_(hostData, range, true) {}
+		: buffer_(const_cast<DataType*>(hostData), range, true) {}
 
 	// Create a new buffer of the given size with storage managed by the SYCL runtime.
 	// The default behavior is to use the default host buffer allocator,
@@ -96,7 +96,7 @@ public:
 	// If the type of the buffer has the const qualifier,
 	// then the default allocator will remove the qualifier to allow host access to the data.
 	buffer_(const range<dimensions>& range)
-		:	host_data(ptr_t(new value_type[ range.size() ])),
+		:	host_data(ptr_t(new DataType[ range.size() ])),
 			rang(range),
 			is_read_only(false),
 			is_blocking(false) {}
@@ -120,7 +120,7 @@ public:
 	// subRange specifies the size of the sub-buffer.
 	buffer_(buffer_& b, const id<dimensions>& baseIndex, const range<dimensions>& subRange)
 		: rang(subRange), is_read_only(b.is_read_only), is_blocking(b.is_blocking) {
-		value_type* start = b.host_data.get();
+		DataType* start = b.host_data.get();
 
 		if(dimensions == 1) {
 			start += (::size_t)(baseIndex.get(0));
@@ -132,7 +132,7 @@ public:
 			// TODO
 		}
 
-		host_data = ptr_t(start, [](value_type* ptr) {});
+		host_data = ptr_t(start, [](DataType* ptr) {});
 	}
 
 	// Creates a buffer from an existing OpenCL memory object associated to a context
@@ -163,7 +163,7 @@ public:
 
 	// Total number of bytes in the buffer
 	::size_t get_size() const {
-		return get_count() * data_size<DataType>::get();
+		return get_count() * data_size<DataType_>::get();
 	}
 
 private:
@@ -193,7 +193,7 @@ private:
 	}
 
 	template <access::mode mode, access::target target>
-	using acc_return_t = accessor<DataType, dimensions, mode, target>;
+	using acc_return_t = accessor<DataType_, dimensions, mode, target>;
 
 	template <access::mode mode, access::target target>
 	acc_return_t<mode, target> get_access_device(handler& cgh) {
@@ -204,7 +204,7 @@ private:
 		init();
 		command::group_::add_buffer_access(buffer_access{ this, mode, target }, __func__);
 		return acc_return_t<mode, target>(
-			*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this)), cgh
+			*(reinterpret_cast<cl::sycl::buffer<DataType_, dimensions>*>(this)), cgh
 		);
 	}
 
@@ -214,18 +214,18 @@ private:
 			check_read_only();
 		}
 		return acc_return_t<mode, target>(
-			*(reinterpret_cast<cl::sycl::buffer<DataType, dimensions>*>(this))
+			*(reinterpret_cast<cl::sycl::buffer<DataType_, dimensions>*>(this))
 		);
 	}
 
 public:
 	template <access::mode mode, access::target target = access::target::global_buffer>
-	accessor<DataType, dimensions, mode, target> get_access(handler& cgh) {
+	accessor<DataType_, dimensions, mode, target> get_access(handler& cgh) {
 		return get_access_device<mode, target>(cgh);
 	}
 
 	template <access::mode mode, access::target target>
-	accessor<DataType, dimensions, mode, target> get_access() {
+	accessor<DataType_, dimensions, mode, target> get_access() {
 		return get_access_host<mode, target>();
 	}
 
@@ -257,7 +257,7 @@ protected:
 	}
 
 public:
-	void set_final_data(weak_ptr_class<DataType>& finalData);
+	void set_final_data(weak_ptr_class<DataType_>& finalData);
 };
 
 } // namespace detail
@@ -280,10 +280,11 @@ public:
 		: Base(mem_object, from_queue, available_event) {}
 #endif
 
-template <typename DataType>
-struct buffer<DataType, 1> : public detail::buffer_<DataType, 1> {
+template <typename DataType_>
+struct buffer<DataType_, 1> : public detail::buffer_<DataType_, 1> {
 private:
-	using Base = detail::buffer_<DataType, 1>;
+	using Base = detail::buffer_<DataType_, 1>;
+	using DataType = typename Base::value_type;
 
 public:
 #if MSVC_LOW
@@ -291,6 +292,7 @@ public:
 #else
 	using Base::Base;
 #endif
+
 	// Create a new allocated 1D buffer initialized from the given elements
 	// ranging from first up to one before last
 	template <class InputIterator>
@@ -306,10 +308,11 @@ public:
 		: Base(host_data.data(), host_data.size()) {}
 };
 
-template <typename DataType>
-struct buffer<DataType, 2> : public detail::buffer_<DataType, 2> {
+template <typename DataType_>
+struct buffer<DataType_, 2> : public detail::buffer_<DataType_, 2> {
 private:
-	using Base = detail::buffer_<DataType, 2>;
+	using Base = detail::buffer_<DataType_, 2>;
+	using DataType = typename Base::value_type;
 
 public:
 #if MSVC_LOW
@@ -325,10 +328,11 @@ public:
 		: buffer(host_data, { sizeX, sizeY }) {}
 };
 
-template <typename DataType>
-struct buffer<DataType, 3> : public detail::buffer_<DataType, 3> {
+template <typename DataType_>
+struct buffer<DataType_, 3> : public detail::buffer_<DataType_, 3> {
 private:
-	using Base = detail::buffer_<DataType, 3>;
+	using Base = detail::buffer_<DataType_, 3>;
+	using DataType = typename Base::value_type;
 
 public:
 #if MSVC_LOW
@@ -344,7 +348,9 @@ public:
 		: buffer(host_data, { sizeX, sizeY, sizeZ }) {}
 };
 
+#if MSVC_LOW
 #undef BUFFER_INHERIT_CONSTRUCTORS
+#endif
 
 } // namespace sycl
 } // namespace cl
