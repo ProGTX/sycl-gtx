@@ -6,7 +6,6 @@
 #include <vector>
 
 
-
 using namespace std;
 
 string OpenCL::read(string filename) {
@@ -115,14 +114,14 @@ void OpenCL::checkError(cl_int error) {
 
 void OpenCL::global(
 	int numInvocations, cl_device_id dev,
-	int width, int height,
-	int dataSize, int filterSize, int filterDataSize,
+	int IMAGE_W, int IMAGE_H,
+	int FILTER_SIZE, int filter_data_size,
 	const float* input, float* output, const float* filter
 ) {
 	common(
 		numInvocations, dev, "global_opt.cl",
-		width, height,
-		dataSize, filterSize, filterDataSize,
+		IMAGE_W, IMAGE_H,
+		FILTER_SIZE, filter_data_size,
 		input, output, filter,
 		false
 	);
@@ -130,14 +129,14 @@ void OpenCL::global(
 
 void OpenCL::local(
 	int numInvocations, cl_device_id dev,
-	int width, int height,
-	int dataSize, int filterSize, int filterDataSize,
+	int IMAGE_W, int IMAGE_H,
+	int FILTER_SIZE, int filter_data_size,
 	const float* input, float* output, const float* filter
 ) {
 	common(
 		numInvocations, dev, "local_opt.cl",
-		width, height,
-		dataSize, filterSize, filterDataSize,
+		IMAGE_W, IMAGE_H,
+		FILTER_SIZE, filter_data_size,
 		input, output, filter,
 		true
 	);
@@ -145,14 +144,15 @@ void OpenCL::local(
 
 void OpenCL::common(
 	int numInvocations, cl_device_id dev, string filename,
-	int width, int height,
-	int dataSize, int filterSize, int filterDataSize,
+	int IMAGE_W, int IMAGE_H,
+	int FILTER_SIZE, int filter_data_size,
 	const float* input, float* output, const float* filter,
 	bool isLocal
 ) {
 	using namespace std;
 	cl_int error;
 
+	int dataSize = IMAGE_W * IMAGE_H * 4;
 	auto context = clCreateContext(nullptr, 1, &dev, nullptr, nullptr, &error);
 
 	string kernelCode = read(filename);
@@ -167,8 +167,8 @@ void OpenCL::common(
 		compileOptions,
 		"-D IMAGE_W=%d -D IMAGE_H=%d -D FILTER_SIZE=%d "
 		"-D HALF_FILTER_SIZE=%d -D TWICE_HALF_FILTER_SIZE=%d -D HALF_FILTER_SIZE_IMAGE_W=%d",
-		width, height, filterSize,
-		filterSize / 2, (filterSize / 2) * 2, (filterSize / 2) * width
+		IMAGE_W, IMAGE_H, FILTER_SIZE,
+		FILTER_SIZE / 2, (FILTER_SIZE / 2) * 2, (FILTER_SIZE / 2) * IMAGE_W
 	);
 
 	error = clBuildProgram(program, 1, &dev, compileOptions, nullptr, nullptr);
@@ -192,7 +192,7 @@ void OpenCL::common(
 	);
 	checkError(error);
 	auto bufFilter = clCreateBuffer(
-		context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * filterDataSize, (void*)filter, &error
+		context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * filter_data_size, (void*)filter, &error
 	);
 	checkError(error);
 
@@ -210,12 +210,12 @@ void OpenCL::common(
 	checkError(error);
 
 	size_t localWorkSize[] = { 16, 16 };
-	size_t globalWorkSize[] = { width, height };
+	size_t globalWorkSize[] = { IMAGE_W, IMAGE_H };
 
 	if(isLocal) {
 		auto localMemSize =
-			(localWorkSize[0] + 2 * (filterSize / 2)) *
-			(localWorkSize[1] + 2 * (filterSize / 2));
+			(localWorkSize[0] + 2 * (FILTER_SIZE / 2)) *
+			(localWorkSize[1] + 2 * (FILTER_SIZE / 2));
 		localMemSize *= 4 * sizeof(float);
 
 		error = clSetKernelArg(kernel, 3, localMemSize, nullptr);

@@ -16,14 +16,14 @@ struct OpenCL {
 	static void global(
 		int numInvocations, cl_device_id dev,
 		int width, int height,
-		int dataSize, int filterSize, int filterDataSize,
+		int filter_size, int filter_data_size,
 		const float* input, float* output, const float* filter
 	);
 
 	static void local(
 		int numInvocations, cl_device_id dev,
 		int width, int height,
-		int dataSize, int filterSize, int filterDataSize,
+		int filter_size, int filter_data_size,
 		const float* input, float* output, const float* filter
 	);
 
@@ -31,7 +31,7 @@ private:
 	static void common(
 		int numInvocations, cl_device_id dev, string filename,
 		int width, int height,
-		int dataSize, int filterSize, int filterDataSize,
+		int filter_size, int filter_data_size,
 		const float* input, float* output, const float* filter,
 		bool isLocal
 	);
