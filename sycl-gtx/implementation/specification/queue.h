@@ -21,6 +21,8 @@ namespace sycl {
 class queue {
 private:
 	friend class detail::synchronizer;
+	template <class>
+	friend class std::allocator;
 
 	using buffer_set = std::set<detail::buffer_base*>;
 
@@ -135,7 +137,7 @@ public:
 	// TODO
 	template <typename T>
 	handler_event submit(T cgf) {
-		subqueues.push_back(queue(this, cgf));
+		subqueues.emplace_back(this, cgf);
 		return subqueues.back().process(buffers_in_use);
 	}
 

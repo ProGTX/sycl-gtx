@@ -54,7 +54,7 @@ public:
 #if MSVC_LOW
 	debug(debug&& move)
 		: stream(std::move(move.stream)), before(std::move(move.before)) {}
-#elif
+#else
 	debug(debug&& move) = default;
 #endif
 	debug(const debug& copy) = delete;
