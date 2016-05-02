@@ -127,6 +127,7 @@ void OpenCL::global(
 	);
 }
 
+// TODO: Fix
 void OpenCL::local(
 	int numInvocations, cl_device_id dev,
 	int IMAGE_W, int IMAGE_H,
