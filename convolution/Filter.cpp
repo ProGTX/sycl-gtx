@@ -27,9 +27,9 @@ vector<float> Filter::generate(int size) {
 	const float DELTA = 1.84089642f * ((float)size / 7.f);
 	const float TWO_DELTA_SQ = 2.0f * DELTA * DELTA;
 	const float k = 1.0f / (PI * TWO_DELTA_SQ);
+	const int HALF_FILTER_SIZE = size / 2;
 
 	vector<float> filter(size * size * 4);
-	int w = size / 2;
 
 	const vector<float>* precomputed = nullptr;
 
@@ -41,8 +41,8 @@ vector<float> Filter::generate(int size) {
 	}
 
 	int i = 0;
-	for(int r = -w; r <= w; ++r) {
-		for(int c = -w; c <= w; ++c) {
+	for(int r = -HALF_FILTER_SIZE; r <= HALF_FILTER_SIZE; ++r) {
+		for(int c = -HALF_FILTER_SIZE; c <= HALF_FILTER_SIZE; ++c) {
 			float value;
 			if(precomputed != nullptr) {
 				value = precomputed->operator[](i / 4);
@@ -54,7 +54,7 @@ vector<float> Filter::generate(int size) {
 			filter[i++] = value;
 			filter[i++] = value;
 			filter[i++] = value;
-			filter[i++] = r == c && c == 0 ? 1.0f : 0.0f;
+			filter[i++] = ((r == 0 && c == 0) ? 1.0f : 0.0f);
 		}
 	}
 

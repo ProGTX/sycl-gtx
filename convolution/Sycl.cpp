@@ -32,7 +32,7 @@ void Sycl::local(
 		reinterpret_cast<const sycl::cl_float4*>(filter_),
 		range<1>(filter_data_size));
 
-	for (int i = 0; i < num_invocations; ++i) {
+	for(int i = 0; i < num_invocations; ++i) {
 		q.submit([&](handler& cgh) {
 			auto input = input_buf.get_access<access::mode::read>(cgh);
 			auto output = output_buf.get_access<access::mode::discard_write>(cgh);
@@ -88,17 +88,21 @@ void Sycl::local(
 					SYCL_END
 
 					SYCL_IF(lid[1] < HALF_FILTER_SIZE) {
-						cached[lid[1] * localRowLen + lid[0] + HALF_FILTER_SIZE] = input[my - HALF_FILTER_SIZE_IMAGE_W];
+						cached[lid[1] * localRowLen + lid[0] + HALF_FILTER_SIZE] =
+							input[my - HALF_FILTER_SIZE_IMAGE_W];
 						SYCL_IF(localColOffset > 0) {
-							cached[lid[1] * localRowLen + localColOffset] = input[my - HALF_FILTER_SIZE_IMAGE_W + globalColOffset];
+							cached[lid[1] * localRowLen + localColOffset] =
+								input[my - HALF_FILTER_SIZE_IMAGE_W + globalColOffset];
 						}
 						SYCL_END
 					}
 					SYCL_ELSE_IF(lid[1] >= i.get_local_range()[1] - HALF_FILTER_SIZE) {
 						int1 offset = (lid[1] + TWICE_HALF_FILTER_SIZE) * localRowLen;
-						cached[offset + lid[0] + HALF_FILTER_SIZE] = input[my + HALF_FILTER_SIZE_IMAGE_W];
+						cached[offset + lid[0] + HALF_FILTER_SIZE] =
+							input[my + HALF_FILTER_SIZE_IMAGE_W];
 						SYCL_IF(localColOffset > 0) {
-							cached[offset + localColOffset] = input[my + HALF_FILTER_SIZE_IMAGE_W + globalColOffset];
+							cached[offset + localColOffset] =
+								input[my + HALF_FILTER_SIZE_IMAGE_W + globalColOffset];
 						}
 						SYCL_END
 					}
@@ -151,7 +155,7 @@ void Sycl::global(
 		reinterpret_cast<const sycl::cl_float4*>(filter_),
 		range<1>(filter_data_size));
 
-	for (int i = 0; i < num_invocations; ++i) {
+	for(int i = 0; i < num_invocations; ++i) {
 		q.submit([&](handler& cgh) {
 			auto input = input_buf.get_access<access::mode::read>(cgh);
 			auto output = output_buf.get_access<access::mode::discard_write>(cgh);
