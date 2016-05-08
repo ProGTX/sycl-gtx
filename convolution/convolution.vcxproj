@@ -83,6 +83,7 @@
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>$(INTELOCLSDKROOT)include;../sycl-gtx</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalOptions>/openmp %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -123,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CPU.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenCL.cpp" />
@@ -134,6 +136,7 @@
     <None Include="local_opt.cl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CPU.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="OpenCL.h" />
     <ClInclude Include="PPM.h" />

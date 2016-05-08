@@ -33,6 +33,9 @@
     <ClCompile Include="Sycl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CPU.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="global_opt.cl">
@@ -56,6 +59,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sycl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPU.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
