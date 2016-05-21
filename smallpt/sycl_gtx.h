@@ -12,7 +12,7 @@
 #include <iostream>
 
 #define SYCL_SIMPLE_SWIZZLES
-#include <sycl.hpp>
+#include <SYCL/sycl.hpp>
 
 #include "classes.h"
 #include "win.h"
@@ -30,7 +30,7 @@ using Ray = Ray_<float_type>;
 using Sphere = Sphere_<float_type, modify_sample_rate>;
 
 #ifndef SYCL_GTX
-#include "../sycl-gtx/sycl_gtx_compatibility.h"
+#include <SYCL/sycl_gtx_compatibility.h>
 #endif
 
 

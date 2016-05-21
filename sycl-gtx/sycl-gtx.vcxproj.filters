@@ -42,58 +42,58 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="implementation\specification\device.cpp">
+    <ClCompile Include="source\specification\device.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\platform.cpp">
+    <ClCompile Include="source\specification\platform.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\context.cpp">
+    <ClCompile Include="source\specification\context.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\queue.cpp">
+    <ClCompile Include="source\specification\queue.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\device_selector.cpp">
+    <ClCompile Include="source\specification\device_selector.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\command_group.cpp">
+    <ClCompile Include="source\specification\command_group.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\program.cpp">
+    <ClCompile Include="source\specification\program.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\kernel.cpp">
+    <ClCompile Include="source\specification\kernel.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\data_ref.cpp">
+    <ClCompile Include="source\data_ref.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\event.cpp">
+    <ClCompile Include="source\specification\event.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\src_handlers\kernel_source.cpp">
+    <ClCompile Include="source\src_handlers\kernel_source.cpp">
       <Filter>Source Files\src_handlers</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\src_handlers\issue_command.cpp">
+    <ClCompile Include="source\src_handlers\issue_command.cpp">
       <Filter>Source Files\src_handlers</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\ranges\point.cpp">
+    <ClCompile Include="source\specification\ranges\point.cpp">
       <Filter>Source Files\specification\ranges</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\kernel_name.cpp">
+    <ClCompile Include="source\kernel_name.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\synchronizer.cpp">
+    <ClCompile Include="source\synchronizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\error_handler.cpp">
+    <ClCompile Include="source\specification\error_handler.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\buffer_base.cpp">
+    <ClCompile Include="source\specification\buffer_base.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
-    <ClCompile Include="implementation\specification\handler.cpp">
+    <ClCompile Include="source\specification\handler.cpp">
       <Filter>Source Files\specification</Filter>
     </ClCompile>
   </ItemGroup>
@@ -101,181 +101,181 @@
     <ClInclude Include="sycl.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\debug.h">
+    <ClInclude Include="include\SYCL\implementation\debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\access.h">
+    <ClInclude Include="include\SYCL\implementation\specification\access.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\accessor.h">
+    <ClInclude Include="include\SYCL\implementation\specification\accessor.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\buffer.h">
+    <ClInclude Include="include\SYCL\implementation\specification\buffer.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\command_group.h">
+    <ClInclude Include="include\SYCL\implementation\specification\command_group.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\context.h">
+    <ClInclude Include="include\SYCL\implementation\specification\context.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\device.h">
+    <ClInclude Include="include\SYCL\implementation\specification\device.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\kernel.h">
+    <ClInclude Include="include\SYCL\implementation\specification\kernel.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\platform.h">
+    <ClInclude Include="include\SYCL\implementation\specification\platform.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\program.h">
+    <ClInclude Include="include\SYCL\implementation\specification\program.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\queue.h">
+    <ClInclude Include="include\SYCL\implementation\specification\queue.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\ranges.h">
+    <ClInclude Include="include\SYCL\implementation\specification\ranges.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\refc.h">
+    <ClInclude Include="include\SYCL\implementation\specification\refc.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\common.h">
+    <ClInclude Include="include\SYCL\implementation\common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\error_handler.h">
+    <ClInclude Include="include\SYCL\implementation\specification\error_handler.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\device_selector.h">
+    <ClInclude Include="include\SYCL\implementation\specification\device_selector.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\event.h">
+    <ClInclude Include="include\SYCL\implementation\specification\event.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\error_code.h">
+    <ClInclude Include="include\SYCL\implementation\error_code.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\data_ref.h">
+    <ClInclude Include="include\SYCL\implementation\data_ref.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\accessor\buffer.h">
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\buffer.h">
       <Filter>Header Files\specification\accessor</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\ranges\range.h">
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\range.h">
       <Filter>Header Files\specification\ranges</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\ranges\id.h">
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\id.h">
       <Filter>Header Files\specification\ranges</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\flow_control.h">
+    <ClInclude Include="include\SYCL\implementation\flow_control.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\accessor\buffer_device.h">
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\buffer_device.h">
       <Filter>Header Files\specification\accessor</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\accessor\buffer_host.h">
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\buffer_host.h">
       <Filter>Header Files\specification\accessor</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\accessor\buffer_base.h">
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\buffer_base.h">
       <Filter>Header Files\specification\accessor</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\atomic.h">
+    <ClInclude Include="include\SYCL\implementation\specification\atomic.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\ranges\item.h">
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\item.h">
       <Filter>Header Files\specification\ranges</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\ranges\nd_range.h">
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\nd_range.h">
       <Filter>Header Files\specification\ranges</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\ranges\nd_item.h">
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\nd_item.h">
       <Filter>Header Files\specification\ranges</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\accessor\local.h">
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\local.h">
       <Filter>Header Files\specification\accessor</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\accessor\device_reference.h">
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\device_reference.h">
       <Filter>Header Files\specification\accessor</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\counter.h">
+    <ClInclude Include="include\SYCL\implementation\counter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\functions\common.h">
+    <ClInclude Include="include\SYCL\implementation\specification\functions\common.h">
       <Filter>Header Files\specification\functions</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\workitem_functions.h">
+    <ClInclude Include="include\SYCL\implementation\specification\workitem_functions.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\info.h">
+    <ClInclude Include="include\SYCL\implementation\specification\info.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\exception.h">
+    <ClInclude Include="include\SYCL\implementation\specification\exception.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\handler.h">
+    <ClInclude Include="include\SYCL\implementation\specification\handler.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\param_traits.h">
+    <ClInclude Include="include\SYCL\implementation\specification\param_traits.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\function_traits.h">
+    <ClInclude Include="include\SYCL\implementation\function_traits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\src_handlers\invoke_source.h">
+    <ClInclude Include="include\SYCL\implementation\src_handlers\invoke_source.h">
       <Filter>Header Files\src_handlers</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\src_handlers\kernel_source.h">
+    <ClInclude Include="include\SYCL\implementation\src_handlers\kernel_source.h">
       <Filter>Header Files\src_handlers</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\src_handlers\issue_command.h">
+    <ClInclude Include="include\SYCL\implementation\src_handlers\issue_command.h">
       <Filter>Header Files\src_handlers</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\ranges\point.h">
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\point.h">
       <Filter>Header Files\specification\ranges</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\point_ref.h">
+    <ClInclude Include="include\SYCL\implementation\point_ref.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\ptr_or_val.h">
+    <ClInclude Include="include\SYCL\implementation\ptr_or_val.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\kernel_name.h">
+    <ClInclude Include="include\SYCL\implementation\kernel_name.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\handler_event.h">
+    <ClInclude Include="include\SYCL\implementation\specification\handler_event.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\buffer_base.h">
+    <ClInclude Include="include\SYCL\implementation\specification\buffer_base.h">
       <Filter>Header Files\specification</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\synchronizer.h">
+    <ClInclude Include="include\SYCL\implementation\synchronizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\src_handlers\register_resource.h">
+    <ClInclude Include="include\SYCL\implementation\src_handlers\register_resource.h">
       <Filter>Header Files\src_handlers</Filter>
     </ClInclude>
     <ClInclude Include="sycl_gtx_compatibility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\vectors\vec.h">
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\vec.h">
       <Filter>Header Files\specification\vectors</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\vectors\vec_members.h">
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\vec_members.h">
       <Filter>Header Files\specification\vectors</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\vectors\helpers.h">
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\helpers.h">
       <Filter>Header Files\specification\vectors</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\vectors\swizzled_vec.h">
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\swizzled_vec.h">
       <Filter>Header Files\specification\vectors</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\vectors\type_string.h">
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\type_string.h">
       <Filter>Header Files\specification\vectors</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\vectors\cl_vec.h">
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\cl_vec.h">
       <Filter>Header Files\specification\vectors</Filter>
     </ClInclude>
-    <ClInclude Include="implementation\specification\vectors\cl_type.h">
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\cl_type.h">
       <Filter>Header Files\specification\vectors</Filter>
     </ClInclude>
   </ItemGroup>

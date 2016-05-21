@@ -71,7 +71,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>implementation;$(INTELOCLSDKROOT)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include\SYCL\implementation;source;$(INTELOCLSDKROOT)include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>Win32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -93,7 +93,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>implementation;$(INTELOCLSDKROOT)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include\SYCL\implementation;source;$(INTELOCLSDKROOT)include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>Win32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -112,7 +112,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>implementation;$(INTELOCLSDKROOT)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include\SYCL\implementation;source;$(INTELOCLSDKROOT)include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>__x86_64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>MaxSpeed</Optimization>
       <MinimalRebuild>true</MinimalRebuild>
@@ -137,7 +137,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>implementation;$(INTELOCLSDKROOT)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include\SYCL\implementation;source;$(INTELOCLSDKROOT)include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>__x86_64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>true</MinimalRebuild>
@@ -158,86 +158,86 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="implementation\data_ref.cpp" />
-    <ClCompile Include="implementation\kernel_name.cpp" />
-    <ClCompile Include="implementation\specification\buffer_base.cpp" />
-    <ClCompile Include="implementation\specification\command_group.cpp" />
-    <ClCompile Include="implementation\specification\context.cpp" />
-    <ClCompile Include="implementation\specification\device.cpp" />
-    <ClCompile Include="implementation\specification\device_selector.cpp" />
-    <ClCompile Include="implementation\specification\error_handler.cpp" />
-    <ClCompile Include="implementation\specification\event.cpp" />
-    <ClCompile Include="implementation\specification\handler.cpp" />
-    <ClCompile Include="implementation\specification\kernel.cpp" />
-    <ClCompile Include="implementation\specification\platform.cpp" />
-    <ClCompile Include="implementation\specification\program.cpp" />
-    <ClCompile Include="implementation\specification\queue.cpp" />
-    <ClCompile Include="implementation\specification\ranges\point.cpp" />
-    <ClCompile Include="implementation\src_handlers\issue_command.cpp" />
-    <ClCompile Include="implementation\src_handlers\kernel_source.cpp" />
-    <ClCompile Include="implementation\synchronizer.cpp" />
+    <ClCompile Include="source\data_ref.cpp" />
+    <ClCompile Include="source\kernel_name.cpp" />
+    <ClCompile Include="source\specification\buffer_base.cpp" />
+    <ClCompile Include="source\specification\command_group.cpp" />
+    <ClCompile Include="source\specification\context.cpp" />
+    <ClCompile Include="source\specification\device.cpp" />
+    <ClCompile Include="source\specification\device_selector.cpp" />
+    <ClCompile Include="source\specification\error_handler.cpp" />
+    <ClCompile Include="source\specification\event.cpp" />
+    <ClCompile Include="source\specification\handler.cpp" />
+    <ClCompile Include="source\specification\kernel.cpp" />
+    <ClCompile Include="source\specification\platform.cpp" />
+    <ClCompile Include="source\specification\program.cpp" />
+    <ClCompile Include="source\specification\queue.cpp" />
+    <ClCompile Include="source\specification\ranges\point.cpp" />
+    <ClCompile Include="source\src_handlers\issue_command.cpp" />
+    <ClCompile Include="source\src_handlers\kernel_source.cpp" />
+    <ClCompile Include="source\synchronizer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="implementation\common.h" />
-    <ClInclude Include="implementation\counter.h" />
-    <ClInclude Include="implementation\data_ref.h" />
-    <ClInclude Include="implementation\debug.h" />
-    <ClInclude Include="implementation\error_code.h" />
-    <ClInclude Include="implementation\flow_control.h" />
-    <ClInclude Include="implementation\function_traits.h" />
-    <ClInclude Include="implementation\kernel_name.h" />
-    <ClInclude Include="implementation\point_ref.h" />
-    <ClInclude Include="implementation\ptr_or_val.h" />
-    <ClInclude Include="implementation\specification\accessor.h" />
-    <ClInclude Include="implementation\specification\access.h" />
-    <ClInclude Include="implementation\specification\accessor\buffer.h" />
-    <ClInclude Include="implementation\specification\accessor\buffer_base.h" />
-    <ClInclude Include="implementation\specification\accessor\buffer_device.h" />
-    <ClInclude Include="implementation\specification\accessor\buffer_host.h" />
-    <ClInclude Include="implementation\specification\accessor\device_reference.h" />
-    <ClInclude Include="implementation\specification\accessor\local.h" />
-    <ClInclude Include="implementation\specification\atomic.h" />
-    <ClInclude Include="implementation\specification\buffer.h" />
-    <ClInclude Include="implementation\specification\buffer_base.h" />
-    <ClInclude Include="implementation\specification\command_group.h" />
-    <ClInclude Include="implementation\specification\context.h" />
-    <ClInclude Include="implementation\specification\device.h" />
-    <ClInclude Include="implementation\specification\device_selector.h" />
-    <ClInclude Include="implementation\specification\exception.h" />
-    <ClInclude Include="implementation\specification\handler_event.h" />
-    <ClInclude Include="implementation\specification\info.h" />
-    <ClInclude Include="implementation\specification\error_handler.h" />
-    <ClInclude Include="implementation\specification\event.h" />
-    <ClInclude Include="implementation\specification\functions\common.h" />
-    <ClInclude Include="implementation\specification\handler.h" />
-    <ClInclude Include="implementation\specification\kernel.h" />
-    <ClInclude Include="implementation\specification\param_traits.h" />
-    <ClInclude Include="implementation\specification\platform.h" />
-    <ClInclude Include="implementation\specification\program.h" />
-    <ClInclude Include="implementation\specification\queue.h" />
-    <ClInclude Include="implementation\specification\ranges.h" />
-    <ClInclude Include="implementation\specification\ranges\id.h" />
-    <ClInclude Include="implementation\specification\ranges\point.h" />
-    <ClInclude Include="implementation\specification\ranges\item.h" />
-    <ClInclude Include="implementation\specification\ranges\nd_item.h" />
-    <ClInclude Include="implementation\specification\ranges\nd_range.h" />
-    <ClInclude Include="implementation\specification\ranges\range.h" />
-    <ClInclude Include="implementation\specification\refc.h" />
-    <ClInclude Include="implementation\specification\vectors\cl_type.h" />
-    <ClInclude Include="implementation\specification\vectors\cl_vec.h" />
-    <ClInclude Include="implementation\specification\vectors\helpers.h" />
-    <ClInclude Include="implementation\specification\vectors\swizzled_vec.h" />
-    <ClInclude Include="implementation\specification\vectors\type_string.h" />
-    <ClInclude Include="implementation\specification\vectors\vec.h" />
-    <ClInclude Include="implementation\specification\vectors\vec_members.h" />
-    <ClInclude Include="implementation\specification\workitem_functions.h" />
-    <ClInclude Include="implementation\src_handlers\invoke_source.h" />
-    <ClInclude Include="implementation\src_handlers\issue_command.h" />
-    <ClInclude Include="implementation\src_handlers\kernel_source.h" />
-    <ClInclude Include="implementation\src_handlers\register_resource.h" />
-    <ClInclude Include="implementation\synchronizer.h" />
-    <ClInclude Include="sycl.hpp" />
-    <ClInclude Include="sycl_gtx_compatibility.h" />
+    <ClInclude Include="include\SYCL\implementation\common.h" />
+    <ClInclude Include="include\SYCL\implementation\counter.h" />
+    <ClInclude Include="include\SYCL\implementation\data_ref.h" />
+    <ClInclude Include="include\SYCL\implementation\debug.h" />
+    <ClInclude Include="include\SYCL\implementation\error_code.h" />
+    <ClInclude Include="include\SYCL\implementation\flow_control.h" />
+    <ClInclude Include="include\SYCL\implementation\function_traits.h" />
+    <ClInclude Include="include\SYCL\implementation\kernel_name.h" />
+    <ClInclude Include="include\SYCL\implementation\point_ref.h" />
+    <ClInclude Include="include\SYCL\implementation\ptr_or_val.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\accessor.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\access.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\buffer.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\buffer_base.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\buffer_device.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\buffer_host.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\device_reference.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\accessor\local.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\atomic.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\buffer.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\buffer_base.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\command_group.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\context.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\device.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\device_selector.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\exception.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\handler_event.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\info.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\error_handler.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\event.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\functions\common.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\handler.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\kernel.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\param_traits.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\platform.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\program.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\queue.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\ranges.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\id.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\point.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\item.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\nd_item.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\nd_range.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\ranges\range.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\refc.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\cl_type.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\cl_vec.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\helpers.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\swizzled_vec.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\type_string.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\vec.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\vectors\vec_members.h" />
+    <ClInclude Include="include\SYCL\implementation\specification\workitem_functions.h" />
+    <ClInclude Include="include\SYCL\implementation\src_handlers\invoke_source.h" />
+    <ClInclude Include="include\SYCL\implementation\src_handlers\issue_command.h" />
+    <ClInclude Include="include\SYCL\implementation\src_handlers\kernel_source.h" />
+    <ClInclude Include="include\SYCL\implementation\src_handlers\register_resource.h" />
+    <ClInclude Include="include\SYCL\implementation\synchronizer.h" />
+    <ClInclude Include="include\SYCL\sycl.hpp" />
+    <ClInclude Include="include\SYCL\sycl_gtx_compatibility.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="make\makefile" />

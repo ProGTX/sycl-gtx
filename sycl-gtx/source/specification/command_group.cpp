@@ -1,8 +1,8 @@
-#include "command_group.h"
+#include "specification/command_group.h"
 
-#include "accessor.h"
-#include "buffer.h"
-#include "queue.h"
+#include "specification/accessor.h"
+#include "specification/buffer.h"
+#include "specification/queue.h"
 #include <map>
 #include <unordered_set>
 

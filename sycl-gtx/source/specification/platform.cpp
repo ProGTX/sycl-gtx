@@ -1,9 +1,9 @@
-#include "platform.h"
-#include "device.h"
-#include "info.h"
+#include "specification/platform.h"
+#include "specification/device.h"
+#include "specification/info.h"
 
 #include <utility>
-#include "../debug.h"
+#include "debug.h"
 
 using namespace cl::sycl;
 

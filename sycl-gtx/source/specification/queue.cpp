@@ -1,6 +1,6 @@
-#include "queue.h"
+#include "specification/queue.h"
 
-#include "buffer_base.h"
+#include "specification/buffer_base.h"
 
 using namespace cl::sycl;
 

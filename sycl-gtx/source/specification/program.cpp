@@ -1,8 +1,8 @@
-#include "program.h"
+#include "specification/program.h"
 
-#include "kernel.h"
-#include "queue.h"
-#include "../debug.h"
+#include "specification/kernel.h"
+#include "specification/queue.h"
+#include "debug.h"
 
 using namespace cl::sycl;
 

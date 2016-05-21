@@ -1,4 +1,4 @@
-#include "point.h"
+#include "specification/ranges/point.h"
 
 using namespace cl::sycl;
 using namespace detail;

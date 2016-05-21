@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sycl.hpp>
+#include <SYCL/sycl.hpp>
 
 #include <chrono>
 #include <iostream>

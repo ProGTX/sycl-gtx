@@ -1,8 +1,8 @@
 #pragma once
 
 #define SYCL_SIMPLE_SWIZZLES
-#include <sycl.hpp>
-#include <implementation/debug.h>
+#include <SYCL/sycl.hpp>
+#include <SYCL/implementation/debug.h>
 
 bool test1();	// Milestone 3
 bool test2();	// Milestone 1

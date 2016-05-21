@@ -1,4 +1,4 @@
-#include "event.h"
+#include "specification/event.h"
 
 using namespace cl::sycl;
 

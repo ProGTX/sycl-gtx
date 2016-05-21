@@ -1,6 +1,6 @@
-#include "context.h"
-#include "device.h"
-#include "platform.h"
+#include "specification/context.h"
+#include "specification/device.h"
+#include "specification/platform.h"
 
 using namespace cl::sycl;
 
