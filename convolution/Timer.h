@@ -4,7 +4,7 @@
 
 struct Timer {
 public:
-	using time_point = std::chrono::system_clock::time_point;
+	using time_point = decltype(std::chrono::high_resolution_clock::now());
 
 private:
 	time_point start;
