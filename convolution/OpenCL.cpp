@@ -8,6 +8,14 @@
 
 using namespace std;
 
+namespace {
+template <class releaser_fptr_t, typename CLType>
+void release(releaser_fptr_t releaser, CLType resource) {
+	auto error = releaser(resource);
+	OpenCL::checkError(error);
+}
+}
+
 string OpenCL::read(string filename) {
 	using namespace std;
 
@@ -197,9 +205,6 @@ void OpenCL::common(
 	);
 	checkError(error);
 
-	auto queue = clCreateCommandQueue(context, dev, 0, &error);
-	checkError(error);
-
 	auto kernel = clCreateKernel(program, "convolute", &error);
 	checkError(error);
 
@@ -223,6 +228,9 @@ void OpenCL::common(
 		checkError(error);
 	}
 
+	auto queue = clCreateCommandQueue(context, dev, 0, &error);
+	checkError(error);
+
 	for(int i = 0; i < numInvocations; ++i) {
 		error = clEnqueueNDRangeKernel(
 			queue, kernel, 2,
@@ -238,4 +246,12 @@ void OpenCL::common(
 		queue, bufOutput, CL_TRUE, 0, sizeof(float) * dataSize, output, 0, nullptr, nullptr
 	);
 	checkError(error);
+
+	release(clReleaseCommandQueue, queue);
+	release(clReleaseKernel, kernel);
+	release(clReleaseProgram, program);
+	release(clReleaseMemObject, bufFilter);
+	release(clReleaseMemObject, bufOutput);
+	release(clReleaseMemObject, bufInput);
+	release(clReleaseContext, context);
 }
