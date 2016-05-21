@@ -7,5 +7,5 @@ using namespace cl::sycl;
 using namespace detail;
 
 context handler::get_context(queue* q) {
-	return q->get_context();
+  return q->get_context();
 }

@@ -10,26 +10,26 @@ namespace detail {
 
 class kernel_name {
 private:
-	static ::size_t current_count;
+  static ::size_t current_count;
 
-	template <class T>
-	struct namer {
-		static ::size_t id;
-		static bool is_set;
-		static void set() {
-			if(!is_set) {
-				id = ++current_count;
-				is_set = true;
-			}
-		}
-	};
+  template <class T>
+  struct namer {
+    static ::size_t id;
+    static bool is_set;
+    static void set() {
+      if(!is_set) {
+        id = ++current_count;
+        is_set = true;
+      }
+    }
+  };
 
 public:
-	template <class T>
-	static ::size_t get() {
-		namer<T>::set();
-		return namer<T>::id;
-	}
+  template <class T>
+  static ::size_t get() {
+    namer<T>::set();
+    return namer<T>::id;
+  }
 };
 
 template <class T>

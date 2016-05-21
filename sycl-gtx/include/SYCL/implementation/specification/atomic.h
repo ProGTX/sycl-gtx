@@ -10,35 +10,36 @@ namespace sycl {
 template <typename T>
 class atomic<T> {
 public:
-	// Constructors
-	atomic() = delete;
+  // Constructors
+  atomic() = delete;
 
-	// Methods
-	// Only memory_order_relaxed is supported in SYCL 1.2
-	void store(T, std::memory_order);
-	void store(T, std::memory_order) volatile;
-	T load(std::memory_order) const;
-	T load(std::memory_order) const volatile;
-	T exchange(T, std::memory_order);
-	T exchange(T, std::memory_order) volatile;
-	T compare_exchange_strong(T*, T, std::memory_order success, std::memory_order fail);
-	T compare_exchange_strong(T*, T, std::memory_order success, std::memory_order fail) volatile;
-	T fetch_add(T, std::memory_order);
-	T fetch_add(T, std::memory_order) volatile;
-	T fetch_sub(T, std::memory_order);
-	T fetch_sub(T, std::memory_order) volatile;
-	T fetch_and(T, std::memory_order);
-	T fetch_and(T, std::memory_order) volatile;
-	T fetch_or(T, std::memory_order);
-	T fetch_or(T, std::memory_order) volatile;
-	T fetch_xor(T, std::memory_order);
-	T fetch_xor(T, std::memory_order) volatile;
+  // Methods
+  // Only memory_order_relaxed is supported in SYCL 1.2
+  void store(T, std::memory_order);
+  void store(T, std::memory_order) volatile;
+  T load(std::memory_order) const;
+  T load(std::memory_order) const volatile;
+  T exchange(T, std::memory_order);
+  T exchange(T, std::memory_order) volatile;
+  T compare_exchange_strong(T*, T, std::memory_order success, std::memory_order fail);
+  T compare_exchange_strong(
+    T*, T, std::memory_order success, std::memory_order fail) volatile;
+  T fetch_add(T, std::memory_order);
+  T fetch_add(T, std::memory_order) volatile;
+  T fetch_sub(T, std::memory_order);
+  T fetch_sub(T, std::memory_order) volatile;
+  T fetch_and(T, std::memory_order);
+  T fetch_and(T, std::memory_order) volatile;
+  T fetch_or(T, std::memory_order);
+  T fetch_or(T, std::memory_order) volatile;
+  T fetch_xor(T, std::memory_order);
+  T fetch_xor(T, std::memory_order) volatile;
 
-	// Additional functionality provided beyond that of C++11
-	T fetch_min(T, std::memory_order);
-	T fetch_min(T, std::memory_order) volatile;
-	T fetch_max(T, std::memory_order);
-	T fetch_max(T, std::memory_order) volatile;
+  // Additional functionality provided beyond that of C++11
+  T fetch_min(T, std::memory_order);
+  T fetch_min(T, std::memory_order) volatile;
+  T fetch_max(T, std::memory_order);
+  T fetch_max(T, std::memory_order) volatile;
 };
 
 typedef atomic<int> atomic_int;
@@ -58,9 +59,11 @@ T atomic_exchange_explicit(atomic<T>*, T, std::memory_order);
 template <class T>
 T atomic_exchange_explicit(volatile atomic<T>*, T, std::memory_order);
 template <class T>
-bool atomic_compare_exchange_strong_explicit(atomic<T>*, T*, T, std::memory_order success, std::memory_order fail);
+bool atomic_compare_exchange_strong_explicit(
+  atomic<T>*, T*, T, std::memory_order success, std::memory_order fail);
 template <class T>
-bool atomic_compare_exchange_strong_explicit(volatile atomic<T>*, T*, T, std::memory_order success, std::memory_order fail);
+bool atomic_compare_exchange_strong_explicit(
+  volatile atomic<T>*, T*, T, std::memory_order success, std::memory_order fail);
 template <class T>
 T atomic_fetch_add_explicit(atomic<T>*, T, std::memory_order);
 template <class T>

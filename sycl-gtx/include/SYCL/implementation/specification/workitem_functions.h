@@ -1,3 +1,3 @@
 #pragma once
 
-#include "functions\common.h"
+#include "functions/common.h"
