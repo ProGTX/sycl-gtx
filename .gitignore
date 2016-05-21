@@ -15,3 +15,5 @@ ComputeCpp/sycl/sycl_export.h
 ComputeCpp/sycl/sycl_export_link.h
 *.a
 *.sycl
+*.opendb
+*.db
