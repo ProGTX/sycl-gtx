@@ -42,9 +42,9 @@ int main() {
 #endif
 			if(actual != expected) {
 				cout << "Wrong output, expected " << expected << ", got " << actual << endl;
-				return 1;
+				return false;
 			}
-			return 0;
+			return true;
 		};
 
 		// See SphereSycl
