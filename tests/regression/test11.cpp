@@ -1,4 +1,4 @@
-#include "../tests.h"
+#include "../common.h"
 
 // Random number generation
 
@@ -25,7 +25,7 @@ float hostRandom(cl::sycl::cl_uint2& seed) {
 	return getRandom<float, cl::sycl::cl_uint>(seed);
 }
 
-bool test11() {
+int main() {
 
 	using namespace cl::sycl;
 	using namespace std;
@@ -42,7 +42,7 @@ bool test11() {
 		auto n = numbers.get_access<access::mode::discard_write>(cgh);
 
 		cgh.single_task<class generate>([=]() {
-			uint2 seed(startSeed.x, startSeed.y);
+			uint2 seed(startSeed.s[0], startSeed.s[1]);
 			SYCL_FOR(int1 i = 0, i < size, ++i) {
 				n[i] = deviceRandom(seed);
 			}
@@ -60,9 +60,9 @@ bool test11() {
 		auto deviceRnd = n[i];
 		if(deviceRnd < hostRnd - eps || deviceRnd > hostRnd + eps) {
 			cout << i << " -> expected " << hostRnd << ", got " << deviceRnd << endl;
-			return false;
+			return 1;
 		}
 	}
 
-	return true;
+	return 0;
 }

@@ -1,8 +1,8 @@
-#include "../tests.h"
+#include "../common.h"
 
 // Parallel reduction sum with local decomposition
 
-bool test6() {
+int main() {
 	using namespace cl::sycl;
 
 	{
@@ -81,9 +81,9 @@ bool test6() {
 		type_t sum = ((type_t)size / 2) * (type_t)(size - 1);
 		if(p[0] != sum) {
 			debug() << "wrong sum, should be" << sum << "- is" << p[0];
-			return false;
+			return 1;
 		}
 	}
 
-	return true;
+	return 0;
 }

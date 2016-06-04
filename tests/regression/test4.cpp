@@ -1,8 +1,8 @@
-#include "../tests.h"
+#include "../common.h"
 
 // Parallel reduction sum
 
-bool test4() {
+int main() {
 	static const size_t N = 1024;
 
 	using namespace cl::sycl;
@@ -42,9 +42,9 @@ bool test4() {
 
 		if(v[0] != sum) {
 			debug() << "wrong sum, should be" << sum << "- is" << v[0];
-				return false;
+				return 1;
 			}
 		}
 
-	return true;
+	return 0;
 }

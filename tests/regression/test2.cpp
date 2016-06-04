@@ -1,9 +1,9 @@
-#include "../tests.h"
+#include "../common.h"
 
 // 2.5.6 Anatomy of a SYCL application
 // (slightly revised from revision 2014-03-09 of the specification)
 
-bool test2() {
+int main() {
 	using namespace cl::sycl;
 
 	static const int expected = 1024;
@@ -35,5 +35,5 @@ bool test2() {
 	debug() << "Expected result" << expected;
 	debug() << "Actual result" << result;
 
-	return result == expected;
+	return static_cast<int>(result != expected);
 }

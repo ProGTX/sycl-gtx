@@ -1,4 +1,4 @@
-#include "../tests.h"
+#include "../common.h"
 #include <ctime>
 
 // Passing functors as nd-range kernels
@@ -28,7 +28,7 @@ public:
 	}
 };
 
-bool test5() {
+int main() {
 	static const int group_size = 8;
 	static const int size = group_size * 8;
 
@@ -62,9 +62,9 @@ bool test5() {
 			debug()
 				<< "The data retrieved from the device" << hostPtr[5]
 				<< "does not match the random number generated:" << random_num;
-			return false;
+			return 1;
 		}
 	}
 
-	return true;
+	return 0;
 }

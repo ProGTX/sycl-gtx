@@ -1,4 +1,4 @@
-#include "../tests.h"
+#include "../common.h"
 
 // Work efficient prefix sum
 
@@ -203,7 +203,7 @@ void prefix_sum_recursion(
 
 }
 
-bool test9() {
+int main() {
 	using namespace cl::sycl;
 
 	{
@@ -248,8 +248,8 @@ bool test9() {
 		prefix_sum_recursion(myQueue, data, sizes, 0, number_levels, group_size);
 
 		debug() << "Done, checking results";
-		return check_sum(data[0]);
+		return static_cast<int>(!check_sum(data[0]));
 	}
 
-	return true;
+	return 0;
 }

@@ -1,9 +1,9 @@
-#include "../tests.h"
+#include "../common.h"
 
 // 2.6 Anatomy of a SYCL application
 // (slightly revised from revision 2014-09-16 of the specification)
 
-bool test8() {
+int main() {
 	using namespace cl::sycl;
 
 	static const int size = 1024;
@@ -47,5 +47,5 @@ bool test8() {
 		}
 	}
 
-	return success;
+	return static_cast<int>(!success);
 }

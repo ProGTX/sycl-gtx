@@ -1,4 +1,4 @@
-#include "../tests.h"
+#include "../common.h"
 
 // Test vectors in kernel
 
@@ -11,7 +11,7 @@ std::string to_string(const T& t) {
 	return s.str();
 }
 
-bool test10() {
+int main() {
 
 	using namespace cl::sycl;
 	using namespace std;
@@ -49,9 +49,9 @@ bool test10() {
 			!floatEqual(vi.z(), testVector.z())
 		) {
 			cout << i << " -> expected " << to_string(testVector) << ", got " << to_string(vi) << endl;
-			return false;
+			return 1;
 		}
 	}
 
-	return true;
+	return 0;
 }

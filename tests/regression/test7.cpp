@@ -1,4 +1,4 @@
-#include "../tests.h"
+#include "../common.h"
 
 // 2.12 Example SYCL application
 
@@ -10,7 +10,7 @@ using namespace cl::sycl;
 const size_t N = 2000;
 const size_t M = 1000;
 
-bool test7() {
+int main() {
 	{	// By including all the SYCL work in a {} block,
 		// we ensure all SYCL tasks must complete before exiting the block
 
@@ -72,7 +72,7 @@ bool test7() {
 				auto expected = (int)(i*(2 + 2014) + j*(1 + 42));
 				if(C[i][j] != expected) {
 					debug() << i << j << "expected" << expected << "actual" << C[i][j];
-					return false;
+					return 1;
 				}
 			}
 		}
@@ -80,5 +80,5 @@ bool test7() {
 	} // End scope of myQueue, which waits for any remaining operations on the queue to complete
 
 	debug() << "Good computation!";
-	return true;
+	return 0;
 }

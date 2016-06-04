@@ -1,4 +1,4 @@
-#include "../tests.h"
+#include "../common.h"
 
 // Naive square matrix rotation
 
@@ -7,7 +7,7 @@ using namespace cl::sycl;
 // Size of the square matrices
 const size_t N = 1024;
 
-bool test3() {
+int main() {
 	{
 		queue myQueue;
 
@@ -44,11 +44,11 @@ bool test3() {
 				auto actual = bh[N - j - 1][i];
 				if(actual != expected) {
 					debug() << i << j << "expected" << expected << "actual" << actual;
-					return false;
+					return 1;
 				}
 			}
 		}
 	}
 
-	return true;
+	return 0;
 }

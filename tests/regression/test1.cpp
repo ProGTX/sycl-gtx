@@ -1,4 +1,4 @@
-#include "../tests.h"
+#include "../common.h"
 
 #include <vector>
 
@@ -8,7 +8,7 @@
 #define TOL (0.001)		// Tolerance used in floating point comparisons
 #define LENGTH (1024)	// Length of vectors a, b and c
 
-bool test1() {
+int main() {
 	using namespace cl::sycl;
 
 	std::vector<int> h_a(LENGTH);				// a vector
@@ -64,8 +64,5 @@ bool test1() {
 	// Summarize results
 	debug() << "R = A+B+C:" << correct << "out of" << count << "results were correct.";
 
-	return (correct == count);
+	return static_cast<int>(correct != count);
 }
-
-#undef TOL
-#undef LENGTH
