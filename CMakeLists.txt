@@ -17,6 +17,7 @@ set(_sycl_gtx_include_path "${CMAKE_SOURCE_DIR}/sycl-gtx/include")
 add_subdirectory(sycl-gtx)
 
 # Tests
+enable_testing()
 add_subdirectory(tests)
 
 # Other projects

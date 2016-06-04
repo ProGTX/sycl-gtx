@@ -25,6 +25,5 @@ foreach(_test ${_source_list})
     )
   endif(MSVC)
   
-  # TODO: Does not seem to work
   add_test(NAME ${_project_name} COMMAND ${_project_name})
 endforeach()
