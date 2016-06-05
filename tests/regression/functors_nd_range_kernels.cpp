@@ -3,6 +3,8 @@
 
 // Passing functors as nd-range kernels
 
+// Originally test5
+
 using namespace cl::sycl;
 
 class example_functor {

@@ -2,6 +2,8 @@
 
 // Parallel reduction sum
 
+// Originally test4
+
 int main() {
 	static const size_t N = 1024;
 

@@ -2,6 +2,8 @@
 
 // Check access into SYCL CL types
 
+// Originally test12
+
 
 int main() {
 	using namespace std;

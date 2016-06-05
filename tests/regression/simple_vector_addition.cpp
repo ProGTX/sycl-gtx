@@ -5,6 +5,8 @@
 // Example from http://www.codeplay.com/portal/sycl-tutorial-1-the-vector-addition
 // (slightly modified)
 
+// Originally test1
+
 #define TOL (0.001)		// Tolerance used in floating point comparisons
 #define LENGTH (1024)	// Length of vectors a, b and c
 

@@ -2,6 +2,8 @@
 
 // Random number generation
 
+// Originally test11
+
 using cl::sycl::float1;
 using cl::sycl::uint1;
 using cl::sycl::uint2;
@@ -13,7 +15,7 @@ Float getRandom(Uint2& seed) {
 	Uint1 x = seed.x() * 17 + seed.y() * 13123;
 	seed.x() = (x << 13) ^ x;
 	seed.y() ^= x << 7;
-	return (Float)(x * (x * x * 15731 + 74323) + 871483) * invMaxInt;
+	return static_cast<Float>((x * (x * x * 15731 + 74323) + 871483) * invMaxInt);
 }
 
 float1 deviceRandom(uint2& seed) {

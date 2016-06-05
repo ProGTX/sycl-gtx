@@ -3,6 +3,8 @@
 // 2.5.6 Anatomy of a SYCL application
 // (slightly revised from revision 2014-03-09 of the specification)
 
+// Originally test2
+
 int main() {
 	using namespace cl::sycl;
 

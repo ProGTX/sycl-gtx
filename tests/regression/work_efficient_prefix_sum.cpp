@@ -2,6 +2,8 @@
 
 // Work efficient prefix sum
 
+// Originally test9
+
 template <typename F, typename std::enable_if<std::is_floating_point<F>::value>::type* = nullptr>
 bool check_sum(cl::sycl::buffer<F, 1>& data) {
 	using namespace cl::sycl;

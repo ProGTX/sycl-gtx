@@ -2,6 +2,8 @@
 
 // Parallel reduction sum with local decomposition
 
+// Originally test6
+
 int main() {
 	using namespace cl::sycl;
 

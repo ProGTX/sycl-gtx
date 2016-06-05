@@ -2,10 +2,16 @@
 
 // Naive square matrix rotation
 
+// Originally test3
+
 using namespace cl::sycl;
 
 // Size of the square matrices
+#if _DEBUG
+const size_t N = 128;
+#else
 const size_t N = 1024;
+#endif
 
 int main() {
 	{

@@ -2,13 +2,20 @@
 
 // 2.12 Example SYCL application
 
+// Originally test7
+
 using namespace cl::sycl;
 
 // Size of the matrices
 // Note: Checking results at end can be very slow
-// - this size is still manageable, if optimizations are on
+// - this size is still manageable if optimizations are on
+#if _DEBUG
+const size_t N = 200;
+const size_t M = 100;
+#else
 const size_t N = 2000;
 const size_t M = 1000;
+#endif
 
 int main() {
 	{	// By including all the SYCL work in a {} block,
@@ -66,10 +73,10 @@ int main() {
 		// Ask for access to read c from the host-side.
 		// The SYCL runtime ensures that c is ready when the accessor is returned
 		auto C = c.get_access<access::mode::read, access::target::host_buffer>();
-		for(size_t i = 0; i < N; ++i) {
-			for(size_t j = 0; j < M; ++j) {
+		for(int i = 0; i < N; ++i) {
+			for(int j = 0; j < M; ++j) {
 				// Compare the result to the analytic value
-				auto expected = (int)(i*(2 + 2014) + j*(1 + 42));
+				auto expected = i*(2 + 2014) + j*(1 + 42);
 				if(C[i][j] != expected) {
 					debug() << i << j << "expected" << expected << "actual" << C[i][j];
 					return 1;
