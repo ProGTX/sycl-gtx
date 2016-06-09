@@ -1,11 +1,12 @@
 #pragma once
 
-#ifdef _WIN32
 #include <random>
 
+#ifndef M_PI
 #define M_PI 3.14159265358979323846	// MSDN Math Constants
+#endif
 
-namespace ns_erand {
+namespace ns_random {
 
 inline std::default_random_engine& generator() {
 	static std::default_random_engine generator_;
@@ -25,9 +26,7 @@ static void reset() {
 
 // http://stackoverflow.com/a/27198754
 // With modifications to make variables static
-static double erand48(unsigned short int X[3]) {
-	return ns_erand::distr(ns_erand::generator());
+static double get_random(unsigned short int X[3]) {
+	return ns_random::distr(ns_random::generator());
 }
 
-
-#endif

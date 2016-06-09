@@ -129,7 +129,7 @@ static bool tester(
 		}
 
 		cout << "Running test: " << t.name << endl;
-		ns_erand::reset();
+		ns_random::reset();
 #ifndef _DEBUG
 		try {
 #endif

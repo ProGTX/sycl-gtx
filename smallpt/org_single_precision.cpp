@@ -75,9 +75,9 @@ Vec radiance(const Ray &r, int depth, unsigned short *Xi) {
 	Vec x = r.o + r.d*t, n = (x - obj.p).norm(), nl = n.dot(r.d) < 0 ? n : n*-1, f = obj.c;
 	float p = f.x > f.y && f.x>f.z ? f.x : f.y > f.z ? f.y : f.z; // max refl
 	if(depth > 255) return obj.e;
-	if(++depth > 5) if(erand48(Xi) < p) f = f*(1 / p); else return obj.e; //R.R.
+	if(++depth > 5) if(get_random(Xi) < p) f = f*(1 / p); else return obj.e; //R.R.
 	if(obj.refl == DIFF) {                  // Ideal DIFFUSE reflection
-		float r1 = (float)(2 * M_PI*erand48(Xi)), r2 = (float)erand48(Xi), r2s = sqrt(r2);
+		float r1 = (float)(2 * M_PI*get_random(Xi)), r2 = (float)get_random(Xi), r2s = sqrt(r2);
 		Vec w = nl, u = ((fabs(w.x) > .1 ? Vec(0, 1) : Vec(1)) % w).norm(), v = w%u;
 		Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1 - r2)).norm();
 		return obj.e + f.mult(radiance(Ray(x, d), depth, Xi));
@@ -92,7 +92,7 @@ Vec radiance(const Ray &r, int depth, unsigned short *Xi) {
 	Vec tdir = (r.d*nnt - n*((into ? 1 : -1)*(ddn*nnt + sqrt(cos2t)))).norm();
 	float a = nt - nc, b = nt + nc, R0 = a*a / (b*b), c = 1 - (into ? -ddn : tdir.dot(n));
 	float Re = R0 + (1 - R0)*c*c*c*c*c, Tr = 1 - Re, P = .25f + .5f*Re, RP = Re / P, TP = Tr / (1 - P);
-	return obj.e + f.mult(depth > 2 ? (erand48(Xi) < P ?   // Russian roulette
+	return obj.e + f.mult(depth > 2 ? (get_random(Xi) < P ?   // Russian roulette
 		radiance(reflRay, depth, Xi)*RP : radiance(Ray(x, tdir), depth, Xi)*TP) :
 		radiance(reflRay, depth, Xi)*Re + radiance(Ray(x, tdir), depth, Xi)*Tr);
 }
@@ -102,8 +102,8 @@ inline void compute_inner(int y, int w, int h, int samps, Ray &cam, Vec &cx, Vec
 		for(int sy = 0, i = (h - y - 1)*w + x; sy < 2; sy++)     // 2x2 subpixel rows
 			for(int sx = 0; sx < 2; sx++, r = Vec()) {        // 2x2 subpixel cols
 				for(int s = 0; s < samps; s++) {
-					float r1 = (float)(2 * erand48(Xi)), dx = r1 < 1 ? sqrt(r1) - 1 : 1 - sqrt(2 - r1);
-					float r2 = (float)(2 * erand48(Xi)), dy = r2 < 1 ? sqrt(r2) - 1 : 1 - sqrt(2 - r2);
+					float r1 = (float)(2 * get_random(Xi)), dx = r1 < 1 ? sqrt(r1) - 1 : 1 - sqrt(2 - r1);
+					float r2 = (float)(2 * get_random(Xi)), dy = r2 < 1 ? sqrt(r2) - 1 : 1 - sqrt(2 - r2);
 					Vec d = cx*(((sx + .5f + dx) / 2 + x) / w - .5f) +
 						cy*(((sy + .5f + dy) / 2 + y) / h - .5f) + cam.d;
 					r = r + radiance(Ray(cam.o + d * 140, d.norm()), 0, Xi)*(1.f / samps);

@@ -373,8 +373,8 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec c
 				Xi[2] = y*y*y;
 				for(int x = 0; x < w; ++x) {
 					cl::sycl::cl_uint2 seed;
-					seed.x() = (::cl_uint)erand48(Xi);
-					seed.y() = (::cl_uint)erand48(Xi);
+					seed.x() = (::cl_uint)get_random(Xi);
+					seed.y() = (::cl_uint)get_random(Xi);
 					seeds[y*w + x] = seed;
 				}
 			}
