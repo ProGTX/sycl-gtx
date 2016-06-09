@@ -85,8 +85,11 @@ private:
   struct array_traits :
     detail::array_traits<Contained_, info::device, param, BufferSize>
   {
+  private:
+    using Base = detail::array_traits<Contained_, info::device, param, BufferSize>;
+  public:
     void get_info(const device* dev) {
-      this->Base::get(dev->device_id.get());
+      Base::Base::get(dev->device_id.get());
     }
   };
 

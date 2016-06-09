@@ -123,8 +123,11 @@ private:
   struct array_traits :
     detail::array_traits<Contained_, info::context, param, BufferSize>
   {
+  private:
+    using Base = detail::array_traits<Contained_, info::context, param, BufferSize>;
+  public:
     void get_info(const context* ctx) {
-      this->Base::get(ctx->ctx.get());
+      Base::Base::get(ctx->ctx.get());
     }
   };
 
