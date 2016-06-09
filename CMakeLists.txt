@@ -8,7 +8,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(OpenCL REQUIRED)
 
 # Common functions
-include("cmake/common.cmake")
+set(_cmake_files
+  "cmake/common.cmake"
+  "cmake/color_diagnostics.cmake"
+)
+foreach(_file ${_cmake_files})
+  include(${_file})
+endforeach()
 
 if(MSVC)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
