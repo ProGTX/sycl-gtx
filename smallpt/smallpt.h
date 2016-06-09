@@ -174,7 +174,7 @@ struct version {
 	int minor = 0;
 
 	version(int major, int minor)
-		: major(major), minor(minor) {}
+		: major{ major }, minor{ minor } {}
 	version(const string& v) {
 		// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetPlatformInfo.html
 		using namespace std;
