@@ -53,7 +53,7 @@ protected:
   template <typename, int, int>
   friend struct cl_base;
   template <typename>
-  friend struct type_string;
+  friend struct ::cl::sycl::detail::type_string;
   template <typename, int>
   friend class base;
 

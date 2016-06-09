@@ -35,10 +35,14 @@ private:
   using data_ref = detail::data_ref;
   using type_t = data_ref::type_t;
 
+  // Helper constructor to help with assignment
+  vec(const string_class& name, bool, bool)
+    : Base(name, true), Members(this) {}
+
   template <typename T>
   vec& assign(const T& copy) {
     if(this->type == type_t::expression) {
-      Base b(this->name, true);
+      vec b(this->name, true, true);
       this->name = std::move(b.name);
       this->type = type_t::general;
     }
@@ -132,10 +136,14 @@ private:
   using data_ref = detail::data_ref;
   using type_t = data_ref::type_t;
 
+  // Helper constructor to help with assignment
+  vec(const string_class& name, bool, bool)
+    : Base(name, true), Members(this) {}
+
   template <typename T>
   vec& assign(const T& copy) {
     if(this->type == type_t::expression) {
-      Base b(this->name, true);
+      vec b(this->name, true, true);
       this->name = std::move(b.name);
       this->type = type_t::general;
     }

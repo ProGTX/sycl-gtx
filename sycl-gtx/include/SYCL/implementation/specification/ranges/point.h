@@ -8,6 +8,14 @@ namespace cl {
 namespace sycl {
 namespace detail {
 
+// Forward declarations
+template <int dimensions>
+struct get_special_id;
+template <int dimensions>
+struct get_special_range;
+template <int dimensions, bool is_id>
+struct identifier_code;
+
 struct point_names {
   static const string_class id_global;
   static const string_class range_global;
