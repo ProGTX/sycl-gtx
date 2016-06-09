@@ -1,5 +1,7 @@
 #pragma once
 
+#include "base.h"
+
 namespace cl {
 namespace sycl {
 
@@ -13,12 +15,7 @@ namespace vectors {
 
 #define SYCL_SIMPLE_SWIZZLES
 
-// Forward declarations
-template <typename, int>
-class base;
-template <typename dataT, int numElements>
-using swizzled_vec = vec<dataT, numElements>;
-
+// Forward declaration
 template <typename dataT, int parentElems, int selfElems = parentElems>
 struct members;
 
