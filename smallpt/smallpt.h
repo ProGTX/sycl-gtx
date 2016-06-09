@@ -130,7 +130,7 @@ static bool tester(
 
 		cout << "Running test: " << t.name << endl;
 		ns_random::reset();
-#ifndef _DEBUG
+#ifdef NDEBUG
 		try {
 #endif
 			auto start = now();
@@ -140,7 +140,7 @@ static bool tester(
 			}
 			time = (duration(start) / (float)iterations);
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 		}
 		catch(cl::sycl::exception& e) {
 			cerr << "SYCL error while testing: " << e.what() << endl;
@@ -152,7 +152,7 @@ static bool tester(
 		}
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		to_file(w, h, vectors.data(), imagePrefix() + ' ' + t.name + ".ppm");
 #endif
 
@@ -282,7 +282,7 @@ static void getDevices(std::vector<testInfo>& tests, std::vector<testInfo::funct
 					(deviceVersion.major == required.major && deviceVersion.minor >= required.minor)
 				) {
 #ifndef SYCL_GTX
-#ifdef _DEBUG
+#ifndef NDEBUG
 					// There seem to be some problems with ComputeCpp and HD 4600
 					if(name.find("HD Graphics 4600") == string::npos)
 #endif

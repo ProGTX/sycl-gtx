@@ -17,7 +17,7 @@
 
 #define DSELF() debug(__func__)
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define SYCL_ENABLE_DEBUG 1
 #endif
 

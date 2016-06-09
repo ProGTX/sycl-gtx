@@ -462,12 +462,12 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_, Vec c
 	};
 
 	for(auto k = 0; k < numParts; ++k) {
-#if _DEBUG
+#ifndef NDEBUG
 		cout << "Waiting for kernel to finish ..." << endl;
 #endif
 		auto c = colors[k].get_access<access::mode::read, access::target::host_buffer>();
 
-#if _DEBUG
+#ifndef NDEBUG
 		cout << "Copying results ..." << endl;
 #endif
 		auto start = lineOffset[k].first;

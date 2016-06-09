@@ -39,7 +39,7 @@ int main() {
 		auto s = spheres.get_access<access::mode::read, access::target::host_buffer>();
 
 		auto compare = [](::cl_int expected, ::cl_int actual) {
-#ifdef _DEBUG
+#ifndef NDEBUG
 			cout << expected << ", " << actual << endl;
 #endif
 			if(actual != expected) {

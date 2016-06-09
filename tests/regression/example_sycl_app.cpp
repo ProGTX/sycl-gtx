@@ -9,7 +9,7 @@ using namespace cl::sycl;
 // Size of the matrices
 // Note: Checking results at end can be very slow
 // - this size is still manageable if optimizations are on
-#if _DEBUG
+#ifndef NDEBUG
 const size_t N = 200;
 const size_t M = 100;
 #else

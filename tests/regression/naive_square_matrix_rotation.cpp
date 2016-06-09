@@ -7,7 +7,7 @@
 using namespace cl::sycl;
 
 // Size of the square matrices
-#if _DEBUG
+#ifndef NDEBUG
 const size_t N = 128;
 #else
 const size_t N = 1024;
