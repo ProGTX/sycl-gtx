@@ -32,7 +32,7 @@ public:
     : parent(parent) {}
 
   swizzled_vec<dataT, 1> x() const {
-    return this->parent->swizzle<0>();
+    return this->parent->template swizzle<0>();
   }
 #endif
 };
@@ -44,7 +44,7 @@ struct members<dataT, parentElems, 2> : members<dataT, parentElems, 1> {
 
 #ifdef SYCL_SIMPLE_SWIZZLES
   swizzled_vec<dataT, 1> y() const {
-    return this->parent->swizzle<1>();
+    return this->parent->template swizzle<1>();
   }
 #endif
 };
@@ -56,11 +56,11 @@ struct members<dataT, parentElems, 3> : members<dataT, parentElems, 2> {
 
 #ifdef SYCL_SIMPLE_SWIZZLES
   swizzled_vec<dataT, 1> z() const {
-    return this->parent->swizzle<2>();
+    return this->parent->template swizzle<2>();
   }
 
   swizzled_vec<dataT, 3> xyz() const {
-    return this->parent->swizzle<0, 1, 2>();
+    return this->parent->template swizzle<0, 1, 2>();
   }
 #endif
 };
@@ -72,7 +72,7 @@ struct members<dataT, parentElems, 4> : members<dataT, parentElems, 3> {
 
 #ifdef SYCL_SIMPLE_SWIZZLES
   swizzled_vec<dataT, 1> w() const {
-    return this->parent->swizzle<3>();
+    return this->parent->template swizzle<3>();
   }
 #endif
 };
