@@ -14,6 +14,7 @@
 #include "../debug.h"
 #include "../synchronizer.h"
 
+
 namespace cl {
 namespace sycl {
 
@@ -21,8 +22,6 @@ namespace sycl {
 class queue {
 private:
   friend class detail::synchronizer;
-  template <class>
-  friend class std::allocator;
 
   using buffer_set = std::set<detail::buffer_base*>;
 
@@ -99,19 +98,21 @@ private:
 public:
   ~queue();
 
-  // Copy and move semantics
+  // Copy semantics
   queue(const queue&) = default;
   queue& operator=(const queue&) = default;
-#if MSVC_LOW
+
+  // Queue requires custom move semantics
+  // because the parent pointer is carrier in subqueues
   queue(queue&& move)
     : SYCL_MOVE_INIT(ctx),
-    SYCL_MOVE_INIT(dev),
-    SYCL_MOVE_INIT(command_q),
-    SYCL_MOVE_INIT(ex_list),
-    SYCL_MOVE_INIT(command_group),
-    SYCL_MOVE_INIT(buffers_in_use),
-    SYCL_MOVE_INIT(is_flushed),
-    SYCL_MOVE_INIT(subqueues) {
+      SYCL_MOVE_INIT(dev),
+      SYCL_MOVE_INIT(command_q),
+      SYCL_MOVE_INIT(ex_list),
+      SYCL_MOVE_INIT(command_group),
+      SYCL_MOVE_INIT(buffers_in_use),
+      SYCL_MOVE_INIT(is_flushed),
+      SYCL_MOVE_INIT(subqueues) {
     move.command_q = nullptr;
     command_group.q = this;
   }
@@ -126,10 +127,6 @@ public:
     SYCL_SWAP(is_flushed);
     SYCL_SWAP(subqueues);
   }
-#else
-  queue(queue&&) = default;
-  queue& operator=(queue&&) = default;
-#endif
 
   bool is_host();
 
@@ -168,7 +165,7 @@ public:
   // TODO
   template <typename T>
   handler_event submit(T cgf) {
-    subqueues.emplace_back(this, cgf);
+    subqueues.push_back({ this, cgf });
     return subqueues.back().process(buffers_in_use);
   }
 

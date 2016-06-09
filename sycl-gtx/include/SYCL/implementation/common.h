@@ -12,9 +12,10 @@
 #endif
 #endif
 
-#if MSVC_LOW
 #define SYCL_SWAP(member) swap(first.member, second.member)
 #define SYCL_MOVE_INIT(member) member(std::move(move.member))
+
+#if MSVC_LOW
 #define SYCL_THREAD_LOCAL __declspec(thread)
 #else
 #define SYCL_THREAD_LOCAL thread_local
