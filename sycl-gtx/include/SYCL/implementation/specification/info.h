@@ -2,6 +2,7 @@
 
 // C. Interface of Memory Object Information Descriptors
 
+#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #include <CL/cl.h>
 #include <type_traits>
 

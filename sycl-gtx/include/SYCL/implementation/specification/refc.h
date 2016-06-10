@@ -6,7 +6,6 @@
 
 #include "error_handler.h"
 #include "../common.h"
-#include <CL/cl.h>
 
 namespace cl {
 namespace sycl {
