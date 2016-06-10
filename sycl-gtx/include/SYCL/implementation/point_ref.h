@@ -19,7 +19,7 @@ struct get_value_point_t {
     return type(std::move(value), type_, true);
   }
   static type constructor(string_class&& value, data_ref::type_t type_) {
-    type(std::move(value), type_, true);
+    return type(std::move(value), type_, true);
   }
 };
 
