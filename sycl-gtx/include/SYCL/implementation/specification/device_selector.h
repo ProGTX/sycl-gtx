@@ -39,7 +39,7 @@ public:
 // If no OpenCL device is found then the execution is executed on the SYCL Host Mode.
 struct default_selector : device_selector {
   default_selector()
-    : device_selector(info::device_type::all) {}
+    : device_selector(info::device_type::defaults) {}
   virtual int operator()(const device& dev) const override;
 };
 
