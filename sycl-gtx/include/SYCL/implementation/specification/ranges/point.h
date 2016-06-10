@@ -59,6 +59,8 @@ protected:
       case type_t::range_local:
         name = point_names::range_local;
         break;
+      default:
+        break;
     }
     return name;
   }

@@ -30,6 +30,8 @@ struct identifier_code {
       case type_t::range_local:
         name = "get_local_size";
         break;
+      default:
+        break;
     }
     return name;
   }

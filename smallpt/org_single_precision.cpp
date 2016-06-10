@@ -75,7 +75,9 @@ Vec radiance(const Ray &r, int depth, unsigned short *Xi) {
 	Vec x = r.o + r.d*t, n = (x - obj.p).norm(), nl = n.dot(r.d) < 0 ? n : n*-1, f = obj.c;
 	float p = f.x > f.y && f.x>f.z ? f.x : f.y > f.z ? f.y : f.z; // max refl
 	if(depth > 255) return obj.e;
-	if(++depth > 5) if(get_random(Xi) < p) f = f*(1 / p); else return obj.e; //R.R.
+	if(++depth > 5) {
+		if(get_random(Xi) < p) { f = f*(1 / p); } else { return obj.e; }
+	} //R.R.
 	if(obj.refl == DIFF) {                  // Ideal DIFFUSE reflection
 		float r1 = (float)(2 * M_PI*get_random(Xi)), r2 = (float)get_random(Xi), r2s = sqrt(r2);
 		Vec w = nl, u = ((fabs(w.x) > .1 ? Vec(0, 1) : Vec(1)) % w).norm(), v = w%u;

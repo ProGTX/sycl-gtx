@@ -119,10 +119,10 @@ static bool tester(
 		if(t.lastTime > perTestLimit &&
 			(
 				(!isOpenCLAvailable && overHalf)	||
-				(isOpenCLAvailable &&
+				(isOpenCLAvailable && (
 					!t.isOpenCL() ||
 					(t.isOpenCL() && overHalf)
-				)
+				))
 			)
 		) {
 			continue;
