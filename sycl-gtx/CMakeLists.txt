@@ -1,5 +1,5 @@
 set(_source_root_path "${CMAKE_CURRENT_SOURCE_DIR}/source")
-set(_include_root_path "${CMAKE_CURRENT_SOURCE_DIR}/include/CL/implementation")
+set(_include_root_path "${CMAKE_CURRENT_SOURCE_DIR}/include/CL")
 
 GET_ALL_FILES(_source_list "${_source_root_path}" "*.cpp")
 GET_ALL_FILES(_header_list "${_include_root_path}" "*.h")
