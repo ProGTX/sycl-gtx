@@ -1,7 +1,0 @@
-purpose				Compare performance of test3 before and after commit
-commit before		b0298f96822b341419469538f9aee525de8e8b47
-commit after
-tested				test3
-target				Release Win32
-analysis			CPU
-TRY_CATCH_ERRORS	1
