@@ -9,6 +9,7 @@
 #include "command_group.h"
 #include "context.h"
 #include "device.h"
+#include "functions/common.h"
 #include "handler.h"
 #include "info.h"
 #include "kernel.h"
