@@ -6,7 +6,6 @@ Debug/
 Release/
 *.vsp
 *.vspx
-cl/
 *.stackdump
 *.ppm
 *.o
