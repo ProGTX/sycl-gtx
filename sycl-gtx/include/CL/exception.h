@@ -17,7 +17,7 @@ struct thrower;
 }
 }
 
-struct exception {
+struct exception : std::exception_ptr {
 protected:
   friend struct detail::error::thrower;
   string_class description;
