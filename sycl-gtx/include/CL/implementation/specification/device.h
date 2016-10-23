@@ -67,7 +67,7 @@ public:
   static vector_class<device> get_devices(
     info::device_type deviceType = info::device_type::all);
 
-  bool has_extension(const string_class& extension_name);
+  bool has_extension(const string_class& extension_name) const;
 
   // Partition device
   vector_class<device> create_sub_devices(

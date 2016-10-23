@@ -54,7 +54,7 @@ vector_class<device> device::get_devices(info::device_type deviceType) {
   return detail::get_devices((cl_device_type)deviceType, nullptr);
 }
 
-bool device::has_extension(const string_class& extension_name) {
+bool device::has_extension(const string_class& extension_name) const {
   return detail::has_extension<info::device, info::device::extensions>(
     this, extension_name);
 }
