@@ -285,6 +285,10 @@ protected:
 
 public:
   void set_final_data(weak_ptr_class<DataType_>& finalData);
+
+  // TODO: nullptr indicates not to copy back
+  void set_final_data(nullptr_t) {
+  }
 };
 
 } // namespace detail
