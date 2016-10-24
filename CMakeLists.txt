@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 project(sycl-gtx-solution)
 
+# CMake variable to string resolution policy
+cmake_policy(SET CMP0054 NEW)
+
 # Requirements
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
