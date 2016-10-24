@@ -73,7 +73,7 @@ public:
     size_t local_size
   ) : input(data.template get_access<mode::read_write>(cgh)),
       higher_level(higher_level.template get_access<mode::write>(cgh)),
-      localBlock(local_size),
+      localBlock(local_size, cgh),
       global_size(global_size) {}
 
   void operator()(cl::sycl::nd_item<1> index) {

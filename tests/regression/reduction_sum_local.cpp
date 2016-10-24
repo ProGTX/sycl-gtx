@@ -42,7 +42,7 @@ int main() {
         local_size = std::min(local_size, N);
         auto local =
           accessor<float, 1, access::mode::read_write, access::target::local>(
-            local_size
+            local_size, cgh
           );
 
         DSELF() << N << local_size;

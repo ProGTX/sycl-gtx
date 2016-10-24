@@ -3,8 +3,9 @@
 // 3.6.4.6 Local accessors
 
 #include "device_reference.h"
-#include "../access.h"
+#include "access.h"
 #include "accessor.h"
+
 #include "../buffer.h"
 #include "command_group.h"
 #include "ranges.h"
@@ -43,7 +44,7 @@ protected:
   }
 
 public:
-  accessor_(range<dimensions> allocationSize)
+  accessor_(range<dimensions> allocationSize, handler& commandGroupHandler)
     : base_acc_device_ref(this, {}),
     allocationSize(allocationSize) {
     // TODO
