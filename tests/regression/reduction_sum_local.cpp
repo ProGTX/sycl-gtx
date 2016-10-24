@@ -59,7 +59,7 @@ int main() {
           }
           SYCL_END
 
-            index.barrier(access::fence_space::local);
+            index.barrier(access::fence_space::local_space);
 
           N = min(N, (uint1)index.get_local_range().get(0));
 
@@ -69,7 +69,7 @@ int main() {
               local[lid] += local[lid + stride];
             }
             SYCL_END
-              index.barrier(access::fence_space::local);
+              index.barrier(access::fence_space::local_space);
             stride /= 2;
           }
           SYCL_END

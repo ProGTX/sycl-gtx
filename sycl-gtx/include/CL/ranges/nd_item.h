@@ -97,10 +97,10 @@ public:
     string_class flag_string;
 
     switch(flag) {
-      case access::fence_space::local:
+      case access::fence_space::local_space:
         flag_string = "CLK_LOCAL_MEM_FENCE";
         break;
-      case access::fence_space::global:
+      case access::fence_space::global_space:
         flag_string = "CLK_GLOBAL_MEM_FENCE";
         break;
       case access::fence_space::global_and_local:

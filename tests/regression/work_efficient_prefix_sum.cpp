@@ -88,7 +88,7 @@ public:
     }
     SYCL_END
 
-      index.barrier(access::fence_space::local);
+      index.barrier(access::fence_space::local_space);
 
     uint1 local_size = 2 * index.get_local_range()[0];
     uint1 first;
@@ -106,7 +106,7 @@ public:
       }
       SYCL_END
 
-        index.barrier(access::fence_space::local);
+        index.barrier(access::fence_space::local_space);
       offset *= 2;
     }
     SYCL_END
@@ -115,7 +115,7 @@ public:
       localBlock[local_size - 1] = 0;
     }
     SYCL_END
-      index.barrier(access::fence_space::local);
+      index.barrier(access::fence_space::local_space);
 
     vec<T, 1> tmp;
 
@@ -131,7 +131,7 @@ public:
       }
       SYCL_END
 
-        index.barrier(access::fence_space::local);
+        index.barrier(access::fence_space::local_space);
       offset /= 2;
     }
     SYCL_END
@@ -144,7 +144,7 @@ public:
     }
     SYCL_END
 
-      index.barrier(access::fence_space::local);
+      index.barrier(access::fence_space::local_space);
 
     uint1 last_sum_id = GID + local_size - 1;
     SYCL_IF(LID == 0 && last_sum_id < global_size) {

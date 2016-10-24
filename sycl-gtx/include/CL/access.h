@@ -8,8 +8,8 @@ namespace access {
 
 // 3.8 Synchronization and atomics
 enum class fence_space : char {
-  local,
-  global,
+  local_space,
+  global_space,
   global_and_local
 };
 
