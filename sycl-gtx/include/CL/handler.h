@@ -60,11 +60,32 @@ private:
     issue::read_buffers_from_device(kern);
   }
 
+  template <typename KernelName, class KernelType, int dimensions>
+  void parallel_for_range(
+    range<dimensions> numWorkItems,
+    id<dimensions> workItemOffset,
+    KernelType kernFunctor
+  ) {
+    auto kern = build(kernFunctor);
+    issue_enqueue(kern, &issue::enqueue_range, numWorkItems, workItemOffset);
+  }
+  // TODO: Why is the offset needed? It's already contained in the nd_range
+  template <typename KernelName, class KernelType, int dimensions>
+  void parallel_for_nd_range(
+    nd_range<dimensions> executionRange,
+    id<dimensions> workItemOffset,
+    KernelType kernFunctor
+  ) {
+    auto kern = build(kernFunctor);
+    issue_enqueue(kern, &issue::enqueue_nd_range, executionRange);
+  }
+
 public:
   // TODO
-  template
-    <typename DataType, int dimensions, access::mode mode, access::target target>
+  template <typename DataType, int dimensions, access::mode mode,
+            access::target target>
   void set_arg(int arg_index, accessor<DataType, dimensions, mode, target>& acc_obj);
+
   template <typename T>
   void set_arg(int arg_index, T scalar_value);
 
@@ -82,7 +103,7 @@ public:
 
   template <typename KernelName, class KernelType, int dimensions>
   void parallel_for(range<dimensions> numWorkItems, KernelType kernFunctor) {
-    parallel_for<KernelName>(numWorkItems, id<dimensions>(), kernFunctor);
+    parallel_for_range<KernelName>(numWorkItems, id<dimensions>(), kernFunctor);
   }
 
   // This type of kernel can be invoked with a function
@@ -93,23 +114,21 @@ public:
     id<dimensions> workItemOffset,
     KernelType kernFunctor
   ) {
-    auto kern = build(kernFunctor);
-    issue_enqueue(kern, &issue::enqueue_range, numWorkItems, workItemOffset);
+    parallel_for_range<KernelName>(numWorkItems, workItemOffset, kernFunctor);
   }
 
   template <typename KernelName, class KernelType, int dimensions>
   void parallel_for(nd_range<dimensions> executionRange, KernelType kernFunctor) {
-    auto kern = build(kernFunctor);
-    issue_enqueue(kern, &issue::enqueue_nd_range, executionRange);
+    parallel_for_nd_range<KernelName>(executionRange, id<dimensions>(), kernFunctor);
   }
-
-  // TODO: Why is the offset needed? It's already contained in the nd_range
   template <typename KernelName, class KernelType, int dimensions>
   void parallel_for(
     nd_range<dimensions> numWorkItems,
     id<dimensions> workItemOffset,
     KernelType kernFunctor
-  );
+  ) {
+    parallel_for_nd_range<KernelName>(numWorkItems, workItemOffset, kernFunctor);
+  }
 
 
   // TODO: 3.5.3.3 Parallel For hierarchical invoke
@@ -132,41 +151,60 @@ public:
   void single_task(KernelType kernFunctor) {
     single_task<KernelType, KernelType>(kernFunctor);
   }
-  template
-    <class KernelType, int dimensions, class = decltype(KernelType::operator())>
+  template <
+    class KernelType,
+    int dimensions,
+    class = decltype(
+      std::declval<KernelType>().operator()(std::declval<item<dimensions>>())
+    )
+  >
   void parallel_for(range<dimensions> numWorkItems, KernelType kernFunctor) {
-    parallel_for<KernelType, KernelType, dimensions>(numWorkItems, kernFunctor);
+    parallel_for_range<KernelType, KernelType, dimensions>(
+      numWorkItems, id<dimensions>(), kernFunctor);
   }
-  template
-    <class KernelType, int dimensions, class = decltype(KernelType::operator())>
+  template <
+    class KernelType,
+    int dimensions,
+    class = decltype(
+      std::declval<KernelType>().operator()(std::declval<item<dimensions>>())
+    )
+  >
   void parallel_for(
     range<dimensions> numWorkItems,
     id<dimensions> workItemOffset,
     KernelType kernFunctor
   ) {
-    parallel_for<KernelType, KernelType, dimensions>(
+    parallel_for_range<KernelType, KernelType, dimensions>(
       numWorkItems, workItemOffset, kernFunctor);
   }
   template <
     class KernelType,
     int dimensions,
     class = decltype(
-      std::declval<KernelType>().operator()(std::declval<nd_item<1>>())
+      std::declval<KernelType>().operator()(std::declval<nd_item<dimensions>>())
     )
   >
   void parallel_for(nd_range<dimensions> executionRange, KernelType kernFunctor) {
-    parallel_for<KernelType, KernelType, dimensions>(executionRange, kernFunctor);
+    parallel_for_nd_range<KernelType, KernelType, dimensions>(
+      executionRange, id<dimensions>(), kernFunctor);
   }
-  template
-    <class KernelType, int dimensions, class = decltype(KernelType::operator())>
+  template <
+    class KernelType,
+    int dimensions,
+    class = decltype(
+      std::declval<KernelType>().operator()(std::declval<nd_item<dimensions>>())
+    )
+  >
   void parallel_for(
     nd_range<dimensions> numWorkItems,
     id<dimensions> workItemOffset,
     KernelType kernFunctor
   ) {
-    parallel_for<KernelType, KernelType, dimensions>(
+    parallel_for_nd_range<KernelType, KernelType, dimensions>(
       numWorkItems, workItemOffset, kernFunctor);
   }
+
+  // TODO: Hierarchical invoke
   template <
     class WorkgroupFunctionType,
     int dimensions,
