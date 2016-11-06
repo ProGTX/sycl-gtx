@@ -91,6 +91,44 @@ public:
   template <int num = numElements>
   vec(const data_ref& x, const data_ref& y, const data_ref& z, SYCL_ENABLE_IF_DIM(3))
     : Base(x, y, z), Members(this) {}
+  template <int num = numElements>
+  vec(const data_ref& x,
+      const data_ref& y,
+      const data_ref& z,
+      const data_ref& w,
+      SYCL_ENABLE_IF_DIM(4))
+    : Base(x, y, z, w), Members(this) {}
+  template <int num = numElements>
+  vec(const data_ref& s0,
+      const data_ref& s1,
+      const data_ref& s2,
+      const data_ref& s3,
+      const data_ref& s4,
+      const data_ref& s5,
+      const data_ref& s6,
+      const data_ref& s7,
+      SYCL_ENABLE_IF_DIM(8))
+    : Base(s1, s2, s3, s4, s5, s6, s7), Members(this) {}
+  template <int num = numElements>
+  vec(const data_ref& s0,
+    const data_ref& s1,
+    const data_ref& s2,
+    const data_ref& s3,
+    const data_ref& s4,
+    const data_ref& s5,
+    const data_ref& s6,
+    const data_ref& s7,
+    const data_ref& s8,
+    const data_ref& s9,
+    const data_ref& sA,
+    const data_ref& sB,
+    const data_ref& sC,
+    const data_ref& sD,
+    const data_ref& sE,
+    const data_ref& sF,
+    SYCL_ENABLE_IF_DIM(16))
+    : Base(s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF),
+      Members(this) {}
 
   // TODO
   operator genvector() const {

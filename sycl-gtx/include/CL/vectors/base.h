@@ -92,7 +92,6 @@ public:
         open_parenthesis + type_name() + ")(" + x.name + ", " + y.name + ')',
         true
     ) {}
-
   template <int num = numElements>
   base(const data_ref& x, const data_ref& y, const data_ref& z, SYCL_ENABLE_IF_DIM(3))
     : base(
@@ -100,6 +99,62 @@ public:
           x.name + ", " + y.name + ", " + z.name +
         ')',
         true
+    ) {}
+  template <int num = numElements>
+  base(const data_ref& x,
+       const data_ref& y,
+       const data_ref& z,
+       const data_ref& w,
+       SYCL_ENABLE_IF_DIM(4))
+    : base(
+      open_parenthesis + type_name() + ")(" +
+        x.name + ", " + y.name + ", " + z.name + ", " + w.name +
+      ')',
+      true
+    ) {}
+  template <int num = numElements>
+  base(const data_ref& s0,
+       const data_ref& s1,
+       const data_ref& s2,
+       const data_ref& s3,
+       const data_ref& s4,
+       const data_ref& s5,
+       const data_ref& s6,
+       const data_ref& s7,
+       SYCL_ENABLE_IF_DIM(8))
+    : base(
+      open_parenthesis + type_name() + ")(" +
+        s0.name + ", " + s1.name + ", " + s2.name + ", " + s3.name + ", " +
+        s4.name + ", " + s5.name + ", " + s6.name + ", " + s7.name +
+      ')',
+      true
+    ) {}
+  template <int num = numElements>
+  base(const data_ref& s0,
+       const data_ref& s1,
+       const data_ref& s2,
+       const data_ref& s3,
+       const data_ref& s4,
+       const data_ref& s5,
+       const data_ref& s6,
+       const data_ref& s7,
+       const data_ref& sA,
+       const data_ref& sB,
+       const data_ref& sC,
+       const data_ref& sD,
+       const data_ref& sE,
+       const data_ref& sF,
+       const data_ref& sG,
+       const data_ref& sH,
+       SYCL_ENABLE_IF_DIM(16))
+    : base(
+      open_parenthesis + type_name() + ")(" +
+        s0.name + ", " + s1.name + ", " + s2.name + ", " + s3.name + ", " +
+        s4.name + ", " + s5.name + ", " + s6.name + ", " + s7.name + ", " +
+        s8.name + ", " + s9.name + ", " + sA.name + ", " + sB.name + ", " +
+        sC.name + ", " + sD.name + ", " + sE.name + ", " + sF.name +
+      ')',
+      true
     ) {}
 
   operator vec<dataT, numElements>&() {
