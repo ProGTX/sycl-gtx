@@ -238,9 +238,10 @@ public:
     return vec(std::move(r.name), type_t::expression);  \
   }
 
-  SYCL_VEC_OP(+)
-    SYCL_VEC_OP(-)
-    SYCL_VEC_OP(*)
+  SYCL_VEC_OP(+);
+  SYCL_VEC_OP(-);
+  SYCL_VEC_OP(*);
+  SYCL_VEC_OP(/);
 
 #undef SYCL_VEC_OP
 
