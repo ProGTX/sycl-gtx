@@ -1,4 +1,4 @@
-#include "detail/kernel_name.h"
+#include "SYCL/detail/kernel_name.h"
 
 using namespace cl::sycl;
 using namespace detail;

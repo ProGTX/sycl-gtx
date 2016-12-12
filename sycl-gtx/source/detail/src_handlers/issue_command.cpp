@@ -1,8 +1,8 @@
-#include "detail/src_handlers/issue_command.h"
+#include "SYCL/detail/src_handlers/issue_command.h"
 
-#include "accessor/buffer.h"
-#include "buffer.h"
-#include "kernel.h"
+#include "SYCL/accessors/buffer.h"
+#include "SYCL/buffer.h"
+#include "SYCL/kernel.h"
 
 using namespace cl::sycl;
 using detail::issue_command;

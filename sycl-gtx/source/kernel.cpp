@@ -1,8 +1,8 @@
-#include "kernel.h"
+#include "SYCL/kernel.h"
 
-#include "event.h"
-#include "program.h"
-#include "queue.h"
+#include "SYCL/event.h"
+#include "SYCL/program.h"
+#include "SYCL/queue.h"
 
 using namespace cl::sycl;
 

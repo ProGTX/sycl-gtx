@@ -3,25 +3,25 @@
 #define SYCL_GTX
 #define CL_SYCL_LANGUAGE_VERSION 120
 
-#include "accessor/buffer.h"
-#include "accessor/local.h"
-#include "buffer.h"
-#include "command_group.h"
-#include "context.h"
-#include "device.h"
-#include "functions/common.h"
-#include "handler.h"
-#include "info.h"
-#include "kernel.h"
-#include "platform.h"
-#include "program.h"
-#include "queue.h"
-#include "ranges.h"
-#include "vectors/swizzled_vec.h"
-#include "vectors/vec.h"
-#include "workitem_functions.h"
+#include "SYCL/accessors/buffer.h"
+#include "SYCL/accessors/local.h"
+#include "SYCL/buffer.h"
+#include "SYCL/command_group.h"
+#include "SYCL/context.h"
+#include "SYCL/device.h"
+#include "SYCL/functions/common.h"
+#include "SYCL/handler.h"
+#include "SYCL/info.h"
+#include "SYCL/kernel.h"
+#include "SYCL/platform.h"
+#include "SYCL/program.h"
+#include "SYCL/queue.h"
+#include "SYCL/ranges.h"
+#include "SYCL/vectors/swizzled_vec.h"
+#include "SYCL/vectors/vec.h"
+#include "SYCL/workitem_functions.h"
 
-#include "detail/flow_control.h"
+#include "SYCL/detail/flow_control.h"
 
 #if MSVC_LOW
 #undef MSVC_LOW

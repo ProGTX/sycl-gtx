@@ -1,8 +1,8 @@
-#include "detail/synchronizer.h"
+#include "SYCL/detail/synchronizer.h"
 
-#include "accessor.h"
-#include "buffer_base.h"
-#include "queue.h"
+#include "SYCL/accessor.h"
+#include "SYCL/buffer_base.h"
+#include "SYCL/queue.h"
 
 using namespace cl::sycl;
 using namespace detail;

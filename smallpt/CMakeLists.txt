@@ -10,7 +10,7 @@ if(OPENMP_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-include_directories(${_project_name} "${_sycl_gtx_include_path}")
+include_directories(${_project_name} ${SYCL_GTX_INCLUDE_PATH})
 include_directories(${_project_name} ${OpenCL_INCLUDE_DIRS})
 
 target_link_libraries(${_project_name} sycl-gtx)

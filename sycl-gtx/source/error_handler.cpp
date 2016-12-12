@@ -1,6 +1,6 @@
-#include "error_handler.h"
+#include "SYCL/error_handler.h"
 
-#include "context.h"
+#include "SYCL/context.h"
 
 using namespace cl::sycl;
 using namespace detail;

@@ -46,7 +46,7 @@ function(ADD_TEST_GROUP _group _source_list)
     add_executable(${_project_name} ${_test})
     set(group_set ${group_set} ${_project_name})
     
-    include_directories(${_project_name} "${_sycl_gtx_include_path}")
+    include_directories(${_project_name} ${SYCL_GTX_INCLUDE_PATH})
     include_directories(${_project_name} ${OpenCL_INCLUDE_DIRS})
     
     target_link_libraries(${_project_name} sycl-gtx)

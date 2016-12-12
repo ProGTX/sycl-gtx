@@ -1,6 +1,6 @@
-#include "device.h"
-#include "info.h"
-#include "platform.h"
+#include "SYCL/device.h"
+#include "SYCL/info.h"
+#include "SYCL/platform.h"
 
 using namespace cl::sycl;
 

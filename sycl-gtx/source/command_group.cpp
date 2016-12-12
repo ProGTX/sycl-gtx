@@ -1,8 +1,8 @@
-#include "command_group.h"
+#include "SYCL/command_group.h"
 
-#include "accessor.h"
-#include "buffer.h"
-#include "queue.h"
+#include "SYCL/accessor.h"
+#include "SYCL/buffer.h"
+#include "SYCL/queue.h"
 #include <map>
 #include <unordered_set>
 

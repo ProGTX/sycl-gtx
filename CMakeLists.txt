@@ -23,7 +23,7 @@ if(MSVC)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
-set(_sycl_gtx_include_path "${CMAKE_SOURCE_DIR}/sycl-gtx/include")
+set(SYCL_GTX_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/sycl-gtx/include)
 
 # Main library
 add_subdirectory(sycl-gtx)

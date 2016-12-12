@@ -1,7 +1,7 @@
-#include "handler.h"
+#include "SYCL/handler.h"
 
-#include "context.h"
-#include "queue.h"
+#include "SYCL/context.h"
+#include "SYCL/queue.h"
 
 using namespace cl::sycl;
 using namespace detail;

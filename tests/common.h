@@ -2,4 +2,4 @@
 
 #define SYCL_SIMPLE_SWIZZLES
 #include <CL/sycl.hpp>
-#include <CL/detail/debug.h>
+#include <SYCL/detail/debug.h>

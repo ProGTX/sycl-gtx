@@ -1,10 +1,10 @@
-#include "detail/src_handlers/kernel_source.h"
+#include "SYCL/detail/src_handlers/kernel_source.h"
 
-#include "access.h"
-#include "command_group.h"
-#include "error_handler.h"
-#include "kernel.h"
-#include "program.h"
+#include "SYCL/access.h"
+#include "SYCL/command_group.h"
+#include "SYCL/error_handler.h"
+#include "SYCL/kernel.h"
+#include "SYCL/program.h"
 
 using namespace cl::sycl;
 using namespace detail::kernel_;

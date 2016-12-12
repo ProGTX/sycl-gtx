@@ -1,7 +1,7 @@
-#include "device_selector.h"
-#include "device.h"
-#include "platform.h"
-#include "detail/debug.h"
+#include "SYCL/device_selector.h"
+#include "SYCL/device.h"
+#include "SYCL/platform.h"
+#include "SYCL/detail/debug.h"
 
 using namespace cl::sycl;
 
