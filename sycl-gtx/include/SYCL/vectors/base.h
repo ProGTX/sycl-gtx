@@ -138,6 +138,8 @@ public:
        const data_ref& s5,
        const data_ref& s6,
        const data_ref& s7,
+       const data_ref& s8,
+       const data_ref& s9,
        const data_ref& sA,
        const data_ref& sB,
        const data_ref& sC,
