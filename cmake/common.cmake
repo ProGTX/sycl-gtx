@@ -38,11 +38,13 @@ function(MSVC_SET_HEADER_FILTERS _include_root_path _header_list)
 endfunction()
 
 function(ADD_TEST_GROUP _group _source_list)
+  set(group_set "")
   foreach(_test ${_source_list})
     get_filename_component(_test "${_test}" NAME)
     get_filename_component(_project_name "${_test}" NAME_WE)
     
     add_executable(${_project_name} ${_test})
+    set(group_set ${group_set} ${_project_name})
     
     include_directories(${_project_name} "${_sycl_gtx_include_path}")
     include_directories(${_project_name} ${OpenCL_INCLUDE_DIRS})
@@ -58,4 +60,10 @@ function(ADD_TEST_GROUP _group _source_list)
     
     add_test(NAME ${_project_name} COMMAND ${_project_name})
   endforeach()
+
+  add_custom_target(${_group}_tests DEPENDS ${group_set})
+  if(MSVC)
+    set_target_properties(${_group}_tests
+                          PROPERTIES FOLDER "tests")
+  endif(MSVC)
 endfunction()
