@@ -17,3 +17,4 @@ ComputeCpp/sycl/sycl_export_link.h
 *.opendb
 *.db
 build/
+.vscode/
