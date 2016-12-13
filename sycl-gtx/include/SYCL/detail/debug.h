@@ -54,6 +54,12 @@ public:
 #if MSVC_LOW
   debug(debug&& move)
     : stream(std::move(move.stream)), before(std::move(move.before)) {}
+#elif defined(__GNUC__) && (__GNUC__ < 5)
+  // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54316
+  debug(debug&& move) {
+    stream << move.stream.str();
+    before << move.before.str();
+  }
 #else
   debug(debug&& move) = default;
 #endif
