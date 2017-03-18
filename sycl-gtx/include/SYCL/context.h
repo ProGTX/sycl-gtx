@@ -83,8 +83,8 @@ class context {
     SYCL_SWAP(asyncHandler);
   }
 #else
-  context(context&&) = default;
-  context& operator=(context&&) = default;
+  context(context&&) = default;             // NOLINT
+  context& operator=(context&&) = default;  // NOLINT
 #endif
 
  public:

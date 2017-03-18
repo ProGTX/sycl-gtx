@@ -45,9 +45,12 @@ class device {
     SYCL_SWAP(device_id);
     SYCL_SWAP(platfrm);
   }
-#else
+#elif MSVC_2017_OR_LOWER
   device(device&&) = default;
   device& operator=(device&&) = default;
+#else
+  device(device&&) noexcept = default;             // NOLINT
+  device& operator=(device&&) noexcept = default;  // NOLINT
 #endif
 
   cl_device_id get() const;

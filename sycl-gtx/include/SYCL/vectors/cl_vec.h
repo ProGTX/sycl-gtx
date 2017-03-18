@@ -73,9 +73,12 @@ struct cl_base<dataT, parentElems, 0> {
     std::swap(this->elems, move.elems);
     return *this;
   }
-#else
+#elif MSVC_2017_OR_LOWER
   cl_base(cl_base&&) = default;
   cl_base& operator=(cl_base&&) = default;
+#else
+  cl_base(cl_base&&) noexcept = default;             // NOLINT
+  cl_base& operator=(cl_base&&) noexcept = default;  // NOLINT
 #endif
   cl_base& operator=(const cl_base&) = default;
   cl_base& operator=(genvector v) { std::copy(&v, &v + size, this->elems); }

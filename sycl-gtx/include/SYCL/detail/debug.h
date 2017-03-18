@@ -52,12 +52,14 @@ class debug {
       : stream(std::move(move.stream)), before(std::move(move.before)) {}
 #elif defined(__GNUC__) && (__GNUC__ < 5)
   // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54316
-  debug(debug&& move) {
+  debug(debug&& move) noexcept {
     stream << move.stream.str();
     before << move.before.str();
   }
-#else
+#elif MSVC_2017_OR_LOWER
   debug(debug&& move) = default;
+#else
+  debug(debug&& move) noexcept = default;
 #endif
   debug(const debug& copy) = delete;
 
