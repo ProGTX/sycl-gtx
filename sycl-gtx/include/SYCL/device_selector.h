@@ -34,7 +34,7 @@ class device_selector {
   virtual int operator()(const device& dev) const = 0;
 };
 
-// TODO: Built-in device selectors
+// TODO(progtx): Built-in device selectors
 
 // Devices selected by heuristics of the system.
 // If no OpenCL device is found then the execution is executed on the SYCL Host

@@ -21,7 +21,7 @@ device device_selector::select_device(vector_class<device> devices) const {
 
   // Devices with a negative score will never be chosen.
   if (best_score < 0) {
-    // TODO: The "default" device constructed corresponds to the host.
+    // TODO(progtx): The "default" device constructed corresponds to the host.
     // This is also the device that the system will "fall-back" to,
     // if there are no existing or valid OpenCL devices associated with the
     // system.
@@ -34,7 +34,7 @@ device device_selector::select_device(vector_class<device> devices) const {
 
 platform device_selector::get_platform() {
   auto platforms = platform::get_platforms();
-  // TODO: Platform selection
+  // TODO(progtx): Platform selection
   return std::move(platforms[0]);
 }
 

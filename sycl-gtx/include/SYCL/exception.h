@@ -59,7 +59,7 @@ struct async_exception : exception {
 
 using exception_ptr = std::exception_ptr;
 
-// TODO: Used as a container for a list of asynchronous exceptions
+// TODO(progtx): Used as a container for a list of asynchronous exceptions
 class exception_list {
  private:
   using list_t = vector_class<async_exception>;
@@ -70,7 +70,7 @@ class exception_list {
   using reference = value_type&;
   using const_reference = const value_type&;
   using size_type = ::size_t;
-  using iterator = list_t::const_iterator;  // TODO: non const
+  using iterator = list_t::const_iterator;  // TODO(progtx): non const
   using const_iterator = list_t::const_iterator;
 
   ::size_t size() const { return list.size(); }
@@ -83,7 +83,7 @@ class exception_list {
 
 using async_handler = function_class<void(cl::sycl::exception_list)>;
 
-// TODO
+// TODO(progtx):
 class runtime_error : public exception {};
 class kernel_error : public runtime_error {};
 class accessor_error : public runtime_error {};

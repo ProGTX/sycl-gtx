@@ -44,7 +44,7 @@ class source : protected counter<source> {
   vector_class<string_class> lines;
   std::map<void*, buf_info> resources;
 
-  // TODO: Multithreading support
+  // TODO(progtx): Multithreading support
   SYCL_THREAD_LOCAL static source* scope;
 
   template <class Input>

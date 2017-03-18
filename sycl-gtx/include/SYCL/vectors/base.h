@@ -149,7 +149,7 @@ class base : protected counter<base<dataT, numElements>>, public data_ref {
     return swizzled_vec<dataT, half_size>(this->name + ".hi");
   }
 
-// TODO: Swizzle methods
+// TODO(progtx): Swizzle methods
 // swizzled_vec<T, out_dims> swizzle<int s1, ...>();
 #ifdef SYCL_SIMPLE_SWIZZLES
 // swizzled_vec<T, 4> xyzw();

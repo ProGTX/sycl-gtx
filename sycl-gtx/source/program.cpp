@@ -40,10 +40,10 @@ void program::compile(string_class compile_options, ::size_t kernel_name_id,
 
   auto device_pointers = detail::get_cl_array(devices);
 
-  error_code =
-      clCompileProgram(kern->prog.get()->get(), (::cl_uint)devices.size(),
-                       device_pointers.data(), compile_options.c_str(), 0,
-                       nullptr, nullptr, nullptr, nullptr);
+  error_code = clCompileProgram(kern->prog.get()->get(),
+                                static_cast<::cl_uint>(devices.size()),
+                                device_pointers.data(), compile_options.c_str(),
+                                0, nullptr, nullptr, nullptr, nullptr);
 
   try {
     detail::error::report(error_code);
@@ -100,7 +100,7 @@ vector_class<cl_program> program::get_program_pointers() const {
 
 void program::link(string_class linking_options) {
   if (linked) {
-    // TODO: Error?
+    // TODO(progtx): Error?
     return;
   }
 
@@ -108,10 +108,11 @@ void program::link(string_class linking_options) {
   auto program_pointers = get_program_pointers();
   ::cl_int error_code;
 
-  prog = clLinkProgram(ctx.get(), (::cl_uint)device_pointers.size(),
-                       device_pointers.data(), linking_options.c_str(),
-                       (::cl_uint)program_pointers.size(),
-                       program_pointers.data(), nullptr, nullptr, &error_code);
+  prog =
+      clLinkProgram(ctx.get(), static_cast<::cl_uint>(device_pointers.size()),
+                    device_pointers.data(), linking_options.c_str(),
+                    static_cast<::cl_uint>(program_pointers.size()),
+                    program_pointers.data(), nullptr, nullptr, &error_code);
   detail::error::report(error_code);
 
   // Can only initialize after program successfully built

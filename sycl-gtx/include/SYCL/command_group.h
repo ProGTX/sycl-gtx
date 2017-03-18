@@ -124,7 +124,7 @@ class command_group {
     exit();
   }
 
-  // TODO
+  // TODO(progtx):
   // Constructs a command group from a primary queue
   // to be used in order to enqueue its commands to
   // and a lambda function or function object
@@ -145,7 +145,7 @@ class group_ {
  private:
   friend class ::cl::sycl::detail::command_group;
 
-  // TODO: Need to deal better with threads
+  // TODO(progtx): Need to deal better with threads
   SYCL_THREAD_LOCAL static command_group* last;
 
   template <class... Args>

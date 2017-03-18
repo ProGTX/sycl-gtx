@@ -8,7 +8,7 @@ namespace sycl {
 // Forward declaration
 class handler;
 
-// TODO
+// TODO(progtx):
 class handler_event {
  private:
   friend class handler;

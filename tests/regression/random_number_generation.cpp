@@ -36,7 +36,7 @@ int main() {
   const int size = 4096;
   buffer<float> numbers(size);
 
-  // TODO: Should not be zero
+  // TODO(progtx): Should not be zero
   ::cl_uint2 startSeed = {24325, 32536};
 
   myQueue.submit([&](handler& cgh) {
@@ -54,7 +54,7 @@ int main() {
       numbers.get_access<access::mode::read, access::target::host_buffer>();
   cl::sycl::cl_uint2 seed = startSeed;
 
-  // TODO: Better automatic testing
+  // TODO(progtx): Better automatic testing
   for (auto i = 0; i < size; ++i) {
     auto hostRnd = hostRandom(seed);
     auto deviceRnd = n[i];

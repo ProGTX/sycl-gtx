@@ -12,7 +12,7 @@ using namespace detail;
 void command_group::enter() { detail::command::group_::last = this; }
 void command_group::exit() { detail::command::group_::last = nullptr; }
 
-// TODO: Reschedules commands to achieve better performance
+// TODO(progtx): Reschedules commands to achieve better performance
 void command_group::optimize() {
   DSELF();
 
@@ -129,7 +129,7 @@ void command::group_::add_buffer_access(buffer_access buf_acc,
                                       std::placeholders::_2),
                             type_t::get_accessor, metadata(buf_acc)});
 
-  // TODO: Maybe other targets
+  // TODO(progtx): Maybe other targets
   if (buf_acc.target == access::target::global_buffer) {
     if (buf_acc.mode != access::mode::discard_write &&
         buf_acc.mode != access::mode::discard_read_write) {

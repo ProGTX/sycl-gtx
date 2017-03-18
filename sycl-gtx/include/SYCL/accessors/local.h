@@ -43,7 +43,7 @@ SYCL_ACCESSOR_CLASS(target == access::target::local)
  public:
   accessor_(range<dimensions> allocationSize, handler & commandGroupHandler)
       : base_acc_device_ref(this, {}), allocationSize(allocationSize) {
-    // TODO
+    // TODO(progtx):
     if (command::group_::in_scope()) {
       command::group_::add_buffer_access(buffer_access{nullptr, mode, target},
                                          __func__);

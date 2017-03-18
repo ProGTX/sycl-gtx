@@ -5,7 +5,7 @@
 using namespace cl::sycl;
 
 void queue::display_device_info() const {
-  debug();
+  debug printLine;
   debug() << "Queue device information:";
   debug() << dev.get_info<info::device::name>();
   debug() << dev.get_info<info::device::opencl_version>();
@@ -54,7 +54,8 @@ queue::queue(const device_selector& deviceSelector,
 
 queue::queue(const context& syclContext, const device_selector& deviceSelector,
              const async_handler& asyncHandler)
-    // TODO: Specification requires const selector in queue and non-const in
+    // TODO(progtx): Specification requires const selector in queue and
+    // non-const in
     // device
     : ctx(syclContext.get(), asyncHandler),
       dev(deviceSelector.select_device(ctx.get_devices())),
@@ -160,7 +161,7 @@ handler_event queue::process(buffer_set& buffers_in_use_master) {
   if (is_flushed ||
       !detail::synchronizer::can_flush(command_group.read_buffers) ||
       !detail::synchronizer::can_flush(command_group.write_buffers)) {
-    // TODO
+    // TODO(progtx):
     return handler_event();
   }
   command_group.optimize();

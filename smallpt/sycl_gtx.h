@@ -306,7 +306,7 @@ static void radiance(Vector& return_, spheres_t spheres, RaySycl r,
   SYCL_END;
 }
 
-}  // ns_sycl_gtx
+}  // namespace ns_sycl_gtx
 
 static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
                              Vec cx_, Vec cy_, Vec r_, Vec* c_) {
@@ -318,7 +318,7 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
 
   auto spheres_ = buffer<float16>(range<1>(ns_sycl_gtx::numSpheres));
   {
-// TODO: Conform to the SYCL spec
+// TODO(progtx): Conform to the SYCL spec
 #ifdef SYCL_GTX
     auto assign = [](cl::sycl::cl_float4& target, ::Vec& data) {
 #else
@@ -352,7 +352,7 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
                            ? std::min(samps / 5 + 1, h / 10)
                            : 1;
 
-  unsigned short Xi[3] = {0, 0, 0};
+  uint16_t Xi[3] = {0, 0, 0};
   vector<buffer<float3>> colors;
   vector<buffer<cl::sycl::cl_uint2>> seeds_;
   vector<pair<int, int>> lineOffset;
@@ -394,7 +394,7 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
                    .get_access<access::mode::discard_read_write,
                                access::target::global_buffer>(cgh);
 
-      // TODO: constant_buffer
+      // TODO(progtx): constant_buffer
       auto spheres = spheres_.get_access<access::mode::read,
                                          access::target::global_buffer>(cgh);
       auto seeds =
@@ -446,7 +446,7 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
                             .5f) +
                       cam.d;
 
-                  // TODO:
+                  // TODO(progtx):
                   Vector rad;
                   radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()),
                            randomSeed);

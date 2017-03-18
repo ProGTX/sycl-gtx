@@ -62,7 +62,7 @@ struct testInfo {
   testInfo(testInfo&& move)
       : name(std::move(move.name)), test(move.test), dev(std::move(move.dev)) {}
 
-  bool isOpenCL() { return dev.get() != nullptr; }
+  bool isOpenCL() { return dev != nullptr; }
 };
 
 static decltype(now()) & startTime() {
@@ -313,7 +313,7 @@ static void getDevices(std::vector<testInfo>& tests,
       }
     }
   } catch (cl::sycl::exception& e) {
-    // TODO
+    // TODO(progtx):
     cout << "OpenCL not available: " << e.what() << endl;
   }
 }

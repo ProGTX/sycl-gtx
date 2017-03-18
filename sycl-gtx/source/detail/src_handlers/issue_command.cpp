@@ -8,7 +8,7 @@ using namespace cl::sycl;
 using detail::issue_command;
 using namespace detail::kernel_;
 
-// TODO
+// TODO(progtx):
 void issue_command::compile_command(queue* q,
                                     const vector_class<cl_event>& wait_events,
                                     source src, shared_ptr_class<kernel> kern) {

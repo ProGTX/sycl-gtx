@@ -93,10 +93,10 @@ class vec : public detail::vectors::base<dataT, numElements>,
       : Base(s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF),
         Members(this) {}
 
-  // TODO
+  // TODO(progtx):
   operator genvector() const { return genvector(); }
 
-// TODO: Operators
+// TODO(progtx): Operators
 #define SYCL_VEC_OP(op)                                \
   vec operator op(const vec& v) const {                \
     auto r = data_ref::operator op(v);                 \
@@ -168,10 +168,10 @@ class vec<dataT, 1> : public detail::vectors::base<dataT, 1>,
   vec& operator=(data_ref&& move) { return assign(move); }
   vec& operator=(const dataT& n) { return assign(n); }
 
-  // TODO
+  // TODO(progtx):
   operator genvector() const { return genvector(); }
 
-// TODO: Operators
+// TODO(progtx): Operators
 #define SYCL_VEC_OP(op)                                \
   vec operator op(const data_ref& d) const {           \
     auto r = data_ref::operator op(d);                 \

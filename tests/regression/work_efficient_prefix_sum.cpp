@@ -14,7 +14,7 @@ bool check_sum(cl::sycl::buffer<F, 1>& data) {
                                     access::target::host_buffer>();
   F sum = 0;
   for (size_t i = 0; i < data.get_count(); ++i) {
-    sum += (F)1;
+    sum += static_cast<F>(1);
     auto diff = std::abs(sum - d[i]);
     if (diff > 0.01) {
       debug() << "wrong sum, should be" << sum << "- is" << d[i];
@@ -34,7 +34,7 @@ bool check_sum(cl::sycl::buffer<I, 1>& data) {
                                     access::target::host_buffer>();
   I sum = 0;
   for (size_t i = 0; i < data.get_count(); ++i) {
-    sum += (I)1;
+    sum += static_cast<I>(1);
     if (d[i] != sum) {
       debug() << "wrong sum, should be" << sum << "- is" << d[i];
       return false;
@@ -233,7 +233,7 @@ int main() {
       sizes.push_back(N);
       data.emplace_back(N);
 
-      N = std::max((size_t)1, N / (2 * group_size));
+      N = std::max(static_cast<size_t>(1), N / (2 * group_size));
       N += N % 2;  // Needs to be divisible by 2
     }
 

@@ -58,7 +58,7 @@ int main() {
 
               index.barrier(access::fence_space::local_space);
 
-              N = min(N, (uint1)index.get_local_range().get(0));
+              N = min(N, static_cast<uint1>(index.get_local_range().get(0)));
 
               uint1 stride = N / 2;
               SYCL_WHILE(stride > 0) {
@@ -79,7 +79,8 @@ int main() {
 
     debug() << "Done, checking results";
     auto p = P->get_access<access::mode::read, access::target::host_buffer>();
-    type_t sum = ((type_t)size / 2) * (type_t)(size - 1);
+    type_t sum =
+        (static_cast<type_t>(size) / 2) * static_cast<type_t>(size - 1);
     if (p[0] != sum) {
       debug() << "wrong sum, should be" << sum << "- is" << p[0];
       return 1;

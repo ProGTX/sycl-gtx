@@ -154,10 +154,10 @@ class device {
                 typename std::false_type::type>
       : traits<vector_class<Contained_>, info::device::partition_type,
                typename std::true_type::type> {
-    // TODO: Why isn't return_t inherited? May be a bug.
+    // TODO(progtx): Why isn't return_t inherited? May be a bug.
     using return_t = vector_class<Contained_>;
     return_t get(const device* dev) {
-      // TODO: I have no idea how to handle this case
+      // TODO(progtx): I have no idea how to handle this case
       this->get_info(dev);
       if (this->actual_size == 0) {
         return_t ret;

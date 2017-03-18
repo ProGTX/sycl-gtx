@@ -31,7 +31,7 @@ class handler {
   queue* q;
   handler_event events;
 
-  // TODO: Implementation defined constructor
+  // TODO(progtx): Implementation defined constructor
   handler(queue* q) : q(q) {}
 
   static context get_context(queue* q);
@@ -65,7 +65,8 @@ class handler {
     auto kern = build(kernFunctor);
     issue_enqueue(kern, &issue::enqueue_range, numWorkItems, workItemOffset);
   }
-  // TODO: Why is the offset needed? It's already contained in the nd_range
+  // TODO(progtx): Why is the offset needed? It's already contained in the
+  // nd_range
   template <typename KernelName, class KernelType, int dimensions>
   void parallel_for_nd_range(nd_range<dimensions> executionRange,
                              id<dimensions> workItemOffset,
@@ -75,7 +76,7 @@ class handler {
   }
 
  public:
-  // TODO
+  // TODO(progtx):
   template <typename DataType, int dimensions, access::mode mode,
             access::target target>
   void set_arg(int arg_index,
@@ -120,7 +121,7 @@ class handler {
                                       kernFunctor);
   }
 
-  // TODO: 3.5.3.3 Parallel For hierarchical invoke
+  // TODO(progtx): 3.5.3.3 Parallel For hierarchical invoke
 
   template <typename KernelName, class WorkgroupFunctionType, int dimensions>
   void parallel_for_work_group(range<dimensions> numWorkGroups,
@@ -169,7 +170,7 @@ class handler {
         numWorkItems, workItemOffset, kernFunctor);
   }
 
-  // TODO: Hierarchical invoke
+  // TODO(progtx): Hierarchical invoke
   template <class WorkgroupFunctionType, int dimensions,
             class = decltype(WorkgroupFunctionType::operator())>
   void parallel_for_work_group(range<dimensions> numWorkGroups,

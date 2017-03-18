@@ -53,10 +53,11 @@ struct Sphere_ {
         p - r.o;  // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
     type t, eps = (type)(1e-4 * modify_sample_rate_), b = op.dot(r.d),
             det = b * b - op.dot(op) + rad * rad;
-    if (det < 0)
+    if (det < 0) {
       return 0;
-    else
+    } else {
       det = sqrt_f(det);
+    }
     return (t = b - det) > eps ? t : ((t = b + det) > eps ? t : 0);
   }
 };

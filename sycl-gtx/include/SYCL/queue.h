@@ -115,7 +115,8 @@ class queue {
 
   bool is_host();
 
-  // TODO: Returns the underlying OpenCL command queue after doing a retain.
+  // TODO(progtx): Returns the underlying OpenCL command queue after doing a
+  // retain.
   // Afterwards it needs to be manually released.
   cl_command_queue get();
 
@@ -146,14 +147,14 @@ class queue {
   // queue.
   void wait_and_throw();
 
-  // TODO
+  // TODO(progtx):
   template <typename T>
   handler_event submit(T cgf) {
     subqueues.push_back({this, cgf});
     return subqueues.back().process(buffers_in_use);
   }
 
-  // TODO
+  // TODO(progtx):
   template <typename T>
   handler_event submit(T cgf, queue& secondaryQueue);
 

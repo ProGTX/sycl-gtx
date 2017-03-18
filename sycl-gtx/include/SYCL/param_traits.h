@@ -243,8 +243,9 @@ SYCL_ADD_DEVICE_TRAIT(info::device::partition_properties,
                       vector_class<info::device_partition_property>)
 SYCL_ADD_DEVICE_TRAIT(info::device::partition_affinity_domain,
                       info::device_affinity_domain)
-SYCL_ADD_DEVICE_TRAIT(info::device::partition_type,
-                      vector_class<info::device_partition_type>)  // TODO
+SYCL_ADD_DEVICE_TRAIT(
+    info::device::partition_type,
+    vector_class<info::device_partition_type>)  // TODO(progtx):
 SYCL_ADD_DEVICE_TRAIT(info::device::reference_count, cl_uint)
 
 #undef SYCL_ADD_DEVICE_TRAIT

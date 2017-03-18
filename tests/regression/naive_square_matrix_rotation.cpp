@@ -26,7 +26,7 @@ int main() {
           A.get_access<access::mode::read_write, access::target::host_buffer>();
       for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N; ++j) {
-          ah[i][j] = (float)(i + j * N);
+          ah[i][j] = static_cast<float>(i + j * N);
         }
       }
     }

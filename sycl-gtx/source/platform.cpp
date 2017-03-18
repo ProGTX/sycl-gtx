@@ -14,7 +14,7 @@ platform::platform(cl_platform_id platform_id, device_selector& dev_selector)
 
 platform::platform() : platform(nullptr) {}
 platform::platform(cl_platform_id platform_id)
-    : platform(platform_id, *detail::default_device_selector().get()) {}
+    : platform(platform_id, *detail::default_device_selector()) {}
 platform::platform(device_selector& dev_selector)
     : platform(nullptr, dev_selector) {}
 
@@ -22,7 +22,7 @@ cl_platform_id platform::get() const { return platform_id.get(); }
 
 vector_class<platform> platform::get_platforms() {
   if (platforms.empty()) {
-    // TODO: Thread safe
+    // TODO(progtx): Thread safe
     static const int MAX_PLATFORMS = 1024;
     cl_platform_id platform_ids[MAX_PLATFORMS];
     cl_uint num_platforms;
@@ -37,10 +37,11 @@ vector_class<platform> platform::get_platforms() {
 
 vector_class<device> platform::get_devices(
     info::device_type device_type) const {
-  return detail::get_devices((cl_device_type)device_type, platform_id.get());
+  return detail::get_devices(static_cast<cl_device_type>(device_type),
+                             platform_id.get());
 }
 
-// TODO: Check if SYCL running in Host Mode
+// TODO(progtx): Check if SYCL running in Host Mode
 bool platform::is_host() const {
   DSELF() << "not implemented";
   return false;

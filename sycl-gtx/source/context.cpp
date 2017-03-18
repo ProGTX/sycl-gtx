@@ -4,19 +4,19 @@
 
 using namespace cl::sycl;
 
-// TODO: Master constructor
+// TODO(progtx): Master constructor
 context::context(cl_context c, const async_handler& asyncHandler,
                  info::gl_context_interop interopFlag,
                  vector_class<device> deviceList, const platform* plt,
                  const device_selector& deviceSelector)
     : ctx(c), target_devices(deviceList), asyncHandler(asyncHandler) {
   if (c == nullptr) {
-    cl_uint num_devices = (::cl_uint)target_devices.size();
+    cl_uint num_devices = static_cast<::cl_uint>(target_devices.size());
 
     if (num_devices == 0) {
       target_devices =
           device_selector::get_platform().get_devices(deviceSelector.type);
-      num_devices = (::cl_uint)target_devices.size();
+      num_devices = static_cast<::cl_uint>(target_devices.size());
     }
 
     vector_class<cl_device_id> devices;
@@ -64,7 +64,7 @@ context::context(vector_class<device> deviceList,
                  const async_handler& asyncHandler)
     : context(nullptr, asyncHandler, interopFlag, deviceList) {}
 
-// TODO: Retain
+// TODO(progtx): Retain
 cl_context context::get() const { return ctx.get(); }
 
 vector_class<device> context::get_devices() const {

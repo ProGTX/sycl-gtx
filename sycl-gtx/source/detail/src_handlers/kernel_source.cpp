@@ -27,7 +27,7 @@ source source::exit(source& src) {
 
 // Creates kernel source
 string_class source::get_code() const {
-  // TODO: Caching?
+  // TODO(progtx): Caching?
 
   static const char newline = '\n';
 
@@ -65,7 +65,7 @@ string_class source::generate_accessor_list() const {
 }
 
 string_class source::get_name(access::target target) {
-  // TODO: All cases
+  // TODO(progtx): All cases
   switch (target) {
     case access::target::global_buffer:
       return "__global";

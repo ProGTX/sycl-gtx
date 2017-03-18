@@ -91,7 +91,7 @@ class context {
   // Returns the underlying cl context object, after retaining the cl_context.
   cl_context get() const;
 
-  // TODO: Specifies whether the context is in SYCL Host Execution Mode
+  // TODO(progtx): Specifies whether the context is in SYCL Host Execution Mode
   bool is_host() const;
 
   // Returns the SYCL platform that the context is initialized for.

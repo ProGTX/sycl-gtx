@@ -13,8 +13,8 @@ using namespace detail;
 
   return clEnqueueBuffer(
       q->get(), device_data.get(), false,
-      // TODO: Sub-buffer access
-      0, size, host_ptr, (::cl_uint)num_events_to_wait,
+      // TODO(progtx): Sub-buffer access
+      0, size, host_ptr, static_cast<::cl_uint>(num_events_to_wait),
       (num_events_to_wait == 0 ? nullptr : wait_events.data()), &evnt);
 }
 

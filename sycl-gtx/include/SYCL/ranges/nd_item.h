@@ -51,15 +51,15 @@ struct nd_item {
   size_t get_local_linear_id() const { return local_item.get_linear_id(); }
 
   id<dimensions> get_group() const {
-    // TODO
+    // TODO(progtx):
     return local_item.get_offset();
   }
   size_t get_group(int dimension) const { return get_group()[dimension]; }
   size_t get_group_linear_id() const {
-    // TODO
+    // TODO(progtx):
   }
 
-  // TODO
+  // TODO(progtx):
   id<dimensions> get_num_groups() const;
   int get_num_groups(int) const;
 

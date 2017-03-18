@@ -1,6 +1,6 @@
 // smallpt, a Path Tracer by Kevin Beason, 2008
 //
-// Modified by Peter éuûek
+// Modified by Peter ≈Ωu≈æek
 // For the original code, see github.com/munificient/smallpt
 // For the original license, see smallpt.LICENSE.txt
 
@@ -45,7 +45,7 @@ inline bool intersect(const Ray& r, double& t, int& id) {
   }
   return t < inf;
 }
-Vec radiance(const Ray& r, int depth, unsigned short* Xi) {
+Vec radiance(const Ray& r, int depth, uint16_t* Xi) {
   double t;                                // distance to intersection
   int id = 0;                              // id of intersected object
   if (!intersect(r, t, id)) return Vec();  // if miss, return black
@@ -67,16 +67,18 @@ Vec radiance(const Ray& r, int depth, unsigned short* Xi) {
         v = w % u;
     Vec d = (u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1 - r2)).norm();
     return obj.e + f.mult(radiance(Ray(x, d), depth, Xi));
-  } else if (obj.refl == SPEC)  // Ideal SPECULAR reflection
+  } else if (obj.refl == SPEC) {  // Ideal SPECULAR reflection
     return obj.e +
            f.mult(radiance(Ray(x, r.d - n * 2 * n.dot(r.d)), depth, Xi));
+  }
   Ray reflRay(x, r.d - n * 2 * n.dot(r.d));  // Ideal dielectric REFRACTION
   bool into = n.dot(nl) > 0;                 // Ray from outside going in?
   double nc = 1, nt = 1.5, nnt = into ? nc / nt : nt / nc, ddn = r.d.dot(nl),
          cos2t;
   if ((cos2t = 1 - nnt * nnt * (1 - ddn * ddn)) <
-      0)  // Total internal reflection
+      0) {  // Total internal reflection
     return obj.e + f.mult(radiance(reflRay, depth, Xi));
+  }
   Vec tdir =
       (r.d * nnt - n * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t)))).norm();
   double a = nt - nc;
@@ -96,10 +98,10 @@ inline void compute_inner(int y, int w, int h, int samps, Ray& cam, Vec& cx,
   // fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samps * 4, 100.*y / (h -
   // 1));
   // Loop cols
-  for (unsigned short x = 0, Xi[3] = {0, 0, (unsigned short)(y * y * y)}; x < w;
-       x++)
+  for (uint16_t x = 0, Xi[3] = {0, 0, static_cast<uint16_t>(y * y * y)}; x < w;
+       x++) {
     for (int sy = 0, i = (h - y - 1) * w + x; sy < 2;
-         sy++)                                     // 2x2 subpixel rows
+         sy++) {                                   // 2x2 subpixel rows
       for (int sx = 0; sx < 2; sx++, r = Vec()) {  // 2x2 subpixel cols
         for (int s = 0; s < samps; s++) {
           double r1 = 2 * get_random(Xi),
@@ -113,6 +115,8 @@ inline void compute_inner(int y, int w, int h, int samps, Ray& cam, Vec& cx,
         }  // Camera rays are pushed ^^^^^ forward to start in interior
         c[i] = c[i] + Vec(clamp(r.x), clamp(r.y), clamp(r.z)) * .25;
       }
+    }
+  }
 }
 }  // namespace org
 void compute_org(void*, int w, int h, int samps, Ray cam, Vec cx, Vec cy, Vec r,

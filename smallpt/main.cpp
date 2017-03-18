@@ -3,6 +3,8 @@
 #include "smallpt.h"
 #include "sycl_gtx.h"
 
+#include <cmath>
+
 extern void compute_org(void*, int w, int h, int samps, Ray cam, Vec cx, Vec cy,
                         Vec r, Vec* c);
 extern void compute_org_openmp(void*, int w, int h, int samps, Ray cam, Vec cx,
@@ -15,7 +17,7 @@ extern void compute_sycl_gtx(void*, int w, int h, int samps, Ray cam, Vec cx,
                              Vec cy, Vec r, Vec* c);
 
 inline int toInt(float_type x) {
-  return int(pow(clamp(x), 1 / 2.2) * 255 + .5);
+  return std::lround(pow(clamp(x), 1 / 2.2) * 255);
 }
 
 int main(int argc, char* argv[]) {

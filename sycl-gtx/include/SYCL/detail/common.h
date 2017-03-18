@@ -3,7 +3,7 @@
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #include <CL/cl.h>
 
-// TODO: Non-standard
+// TODO(progtx): Non-standard
 #include <cstdio>
 #include <sstream>
 
@@ -133,8 +133,8 @@ auto get_cl_array(vector_class<From> array)
 
 template <typename EnumClass, EnumClass Value, class T>
 bool has_extension(T* sycl_class, const string_class& extension_name) {
-  // TODO: Maybe add caching
-  return false;  // TODO: Doesn't seem to work, ignore for now
+  // TODO(progtx): Maybe add caching
+  return false;  // TODO(progtx): Doesn't seem to work, ignore for now
   // return sycl_class->get_info<Value>().find(extension_name) !=
   // string_class::npos;
 }
@@ -186,7 +186,7 @@ struct get_string {
     return s.str();
   }
 };
-// TODO: Should be more efficient
+// TODO(progtx): Should be more efficient
 template <>
 struct get_string<float> {
   static string_class get(float t) {

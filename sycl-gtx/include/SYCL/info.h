@@ -25,7 +25,7 @@ enum class context : cl_context_info {
   reference_count = CL_CONTEXT_REFERENCE_COUNT,
   num_devices = CL_CONTEXT_NUM_DEVICES,
   devices = CL_CONTEXT_DEVICES,
-  gl_interop = CL_CONTEXT_INTEROP_USER_SYNC  // TODO: Not sure
+  gl_interop = CL_CONTEXT_INTEROP_USER_SYNC  // TODO(progtx): Not sure
 };
 
 // C.3 Device Information Descriptors
@@ -34,7 +34,7 @@ using device_fp_config = cl_device_fp_config;
 using device_exec_capabilities = cl_device_exec_capabilities;
 using device_queue_properties = cl_command_queue_properties;
 
-// TODO: Host
+// TODO(progtx): Host
 enum class device_type : cl_device_type {
   cpu = CL_DEVICE_TYPE_CPU,
   gpu = CL_DEVICE_TYPE_GPU,

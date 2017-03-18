@@ -43,7 +43,7 @@ struct thrower {
     return exception((*error::codes.find(error_code)).second, thrower);
   }
   static void report(exception& error) {
-    debug("SYCL_ERROR::", error.what());
+    debug displayError("SYCL_ERROR::", error.what());
     throw error;
   }
   static void report_async(context* thrower, exception_list& list);

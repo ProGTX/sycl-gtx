@@ -77,7 +77,7 @@ class data_ref {
     return *this;
   }
 
-// TODO:
+// TODO(progtx):
 // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/operators.html
 
 #define SYCL_ASSIGNMENT_OPERATOR(op)              \
@@ -144,7 +144,8 @@ class data_ref {
 #undef SYCL_ASSIGNMENT_OPERATOR
 #undef SYCL_DATA_REF_OPERATOR
 
-  // TODO: Increment and decrement can be either a statement or an expression
+  // TODO(progtx): Increment and decrement can be either a statement or an
+  // expression
   // But there is no way to distinguish it
   // Here presume an expression
   data_ref operator++() const {

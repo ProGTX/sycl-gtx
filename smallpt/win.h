@@ -20,10 +20,10 @@ inline double distr(std::default_random_engine& generator_) {
 
 static void reset() { generator().seed(0); }
 
-}  // namespace ns_erand
+}  // namespace ns_random
 
 // http://stackoverflow.com/a/27198754
 // With modifications to make variables static
-static double get_random(unsigned short int X[3]) {
+static double get_random(uint16_t X[3]) {
   return ns_random::distr(ns_random::generator());
 }

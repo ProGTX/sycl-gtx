@@ -63,7 +63,7 @@ static void return_() { kernel_::source::add<true>("return"); }
       ::cl::sycl::detail::data_ref((condition))); \
   SYCL_BEGIN
 
-// TODO: do-while not supported
+// TODO(progtx): do-while not supported
 #define SYCL_WHILE(condition)                     \
   ::cl::sycl::detail::control::while_(            \
       ::cl::sycl::detail::data_ref((condition))); \

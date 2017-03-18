@@ -77,7 +77,7 @@ class program {
 
   // Obtains a SYCL program object from a SYCL kernel name
   // and compiles it ready-to-link
-  // TODO: Can only compile well-defined functors with a public default
+  // TODO(progtx): Can only compile well-defined functors with a public default
   // constructor
   template <typename kernelT>
   void compile_from_kernel_name(string_class compile_options = "") {
@@ -154,7 +154,7 @@ class program {
     return traits<param_traits_t<info::program, param>, param>().get_info(this);
   }
 
-  // TODO
+  // TODO(progtx):
   vector_class<vector_class<unsigned char>> get_binaries() const;
   vector_class<::size_t> get_binary_sizes() const;
   vector_class<device> get_devices() const;

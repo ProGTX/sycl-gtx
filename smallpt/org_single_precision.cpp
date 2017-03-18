@@ -1,6 +1,6 @@
 // smallpt, a Path Tracer by Kevin Beason, 2008
 //
-// Modified by Peter éuûek
+// Modified by Peter ≈Ωu≈æek
 // For the original code, see github.com/munificient/smallpt
 // For the original license, see smallpt.LICENSE.txt
 
@@ -26,7 +26,9 @@ struct Vec {
     y = y_;
     z = z_;
   }
-  Vec(const ::Vec& v) : Vec((float)v.x, (float)v.y, (float)v.z) {}
+  Vec(const ::Vec& v)
+      : Vec(static_cast<float>(v.x), static_cast<float>(v.y),
+            static_cast<float>(v.z)) {}
   Vec operator+(const Vec& b) const { return Vec(x + b.x, y + b.y, z + b.z); }
   Vec operator-(const Vec& b) const { return Vec(x - b.x, y - b.y, z - b.z); }
   Vec operator*(float b) const { return Vec(x * b, y * b, z * b); }
@@ -54,10 +56,11 @@ struct Sphere {
   float intersect(const Ray& r) const {  // returns distance, 0 if nohit
     Vec op = p - r.o;  // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
     float t, eps = 1e-2f, b = op.dot(r.d), det = b * b - op.dot(op) + rad * rad;
-    if (det < 0)
+    if (det < 0) {
       return 0;
-    else
+    } else {
       det = sqrt(det);
+    }
     return (t = b - det) > eps ? t : ((t = b + det) > eps ? t : 0);
   }
 };
@@ -92,7 +95,7 @@ inline bool intersect(const Ray& r, float& t, int& id) {
   }
   return t < inf;
 }
-Vec radiance(const Ray& r, int depth, unsigned short* Xi) {
+Vec radiance(const Ray& r, int depth, uint16_t* Xi) {
   float t;                                 // distance to intersection
   int id = 0;                              // id of intersected object
   if (!intersect(r, t, id)) return Vec();  // if miss, return black
@@ -109,22 +112,24 @@ Vec radiance(const Ray& r, int depth, unsigned short* Xi) {
     }
   }                        // R.R.
   if (obj.refl == DIFF) {  // Ideal DIFFUSE reflection
-    float r1 = (float)(2 * M_PI * get_random(Xi));
-    float r2 = (float)get_random(Xi), r2s = sqrt(r2);
+    float r1 = static_cast<float>(2 * M_PI * get_random(Xi));
+    float r2 = static_cast<float>(get_random(Xi)), r2s = sqrt(r2);
     Vec w = nl, u = ((fabs(w.x) > .1 ? Vec(0, 1) : Vec(1)) % w).norm(),
         v = w % u;
     Vec d = (u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1 - r2)).norm();
     return obj.e + f.mult(radiance(Ray(x, d), depth, Xi));
-  } else if (obj.refl == SPEC)  // Ideal SPECULAR reflection
+  } else if (obj.refl == SPEC) {  // Ideal SPECULAR reflection
     return obj.e +
            f.mult(radiance(Ray(x, r.d - n * 2 * n.dot(r.d)), depth, Xi));
+  }
   Ray reflRay(x, r.d - n * 2 * n.dot(r.d));  // Ideal dielectric REFRACTION
   bool into = n.dot(nl) > 0;                 // Ray from outside going in?
   float nc = 1, nt = 1.5f, nnt = into ? nc / nt : nt / nc, ddn = r.d.dot(nl),
         cos2t;
   if ((cos2t = 1 - nnt * nnt * (1 - ddn * ddn)) <
-      0)  // Total internal reflection
+      0) {  // Total internal reflection
     return obj.e + f.mult(radiance(reflRay, depth, Xi));
+  }
   Vec tdir =
       (r.d * nnt - n * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t)))).norm();
   float a = nt - nc;
@@ -144,15 +149,15 @@ inline void compute_inner(int y, int w, int h, int samps, Ray& cam, Vec& cx,
   // fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samps * 4, 100.*y / (h -
   // 1));
   // Loop cols
-  for (unsigned short x = 0, Xi[3] = {0, 0, (unsigned short)(y * y * y)}; x < w;
-       x++)
+  for (uint16_t x = 0, Xi[3] = {0, 0, static_cast<uint16_t>(y * y * y)}; x < w;
+       x++) {
     for (int sy = 0, i = (h - y - 1) * w + x; sy < 2;
-         sy++)                                     // 2x2 subpixel rows
+         sy++) {                                   // 2x2 subpixel rows
       for (int sx = 0; sx < 2; sx++, r = Vec()) {  // 2x2 subpixel cols
         for (int s = 0; s < samps; s++) {
-          float r1 = (float)(2 * get_random(Xi)),
+          float r1 = static_cast<float>(2 * get_random(Xi)),
                 dx = r1 < 1 ? sqrt(r1) - 1 : 1 - sqrt(2 - r1);
-          float r2 = (float)(2 * get_random(Xi)),
+          float r2 = static_cast<float>(2 * get_random(Xi)),
                 dy = r2 < 1 ? sqrt(r2) - 1 : 1 - sqrt(2 - r2);
           Vec d = cx * (((sx + .5f + dx) / 2 + x) / w - .5f) +
                   cy * (((sy + .5f + dy) / 2 + y) / h - .5f) + cam.d;
@@ -161,10 +166,12 @@ inline void compute_inner(int y, int w, int h, int samps, Ray& cam, Vec& cx,
         }  // Camera rays are pushed ^^^^^ forward to start in interior
         c[i] = c[i] + Vec(clamp(r.x), clamp(r.y), clamp(r.z)) * .25f;
       }
+    }
+  }
 }
 std::vector<org_sp::Vec> get_c(int w, int h, ::Vec* c_) {
   std::vector<org_sp::Vec> c;
-  c.reserve(w * h);
+  c.reserve(static_cast<size_t>(w) * static_cast<size_t>(h));
   for (int y = 0; y < h; ++y) {
     for (int x = 0; x < w; ++x) {
       int i = y * w + x;

@@ -49,7 +49,7 @@ struct point_ref : data_ref {
   using value_point_t =
       typename get_value_point_t<is_const, data_basic_t>::type;
 
-  // TODO: Need to also carry references to type and name
+  // TODO(progtx): Need to also carry references to type and name
   ptr_or_val<data_t, holds_pointer> data;
 
   point_ref(data_basic_t value, type_t type_, bool)
@@ -67,11 +67,11 @@ struct point_ref : data_ref {
   }
 
   operator data_basic_t() const { return data; }
-  // TODO: Only allow on is_const
+  // TODO(progtx): Only allow on is_const
   operator data_basic_t&() { return data; }
 
-  // TODO: enable_if causes here an internal MSVC error C1001
-  // TODO: data_ref::operator&
+  // TODO(progtx): enable_if causes here an internal MSVC error C1001
+  // TODO(progtx): data_ref::operator&
   // template <class = typename std::enable_if<!is_const>::type>
   point_ref<is_const, data_basic_t*> operator&() {
     string_class name_;
@@ -84,8 +84,8 @@ struct point_ref : data_ref {
     return point_ref<is_const, data_basic_t*>(&data, name_, type);
   }
 
-  // TODO: enable_if causes here an internal MSVC error C1001
-  // TODO: data_ref::operator*
+  // TODO(progtx): enable_if causes here an internal MSVC error C1001
+  // TODO(progtx): data_ref::operator*
   // template <
   //  class = typename
   //  std::enable_if<std::is_pointer<data_basic_t>::value>::type>

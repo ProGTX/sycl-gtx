@@ -30,12 +30,12 @@ class accessor_core : public accessor_base {
   ::size_t get_size() const;
 
   // Returns the cl_mem object corresponding to the access.
-  // TODO: Only available when target is cl_image or cl_buffer
+  // TODO(progtx): Only available when target is cl_image or cl_buffer
   virtual cl_mem get_cl_mem_object() const { return nullptr; }
 
   // Returns the cl_event object corresponding to the last command
   // to access the memory object.
-  // TODO: Only available when target is cl_image or cl_buffer.
+  // TODO(progtx): Only available when target is cl_image or cl_buffer.
   cl_event get_cl_event_object() const;
 
  protected:

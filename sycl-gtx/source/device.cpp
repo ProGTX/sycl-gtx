@@ -21,7 +21,7 @@ device::device(device_selector& dev_sel) : device(nullptr, &dev_sel) {}
 cl_device_id device::get() const { return device_id.get(); }
 
 bool device::is_host() const {
-  // TODO
+  // TODO(progtx):
   return false;
 }
 
@@ -39,7 +39,7 @@ bool device::is_accelerator() const {
 platform device::get_platform() const { return platfrm; }
 
 vector_class<device> device::get_devices(info::device_type deviceType) {
-  return detail::get_devices((cl_device_type)deviceType, nullptr);
+  return detail::get_devices(static_cast<cl_device_type>(deviceType), nullptr);
 }
 
 bool device::has_extension(const string_class& extension_name) const {
@@ -47,7 +47,7 @@ bool device::has_extension(const string_class& extension_name) const {
       this, extension_name);
 }
 
-// TODO
+// TODO(progtx):
 static vector_class<device> create_sub_devices(
     cl_device_id& did, const cl_device_partition_property* properties,
     int devices, unsigned int* num_devices) {

@@ -57,7 +57,7 @@ struct identifier_code {
                     function_name + "(0) + " + name + "0");
       }
 
-      // TODO: 3d
+      // TODO(progtx): 3d
     }
   }
 };
@@ -111,7 +111,7 @@ struct constructor<id<dimensions>> {
     source src;
     source::enter(src);
 
-    // TODO: num_work_items, work_item_offset
+    // TODO(progtx): num_work_items, work_item_offset
     generate_id_refs<dimensions>::global();
     kern(get_special_id<dimensions>::global());
 
@@ -128,7 +128,7 @@ struct constructor<item<dimensions>> {
 
     generate_id_refs<dimensions>::global();
     auto index = get_special_id<dimensions>::global();
-    // TODO: num_work_items, work_item_offset
+    // TODO(progtx): num_work_items, work_item_offset
     // item<dimensions> it(index, num_work_items, work_item_offset);
     item<dimensions> it(index, empty_range<dimensions>());
     kern(it);
@@ -158,7 +158,7 @@ struct constructor<nd_item<dimensions>> {
     item<dimensions> global_item(global_id, execution_range.get_global(),
                                  execution_range.get_offset());
 
-    // TODO: Store group ID into offset of local_item
+    // TODO(progtx): Store group ID into offset of local_item
     item<dimensions> local_item(get_special_id<dimensions>::local(),
                                 execution_range.get_local(),
                                 execution_range.get_offset());

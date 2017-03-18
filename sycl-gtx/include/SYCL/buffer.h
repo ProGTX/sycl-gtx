@@ -128,7 +128,7 @@ class buffer_ : public buffer_base {
   buffer_(unique_ptr_class<void>&& hostData,
           const range<dimensions>& bufferRange);
 
-  // TODO
+  // TODO(progtx):
   // Create a new sub-buffer without allocation to have separate accessors
   // later.
   // b is the buffer with the real data.
@@ -147,7 +147,7 @@ class buffer_ : public buffer_base {
       start += (::size_t)(baseIndex.get(1)) * (::size_t)(rang.get(0)) +
                (::size_t)(baseIndex.get(0));
     } else if (dimensions == 3) {
-      // TODO
+      // TODO(progtx):
     }
 
     host_data = ptr_t(start, [](DataType* ptr) {});
@@ -247,7 +247,7 @@ class buffer_ : public buffer_base {
   }
 
  private:
-  // TODO
+  // TODO(progtx):
   virtual void enqueue(queue* q, const vector_class<cl_event>& wait_events,
                        clEnqueueBuffer_f clEnqueueBuffer) override {
     cl_event evnt;
@@ -267,7 +267,7 @@ class buffer_ : public buffer_base {
  public:
   void set_final_data(weak_ptr_class<DataType_>& finalData);
 
-  // TODO: nullptr indicates not to copy back
+  // TODO(progtx): nullptr indicates not to copy back
   void set_final_data(std::nullptr_t) {}
 };
 
