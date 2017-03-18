@@ -92,7 +92,7 @@ SYCL_ACCESSOR_CLASS(target == access::target::host_buffer)
         base_acc_host_ref(this, copy) {
     synchronizer::add(this, base_acc_buffer::buf);
   }
-  accessor_(accessor_ && move)
+  accessor_(accessor_ && move) noexcept
       : base_acc_buffer(std::move((base_acc_buffer)move)),
         base_acc_host_ref(this, std::move((base_acc_host_ref)move)) {
     synchronizer::add(this, base_acc_buffer::buf);
