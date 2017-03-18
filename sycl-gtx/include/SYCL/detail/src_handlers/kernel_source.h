@@ -7,7 +7,6 @@
 #include "SYCL/detail/debug.h"
 #include <map>
 
-
 namespace cl {
 namespace sycl {
 
@@ -24,12 +23,11 @@ class issue_command;
 namespace kernel_ {
 
 // Forward declaration
-template<class Input>
+template <class Input>
 struct constructor;
 
-
 class source : protected counter<source> {
-private:
+ private:
   struct buf_info {
     buffer_access acc;
     string_class resource_name;
@@ -49,7 +47,7 @@ private:
   // TODO: Multithreading support
   SYCL_THREAD_LOCAL static source* scope;
 
-  template<class Input>
+  template <class Input>
   friend struct constructor;
   friend class ::cl::sycl::detail::issue_command;
 
@@ -58,11 +56,11 @@ private:
   static void enter(source& src);
   static source exit(source& src);
 
-public:
+ public:
   source()
-    : tab_offset("\t"),
-    kernel_name(
-      string_class("_sycl_kernel_") + get_string<counter_t>::get(get_count_id())) {}
+      : tab_offset("\t"),
+        kernel_name(string_class("_sycl_kernel_") +
+                    get_string<counter_t>::get(get_count_id())) {}
 
   static bool in_scope();
 
@@ -71,32 +69,27 @@ public:
 
   void init_kernel(program& p, shared_ptr_class<kernel> kern);
 
-  template <
-    typename DataType, int dimensions, access::mode mode, access::target target>
+  template <typename DataType, int dimensions, access::mode mode,
+            access::target target>
   static string_class register_resource(
-    const accessor_core<DataType, dimensions, mode, target>& acc
-  ) {
-    if(scope == nullptr) {
-      //error::report(error::code::NOT_IN_KERNEL_SCOPE);
+      const accessor_core<DataType, dimensions, mode, target>& acc) {
+    if (scope == nullptr) {
+      // error::report(error::code::NOT_IN_KERNEL_SCOPE);
       return "";
     }
 
     string_class resource_name;
-    auto buf = (buffer<DataType, dimensions>*) acc.resource();
+    auto buf = (buffer<DataType, dimensions>*)acc.resource();
     auto it = scope->resources.find(buf);
 
-    if(it == scope->resources.end()) {
-      resource_name =
-        resource_name_root +
-        get_string<decltype(num_resources)>::get(++num_resources);
-      scope->resources[buf] = {
-        { buf, mode, target },
-        resource_name,
-        type_string<DataType>::get() + '*',
-        acc.argument_size()
-      };
-    }
-    else {
+    if (it == scope->resources.end()) {
+      resource_name = resource_name_root +
+                      get_string<decltype(num_resources)>::get(++num_resources);
+      scope->resources[buf] = {{buf, mode, target},
+                               resource_name,
+                               type_string<DataType>::get() + '*',
+                               acc.argument_size()};
+    } else {
       resource_name = it->second.resource_name;
     }
 
@@ -120,15 +113,15 @@ public:
   static string_class get_name(access::target target);
 };
 
-template <typename DataType, int dimensions, access::mode mode, access::target target>
+template <typename DataType, int dimensions, access::mode mode,
+          access::target target>
 static string_class register_resource(
-  const accessor_core<DataType, dimensions, mode, target>& acc
-) {
+    const accessor_core<DataType, dimensions, mode, target>& acc) {
   return source::register_resource(acc);
 }
 
-} // namespace kernel_
-} // namespace detail
+}  // namespace kernel_
+}  // namespace detail
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

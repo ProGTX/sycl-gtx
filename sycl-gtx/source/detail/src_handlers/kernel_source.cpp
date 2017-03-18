@@ -13,9 +13,7 @@ const string_class source::resource_name_root = "_sycl_buf";
 SYCL_THREAD_LOCAL int source::num_resources = 0;
 SYCL_THREAD_LOCAL source* source::scope = nullptr;
 
-bool source::in_scope() {
-  return scope != nullptr;
-}
+bool source::in_scope() { return scope != nullptr; }
 
 void source::enter(source& src) {
   scope = &src;
@@ -33,11 +31,10 @@ string_class source::get_code() const {
 
   static const char newline = '\n';
 
-  string_class final_code =
-    string_class("__kernel void ") + kernel_name +
-    "(" + generate_accessor_list() + ") {" + newline;
+  string_class final_code = string_class("__kernel void ") + kernel_name + "(" +
+                            generate_accessor_list() + ") {" + newline;
 
-  for(auto& line : lines) {
+  for (auto& line : lines) {
     final_code += line + newline;
   }
 
@@ -46,20 +43,17 @@ string_class source::get_code() const {
   return final_code;
 }
 
-
-string_class source::get_kernel_name() const {
-  return kernel_name;
-}
+string_class source::get_kernel_name() const { return kernel_name; }
 
 string_class source::generate_accessor_list() const {
   string_class list;
-  if(resources.empty()) {
+  if (resources.empty()) {
     return list;
   }
 
-  for(auto& acc : resources) {
+  for (auto& acc : resources) {
     list += get_name(acc.second.acc.target) + " ";
-    if(acc.second.acc.mode == access::mode::read) {
+    if (acc.second.acc.mode == access::mode::read) {
       list += "const ";
     }
     list += acc.second.type_name + " ";
@@ -72,7 +66,7 @@ string_class source::generate_accessor_list() const {
 
 string_class source::get_name(access::target target) {
   // TODO: All cases
-  switch(target) {
+  switch (target) {
     case access::target::global_buffer:
       return "__global";
     case access::target::constant_buffer:

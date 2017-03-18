@@ -2,16 +2,13 @@
 
 using namespace cl::sycl;
 
-event::event(cl_event clEvent)
-  : evnt(clEvent) {}
+event::event(cl_event clEvent) : evnt(clEvent) {}
 
-cl_event event::get() {
-  return evnt.get();
-}
+cl_event event::get() { return evnt.get(); }
 
 vector_class<event> event::get_wait_list() {
   // TODO
-  return{};
+  return {};
 }
 
 void event::wait() {
@@ -22,13 +19,13 @@ void event::wait() {
 
 void event::wait(const vector_class<event>& event_list) {
   auto size = event_list.size();
-  if(size == 0) {
+  if (size == 0) {
     return;
   }
 
   vector_class<cl_event> events;
   events.reserve(size);
-  for(auto& e : event_list) {
+  for (auto& e : event_list) {
     events.push_back(e.evnt.get());
   }
 

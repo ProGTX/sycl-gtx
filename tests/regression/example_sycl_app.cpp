@@ -18,7 +18,7 @@ const size_t M = 1000;
 #endif
 
 int main() {
-  { // By including all the SYCL work in a {} block,
+  {  // By including all the SYCL work in a {} block,
     // we ensure all SYCL tasks must complete before exiting the block
 
     // Create a queue to work on
@@ -45,7 +45,8 @@ int main() {
       // The kernel write b, so get a write accessor on it
       auto B = b.get_access<access::mode::write>(cgh);
       // From the access pattern above,
-      // the SYCL runtime detect this command_group is independent from the first one
+      // the SYCL runtime detect this command_group is independent from the
+      // first one
       // and can be scheduled independently
 
       // Enqueue a parallel kernel iterating on a N*M 2D iteration space
@@ -64,28 +65,27 @@ int main() {
       // this kernel is run, the kernels computing a and b completed
 
       // Enqueue a parallel kernel iterating on a N*M 2D iteration space
-      cgh.parallel_for<class matrix_add>(range<2>(N, M), [=](id<2> index) {
-        C[index] = A[index] + B[index];
-      });
+      cgh.parallel_for<class matrix_add>(
+          range<2>(N, M), [=](id<2> index) { C[index] = A[index] + B[index]; });
     });
 
     debug() << "Done, checking results";
     // Ask for access to read c from the host-side.
     // The SYCL runtime ensures that c is ready when the accessor is returned
     auto C = c.get_access<access::mode::read, access::target::host_buffer>();
-    for(int i = 0; i < N; ++i) {
-      for(int j = 0; j < M; ++j) {
+    for (int i = 0; i < N; ++i) {
+      for (int j = 0; j < M; ++j) {
         // Compare the result to the analytic value
-        auto expected = i*(2 + 2014) + j*(1 + 42);
-        if(C[i][j] != expected) {
+        auto expected = i * (2 + 2014) + j * (1 + 42);
+        if (C[i][j] != expected) {
           debug() << i << j << "expected" << expected << "actual" << C[i][j];
           return 1;
         }
       }
     }
 
-  } // End scope of myQueue,
-    // which waits for any remaining operations on the queue to complete
+  }  // End scope of myQueue,
+  // which waits for any remaining operations on the queue to complete
 
   debug() << "Good computation!";
   return 0;

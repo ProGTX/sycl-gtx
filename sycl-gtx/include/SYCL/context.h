@@ -2,14 +2,14 @@
 
 // 3.3.3 Context class
 
+#include "SYCL/detail/common.h"
+#include "SYCL/detail/debug.h"
 #include "SYCL/device.h"
-#include "SYCL/refc.h"
 #include "SYCL/device_selector.h"
 #include "SYCL/error_handler.h"
 #include "SYCL/info.h"
 #include "SYCL/param_traits.h"
-#include "SYCL/detail/common.h"
-#include "SYCL/detail/debug.h"
+#include "SYCL/refc.h"
 
 namespace cl {
 namespace sycl {
@@ -27,22 +27,20 @@ class program;
 // while data movement between contexts must involve the host.
 // A given context can only wrap devices owned by a single platform.
 class context {
-private:
+ private:
   detail::refc<cl_context, clRetainContext, clReleaseContext> ctx;
   vector_class<device> target_devices;
   async_handler asyncHandler;
   friend struct detail::error::thrower;
 
   // Master constructor
-  context(
-    cl_context c,
-    const async_handler& asyncHandler,
-    info::gl_context_interop interopFlag,
-    vector_class<device> deviceList = {},
-    const platform* plt = nullptr,
-    const device_selector& deviceSelector = *(detail::default_device_selector())
-  );
-public:
+  context(cl_context c, const async_handler& asyncHandler,
+          info::gl_context_interop interopFlag,
+          vector_class<device> deviceList = {}, const platform* plt = nullptr,
+          const device_selector& deviceSelector =
+              *(detail::default_device_selector()));
+
+ public:
   // Default constructor that chooses the context
   // according the heuristics of the default selector.
   // Returns synchronous errors via the SYCL exception class.
@@ -53,43 +51,31 @@ public:
   explicit context(const async_handler& asyncHandler);
 
   // Executes a retain on the cl_context
-  context(
-    cl_context clContext,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  context(cl_context clContext,
+          const async_handler& asyncHandler = detail::default_async_handler);
 
-  context(
-    const device_selector& deviceSelector,
-    info::gl_context_interop interopFlag = false,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  context(const device_selector& deviceSelector,
+          info::gl_context_interop interopFlag = false,
+          const async_handler& asyncHandler = detail::default_async_handler);
 
-  context(
-    const device& dev,
-    info::gl_context_interop interopFlag = false,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  context(const device& dev, info::gl_context_interop interopFlag = false,
+          const async_handler& asyncHandler = detail::default_async_handler);
 
-  context(
-    const platform& plt,
-    info::gl_context_interop interopFlag = false,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  context(const platform& plt, info::gl_context_interop interopFlag = false,
+          const async_handler& asyncHandler = detail::default_async_handler);
 
-  context(
-    vector_class<device> deviceList,
-    info::gl_context_interop interopFlag = false,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  context(vector_class<device> deviceList,
+          info::gl_context_interop interopFlag = false,
+          const async_handler& asyncHandler = detail::default_async_handler);
 
   // Copy and move semantics
   context(const context&) = default;
   context& operator=(const context&) = default;
 #if MSVC_LOW
   context(context&& move)
-    : SYCL_MOVE_INIT(ctx),
-      SYCL_MOVE_INIT(target_devices),
-      SYCL_MOVE_INIT(asyncHandler) {}
+      : SYCL_MOVE_INIT(ctx),
+        SYCL_MOVE_INIT(target_devices),
+        SYCL_MOVE_INIT(asyncHandler) {}
   friend void swap(context& first, context& second) {
     using std::swap;
     SYCL_SWAP(ctx);
@@ -101,7 +87,7 @@ public:
   context& operator=(context&&) = default;
 #endif
 
-public:
+ public:
   // Returns the underlying cl context object, after retaining the cl_context.
   cl_context get() const;
 
@@ -114,26 +100,21 @@ public:
   // Returns the set of devices that are part of this context.
   vector_class<device> get_devices() const;
 
-private:
-  template <
-    class Contained_,
-    info::context param,
-    ::size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE
-  >
-  struct array_traits :
-    detail::array_traits<Contained_, info::context, param, BufferSize>
-  {
-  private:
-    using Base = detail::array_traits<Contained_, info::context, param, BufferSize>;
-  public:
-    void get_info(const context* ctx) {
-      Base::Base::get(ctx->ctx.get());
-    }
+ private:
+  template <class Contained_, info::context param,
+            ::size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
+  struct array_traits
+      : detail::array_traits<Contained_, info::context, param, BufferSize> {
+   private:
+    using Base =
+        detail::array_traits<Contained_, info::context, param, BufferSize>;
+
+   public:
+    void get_info(const context* ctx) { Base::Base::get(ctx->ctx.get()); }
   };
 
   template <class return_t, info::context param>
-  struct traits
-    : array_traits<return_t, param, 1> {
+  struct traits : array_traits<return_t, param, 1> {
     return_t get(const context* ctx) {
       this->get_info(ctx);
       return this->param_value[0];
@@ -141,24 +122,23 @@ private:
   };
   template <typename Contained, info::context param>
   struct traits<vector_class<Contained>, param>
-    : array_traits<Contained, param> {
+      : array_traits<Contained, param> {
     using Container = typename array_traits<Contained, param>::Container;
     Container get(const context* ctx) {
       this->get_info(ctx);
-      return Container(
-        this->param_value, this->param_value + this->actual_size / this->type_size);
+      return Container(this->param_value,
+                       this->param_value + this->actual_size / this->type_size);
     }
   };
 
-public:
+ public:
   // Queries OpenCL information for the underlying cl_context
   template <info::context param>
-  typename param_traits<info::context, param>::type
-    get_info() const {
-    return
-      traits<typename param_traits<info::context, param>::type, param>().get(this);
+  typename param_traits<info::context, param>::type get_info() const {
+    return traits<typename param_traits<info::context, param>::type, param>()
+        .get(this);
   }
 };
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

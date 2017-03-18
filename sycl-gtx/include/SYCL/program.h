@@ -3,17 +3,17 @@
 // 3.5.5 Program class
 
 #include "SYCL/context.h"
+#include "SYCL/detail/common.h"
+#include "SYCL/detail/function_traits.h"
+#include "SYCL/detail/kernel_name.h"
+#include "SYCL/detail/src_handlers/invoke_source.h"
+#include "SYCL/detail/src_handlers/kernel_source.h"
 #include "SYCL/device.h"
 #include "SYCL/error_handler.h"
 #include "SYCL/info.h"
 #include "SYCL/kernel.h"
 #include "SYCL/param_traits.h"
 #include "SYCL/refc.h"
-#include "SYCL/detail/common.h"
-#include "SYCL/detail/function_traits.h"
-#include "SYCL/detail/kernel_name.h"
-#include "SYCL/detail/src_handlers/invoke_source.h"
-#include "SYCL/detail/src_handlers/kernel_source.h"
 #include <map>
 
 namespace cl {
@@ -23,9 +23,8 @@ namespace sycl {
 class kernel;
 class queue;
 
-
 class program {
-protected:
+ protected:
   friend class handler;
   friend class kernel;
   friend class detail::kernel_::source;
@@ -37,24 +36,20 @@ protected:
   vector_class<device> devices;
   std::map<::size_t, shared_ptr_class<kernel>> kernels;
 
-  program(
-    cl_program clProgram, const context& context, vector_class<device> deviceList);
+  program(cl_program clProgram, const context& context,
+          vector_class<device> deviceList);
 
   void init_kernels();
   vector_class<cl_program> get_program_pointers() const;
 
-  void compile(
-    string_class compile_options,
-    ::size_t kernel_name_id,
-    shared_ptr_class<kernel> kern
-  );
+  void compile(string_class compile_options, ::size_t kernel_name_id,
+               shared_ptr_class<kernel> kern);
   void report_compile_error(shared_ptr_class<kernel> kern, device& dev) const;
 
   template <class KernelType>
   void compile(KernelType kernFunctor, string_class compile_options = "") {
-    auto src =
-      detail::kernel_::constructor<typename detail::first_arg<KernelType>::type>::get(
-        kernFunctor);
+    auto src = detail::kernel_::constructor<
+        typename detail::first_arg<KernelType>::type>::get(kernFunctor);
     auto kern = shared_ptr_class<kernel>(new kernel(true));
     kern->src = std::move(src);
     compile(compile_options, detail::kernel_name::get<KernelType>(), kern);
@@ -65,7 +60,8 @@ protected:
     compile(kernFunctor, compile_options);
     link();
   }
-public:
+
+ public:
   // Creates an empty program object for all devices associated with context
   explicit program(const context& context);
 
@@ -81,14 +77,16 @@ public:
 
   // Obtains a SYCL program object from a SYCL kernel name
   // and compiles it ready-to-link
-  // TODO: Can only compile well-defined functors with a public default constructor
+  // TODO: Can only compile well-defined functors with a public default
+  // constructor
   template <typename kernelT>
   void compile_from_kernel_name(string_class compile_options = "") {
     kernelT functor;
     compile(functor, compile_options);
   }
 
-  // Obtains a SYCL program object from a SYCL kernel name and builds it ready-to-run
+  // Obtains a SYCL program object from a SYCL kernel name and builds it
+  // ready-to-run
   template <typename kernelT>
   void build_from_kernel_name(string_class compile_options = "") {
     compile_from_kernel_name<kernelT>(compile_options);
@@ -104,45 +102,35 @@ public:
     return *(kernels.at(detail::kernel_name::get<kernelT>()));
   }
 
-  bool is_linked() const {
-    return linked;
-  }
+  bool is_linked() const { return linked; }
 
-private:
+ private:
   template <typename ReturnType, info::program param>
   struct traits
-    : detail::array_traits<
-    ReturnType,
-    info::program,
-    param,
-    detail::traits_buffer_default<ReturnType>::size
-    > {
+      : detail::array_traits<ReturnType, info::program, param,
+                             detail::traits_buffer_default<ReturnType>::size> {
     using return_t = typename detail::array_traits<
-      ReturnType,
-      info::program,
-      param,
-      detail::traits_buffer_default<ReturnType>::size
-    >::return_t;
-    return_t get_info(const program* p) {
-      return this->get(p->prog.get());
-    }
+        ReturnType, info::program, param,
+        detail::traits_buffer_default<ReturnType>::size>::return_t;
+    return_t get_info(const program* p) { return this->get(p->prog.get()); }
   };
 
   template <typename Contained_, info::program param>
   struct traits<vector_class<Contained_>, param>
-    : detail::array_traits<Contained_, info::program, param> {
-    using Container =
-      typename detail::array_traits<Contained_, info::program, param>::Container;
+      : detail::array_traits<Contained_, info::program, param> {
+    using Container = typename detail::array_traits<Contained_, info::program,
+                                                    param>::Container;
     Container get_info(const program* p) {
       this->get(p->prog.get());
-      return Container(
-        this->param_value, this->param_value + this->actual_size / this->type_size);
+      return Container(this->param_value,
+                       this->param_value + this->actual_size / this->type_size);
     }
   };
 
   template <class Contained_>
   struct traits<vector_class<vector_class<Contained_>>, info::program::binaries>
-    : detail::array_traits<Contained_*, info::program, info::program::binaries> {
+      : detail::array_traits<Contained_*, info::program,
+                             info::program::binaries> {
     using DoubleContainer = vector_class<vector_class<Contained_>>;
     DoubleContainer get_info(const program* p) {
       auto binary_sizes = p->get_info<info::program::binary_sizes>();
@@ -151,16 +139,16 @@ private:
       DoubleContainer ret;
       static const auto inner_type_size = sizeof(Contained_);
       ::size_t i = 0;
-      for(auto bin_size : binary_sizes) {
-        ret.emplace_back(
-          this->param_value[i], this->param_value[i] + bin_size / inner_type_size);
+      for (auto bin_size : binary_sizes) {
+        ret.emplace_back(this->param_value[i],
+                         this->param_value[i] + bin_size / inner_type_size);
         ++i;
       }
       return ret;
     }
   };
 
-public:
+ public:
   template <info::program param>
   typename param_traits<info::program, param>::type get_info() const {
     return traits<param_traits_t<info::program, param>, param>().get_info(this);
@@ -172,10 +160,8 @@ public:
   vector_class<device> get_devices() const;
   string_class get_build_options() const;
 
-  cl_program get() const {
-    return prog.get();
-  }
+  cl_program get() const { return prog.get(); }
 };
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

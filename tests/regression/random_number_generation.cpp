@@ -28,7 +28,6 @@ float hostRandom(cl::sycl::cl_uint2& seed) {
 }
 
 int main() {
-
   using namespace cl::sycl;
   using namespace std;
 
@@ -38,29 +37,28 @@ int main() {
   buffer<float> numbers(size);
 
   // TODO: Should not be zero
-  ::cl_uint2 startSeed = { 24325, 32536 };
+  ::cl_uint2 startSeed = {24325, 32536};
 
   myQueue.submit([&](handler& cgh) {
     auto n = numbers.get_access<access::mode::discard_write>(cgh);
 
     cgh.single_task<class generate>([=]() {
       uint2 seed(startSeed.s[0], startSeed.s[1]);
-      SYCL_FOR(int1 i = 0, i < size, ++i) {
-        n[i] = deviceRandom(seed);
-      }
+      SYCL_FOR(int1 i = 0, i < size, ++i) { n[i] = deviceRandom(seed); }
       SYCL_END;
     });
   });
 
   float eps = 1e-3f;  // Don't need very high accuracy
-  auto n = numbers.get_access<access::mode::read, access::target::host_buffer>();
+  auto n =
+      numbers.get_access<access::mode::read, access::target::host_buffer>();
   cl::sycl::cl_uint2 seed = startSeed;
 
   // TODO: Better automatic testing
-  for(auto i = 0; i < size; ++i) {
+  for (auto i = 0; i < size; ++i) {
     auto hostRnd = hostRandom(seed);
     auto deviceRnd = n[i];
-    if(deviceRnd < hostRnd - eps || deviceRnd > hostRnd + eps) {
+    if (deviceRnd < hostRnd - eps || deviceRnd > hostRnd + eps) {
       cout << i << " -> expected " << hostRnd << ", got " << deviceRnd << endl;
       return 1;
     }

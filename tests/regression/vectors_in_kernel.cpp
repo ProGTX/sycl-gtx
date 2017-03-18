@@ -14,7 +14,6 @@ std::string to_string(const T& t) {
 }
 
 int main() {
-
   using namespace cl::sycl;
   using namespace std;
 
@@ -37,21 +36,21 @@ int main() {
     });
   });
 
-  auto v = vectors.get_access<access::mode::read, access::target::host_buffer>();
+  auto v =
+      vectors.get_access<access::mode::read, access::target::host_buffer>();
 
   auto floatEqual = [](float& first, float& second) {
     static const double eps = 1e-5f;
     return first > second - eps && first < second + eps;
   };
 
-  for(auto i = 0; i < size; ++i) {
+  for (auto i = 0; i < size; ++i) {
     auto vi = v[i];
-    if(!floatEqual(vi.x(), testVector.x()) ||
-      !floatEqual(vi.y(), testVector.y()) ||
-      !floatEqual(vi.z(), testVector.z())
-      ) {
-      cout << i << " -> expected " << to_string(testVector)
-           << ", got " << to_string(vi) << endl;
+    if (!floatEqual(vi.x(), testVector.x()) ||
+        !floatEqual(vi.y(), testVector.y()) ||
+        !floatEqual(vi.z(), testVector.z())) {
+      cout << i << " -> expected " << to_string(testVector) << ", got "
+           << to_string(vi) << endl;
       return 1;
     }
   }

@@ -19,7 +19,7 @@ namespace detail {
 void kernel_add(string_class line);
 
 class data_ref {
-public:
+ public:
   enum class type_t {
     general,
     numeric,
@@ -34,42 +34,34 @@ public:
   string_class name;
   type_t type;
 
-  static string_class get_name(const data_ref& dref) {
-    return dref.name;
-  }
+  static string_class get_name(const data_ref& dref) { return dref.name; }
 
   template <
-    typename T,
-    typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
+      typename T,
+      typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
   static string_class get_name(const T& n) {
     return get_string<T>::get(n);
   }
 
-  template <
-    typename T,
-    typename std::enable_if<std::is_enum<T>::value>::type* = nullptr>
+  template <typename T,
+            typename std::enable_if<std::is_enum<T>::value>::type* = nullptr>
   static string_class get_name(const T& n) {
     auto value = static_cast<typename std::underlying_type<T>::type>(n);
     return get_string<decltype(value)>::get(value);
   }
 
-  data_ref(string_class name)
-    : name(name) {}
+  data_ref(string_class name) : name(name) {}
 
-  data_ref(char* name)
-    : name(name) {}
+  data_ref(char* name) : name(name) {}
 
-  data_ref(const char* name)
-    : name(name) {}
+  data_ref(const char* name) : name(name) {}
 
   template <class T>
-  data_ref(T&& type)
-    : name(get_name(type)) {}
+  data_ref(T&& type) : name(get_name(type)) {}
 
   data_ref(const data_ref& copy) = default;
 #if MSVC_LOW
-  data_ref(data_ref&& move)
-    : SYCL_MOVE_INIT(name), SYCL_MOVE_INIT(type) {}
+  data_ref(data_ref&& move) : SYCL_MOVE_INIT(name), SYCL_MOVE_INIT(type) {}
   friend void swap(data_ref& first, data_ref& second) {
     using std::swap;
     SYCL_SWAP(name);
@@ -85,7 +77,8 @@ public:
     return *this;
   }
 
-  // TODO: https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/operators.html
+// TODO:
+// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/operators.html
 
 #define SYCL_ASSIGNMENT_OPERATOR(op)              \
   template <class T>                              \
@@ -94,58 +87,59 @@ public:
     return *this;                                 \
   }
 
-#define SYCL_DATA_REF_OPERATOR(op)                                              \
-  template <class T>                                                            \
-  data_ref operator op(const T& n) const {                                      \
-    return data_ref(open_parenthesis + name + " " #op " " + get_name(n) + ')'); \
-  }                                                                             \
-  template <                                                                    \
-    typename T,                                                                 \
-    typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>     \
-  friend data_ref operator op(const T& n, const data_ref& dref) {               \
-    return data_ref(                                                            \
-      open_parenthesis + get_name(n) + " " #op " " + dref.name + ')');          \
+#define SYCL_DATA_REF_OPERATOR(op)                                             \
+  template <class T>                                                           \
+  data_ref operator op(const T& n) const {                                     \
+    return data_ref(open_parenthesis + name + " " #op " " + get_name(n) +      \
+                    ')');                                                      \
+  }                                                                            \
+  template <typename T,                                                        \
+            typename std::enable_if<std::is_arithmetic<T>::value>::type* =     \
+                nullptr>                                                       \
+  friend data_ref operator op(const T& n, const data_ref& dref) {              \
+    return data_ref(open_parenthesis + get_name(n) + " " #op " " + dref.name + \
+                    ')');                                                      \
   }
 
-  SYCL_ASSIGNMENT_OPERATOR(= );
+  SYCL_ASSIGNMENT_OPERATOR(=);
 
   // Arithmetic operatos
   SYCL_DATA_REF_OPERATOR(+);
-  SYCL_ASSIGNMENT_OPERATOR(+= );
+  SYCL_ASSIGNMENT_OPERATOR(+=);
   SYCL_DATA_REF_OPERATOR(-);
-  SYCL_ASSIGNMENT_OPERATOR(-= );
+  SYCL_ASSIGNMENT_OPERATOR(-=);
   SYCL_DATA_REF_OPERATOR(*);
-  SYCL_ASSIGNMENT_OPERATOR(*= );
-  SYCL_DATA_REF_OPERATOR(/ );
-  SYCL_ASSIGNMENT_OPERATOR(/= );
+  SYCL_ASSIGNMENT_OPERATOR(*=);
+  SYCL_DATA_REF_OPERATOR(/);
+  SYCL_ASSIGNMENT_OPERATOR(/=);
   SYCL_DATA_REF_OPERATOR(%);
-  SYCL_ASSIGNMENT_OPERATOR(%= );
+  SYCL_ASSIGNMENT_OPERATOR(%=);
 
   // Comparison operators
-  SYCL_DATA_REF_OPERATOR(== );
-  SYCL_DATA_REF_OPERATOR(!= );
+  SYCL_DATA_REF_OPERATOR(==);
+  SYCL_DATA_REF_OPERATOR(!=);
   SYCL_DATA_REF_OPERATOR(<);
-  SYCL_DATA_REF_OPERATOR(<= );
+  SYCL_DATA_REF_OPERATOR(<=);
   SYCL_DATA_REF_OPERATOR(>);
-  SYCL_DATA_REF_OPERATOR(>= );
+  SYCL_DATA_REF_OPERATOR(>=);
 
   // Boolean operators
-  SYCL_DATA_REF_OPERATOR(|| );
+  SYCL_DATA_REF_OPERATOR(||);
   SYCL_DATA_REF_OPERATOR(&&);
 
   // Bit operators
   SYCL_DATA_REF_OPERATOR(&);
-  SYCL_ASSIGNMENT_OPERATOR(&= );
-  SYCL_DATA_REF_OPERATOR(| );
-  SYCL_ASSIGNMENT_OPERATOR(|= );
-  SYCL_DATA_REF_OPERATOR(^);
-  SYCL_ASSIGNMENT_OPERATOR(^= );
+  SYCL_ASSIGNMENT_OPERATOR(&=);
+  SYCL_DATA_REF_OPERATOR(|);
+  SYCL_ASSIGNMENT_OPERATOR(|=);
+  SYCL_DATA_REF_OPERATOR (^);
+  SYCL_ASSIGNMENT_OPERATOR(^=);
 
   // Shifts
-  SYCL_DATA_REF_OPERATOR(>> );
-  SYCL_ASSIGNMENT_OPERATOR(>>= );
-  SYCL_DATA_REF_OPERATOR(<< );
-  SYCL_ASSIGNMENT_OPERATOR(<<= );
+  SYCL_DATA_REF_OPERATOR(>>);
+  SYCL_ASSIGNMENT_OPERATOR(>>=);
+  SYCL_DATA_REF_OPERATOR(<<);
+  SYCL_ASSIGNMENT_OPERATOR(<<=);
 
 #undef SYCL_ASSIGNMENT_OPERATOR
 #undef SYCL_DATA_REF_OPERATOR
@@ -156,13 +150,13 @@ public:
   data_ref operator++() const {
     return data_ref(open_parenthesis + "++" + name + ')');
   }
-  data_ref operator++(int) const {
+  data_ref operator++(int)const {
     return data_ref(open_parenthesis + name + "++" + ')');
   }
   data_ref operator--() const {
     return data_ref(open_parenthesis + "--" + name + ')');
   }
-  data_ref operator--(int) const {
+  data_ref operator--(int)const {
     return data_ref(open_parenthesis + name + "--" + ')');
   }
 
@@ -171,7 +165,7 @@ public:
   }
 };
 
-} // namespace detail
+}  // namespace detail
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

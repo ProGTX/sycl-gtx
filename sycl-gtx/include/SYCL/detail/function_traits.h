@@ -27,11 +27,11 @@ struct first_arg<R(void)> {
 
 // Member function pointer
 template <class C, class R, class... Args>
-struct first_arg<R(C::*)(Args...)> : public first_arg<R(Args...)> {};
+struct first_arg<R (C::*)(Args...)> : public first_arg<R(Args...)> {};
 
 // const member function pointer
 template <class C, class R, class... Args>
-struct first_arg<R(C::*)(Args...) const> : public first_arg<R(Args...)> {};
+struct first_arg<R (C::*)(Args...) const> : public first_arg<R(Args...)> {};
 
 // Functor
 template <class F>
@@ -39,6 +39,6 @@ struct first_arg {
   using type = typename first_arg<decltype(&F::operator())>::type;
 };
 
-} // namespace detail
-} // namespace sycl
-} // namespace cl
+}  // namespace detail
+}  // namespace sycl
+}  // namespace cl

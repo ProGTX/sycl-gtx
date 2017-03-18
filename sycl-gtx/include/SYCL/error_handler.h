@@ -4,10 +4,10 @@
 // 2.5.6 Error handling
 // 3.6 Error handling
 
-#include "SYCL/exception.h"
 #include "SYCL/detail/common.h"
 #include "SYCL/detail/debug.h"
 #include "SYCL/detail/error_code.h"
+#include "SYCL/exception.h"
 
 namespace cl {
 namespace sycl {
@@ -24,12 +24,14 @@ namespace detail {
 // and the error is not available to the user in any specified way.
 // Implementations may provide extra debugging information to users
 // to trap and handle asynchronous errors.
-static const async_handler default_async_handler = [](cl::sycl::exception_list list) {
-  debug() << "Number of asynchronous errors during queue execution:" << list.size();
-  for(auto& e : list) {
-    debug("SYCL_ERROR::", e.what());
-  }
-};
+static const async_handler default_async_handler =
+    [](cl::sycl::exception_list list) {
+      debug() << "Number of asynchronous errors during queue execution:"
+              << list.size();
+      for (auto& e : list) {
+        debug("SYCL_ERROR::", e.what());
+      }
+    };
 
 namespace error {
 
@@ -49,7 +51,7 @@ struct thrower {
 
 // Synchronous error reporting
 static void report(::cl_int error_code, context* thrower = nullptr) {
-  if(error_code != CL_SUCCESS) {
+  if (error_code != CL_SUCCESS) {
     auto e = thrower::get(error_code, thrower);
     thrower::report(e);
   }
@@ -61,8 +63,8 @@ static void report(code::value_t error_code, context* thrower = nullptr) {
   thrower::report(e);
 }
 
-} // namespace error
-} // namespace detail
+}  // namespace error
+}  // namespace detail
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

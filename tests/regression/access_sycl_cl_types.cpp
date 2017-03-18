@@ -4,7 +4,6 @@
 
 // Originally test12
 
-
 int main() {
   using namespace std;
   using namespace cl::sycl;
@@ -12,16 +11,14 @@ int main() {
   auto size = 1;
   auto spheres = buffer<int8>(range<1>(size));
 
-  ::cl_int8 testVector = {
-    0, 1, 2, 3, 4, 5, 6, 7
-  };
+  ::cl_int8 testVector = {0, 1, 2, 3, 4, 5, 6, 7};
 
   {
-    auto s =
-      spheres.get_access<access::mode::discard_write, access::target::host_buffer>();
+    auto s = spheres.get_access<access::mode::discard_write,
+                                access::target::host_buffer>();
 
     // See SphereSycl
-    for(int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
       auto& si = s[i];
 
       si.lo().x() = testVector.s[0] * (i + 1);
@@ -37,46 +34,48 @@ int main() {
   }
 
   {
-    auto s = spheres.get_access<access::mode::read, access::target::host_buffer>();
+    auto s =
+        spheres.get_access<access::mode::read, access::target::host_buffer>();
 
     auto compare = [](::cl_int expected, ::cl_int actual) {
 #ifndef NDEBUG
       cout << expected << ", " << actual << endl;
 #endif
-      if(actual != expected) {
-        cout << "Wrong output, expected " << expected << ", got " << actual << endl;
+      if (actual != expected) {
+        cout << "Wrong output, expected " << expected << ", got " << actual
+             << endl;
         return false;
       }
       return true;
     };
 
     // See SphereSycl
-    for(int i = 0; i < size; ++i) {
+    for (int i = 0; i < size; ++i) {
       auto& si = s[i];
 
-      if(!compare(testVector.s[0], si.lo().x())) {
+      if (!compare(testVector.s[0], si.lo().x())) {
         return 1;
       }
-      if(!compare(testVector.s[1], si.lo().y())) {
+      if (!compare(testVector.s[1], si.lo().y())) {
         return 1;
       }
-      if(!compare(testVector.s[2], si.lo().z())) {
+      if (!compare(testVector.s[2], si.lo().z())) {
         return 1;
       }
-      if(!compare(testVector.s[3], si.lo().w())) {
+      if (!compare(testVector.s[3], si.lo().w())) {
         return 1;
       }
 
-      if(!compare(testVector.s[4], si.hi().x())) {
+      if (!compare(testVector.s[4], si.hi().x())) {
         return 1;
       }
-      if(!compare(testVector.s[5], si.hi().y())) {
+      if (!compare(testVector.s[5], si.hi().y())) {
         return 1;
       }
-      if(!compare(testVector.s[6], si.hi().z())) {
+      if (!compare(testVector.s[6], si.hi().z())) {
         return 1;
       }
-      if(!compare(testVector.s[7], si.hi().w())) {
+      if (!compare(testVector.s[7], si.hi().w())) {
         return 1;
       }
     }

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "SYCL/vectors/cl_vec.h"
 #include "SYCL/detail/common.h"
-
+#include "SYCL/vectors/cl_vec.h"
 
 namespace cl {
 namespace sycl {
@@ -10,7 +9,6 @@ namespace sycl {
 // Forward declaration
 template <typename dataT, int numElements>
 class vec;
-
 
 namespace detail {
 
@@ -37,7 +35,7 @@ struct acc_device_return<vectors::cl_base<dataT, numElements, numElements>> {
   using type = vec<dataT, numElements>;
 };
 
-} // namespace detail
+}  // namespace detail
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

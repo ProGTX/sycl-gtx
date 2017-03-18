@@ -9,7 +9,7 @@ namespace sycl {
 
 template <typename T>
 class atomic<T> {
-public:
+ public:
   // Constructors
   atomic() = delete;
 
@@ -21,9 +21,10 @@ public:
   T load(std::memory_order) const volatile;
   T exchange(T, std::memory_order);
   T exchange(T, std::memory_order) volatile;
-  T compare_exchange_strong(T*, T, std::memory_order success, std::memory_order fail);
-  T compare_exchange_strong(
-    T*, T, std::memory_order success, std::memory_order fail) volatile;
+  T compare_exchange_strong(T*, T, std::memory_order success,
+                            std::memory_order fail);
+  T compare_exchange_strong(T*, T, std::memory_order success,
+                            std::memory_order fail) volatile;
   T fetch_add(T, std::memory_order);
   T fetch_add(T, std::memory_order) volatile;
   T fetch_sub(T, std::memory_order);
@@ -59,11 +60,13 @@ T atomic_exchange_explicit(atomic<T>*, T, std::memory_order);
 template <class T>
 T atomic_exchange_explicit(volatile atomic<T>*, T, std::memory_order);
 template <class T>
-bool atomic_compare_exchange_strong_explicit(
-  atomic<T>*, T*, T, std::memory_order success, std::memory_order fail);
+bool atomic_compare_exchange_strong_explicit(atomic<T>*, T*, T,
+                                             std::memory_order success,
+                                             std::memory_order fail);
 template <class T>
-bool atomic_compare_exchange_strong_explicit(
-  volatile atomic<T>*, T*, T, std::memory_order success, std::memory_order fail);
+bool atomic_compare_exchange_strong_explicit(volatile atomic<T>*, T*, T,
+                                             std::memory_order success,
+                                             std::memory_order fail);
 template <class T>
 T atomic_fetch_add_explicit(atomic<T>*, T, std::memory_order);
 template <class T>
@@ -95,5 +98,5 @@ T atomic_fetch_max_explicit(atomic<T>*, T, std::memory_order);
 template <class T>
 T atomic_fetch_max_explicit(volatile atomic<T>*, T, std::memory_order);
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

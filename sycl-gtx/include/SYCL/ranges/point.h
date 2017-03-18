@@ -1,8 +1,8 @@
 #pragma once
 
+#include "SYCL/detail/common.h"
 #include "SYCL/detail/data_ref.h"
 #include "SYCL/detail/point_ref.h"
-#include "SYCL/detail/common.h"
 
 namespace cl {
 namespace sycl {
@@ -24,15 +24,14 @@ struct point_names {
   static const string_class range_local;
 };
 
-
 #define SYCL_POINT_OP_EQ(lhs, op)             \
-  for(::size_t i = 0; i < dimensions; ++i) {  \
+  for (::size_t i = 0; i < dimensions; ++i) { \
     lhs values[i] op rhs.values[i];           \
   }
 
 template <::size_t dimensions>
 struct point : data_ref {
-protected:
+ protected:
   friend class data_ref;
   template <::size_t>
   friend struct point;
@@ -46,7 +45,7 @@ protected:
 
   static string_class name_from_type(type_t type) {
     string_class name = "";
-    switch(type) {
+    switch (type) {
       case type_t::id_global:
         name = point_names::id_global;
         break;
@@ -78,13 +77,13 @@ protected:
   }
 
   void set(::size_t value) {
-    for(::size_t i = 0; i < dimensions; ++i) {
+    for (::size_t i = 0; i < dimensions; ++i) {
       values[i] = value;
     }
   }
 
   bool is_identifier() const {
-    switch(type) {
+    switch (type) {
       case type_t::id_global:
       case type_t::id_local:
       case type_t::range_global:
@@ -95,97 +94,92 @@ protected:
     }
   }
 
-  point(::size_t x, ::size_t y, ::size_t z)
-    : data_ref("") {
+  point(::size_t x, ::size_t y, ::size_t z) : data_ref("") {
     type = type_t::numeric;
     values[0] = x;
-    if(dimensions > 1) {
+    if (dimensions > 1) {
       values[1] = y;
-      if(dimensions > 2) {
+      if (dimensions > 2) {
         values[2] = z;
       }
-    }
-    else {
+    } else {
       name = get_string<::size_t>::get(x);
     }
   }
 
-public:
-
-  // Warning: Extremely ugly,
-  // split in two parts to appease Clang's aversion to the equality sign
+ public:
+// Warning: Extremely ugly,
+// split in two parts to appease Clang's aversion to the equality sign
 #define SYCL_POINT_ARITH_OP_P1(OP)                                \
   data_ref operator OP(const data_ref& rhs) const {               \
     return data_ref::operator OP(rhs);                            \
   }                                                               \
   point operator OP(const point& rhs) const {                     \
     point lhs(*this);                                             \
-    if(type == type_t::numeric && rhs.type == type_t::numeric) {  \
-      SYCL_POINT_OP_EQ(lhs.,  OP);                                \
+    if (type == type_t::numeric && rhs.type == type_t::numeric) { \
+      SYCL_POINT_OP_EQ(lhs., OP);                                 \
     }
 #define SYCL_POINT_ARITH_OP_P2(OP)                                \
-    else {                                                        \
-      lhs.set(type_t::general);                                   \
-      ((data_ref)lhs).operator OP(rhs);                           \
-    }                                                             \
-    return lhs;                                                   \
+  else {                                                          \
+    lhs.set(type_t::general);                                     \
+    ((data_ref)lhs).operator OP(rhs);                             \
+  }                                                               \
+  return lhs;                                                     \
   }                                                               \
   point& operator OP(const data_ref& rhs) {                       \
     set(type_t::general);                                         \
     return data_ref::operator OP(rhs);                            \
   }                                                               \
   point& operator OP(const point& rhs) {                          \
-    if(type == type_t::numeric && rhs.type == type_t::numeric) {  \
+    if (type == type_t::numeric && rhs.type == type_t::numeric) { \
       SYCL_POINT_OP_EQ(this->, OP);                               \
-      if(dimensions == 1) {                                       \
+      if (dimensions == 1) {                                      \
         name = get_string<::size_t>::get(values[0]);              \
       }                                                           \
-    }                                                             \
-    else {                                                        \
+    } else {                                                      \
       return operator OP((data_ref)rhs);                          \
     }                                                             \
   }
 
   SYCL_POINT_ARITH_OP_P1(+)
-    SYCL_POINT_ARITH_OP_P2(+=)
-    SYCL_POINT_ARITH_OP_P1(-)
-    SYCL_POINT_ARITH_OP_P2(-=)
-    SYCL_POINT_ARITH_OP_P1(*)
-    SYCL_POINT_ARITH_OP_P2(*=)
-    SYCL_POINT_ARITH_OP_P1(/ )
-    SYCL_POINT_ARITH_OP_P2(/=)
-    SYCL_POINT_ARITH_OP_P1(%)
-    SYCL_POINT_ARITH_OP_P2(%=)
-    SYCL_POINT_ARITH_OP_P1(>> )
-    SYCL_POINT_ARITH_OP_P2(>>=)
-    SYCL_POINT_ARITH_OP_P1(<< )
-    SYCL_POINT_ARITH_OP_P2(<<=)
-    SYCL_POINT_ARITH_OP_P1(&)
-    SYCL_POINT_ARITH_OP_P2(&=)
-    SYCL_POINT_ARITH_OP_P1(^)
-    SYCL_POINT_ARITH_OP_P2(^=)
-    SYCL_POINT_ARITH_OP_P1(| )
-    SYCL_POINT_ARITH_OP_P2(|=)
+  SYCL_POINT_ARITH_OP_P2(+=)
+  SYCL_POINT_ARITH_OP_P1(-)
+  SYCL_POINT_ARITH_OP_P2(-=)
+  SYCL_POINT_ARITH_OP_P1(*)
+  SYCL_POINT_ARITH_OP_P2(*=)
+  SYCL_POINT_ARITH_OP_P1(/)
+  SYCL_POINT_ARITH_OP_P2(/=)
+  SYCL_POINT_ARITH_OP_P1(%)
+  SYCL_POINT_ARITH_OP_P2(%=)
+  SYCL_POINT_ARITH_OP_P1(>>)
+  SYCL_POINT_ARITH_OP_P2(>>=)
+  SYCL_POINT_ARITH_OP_P1(<<)
+  SYCL_POINT_ARITH_OP_P2(<<=)
+  SYCL_POINT_ARITH_OP_P1(&)
+  SYCL_POINT_ARITH_OP_P2(&=)
+  SYCL_POINT_ARITH_OP_P1 (^)
+  SYCL_POINT_ARITH_OP_P2(^=)
+  SYCL_POINT_ARITH_OP_P1(|)
+  SYCL_POINT_ARITH_OP_P2(|=)
 
 #undef SYCL_POINT_ARITH_OP_P1
 #undef SYCL_POINT_ARITH_OP_P2
 
-private:
+ private:
   template <bool is_const>
   point_ref<is_const> get_ref(int dimension) {
     auto name_ = name;
 
-    if(is_identifier()) {
+    if (is_identifier()) {
       name_ += get_string<::size_t>::get(dimension);
-    }
-    else if(type == type_t::numeric && name.empty()) {
+    } else if (type == type_t::numeric && name.empty()) {
       name_ = get_string<::size_t>::get(values[dimension]);
     }
 
     return point_ref<is_const>(values[dimension], name_, type);
   }
 
-public:
+ public:
   point_ref<true> get(int dimension) const {
     // The const cast is ugly,
     // but the get_ref method doesn't actually modify this class
@@ -198,6 +192,6 @@ public:
 
 #undef SYCL_POINT_OP_EQ
 
-} // namespace detail
-} // namespace sycl
-} // namespace cl
+}  // namespace detail
+}  // namespace sycl
+}  // namespace cl

@@ -50,7 +50,7 @@ namespace cl {
 namespace sycl {
 
 #ifndef CL_SYCL_NO_STD_VECTOR
-template<class T, class Alloc = ::std::allocator<T>>
+template <class T, class Alloc = ::std::allocator<T>>
 using vector_class = ::std::vector<T, Alloc>;
 #endif
 
@@ -62,30 +62,26 @@ using string_class = ::std::string;
 #if MSVC_LOW
 template <class T>
 class function_class : public ::std::function<T> {
-private:
+ private:
   using Base = ::std::function<T>;
-public:
+
+ public:
   function_class() {}
-  function_class(std::nullptr_t fn)
-    : Base(fn) {}
-  template<class Fn>
-  function_class(Fn fn)
-    : Base(fn) {}
-  function_class(const Base& x)
-    : Base(x) {}
-  function_class(Base&& x)
-    : Base(std::move(x)) {}
+  function_class(std::nullptr_t fn) : Base(fn) {}
+  template <class Fn>
+  function_class(Fn fn) : Base(fn) {}
+  function_class(const Base& x) : Base(x) {}
+  function_class(Base&& x) : Base(std::move(x)) {}
   function_class(const function_class&) = default;
   function_class& operator=(const function_class&) = default;
-  function_class(function_class&& move)
-    : Base(std::move((Base)move)) {}
+  function_class(function_class&& move) : Base(std::move((Base)move)) {}
   function_class& operator=(function_class&& move) {
     Base::operator=(std::move((Base)move));
     return *this;
   }
 };
 #else
-template<class T>
+template <class T>
 using function_class = ::std::function<T>;
 #endif
 #endif
@@ -106,14 +102,13 @@ template <class T>
 using weak_ptr_class = ::std::weak_ptr<T>;
 #endif
 
-
 namespace detail {
 
 // http://stackoverflow.com/a/3418285
-static bool string_replace_one(
-  string_class& str, const string_class& from, const string_class& to) {
+static bool string_replace_one(string_class& str, const string_class& from,
+                               const string_class& to) {
   ::size_t start_pos = str.find(from);
-  if(start_pos == string_class::npos) {
+  if (start_pos == string_class::npos) {
     return false;
   }
   str.replace(start_pos, from.length(), to);
@@ -127,10 +122,10 @@ vector_class<To> transform_vector(vector_class<From> array) {
 
 template <class From>
 auto get_cl_array(vector_class<From> array)
-  -> vector_class<decltype(array[0].get())> {
+    -> vector_class<decltype(array[0].get())> {
   vector_class<decltype(array[0].get())> transformed;
   transformed.reserve(array.size());
-  for(auto& e : array) {
+  for (auto& e : array) {
     transformed.push_back(e.get());
   }
   return transformed;
@@ -139,32 +134,27 @@ auto get_cl_array(vector_class<From> array)
 template <typename EnumClass, EnumClass Value, class T>
 bool has_extension(T* sycl_class, const string_class& extension_name) {
   // TODO: Maybe add caching
-  return false; // TODO: Doesn't seem to work, ignore for now
-  //return sycl_class->get_info<Value>().find(extension_name) != string_class::npos;
+  return false;  // TODO: Doesn't seem to work, ignore for now
+  // return sycl_class->get_info<Value>().find(extension_name) !=
+  // string_class::npos;
 }
 
 template <typename DataType>
 struct type_string {
-  static string_class get() {
-    return DataType::type_name();
-  }
+  static string_class get() { return DataType::type_name(); }
 };
 
-#define SYCL_GET_TYPE_STRING(type)  \
-  template <>                       \
-  struct type_string<type> {        \
-    static string_class get() {     \
-      return #type;                 \
-    }                               \
+#define SYCL_GET_TYPE_STRING(type)              \
+  template <>                                   \
+  struct type_string<type> {                    \
+    static string_class get() { return #type; } \
   };
 
-#define SYCL_GET_UTYPE_STRING(type)   \
-  SYCL_GET_TYPE_STRING(type)          \
-  template <>                         \
-  struct type_string<unsigned type> { \
-    static string_class get() {       \
-      return "u"#type;                \
-    }                                 \
+#define SYCL_GET_UTYPE_STRING(type)                 \
+  SYCL_GET_TYPE_STRING(type)                        \
+  template <>                                       \
+  struct type_string<unsigned type> {               \
+    static string_class get() { return "u" #type; } \
   };
 
 SYCL_GET_TYPE_STRING(bool)
@@ -178,12 +168,9 @@ SYCL_GET_TYPE_STRING(double)
 #undef SYCL_GET_TYPE_STRING
 #undef SYCL_GET_UTYPE_STRING
 
-
 template <typename T>
 struct data_size {
-  static ::size_t get() {
-    return sizeof(T);
-  }
+  static ::size_t get() { return sizeof(T); }
 };
 
 template <typename DataType>
@@ -206,10 +193,10 @@ struct get_string<float> {
     std::stringstream s;
     s << t;
     auto str = s.str();
-    if(str.find('e') == string_class::npos && str.find('.') == string_class::npos) {
+    if (str.find('e') == string_class::npos &&
+        str.find('.') == string_class::npos) {
       str += ".f";
-    }
-    else {
+    } else {
       str += 'f';
     }
     return str;
@@ -219,7 +206,7 @@ struct get_string<float> {
 template <typename dataT, int numElements>
 struct cl_type;
 
-} // namespace detail
+}  // namespace detail
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

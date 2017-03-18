@@ -9,10 +9,10 @@ int main() {
   using namespace cl::sycl;
 
   static const int size = 1024;
-  int data[size]; // Initialize data to be worked on
-                    
-  int expected[size]; // Expected results
-  for(int i = 0; i < size; ++i) {
+  int data[size];  // Initialize data to be worked on
+
+  int expected[size];  // Expected results
+  for (int i = 0; i < size; ++i) {
     expected[i] = i;
   }
 
@@ -33,16 +33,16 @@ int main() {
       // enqueue a prallel_for task
       cgh.parallel_for<class simple_test>(range<1>(size), [=](id<1> idx) {
         writeResult[idx] = idx;
-      }); // end of the kernel function
-    }); // end of our commands for this queue
+      });  // end of the kernel function
+    });    // end of our commands for this queue
 
-  } // end of scope, so we wait for the queued work to complete
+  }  // end of scope, so we wait for the queued work to complete
 
   bool success = true;
 
   // Print result
-  for(int i = 0; i < size; ++i) {
-    if(data[i] != expected[i]) {
+  for (int i = 0; i < size; ++i) {
+    if (data[i] != expected[i]) {
       debug() << i << ",\texpected" << expected[i] << ",\tactual" << data[i];
       success = false;
     }

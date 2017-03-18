@@ -10,9 +10,9 @@ int main() {
 
   static const int expected = 1024;
 
-  int result; // this is where we will write our result
+  int result;  // this is where we will write our result
 
-  { // by sticking all the SYCL work in a {} block, we ensure
+  {  // by sticking all the SYCL work in a {} block, we ensure
     // all SYCL tasks must complete before exiting the block
 
     // create a queue to work on
@@ -27,12 +27,10 @@ int main() {
       auto writeResult = resultBuf.get_access<access::mode::write>(cgh);
 
       // enqueue a single, simple task
-      cgh.single_task<class simple_test>([=]() {
-        writeResult[0] = expected;
-      });
-    }); // end of our commands for this queue
+      cgh.single_task<class simple_test>([=]() { writeResult[0] = expected; });
+    });  // end of our commands for this queue
 
-  } // end scope, so we wait for the queue to complete
+  }  // end scope, so we wait for the queue to complete
 
   debug() << "Expected result" << expected;
   debug() << "Actual result" << result;

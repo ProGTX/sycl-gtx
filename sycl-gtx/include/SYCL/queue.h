@@ -4,23 +4,22 @@
 
 #include "SYCL/command_group.h"
 #include "SYCL/context.h"
+#include "SYCL/detail/common.h"
+#include "SYCL/detail/debug.h"
+#include "SYCL/detail/synchronizer.h"
 #include "SYCL/device.h"
 #include "SYCL/error_handler.h"
 #include "SYCL/handler_event.h"
 #include "SYCL/info.h"
 #include "SYCL/param_traits.h"
 #include "SYCL/refc.h"
-#include "SYCL/detail/common.h"
-#include "SYCL/detail/debug.h"
-#include "SYCL/detail/synchronizer.h"
-
 
 namespace cl {
 namespace sycl {
 
 // Encapsulation of an OpenCL cl_command_queue
 class queue {
-private:
+ private:
   friend class detail::synchronizer;
 
   using buffer_set = std::set<detail::buffer_base*>;
@@ -28,7 +27,7 @@ private:
   context ctx;
   device dev;
   detail::refc<cl_command_queue, clRetainCommandQueue, clReleaseCommandQueue>
-    command_q;
+      command_q;
   exception_list ex_list;
   detail::command_group command_group;
   buffer_set buffers_in_use;
@@ -36,66 +35,52 @@ private:
   vector_class<queue> subqueues;
 
   void display_device_info() const;
-  cl_command_queue create_queue(
-    bool display_info = true,
-    bool register_with_synchronizer = true,
-    info::queue_profiling enable_profiling = false
-  );
+  cl_command_queue create_queue(bool display_info = true,
+                                bool register_with_synchronizer = true,
+                                info::queue_profiling enable_profiling = false);
 
-public:
+ public:
   // Creates a queue for a device it chooses
   // according to the heuristics of the default selector.
   // The OpenCL context object is created implicitly.
-  explicit queue(const async_handler& asyncHandler = detail::default_async_handler);
+  explicit queue(
+      const async_handler& asyncHandler = detail::default_async_handler);
 
-  queue(
-    const device_selector& deviceSelector,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  queue(const device_selector& deviceSelector,
+        const async_handler& asyncHandler = detail::default_async_handler);
 
-  queue(
-    const context& syclContext,
-    const device_selector& deviceSelector,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  queue(const context& syclContext, const device_selector& deviceSelector,
+        const async_handler& asyncHandler = detail::default_async_handler);
 
-  queue(
-    const context& syclContext,
-    const device& syclDevice,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  queue(const context& syclContext, const device& syclDevice,
+        const async_handler& asyncHandler = detail::default_async_handler);
 
-  // Chooses a device based on the provided device selector in the given context.
-  queue(
-    const context& syclContext,
-    const device& syclDevice,
-    info::queue_profiling profilingFlag,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  // Chooses a device based on the provided device selector in the given
+  // context.
+  queue(const context& syclContext, const device& syclDevice,
+        info::queue_profiling profilingFlag,
+        const async_handler& asyncHandler = detail::default_async_handler);
 
   // Creates a queue for the provided device.
-  queue(
-    const device& syclDevice,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  queue(const device& syclDevice,
+        const async_handler& asyncHandler = detail::default_async_handler);
 
   // Creates a SYCL queue from an OpenCL queue.
   // At construction it does a retain on the queue memory object.
-  queue(
-    cl_command_queue clQueue,
-    const async_handler& asyncHandler = detail::default_async_handler
-  );
+  queue(cl_command_queue clQueue,
+        const async_handler& asyncHandler = detail::default_async_handler);
 
-private:
+ private:
   // Create sub-queue, which executes the command group immediately
   template <typename T>
   queue(queue* master, T cgf)
-    : ctx(master->ctx),
-      dev(master->dev),
-      command_q(create_queue(false, false)),
-      command_group(*this, cgf), is_flushed(false) {}
+      : ctx(master->ctx),
+        dev(master->dev),
+        command_q(create_queue(false, false)),
+        command_group(*this, cgf),
+        is_flushed(false) {}
 
-public:
+ public:
   ~queue();
 
   // Copy semantics
@@ -105,14 +90,14 @@ public:
   // Queue requires custom move semantics
   // because the parent pointer is carrier in subqueues
   queue(queue&& move)
-    : SYCL_MOVE_INIT(ctx),
-      SYCL_MOVE_INIT(dev),
-      SYCL_MOVE_INIT(command_q),
-      SYCL_MOVE_INIT(ex_list),
-      SYCL_MOVE_INIT(command_group),
-      SYCL_MOVE_INIT(buffers_in_use),
-      SYCL_MOVE_INIT(is_flushed),
-      SYCL_MOVE_INIT(subqueues) {
+      : SYCL_MOVE_INIT(ctx),
+        SYCL_MOVE_INIT(dev),
+        SYCL_MOVE_INIT(command_q),
+        SYCL_MOVE_INIT(ex_list),
+        SYCL_MOVE_INIT(command_group),
+        SYCL_MOVE_INIT(buffers_in_use),
+        SYCL_MOVE_INIT(is_flushed),
+        SYCL_MOVE_INIT(subqueues) {
     move.command_q = nullptr;
     command_group.q = this;
   }
@@ -142,11 +127,8 @@ public:
 
   template <info::queue param>
   typename param_traits<info::queue, param>::type get_info() const {
-    return detail::non_vector_traits<
-      info::queue,
-      param,
-      1
-    >().get(command_q.get());
+    return detail::non_vector_traits<info::queue, param, 1>().get(
+        command_q.get());
   }
 
   // Checks to see if any asynchronous errors have been produced by the queue
@@ -155,32 +137,34 @@ public:
   // If no async_handler was provided then asynchronous exceptions will be lost.
   void throw_asynchronous();
 
-  // Performs a blocking wait for the completion all enqueued tasks in the queue.
+  // Performs a blocking wait for the completion all enqueued tasks in the
+  // queue.
   // Synchronous errors will be reported via an exception.
   void wait();
 
-  // Performs a blocking wait for the completion of all enqueued tasks in the queue.
+  // Performs a blocking wait for the completion of all enqueued tasks in the
+  // queue.
   void wait_and_throw();
 
   // TODO
   template <typename T>
   handler_event submit(T cgf) {
-    subqueues.push_back({ this, cgf });
+    subqueues.push_back({this, cgf});
     return subqueues.back().process(buffers_in_use);
   }
 
   // TODO
   template <typename T>
-  handler_event submit(T cgf, queue &secondaryQueue);
+  handler_event submit(T cgf, queue& secondaryQueue);
 
-private:
+ private:
   void flush();
   void finish();
   void wait_subqueues(bool and_throw);
   handler_event process(buffer_set& buffers_in_use_master);
-  static vector_class<cl_event> get_wait_events(
-    const buffer_set& dependencies, buffer_set& buffers_in_use);
+  static vector_class<cl_event> get_wait_events(const buffer_set& dependencies,
+                                                buffer_set& buffers_in_use);
 };
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

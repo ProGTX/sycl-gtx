@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SYCL/detail/src_handlers/kernel_source.h"
-#include "SYCL/ranges.h"
 #include "SYCL/detail/common.h"
 #include "SYCL/detail/debug.h"
+#include "SYCL/detail/src_handlers/kernel_source.h"
+#include "SYCL/ranges.h"
 
 namespace cl {
 namespace sycl {
@@ -14,10 +14,11 @@ using kernel_::source;
 
 template <int dimensions, bool is_id>
 struct identifier_code {
-  static string_class get_function_name(typename point<dimensions>::type_t type) {
+  static string_class get_function_name(
+      typename point<dimensions>::type_t type) {
     using type_t = typename point<dimensions>::type_t;
     string_class name = "";
-    switch(type) {
+    switch (type) {
       case type_t::id_global:
         name = "get_global_id";
         break;
@@ -39,27 +40,21 @@ struct identifier_code {
     string_class name = point<dimensions>::name_from_type(type);
     string_class function_name = get_function_name(type);
 
-    for(int i = 0; i < dimensions; ++i) {
+    for (int i = 0; i < dimensions; ++i) {
       auto id_s = get_string<int>::get(i);
-      source::add(
-        string_class("const int ") + name + id_s + " = " +
-        function_name + "(" + id_s + ")"
-      );
+      source::add(string_class("const int ") + name + id_s + " = " +
+                  function_name + "(" + id_s + ")");
     }
 
-    if(is_id) {
+    if (is_id) {
       string_replace_one(function_name, "id", "size");
 
-      if(dimensions == 1) {
-        source::add(
-          string_class("const int ") + name + " = " + name + "0"
-        );
+      if (dimensions == 1) {
+        source::add(string_class("const int ") + name + " = " + name + "0");
       }
-      if(dimensions == 2) {
-        source::add(
-          string_class("const int ") + name + " = " +
-          name + "1 * " + function_name + "(0) + " + name + "0"
-        );
+      if (dimensions == 2) {
+        source::add(string_class("const int ") + name + " = " + name + "1 * " +
+                    function_name + "(0) + " + name + "0");
       }
 
       // TODO: 3d
@@ -70,20 +65,24 @@ struct identifier_code {
 template <int dimensions>
 struct generate_id_refs {
   static void global() {
-    identifier_code<dimensions, true>::generate(point<dimensions>::type_t::id_global);
+    identifier_code<dimensions, true>::generate(
+        point<dimensions>::type_t::id_global);
   }
   static void local() {
-    identifier_code<dimensions, true>::generate(point<dimensions>::type_t::id_local);
+    identifier_code<dimensions, true>::generate(
+        point<dimensions>::type_t::id_local);
   }
 };
 
 template <int dimensions>
 struct generate_range_refs {
   static void global() {
-    identifier_code<dimensions, true>::generate(point<dimensions>::type_t::range_global);
+    identifier_code<dimensions, true>::generate(
+        point<dimensions>::type_t::range_global);
   }
   static void local() {
-    identifier_code<dimensions, true>::generate(point<dimensions>::type_t::range_local);
+    identifier_code<dimensions, true>::generate(
+        point<dimensions>::type_t::range_local);
   }
 };
 
@@ -130,7 +129,7 @@ struct constructor<item<dimensions>> {
     generate_id_refs<dimensions>::global();
     auto index = get_special_id<dimensions>::global();
     // TODO: num_work_items, work_item_offset
-    //item<dimensions> it(index, num_work_items, work_item_offset);
+    // item<dimensions> it(index, num_work_items, work_item_offset);
     item<dimensions> it(index, empty_range<dimensions>());
     kern(it);
 
@@ -156,18 +155,13 @@ struct constructor<nd_item<dimensions>> {
 
     auto global_id = get_special_id<dimensions>::global();
 
-    item<dimensions> global_item(
-      global_id,
-      execution_range.get_global(),
-      execution_range.get_offset()
-    );
+    item<dimensions> global_item(global_id, execution_range.get_global(),
+                                 execution_range.get_offset());
 
     // TODO: Store group ID into offset of local_item
-    item<dimensions> local_item(
-      get_special_id<dimensions>::local(),
-      execution_range.get_local(),
-      execution_range.get_offset()
-    );
+    item<dimensions> local_item(get_special_id<dimensions>::local(),
+                                execution_range.get_local(),
+                                execution_range.get_offset());
 
     nd_item<dimensions> it(std::move(global_item), std::move(local_item));
     kern(it);
@@ -176,8 +170,8 @@ struct constructor<nd_item<dimensions>> {
   }
 };
 
-} // namespace kernel_
-} // namespace detail
+}  // namespace kernel_
+}  // namespace detail
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

@@ -2,14 +2,13 @@
 
 #include <cstddef>
 
-
 namespace cl {
 namespace sycl {
 
 namespace detail {
 
 class kernel_name {
-private:
+ private:
   static ::size_t current_count;
 
   template <class T>
@@ -17,14 +16,14 @@ private:
     static ::size_t id;
     static bool is_set;
     static void set() {
-      if(!is_set) {
+      if (!is_set) {
         id = ++current_count;
         is_set = true;
       }
     }
   };
 
-public:
+ public:
   template <class T>
   static ::size_t get() {
     namer<T>::set();
@@ -37,7 +36,7 @@ template <class T>
 template <class T>
 bool kernel_name::namer<T>::is_set = false;
 
-} // namespace detail
+}  // namespace detail
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

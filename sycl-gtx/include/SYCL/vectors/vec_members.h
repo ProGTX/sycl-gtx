@@ -9,7 +9,6 @@ namespace sycl {
 template <typename, int>
 class vec;
 
-
 namespace detail {
 namespace vectors {
 
@@ -24,12 +23,11 @@ struct members<dataT, parentElems, 1> {
 #ifndef SYCL_SIMPLE_SWIZZLES
   members(base<dataT, parentElems>* parent) {}
 #else
-protected:
+ protected:
   base<dataT, parentElems>* parent;
 
-public:
-  members(base<dataT, parentElems>* parent)
-    : parent(parent) {}
+ public:
+  members(base<dataT, parentElems>* parent) : parent(parent) {}
 
   swizzled_vec<dataT, 1> x() const {
     return this->parent->template swizzle<0>();
@@ -40,7 +38,7 @@ public:
 template <typename dataT, int parentElems>
 struct members<dataT, parentElems, 2> : members<dataT, parentElems, 1> {
   members(base<dataT, parentElems>* parent)
-    : members<dataT, parentElems, 1>(parent) {}
+      : members<dataT, parentElems, 1>(parent) {}
 
 #ifdef SYCL_SIMPLE_SWIZZLES
   swizzled_vec<dataT, 1> y() const {
@@ -52,7 +50,7 @@ struct members<dataT, parentElems, 2> : members<dataT, parentElems, 1> {
 template <typename dataT, int parentElems>
 struct members<dataT, parentElems, 3> : members<dataT, parentElems, 2> {
   members(base<dataT, parentElems>* parent)
-    : members<dataT, parentElems, 2>(parent) {}
+      : members<dataT, parentElems, 2>(parent) {}
 
 #ifdef SYCL_SIMPLE_SWIZZLES
   swizzled_vec<dataT, 1> z() const {
@@ -68,7 +66,7 @@ struct members<dataT, parentElems, 3> : members<dataT, parentElems, 2> {
 template <typename dataT, int parentElems>
 struct members<dataT, parentElems, 4> : members<dataT, parentElems, 3> {
   members(base<dataT, parentElems>* parent)
-    : members<dataT, parentElems, 3>(parent) {}
+      : members<dataT, parentElems, 3>(parent) {}
 
 #ifdef SYCL_SIMPLE_SWIZZLES
   swizzled_vec<dataT, 1> w() const {
@@ -93,8 +91,8 @@ struct members<dataT, parentElems, 16> {
 #endif
 };
 
-} // namespace vectors
-} // namespace detail
+}  // namespace vectors
+}  // namespace detail
 
-} // namespace sycl
-} // namespace cl
+}  // namespace sycl
+}  // namespace cl

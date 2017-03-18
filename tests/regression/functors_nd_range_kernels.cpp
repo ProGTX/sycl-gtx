@@ -8,27 +8,22 @@
 using namespace cl::sycl;
 
 class example_functor {
-public:
+ public:
   using rw_acc_t =
-    accessor<int, 1, access::mode::read_write, access::target::global_buffer>;
+      accessor<int, 1, access::mode::read_write, access::target::global_buffer>;
 
-private:
+ private:
   rw_acc_t ptr;
   int random_num;
 
-public:
-  example_functor(rw_acc_t p)
-    : ptr(p) {
+ public:
+  example_functor(rw_acc_t p) : ptr(p) {
     random_num = std::rand() % (100 - 1) + 1;
   }
 
-  void operator()(nd_item<1> item) {
-    ptr[item.get_global()] = random_num;
-  }
+  void operator()(nd_item<1> item) { ptr[item.get_global()] = random_num; }
 
-  int get_random() {
-    return random_num;
-  }
+  int get_random() { return random_num; }
 };
 
 int main() {
@@ -49,9 +44,7 @@ int main() {
 
       auto functor = example_functor(ptr);
 
-      cgh.parallel_for(nd_range<1>(size, group_size),
-        functor
-      );
+      cgh.parallel_for(nd_range<1>(size, group_size), functor);
 
       random_num = functor.get_random();
 
@@ -60,12 +53,11 @@ int main() {
     });
 
     auto hostPtr =
-      buf.get_access<access::mode::read_write, access::target::host_buffer>();
+        buf.get_access<access::mode::read_write, access::target::host_buffer>();
 
-    if(hostPtr[5] != random_num) {
-      debug()
-        << "The data retrieved from the device" << hostPtr[5]
-        << "does not match the random number generated:" << random_num;
+    if (hostPtr[5] != random_num) {
+      debug() << "The data retrieved from the device" << hostPtr[5]
+              << "does not match the random number generated:" << random_num;
       return 1;
     }
   }

@@ -2,26 +2,27 @@
 
 #include <vector>
 
-// Example from http://www.codeplay.com/portal/sycl-tutorial-1-the-vector-addition
+// Example from
+// http://www.codeplay.com/portal/sycl-tutorial-1-the-vector-addition
 // (slightly modified)
 
 // Originally test1
 
-#define TOL (0.001)   // Tolerance used in floating point comparisons
-#define LENGTH (1024) // Length of vectors a, b and c
+#define TOL (0.001)    // Tolerance used in floating point comparisons
+#define LENGTH (1024)  // Length of vectors a, b and c
 
 int main() {
   using namespace cl::sycl;
 
-  std::vector<int> h_a(LENGTH);             // a vector
-  std::vector<int> h_b(LENGTH);             // b vector
-  std::vector<int> h_c(LENGTH);             // c vector
-  std::vector<int> h_r(LENGTH, 0xdeadbeef); // d vector (result)
+  std::vector<int> h_a(LENGTH);              // a vector
+  std::vector<int> h_b(LENGTH);              // b vector
+  std::vector<int> h_c(LENGTH);              // c vector
+  std::vector<int> h_r(LENGTH, 0xdeadbeef);  // d vector (result)
 
   // Fill vectors a and b with random float values
   debug() << "Initializing buffers";
   int count = LENGTH;
-  for(int i = 0; i < count; i++) {
+  for (int i = 0; i < count; i++) {
     h_a[i] = (int)(rand() / (float)RAND_MAX);
     h_b[i] = (int)(rand() / (float)RAND_MAX);
     h_c[i] = (int)(rand() / (float)RAND_MAX);
@@ -43,29 +44,30 @@ int main() {
       auto r = d_r.get_access<access::mode::write>(cgh);
 
       // Kernel
-      cgh.parallel_for<class addition>(range<1>(count), [=](id<> i) {
-        r[i] = a[i] + b[i] + c[i];
-      });
+      cgh.parallel_for<class addition>(
+          range<1>(count), [=](id<> i) { r[i] = a[i] + b[i] + c[i]; });
     });
   }
 
   debug() << "Done, checking results";
   int correct = 0;
   float tmp;
-  for(int i = 0; i < count; i++) {
-    tmp = (float)(h_a[i] + h_b[i] + h_c[i]);  // assign element i of a + b + c to tmp
-    tmp -= h_r[i];  // compute deviation of expected and output result
-    if(tmp * tmp < TOL * TOL) { // correct if square deviation
-                                // is less than tolerance squared
+  for (int i = 0; i < count; i++) {
+    tmp = (float)(h_a[i] + h_b[i] +
+                  h_c[i]);  // assign element i of a + b + c to tmp
+    tmp -= h_r[i];          // compute deviation of expected and output result
+    if (tmp * tmp < TOL * TOL) {  // correct if square deviation
+                                  // is less than tolerance squared
       correct++;
-    }
-    else {
-      debug() << h_r[i] << "=\t" << h_a[i] << "+\t" << h_b[i] << "+\t" << h_c[i];
+    } else {
+      debug() << h_r[i] << "=\t" << h_a[i] << "+\t" << h_b[i] << "+\t"
+              << h_c[i];
     }
   }
 
   // Summarize results
-  debug() << "R = A+B+C:" << correct << "out of" << count << "results were correct.";
+  debug() << "R = A+B+C:" << correct << "out of" << count
+          << "results were correct.";
 
   return static_cast<int>(correct != count);
 }
