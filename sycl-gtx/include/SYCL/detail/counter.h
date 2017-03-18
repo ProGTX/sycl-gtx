@@ -18,12 +18,12 @@ class counter {
   counter() : counter_id(internal_count++) {}
 
   counter(const counter& copy) : counter() {}
-  counter(counter&& move) : counter_id(move.counter_id) {}
+  counter(counter&& move) noexcept : counter_id(move.counter_id) {}
   counter& operator=(const counter& copy) {
     counter_id = copy.counter_id;
     return *this;
   }
-  counter& operator=(counter&& move) { return *this; }
+  counter& operator=(counter&& move) noexcept { return *this; }
 
   static counter_t get_total_count() { return internal_count; }
 

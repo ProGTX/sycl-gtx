@@ -56,14 +56,14 @@ class vec : public detail::vectors::base<dataT, numElements>,
   vec() : Base(), Members(this) {}
   vec(const vec& copy) : Base(copy.name, true), Members(this) {}
   vec(const data_ref& copy) : Base(copy.name, true), Members(this) {}
-  vec(vec&& move) : Base(std::move(move.name)), Members(this) {
+  vec(vec&& move) noexcept : Base(std::move(move.name)), Members(this) {
     this->type = move.type;
   }
   vec(data_ref&& move) : Base(std::move(move.name), true), Members(this) {}
 
   vec& operator=(const vec& copy) { return assign((Base)copy); }
   vec& operator=(const data_ref& copy) { return assign(copy); }
-  vec& operator=(vec&& move) { return assign((Base)move); }
+  vec& operator=(vec&& move) noexcept { return assign((Base)move); }
   vec& operator=(data_ref&& move) { return assign(move); }
   vec& operator=(const dataT& n) { return assign(n); }
 
@@ -155,7 +155,7 @@ class vec<dataT, 1> : public detail::vectors::base<dataT, 1>,
   vec() : Base(), Members(this) {}
   vec(const vec& copy) : Base(copy.name, true), Members(this) {}
   vec(const data_ref& copy) : Base(copy.name, true), Members(this) {}
-  vec(vec&& move) : Base(std::move(move.name)), Members(this) {
+  vec(vec&& move) noexcept : Base(std::move(move.name)), Members(this) {
     this->type = move.type;
   }
   vec(data_ref&& move) : Base(std::move(move.name), true), Members(this) {}
@@ -164,7 +164,7 @@ class vec<dataT, 1> : public detail::vectors::base<dataT, 1>,
 
   vec& operator=(const vec& copy) { return assign((Base)copy); }
   vec& operator=(const data_ref& copy) { return assign(copy); }
-  vec& operator=(vec&& move) { return assign((Base)move); }
+  vec& operator=(vec&& move) noexcept { return assign((Base)move); }
   vec& operator=(data_ref&& move) { return assign(move); }
   vec& operator=(const dataT& n) { return assign(n); }
 

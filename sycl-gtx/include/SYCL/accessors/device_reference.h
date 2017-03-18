@@ -46,7 +46,8 @@ struct subscript_helper<1, DataType, dimensions, mode, target> {
   }                                                                           \
   accessor_device_ref(const acc_t* parent, const accessor_device_ref& copy)   \
       : parent(parent), rang(copy.rang) {}                                    \
-  accessor_device_ref(const acc_t* parent, accessor_device_ref&& move)        \
+  accessor_device_ref(const acc_t* parent,                                    \
+                      accessor_device_ref&& move) noexcept                    \
       : parent(parent), rang(std::move(move.rang)) {}                         \
   friend void swap(accessor_device_ref& first, accessor_device_ref& second) { \
     std::swap(first.rang, second.rang);                                       \

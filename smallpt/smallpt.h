@@ -59,7 +59,7 @@ struct testInfo {
       : name(name), test(test), dev(dev) {}
 
   testInfo(const testInfo&) = delete;
-  testInfo(testInfo&& move)
+  testInfo(testInfo&& move) noexcept
       : name(std::move(move.name)), test(move.test), dev(std::move(move.dev)) {}
 
   bool isOpenCL() { return dev != nullptr; }

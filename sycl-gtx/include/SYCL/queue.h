@@ -89,7 +89,7 @@ class queue {
 
   // Queue requires custom move semantics
   // because the parent pointer is carrier in subqueues
-  queue(queue&& move)
+  queue(queue&& move) noexcept
       : SYCL_MOVE_INIT(ctx),
         SYCL_MOVE_INIT(dev),
         SYCL_MOVE_INIT(command_q),

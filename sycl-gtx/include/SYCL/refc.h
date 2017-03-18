@@ -48,9 +48,9 @@ class refc : public refc_ptr<CL_Type> {
   refc(CL_Type data) : Base(data, release) { call_retain(data); }
 
   refc(const refc&) = default;
-  refc(refc&& move) : Base(std::move(move)) {}
+  refc(refc&& move) noexcept : Base(std::move(move)) {}
   refc& operator=(const refc&) = default;
-  refc& operator=(refc&& move) {
+  refc& operator=(refc&& move) noexcept {
     Base::operator=(std::move(move));
     return *this;
   }
