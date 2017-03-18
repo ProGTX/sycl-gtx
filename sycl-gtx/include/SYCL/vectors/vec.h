@@ -37,14 +37,13 @@ class vec : public detail::vectors::base<dataT, numElements>,
   vec(const string_class& name, bool, bool) : Base(name, true), Members(this) {}
 
   template <typename T>
-  vec& assign(const T& copy) {
+  void assign(const T& copy) {
     if (this->type == type_t::expression) {
       vec b(this->name, true, true);
       this->name = std::move(b.name);
       this->type = type_t::general;
     }
     Base::operator=(copy);
-    return *this;
   }
 
   vec(string_class name_, type_t type = type_t::general)
@@ -61,11 +60,26 @@ class vec : public detail::vectors::base<dataT, numElements>,
   }
   vec(data_ref&& move) : Base(std::move(move.name), true), Members(this) {}
 
-  vec& operator=(const vec& copy) { return assign((Base)copy); }
-  vec& operator=(const data_ref& copy) { return assign(copy); }
-  vec& operator=(vec&& move) noexcept { return assign((Base)move); }
-  vec& operator=(data_ref&& move) { return assign(move); }
-  vec& operator=(const dataT& n) { return assign(n); }
+  vec& operator=(const vec& copy) {
+    assign(static_cast<const Base&>(copy));
+    return *this;
+  }
+  vec& operator=(const data_ref& copy) {
+    assign(copy);
+    return *this;
+  }
+  vec& operator=(vec&& move) noexcept {
+    assign(static_cast<Base&&>(move));
+    return *this;
+  }
+  vec& operator=(data_ref&& move) {
+    assign(move);
+    return *this;
+  }
+  vec& operator=(const dataT& n) {
+    assign(n);
+    return *this;
+  }
 
   template <int num = numElements>
   vec(const data_ref& x, const data_ref& y, SYCL_ENABLE_IF_DIM(2))
@@ -162,11 +176,26 @@ class vec<dataT, 1> : public detail::vectors::base<dataT, 1>,
   vec(const dataT& n)
       : Base(detail::get_string<dataT>::get(n), true), Members(this) {}
 
-  vec& operator=(const vec& copy) { return assign((Base)copy); }
-  vec& operator=(const data_ref& copy) { return assign(copy); }
-  vec& operator=(vec&& move) noexcept { return assign((Base)move); }
-  vec& operator=(data_ref&& move) { return assign(move); }
-  vec& operator=(const dataT& n) { return assign(n); }
+  vec& operator=(const vec& copy) {
+    assign((Base)copy);
+    return *this;
+  }
+  vec& operator=(const data_ref& copy) {
+    assign(copy);
+    return *this;
+  }
+  vec& operator=(vec&& move) noexcept {
+    assign((Base)move);
+    return *this;
+  }
+  vec& operator=(data_ref&& move) {
+    assign(move);
+    return *this;
+  }
+  vec& operator=(const dataT& n) {
+    assign(n);
+    return *this;
+  }
 
   // TODO(progtx):
   operator genvector() const { return genvector(); }
