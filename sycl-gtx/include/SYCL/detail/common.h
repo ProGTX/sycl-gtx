@@ -3,15 +3,10 @@
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #include <CL/cl.h>
 
-// TODO(progtx): Non-standard
+#include "SYCL/detail/msvc_version.h"
+
 #include <cstdio>
 #include <sstream>
-
-#ifdef _MSC_VER
-#if _MSC_VER <= 1800
-#define MSVC_2013_OR_LOWER 1
-#endif
-#endif
 
 #define SYCL_SWAP(member) swap(first.member, second.member)
 #define SYCL_MOVE_INIT(member) member(std::move(move.member))

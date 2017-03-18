@@ -1,14 +1,9 @@
 #pragma once
 
+#include "SYCL/detail/msvc_version.h"
+
 #include <iostream>
 #include <sstream>
-
-// Visual Studio 2013 still lacks some support for modern C++
-#ifdef _MSC_VER
-#if _MSC_VER <= 1800
-#define MSVC_2013_OR_LOWER 1
-#endif
-#endif
 
 #if MSVC_2013_OR_LOWER
 #define __func__ __FUNCTION__
