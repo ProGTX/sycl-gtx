@@ -9,14 +9,14 @@
 
 #ifdef _MSC_VER
 #if _MSC_VER <= 1800
-#define MSVC_LOW 1
+#define MSVC_2013_OR_LOWER 1
 #endif
 #endif
 
 #define SYCL_SWAP(member) swap(first.member, second.member)
 #define SYCL_MOVE_INIT(member) member(std::move(move.member))
 
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
 #define SYCL_THREAD_LOCAL __declspec(thread)
 #else
 #define SYCL_THREAD_LOCAL thread_local
@@ -59,7 +59,7 @@ using string_class = ::std::string;
 #endif
 
 #ifndef CL_SYCL_NO_STD_FUNCTION
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
 template <class T>
 class function_class : public ::std::function<T> {
  private:

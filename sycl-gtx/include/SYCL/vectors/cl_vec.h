@@ -67,7 +67,7 @@ struct cl_base<dataT, parentElems, 0> {
     auto start = reinterpret_cast<dataT*>(&v);
     std::copy(start, start + size, this->elems);
   }
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   cl_base(cl_base&& move) { std::swap(this->elems, move.elems); }
   cl_base& operator=(cl_base&& move) {
     std::swap(this->elems, move.elems);
@@ -103,7 +103,7 @@ struct cl_base<dataT, parentElems, 2> : cl_base<dataT, parentElems, 0> {
   using cl_base_2 = cl_base<dataT, 2, 2>;
 
  public:
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   SYCL_CL_VEC_INHERIT_CONSTRUCTORS
 #else
   using Base::Base;
@@ -124,7 +124,7 @@ struct cl_base<dataT, parentElems, 3> : cl_base<dataT, parentElems, 2> {
   using cl_base_3 = cl_base<dataT, 3, 3>;
 
  public:
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   SYCL_CL_VEC_INHERIT_CONSTRUCTORS
 #else
   using Base::Base;
@@ -154,7 +154,7 @@ struct cl_base<dataT, parentElems, 4> : cl_base<dataT, parentElems, 3> {
   using cl_base_4 = cl_base<dataT, 4, 4>;
 
  public:
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   SYCL_CL_VEC_INHERIT_CONSTRUCTORS
 #else
   using Base::Base;
@@ -177,7 +177,7 @@ struct cl_base<dataT, parentElems, 8> : cl_base<dataT, parentElems, 0> {
   using cl_base_4 = cl_base<dataT, 4, 4>;
 
  public:
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   SYCL_CL_VEC_INHERIT_CONSTRUCTORS
 #else
   using Base::Base;
@@ -196,7 +196,7 @@ struct cl_base<dataT, parentElems, 16> : cl_base<dataT, parentElems, 0> {
   using cl_base_8 = cl_base<dataT, 8, 8>;
 
  public:
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   SYCL_CL_VEC_INHERIT_CONSTRUCTORS
 #else
   using Base::Base;

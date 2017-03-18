@@ -61,7 +61,7 @@ SYCL_ACCESSOR_CLASS(target == access::target::local)
 
 }  // namespace detail
 
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
 #define SYCL_ADD_ACCESSOR_LOCAL(mode)                                         \
   SYCL_ADD_ACCESSOR(mode, access::target::local) {                            \
     using Base =                                                              \

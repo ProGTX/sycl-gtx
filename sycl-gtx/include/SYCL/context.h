@@ -71,7 +71,7 @@ class context {
   // Copy and move semantics
   context(const context&) = default;
   context& operator=(const context&) = default;
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   context(context&& move)
       : SYCL_MOVE_INIT(ctx),
         SYCL_MOVE_INIT(target_devices),

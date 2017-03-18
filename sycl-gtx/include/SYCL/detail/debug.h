@@ -6,11 +6,11 @@
 // Visual Studio 2013 still lacks some support for modern C++
 #ifdef _MSC_VER
 #if _MSC_VER <= 1800
-#define MSVC_LOW 1
+#define MSVC_2013_OR_LOWER 1
 #endif
 #endif
 
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
 #define __func__ __FUNCTION__
 #define constexpr const
 #endif
@@ -52,7 +52,7 @@ class debug {
 
  public:
   debug() = default;
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   debug(debug&& move)
       : stream(std::move(move.stream)), before(std::move(move.before)) {}
 #elif defined(__GNUC__) && (__GNUC__ < 5)

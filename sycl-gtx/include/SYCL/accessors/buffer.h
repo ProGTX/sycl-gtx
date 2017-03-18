@@ -15,7 +15,7 @@ template <typename DataType, int dimensions>
 struct buffer;
 class handler;
 
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
 #define SYCL_ADD_ACCESSOR_BUFFER(mode, target)                          \
   SYCL_ADD_ACCESSOR(mode, target) {                                     \
     using Base = detail::accessor_<DataType, dimensions, mode, target>; \

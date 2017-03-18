@@ -60,7 +60,7 @@ class data_ref {
   data_ref(T&& type) : name(get_name(type)) {}
 
   data_ref(const data_ref& copy) = default;
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   data_ref(data_ref&& move) : SYCL_MOVE_INIT(name), SYCL_MOVE_INIT(type) {}
   friend void swap(data_ref& first, data_ref& second) {
     using std::swap;

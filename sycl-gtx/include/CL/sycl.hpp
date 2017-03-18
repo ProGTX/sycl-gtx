@@ -23,8 +23,8 @@
 
 #include "SYCL/detail/flow_control.h"
 
-#if MSVC_LOW
-#undef MSVC_LOW
+#if MSVC_2013_OR_LOWER
+#undef MSVC_2013_OR_LOWER
 #endif
 
 #undef SYCL_ACCESSOR_CLASS

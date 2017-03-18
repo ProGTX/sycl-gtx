@@ -38,7 +38,7 @@ class device {
   // Copy and move semantics
   device(const device&) = default;
   device& operator=(const device&) = default;
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   device(device&& move) : SYCL_MOVE_INIT(device_id), SYCL_MOVE_INIT(platfrm) {}
   friend void swap(device& first, device& second) {
     using std::swap;

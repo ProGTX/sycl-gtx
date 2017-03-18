@@ -273,7 +273,7 @@ class buffer_ : public buffer_base {
 
 }  // namespace detail
 
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
 #define BUFFER_INHERIT_CONSTRUCTORS(dimensions)                            \
   buffer(const range<dimensions>& range) : Base(range) {}                  \
   buffer(DataType* host_data, range<dimensions> range)                     \
@@ -300,7 +300,7 @@ struct buffer<DataType_, 1> : public detail::buffer_<DataType_, 1> {
   using DataType = typename Base::value_type;
 
  public:
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   BUFFER_INHERIT_CONSTRUCTORS(1)
 #else
   using Base::Base;
@@ -328,7 +328,7 @@ struct buffer<DataType_, 2> : public detail::buffer_<DataType_, 2> {
   using DataType = typename Base::value_type;
 
  public:
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   BUFFER_INHERIT_CONSTRUCTORS(2)
 #else
   using Base::Base;
@@ -347,7 +347,7 @@ struct buffer<DataType_, 3> : public detail::buffer_<DataType_, 3> {
   using DataType = typename Base::value_type;
 
  public:
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
   BUFFER_INHERIT_CONSTRUCTORS(3)
 #else
   using Base::Base;
@@ -361,7 +361,7 @@ struct buffer<DataType_, 3> : public detail::buffer_<DataType_, 3> {
       : buffer(host_data, {sizeX, sizeY, sizeZ}) {}
 };
 
-#if MSVC_LOW
+#if MSVC_2013_OR_LOWER
 #undef BUFFER_INHERIT_CONSTRUCTORS
 #endif
 
