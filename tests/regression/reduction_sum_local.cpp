@@ -57,7 +57,7 @@ int main() {
           SYCL_IF(second < 2 * N) {
             local[lid] = input[gid] + input[second];
           }
-          SYCL_END
+          SYCL_END;
 
             index.barrier(access::fence_space::local_space);
 
@@ -68,16 +68,16 @@ int main() {
             SYCL_IF(lid < stride) {
               local[lid] += local[lid + stride];
             }
-            SYCL_END
+            SYCL_END;
               index.barrier(access::fence_space::local_space);
             stride /= 2;
           }
-          SYCL_END
+          SYCL_END;
 
             SYCL_IF(lid == 0) {
             output[gid / N] = local[0];
           }
-          SYCL_END
+          SYCL_END;
         });
       });
 

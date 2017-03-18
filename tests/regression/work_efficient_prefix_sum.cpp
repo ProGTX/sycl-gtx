@@ -86,7 +86,7 @@ public:
       localBlock[LID] = input[GID];
       localBlock[LID + 1] = input[GID + 1];
     }
-    SYCL_END
+    SYCL_END;
 
       index.barrier(access::fence_space::local_space);
 
@@ -104,17 +104,17 @@ public:
         second = first + offset;
         localBlock[second] = localBlock[first] + localBlock[second];
       }
-      SYCL_END
+      SYCL_END;
 
         index.barrier(access::fence_space::local_space);
       offset *= 2;
     }
-    SYCL_END
+    SYCL_END;
 
       SYCL_IF(LID == 0) {
       localBlock[local_size - 1] = 0;
     }
-    SYCL_END
+    SYCL_END;
       index.barrier(access::fence_space::local_space);
 
     vec<T, 1> tmp;
@@ -129,12 +129,12 @@ public:
         localBlock[second] = localBlock[first] + tmp;
         localBlock[first] = tmp;
       }
-      SYCL_END
+      SYCL_END;
 
         index.barrier(access::fence_space::local_space);
       offset /= 2;
     }
-    SYCL_END
+    SYCL_END;
 
       LID *= 2;
 
@@ -142,7 +142,7 @@ public:
       input[GID] += localBlock[LID];
       input[GID + 1] += localBlock[LID + 1];
     }
-    SYCL_END
+    SYCL_END;
 
       index.barrier(access::fence_space::local_space);
 
@@ -151,7 +151,7 @@ public:
       // Write last sum into auxiliary array
       higher_level[GID / local_size] = input[last_sum_id];
     }
-    SYCL_END
+    SYCL_END;
   }
 };
 
@@ -180,7 +180,7 @@ public:
       data[GID] += higher_level[higher_id];
       data[GID + 1] += higher_level[higher_id];
     }
-    SYCL_END
+    SYCL_END;
   }
 };
 

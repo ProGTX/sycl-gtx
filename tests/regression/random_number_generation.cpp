@@ -48,7 +48,7 @@ int main() {
       SYCL_FOR(int1 i = 0, i < size, ++i) {
         n[i] = deviceRandom(seed);
       }
-      SYCL_END
+      SYCL_END;
     });
   });
 

@@ -2,7 +2,7 @@
 
 // smallpt, a Path Tracer by Kevin Beason, 2008
 //
-// Modified by Peter éuûek
+// Modified by Peter ≈Ωu≈æek
 // For the original code, see github.com/munificient/smallpt
 // For the original license, see smallpt.LICENSE.txt
 
@@ -109,11 +109,11 @@ struct SphereSycl : public ::Sphere_<float1> {
           return_ = t;
         SYCL_ELSE
           return_ = 0;
-        SYCL_END
+        SYCL_END;
       }
-      SYCL_END
+      SYCL_END;
     }
-    SYCL_END
+    SYCL_END;
 
     return return_;
   }
@@ -124,7 +124,7 @@ inline void clamp(float1& x) {
     x = 0;
   SYCL_ELSE_IF(x > 1)
     x = 1;
-  SYCL_END
+  SYCL_END;
 }
 
 inline bool1 intersect(spheres_t spheres, const RaySycl& r, float1& t, int1& id) {
@@ -140,9 +140,9 @@ inline bool1 intersect(spheres_t spheres, const RaySycl& r, float1& t, int1& id)
       t = d;
       id = i;
     }
-    SYCL_END
+    SYCL_END;
   }
-  SYCL_END
+  SYCL_END;
 
   return t < inf;
 }
@@ -183,7 +183,7 @@ static void radiance(
       return_ = cl;
       SYCL_BREAK
     }
-    SYCL_END
+    SYCL_END;
 
     auto obj = SphereSycl(spheres[id]); // the hit object
     x = r.o + r.d*t;
@@ -192,7 +192,7 @@ static void radiance(
     Vector nl = n;
     SYCL_IF(n.dot(r.d) > 0)
       nl = nl * -1;
-    SYCL_END
+    SYCL_END;
 
     Vector f = obj.c;
 
@@ -203,7 +203,7 @@ static void radiance(
       p = f.y;
     SYCL_ELSE
       p = f.z;
-    SYCL_END
+    SYCL_END;
 
     cl = cl + cf.mult(obj.e);
 
@@ -216,9 +216,9 @@ static void radiance(
         return_ = cl;
         SYCL_BREAK
       }
-      SYCL_END
+      SYCL_END;
     }
-    SYCL_END
+    SYCL_END;
 
     cf = cf.mult(f);
 
@@ -233,7 +233,7 @@ static void radiance(
         u.y = 1;
       SYCL_ELSE
         u.x = 1;
-      SYCL_END
+      SYCL_END;
       u = (u % w).norm();
 
       Vector v = w % u;
@@ -250,7 +250,7 @@ static void radiance(
       r = RaySycl(x, r.d - n * 2 * n.dot(r.d));
       SYCL_CONTINUE
     }
-    SYCL_END
+    SYCL_END;
 
     reflRay = RaySycl(x, r.d - n * 2 * n.dot(r.d));  // Ideal dielectric REFRACTION
     bool1 into = n.dot(nl) > 0;  // Ray from outside going in?
@@ -262,7 +262,7 @@ static void radiance(
       nnt = nc / nt;
     SYCL_ELSE
       nnt = nt / nc;
-    SYCL_END
+    SYCL_END;
 
     float1 ddn = r.d.dot(nl);
     float1 cos2t = 1 - nnt*nnt*(1 - ddn*ddn);
@@ -271,12 +271,12 @@ static void radiance(
       r = reflRay;
       SYCL_CONTINUE
     }
-    SYCL_END
+    SYCL_END;
 
     float1 tmp = 1;
     SYCL_IF(!into)
       tmp = -1;
-    SYCL_END
+    SYCL_END;
 
     tdir = Vector(r.d*nnt - n*(tmp*(ddn*nnt + cl::sycl::sqrt(cos2t)))).norm();
     float1 a = nt - nc;
@@ -288,7 +288,7 @@ static void radiance(
       c += ddn;
     SYCL_ELSE
       c -= tdir.dot(n);
-    SYCL_END
+    SYCL_END;
 
     float1 Re = R0 + (1 - R0)*c*c*c*c*c;
     float1 Tr = 1 - Re;
@@ -305,9 +305,9 @@ static void radiance(
       cf = cf * TP;
       r = RaySycl(x, tdir);
     }
-    SYCL_END
+    SYCL_END;
   }
-  SYCL_END
+  SYCL_END;
 }
 
 } // ns_sycl_gtx
@@ -434,13 +434,13 @@ static void compute_sycl_gtx(
                 dd.x() = cl::sycl::sqrt(rnew.x()) - 1;
               SYCL_ELSE
                 dd.x() = 1 - cl::sycl::sqrt(2 - rnew.x());
-              SYCL_END
+              SYCL_END;
 
               SYCL_IF(rnew.y() < 1)
                 dd.y() = cl::sycl::sqrt(rnew.y()) - 1;
               SYCL_ELSE
                 dd.y() = 1 - cl::sycl::sqrt(2 - rnew.y());
-              SYCL_END
+              SYCL_END;
 
               Vector d =
                 cx * (((sx + .5f + dd.x()) / 2 + i[0]) / w - .5f) +
@@ -452,7 +452,7 @@ static void compute_sycl_gtx(
               radiance(rad, spheres, RaySycl(cam.o + d * 140, d.norm()), randomSeed);
               r = r + rad*(1.f / samps);
             } // Camera rays are pushed ^^^^^ forward to start in interior
-            SYCL_END
+            SYCL_END;
 
             ns_sycl_gtx::clamp(r.x);
             ns_sycl_gtx::clamp(r.y);
@@ -466,9 +466,9 @@ static void compute_sycl_gtx(
 
             r = Vector();
           }
-          SYCL_END
+          SYCL_END;
         }
-        SYCL_END
+        SYCL_END;
       });
     });
   }
