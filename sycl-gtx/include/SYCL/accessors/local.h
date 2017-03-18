@@ -33,7 +33,7 @@ SYCL_ACCESSOR_CLASS(target == access::target::local)
   ::size_t access_buffer_range(int n) const { return allocationSize.get(n); }
 
   virtual void* resource() const override {
-    return reinterpret_cast<void*>(this->get_count_id());
+    return reinterpret_cast<void*>(this->get_count_id());  // NOLINT
   }
 
   virtual ::size_t argument_size() const override {

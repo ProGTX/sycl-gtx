@@ -92,13 +92,13 @@ class kernel {
                      event* evnt, range<dimensions> num_work_items,
                      id<dimensions> offset) const {
     ::size_t* global_work_size = &num_work_items[0];
-    ::size_t* offst = &((::size_t&)offset[0]);
+    ::size_t* offst = &static_cast<::size_t&>(offset[0]);
     auto ev = get_cl_event(evnt);
 
     auto error_code = clEnqueueNDRangeKernel(
         get_cl_queue(q), kern.get(), dimensions, offst, global_work_size,
-        nullptr, (::cl_uint)wait_events.size(), get_events_ptr(wait_events),
-        &ev);
+        nullptr, static_cast<::cl_uint>(wait_events.size()),
+        get_events_ptr(wait_events), &ev);
     detail::error::report(error_code);
   }
 
@@ -107,7 +107,7 @@ class kernel {
                         event* evnt,
                         nd_range<dimensions> execution_range) const {
     ::size_t* local_work_size = &execution_range.get_local()[0];
-    ::size_t* offst = &((::size_t&)execution_range.get_offset()[0]);
+    ::size_t* offst = &static_cast<::size_t&>(execution_range.get_offset()[0]);
 
     ::size_t global_work_size[dimensions];
     ::size_t* start = &execution_range.get_global()[0];
@@ -125,7 +125,7 @@ class kernel {
 
     auto error_code = clEnqueueNDRangeKernel(
         get_cl_queue(q), kern.get(), dimensions, offst, global_work_size,
-        local_work_size, (::cl_uint)wait_events.size(),
+        local_work_size, static_cast<::cl_uint>(wait_events.size()),
         get_events_ptr(wait_events), &ev);
     detail::error::report(error_code);
   }

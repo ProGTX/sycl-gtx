@@ -183,7 +183,8 @@ struct point : data_ref {
   point_ref<true> get(int dimension) const {
     // The const cast is ugly,
     // but the get_ref method doesn't actually modify this class
-    return const_cast<point<dimensions>*>(this)->get_ref<true>(dimension);
+    return const_cast<point<dimensions>*>(this)  // NOLINT
+        ->get_ref<true>(dimension);
   }
   point_ref<false> operator[](int dimension) {
     return get_ref<false>(dimension);

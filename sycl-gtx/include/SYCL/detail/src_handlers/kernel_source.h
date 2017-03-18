@@ -79,7 +79,7 @@ class source : protected counter<source> {
     }
 
     string_class resource_name;
-    auto buf = (buffer<DataType, dimensions>*)acc.resource();
+    auto buf = static_cast<buffer<DataType, dimensions>*>(acc.resource());
     auto it = scope->resources.find(buf);
 
     if (it == scope->resources.end()) {

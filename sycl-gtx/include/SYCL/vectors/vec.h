@@ -177,7 +177,7 @@ class vec<dataT, 1> : public detail::vectors::base<dataT, 1>,
       : Base(detail::get_string<dataT>::get(n), true), Members(this) {}
 
   vec& operator=(const vec& copy) {
-    assign((Base)copy);
+    assign(static_cast<const Base&>(copy));
     return *this;
   }
   vec& operator=(const data_ref& copy) {
@@ -185,7 +185,7 @@ class vec<dataT, 1> : public detail::vectors::base<dataT, 1>,
     return *this;
   }
   vec& operator=(vec&& move) noexcept {
-    assign((Base)move);
+    assign(static_cast<Base&&>(move));
     return *this;
   }
   vec& operator=(data_ref&& move) {

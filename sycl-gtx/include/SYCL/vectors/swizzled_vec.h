@@ -11,7 +11,7 @@ namespace vectors {
 
 template <int index, int current>
 static void to_char(char* name) {
-  name[index] = (char)current + '0';
+  name[index] = static_cast<char>(current) + '0';
 }
 
 template <int index, int current, int... others>

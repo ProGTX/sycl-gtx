@@ -58,8 +58,8 @@ class accessor_host_ref<1, DataType, dimensions, mode> {
     index = 0;
     int multiplier = 1;
     for (int i = 0; i < dimensions; ++i) {
-      index += (int)(rang[i] * multiplier);
-      multiplier *= (int)parent->access_buffer_range(i);
+      index += static_cast<int>(rang[i] * multiplier);
+      multiplier *= static_cast<int>(parent->access_buffer_range(i));
     }
     return parent->access_host_data()[index];
   }
@@ -88,13 +88,14 @@ SYCL_ACCESSOR_CLASS(target == access::target::host_buffer)
     synchronizer::add(this, base_acc_buffer::buf);
   }
   accessor_(const accessor_& copy)
-      : base_acc_buffer((const base_acc_buffer&)copy),
+      : base_acc_buffer(static_cast<const base_acc_buffer&>(copy)),
         base_acc_host_ref(this, copy) {
     synchronizer::add(this, base_acc_buffer::buf);
   }
   accessor_(accessor_ && move) noexcept
-      : base_acc_buffer(std::move((base_acc_buffer)move)),
-        base_acc_host_ref(this, std::move((base_acc_host_ref)move)) {
+      : base_acc_buffer(std::move(static_cast<base_acc_buffer&&>(move))),
+        base_acc_host_ref(this,
+                          std::move(static_cast<base_acc_host_ref&&>(move))) {
     synchronizer::add(this, base_acc_buffer::buf);
   }
 

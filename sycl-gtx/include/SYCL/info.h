@@ -143,11 +143,14 @@ using aff_domain_t = std::underlying_type<device_affinity_domain>::type;
 
 enum class device_partition_type : detail::aff_domain_t {
   no_partition = 0,
-  numa = (detail::aff_domain_t)device_affinity_domain::numa,
-  L4_cache = (detail::aff_domain_t)device_affinity_domain::L4_cache,
-  L3_cache = (detail::aff_domain_t)device_affinity_domain::L3_cache,
-  L2_cache = (detail::aff_domain_t)device_affinity_domain::L2_cache,
-  L1_cache = (detail::aff_domain_t)device_affinity_domain::L1_cache
+  numa = static_cast<detail::aff_domain_t>(device_affinity_domain::numa),
+  L4_cache =
+      static_cast<detail::aff_domain_t>(device_affinity_domain::L4_cache),
+  L3_cache =
+      static_cast<detail::aff_domain_t>(device_affinity_domain::L3_cache),
+  L2_cache =
+      static_cast<detail::aff_domain_t>(device_affinity_domain::L2_cache),
+  L1_cache = static_cast<detail::aff_domain_t>(device_affinity_domain::L1_cache)
 };
 
 enum class local_mem_type : cl_device_local_mem_type {

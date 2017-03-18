@@ -363,7 +363,9 @@ struct array_traits : traits<Contained_, BufferSize> {
   template <typename cl_input_t>
   return_t get(cl_input_t data_ptr) {
     auto error_code = info_function<EnumClass>::get(
-        data_ptr, (typename param_traits<EnumClass, param>::cl_flag_type)param,
+        data_ptr,
+        static_cast<typename param_traits<EnumClass, param>::cl_flag_type>(
+            param),
         RealBase::BUFFER_SIZE * RealBase::type_size, param_value, &actual_size);
     error::report(error_code);
     return trait_return<BufferSize == 1>::get(param_value);

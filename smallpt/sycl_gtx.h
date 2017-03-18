@@ -64,7 +64,8 @@ struct Vector : public ::Vec_<float1> {
  public:
   Vector(float x_ = 0, float y_ = 0, float z_ = 0) : Base(x_, y_, z_) {}
   Vector(const ::Vec_<float_type>& base)
-      : Base((float)base.x, (float)base.y, (float)base.z) {}
+      : Base(static_cast<float>(base.x), static_cast<float>(base.y),
+             static_cast<float>(base.z)) {}
   template <typename t = float1>
   Vector(const Base& base,
          typename std::enable_if<!std::is_same<t, float_type>::value>::type* =
@@ -154,7 +155,8 @@ static float1 getRandom(uint2& seed) {
   uint1 x = seed.x() * 17 + seed.y() * 13123;
   seed.x() = (x << 13) ^ x;
   seed.y() = seed.y() ^ x << 7;
-  return (float1)(x * (x * x * 15731 + 74323) + 871483) * invMaxInt;
+  return static_cast<float1>((x * (x * x * 15731 + 74323) + 871483) *
+                             invMaxInt);
 }
 
 static void radiance(Vector& return_, spheres_t spheres, RaySycl r,
@@ -216,7 +218,7 @@ static void radiance(Vector& return_, spheres_t spheres, RaySycl r,
     cf = cf.mult(f);
 
     SYCL_IF(obj.refl == (::cl_float)DIFF) {  // Ideal DIFFUSE reflection
-      float1 r1 = (float1)(2 * M_PI * getRandom(randomSeed));
+      float1 r1 = static_cast<float1>(2 * M_PI * getRandom(randomSeed));
       float1 r2 = getRandom(randomSeed);
       float1 r2s = cl::sycl::sqrt(r2);
       Vector w = nl;
@@ -314,7 +316,7 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
   using namespace cl::sycl;
   using namespace ns_sycl_gtx;
 
-  queue q(*(device*)dev);
+  queue q(*reinterpret_cast<device*>(dev));  // NOLINT
 
   auto spheres_ = buffer<float16>(range<1>(ns_sycl_gtx::numSpheres));
   {
@@ -325,9 +327,9 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
     auto assign = [](cl::sycl::cl_float4 target, ::Vec& data) {
 #endif
       using type = float4::element_type;
-      target.x() = (type)data.x;
-      target.y() = (type)data.y;
-      target.z() = (type)data.z;
+      target.x() = static_cast<type>(data.x);
+      target.y() = static_cast<type>(data.y);
+      target.z() = static_cast<type>(data.z);
     };
 
     auto s = spheres_.get_access<access::mode::discard_write,
@@ -341,8 +343,8 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
       assign(si.lo().hi(), sj.e);
       assign(si.hi().lo(), sj.c);
 
-      si.lo().lo().w() = (::cl_float)sj.rad;
-      si.hi().lo().w() = (::cl_float)sj.refl;
+      si.lo().lo().w() = static_cast<::cl_float>(sj.rad);
+      si.hi().lo().w() = static_cast<::cl_float>(sj.refl);
     }
   }
 
@@ -380,8 +382,8 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
         Xi[2] = y * y * y;
         for (int x = 0; x < w; ++x) {
           cl::sycl::cl_uint2 seed;
-          seed.x() = (::cl_uint)get_random(Xi);
-          seed.y() = (::cl_uint)get_random(Xi);
+          seed.x() = static_cast<::cl_uint>(get_random(Xi));
+          seed.y() = static_cast<::cl_uint>(get_random(Xi));
           seeds[y * w + x] = seed;
         }
       }
@@ -474,9 +476,9 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
   }
 
   auto assign = [](::Vec& target, cl::sycl::cl_float3& data) {
-    target.x = (float_type)data.x();
-    target.y = (float_type)data.y();
-    target.z = (float_type)data.z();
+    target.x = static_cast<float_type>(data.x());
+    target.y = static_cast<float_type>(data.y());
+    target.z = static_cast<float_type>(data.z());
   };
 
   for (auto k = 0; k < numParts; ++k) {

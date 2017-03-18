@@ -95,7 +95,7 @@ class buffer_ : public buffer_base {
   // The default value of the allocator is going to be the buffer_allocator
   // which will be of type DataType.
   buffer_(const DataType* hostData, range<dimensions> range)
-      : buffer_(const_cast<DataType*>(hostData), range, true) {}
+      : buffer_(const_cast<DataType*>(hostData), range, true) {}  // NOLINT
 
   // Create a new buffer of the given size with storage managed by the SYCL
   // runtime.
@@ -142,10 +142,11 @@ class buffer_ : public buffer_base {
     DataType* start = b.host_data.get();
 
     if (dimensions == 1) {
-      start += (::size_t)(baseIndex.get(0));
+      start += static_cast<::size_t>(baseIndex.get(0));
     } else if (dimensions == 2) {
-      start += (::size_t)(baseIndex.get(1)) * (::size_t)(rang.get(0)) +
-               (::size_t)(baseIndex.get(0));
+      start += static_cast<::size_t>(baseIndex.get(1)) *
+                   static_cast<::size_t>(rang.get(0)) +
+               static_cast<::size_t>(baseIndex.get(0));
     } else if (dimensions == 3) {
       // TODO(progtx):
     }
@@ -221,8 +222,7 @@ class buffer_ : public buffer_base {
     command::group_::add_buffer_access(buffer_access{this, mode, target},
                                        __func__);
     return acc_return_t<mode, target>(
-        *(reinterpret_cast<cl::sycl::buffer<DataType_, dimensions>*>(this)),
-        cgh);
+        *(static_cast<cl::sycl::buffer<DataType_, dimensions>*>(this)), cgh);
   }
 
   template <access::mode mode, access::target target>
@@ -231,7 +231,7 @@ class buffer_ : public buffer_base {
       check_read_only();
     }
     return acc_return_t<mode, target>(
-        *(reinterpret_cast<cl::sycl::buffer<DataType_, dimensions>*>(this)));
+        *(static_cast<cl::sycl::buffer<DataType_, dimensions>*>(this)));
   }
 
  public:

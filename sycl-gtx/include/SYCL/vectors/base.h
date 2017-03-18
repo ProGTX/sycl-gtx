@@ -121,7 +121,7 @@ class base : protected counter<base<dataT, numElements>>, public data_ref {
              true) {}
 
   operator vec<dataT, numElements>&() {
-    return *reinterpret_cast<vec<dataT, numElements>*>(this);
+    return *reinterpret_cast<vec<dataT, numElements>*>(this);  // NOLINT
   }
 
   ::size_t get_count() const { return numElements; }

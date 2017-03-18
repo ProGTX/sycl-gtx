@@ -128,7 +128,7 @@ static bool tester(std::vector<testInfo>& tests, int maxMinutes, int w, int h,
         vectors = empty_vectors;
         t.test(t.dev.get(), w, h, samples, cam(), cx, cy, r, vectors.data());
       }
-      time = (duration(start) / (float)iterations);
+      time = (duration(start) / static_cast<float>(iterations));
 
 #ifdef NDEBUG
     } catch (cl::sycl::exception& e) {
@@ -149,7 +149,7 @@ static bool tester(std::vector<testInfo>& tests, int maxMinutes, int w, int h,
     totalTime = duration(startTime());
     cout << "total time: " << std::to_string(totalTime) << endl;
     if (totalTime > globalLimit) {
-      cout << "exceeded " + std::to_string((int)globalLimit) +
+      cout << "exceeded " + std::to_string(static_cast<int>(globalLimit)) +
                   "s limit, stopping"
            << endl;
       return false;
@@ -172,8 +172,8 @@ struct version {
     if (pos != string::npos) {
       pos += search.length() + 1;  // Plus one for space
       try {
-        major = (int)v.at(pos) - '0';
-        minor = (int)v.at(pos + 2) - '0';
+        major = static_cast<int>(v.at(pos)) - '0';
+        minor = static_cast<int>(v.at(pos + 2)) - '0';
         ;  // Plus one for dot
       } catch (std::exception&) {
       }
@@ -201,8 +201,9 @@ static void displayDevice(const cl::sycl::device& d, int dNum, string& name,
   deviceVersion = deviceVersionString;
 
   printInfo("name", name, tabOffset);
-  printInfo("device_type",
-            (cl_device_type)d.get_info<info::device::device_type>(), tabOffset);
+  printInfo("device_type", static_cast<cl_device_type>(
+                               d.get_info<info::device::device_type>()),
+            tabOffset);
   printInfo("vendor", d.get_info<info::device::vendor>(), tabOffset);
   printInfo("device_version", deviceVersionString, tabOffset);
   printInfo("driver_version", d.get_info<info::device::driver_version>(),

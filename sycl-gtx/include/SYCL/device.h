@@ -110,9 +110,9 @@ class device {
   template <class EnumClass, info::device param>
   struct traits<EnumClass, param, typename std::true_type::type> {
     EnumClass get(const device* dev) {
-      return (EnumClass)
-          traits<typename std::underlying_type<EnumClass>::type, param>()
-              .get(dev);
+      return static_cast<EnumClass>(
+          traits<typename std::underlying_type<EnumClass>::type, param>().get(
+              dev));
     }
   };
 
@@ -125,7 +125,7 @@ class device {
       auto size = this->actual_size / this->type_size;
       ret.reserve(size);
       for (::size_t i = 0; i < size; ++i) {
-        ret.push_back((EnumClass)this->param_value[i]);
+        ret.push_back(static_cast<EnumClass>(this->param_value[i]));
       }
       return ret;
     }

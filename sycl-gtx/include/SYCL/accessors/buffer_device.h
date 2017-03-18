@@ -40,11 +40,12 @@ SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
       : accessor_(bufferRef, commandGroupHandler,
                   detail::empty_range<dimensions>(), bufferRef.get_range()) {}
   accessor_(const accessor_& copy)
-      : base_acc_buffer((const base_acc_buffer&)copy),
+      : base_acc_buffer(static_cast<const base_acc_buffer&>(copy)),
         base_acc_device_ref(this, copy) {}
   accessor_(accessor_ && move) noexcept
-      : base_acc_buffer(std::move((base_acc_buffer)move)),
-        base_acc_device_ref(this, std::move((base_acc_device_ref)move)) {}
+      : base_acc_buffer(std::move(static_cast<base_acc_buffer&&>(move))),
+        base_acc_device_ref(
+            this, std::move(static_cast<base_acc_device_ref&&>(move))) {}
 
   virtual cl_mem get_cl_mem_object() const override {
     return base_acc_buffer::get_buffer_object();

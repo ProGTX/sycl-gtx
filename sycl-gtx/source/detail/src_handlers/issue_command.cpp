@@ -68,6 +68,7 @@ void issue_command::read_buffers_from_device(shared_ptr_class<kernel> kern) {
     command::group_::add_buffer_copy(
         acc.second.acc, access::mode::read, buffer_base::enqueue_command,
         __func__, acc.second.acc.data,
-        reinterpret_cast<buffer_base::clEnqueueBuffer_f>(&clEnqueueReadBuffer));
+        reinterpret_cast<buffer_base::clEnqueueBuffer_f>(  // NOLINT
+            &clEnqueueReadBuffer));
   }
 }

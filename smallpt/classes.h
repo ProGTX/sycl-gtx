@@ -1,7 +1,7 @@
 #pragma once
 // smallpt, a Path Tracer by Kevin Beason, 2008
 //
-// Modified by Peter éuûek
+// Modified by Peter ≈Ωu≈æek
 // For the original code, see github.com/munificient/smallpt
 // For the original license, see smallpt.LICENSE.txt
 
@@ -51,8 +51,8 @@ struct Sphere_ {
   type intersect(const Ray_<type>& r) const {  // returns distance, 0 if nohit
     Vec_<type> op =
         p - r.o;  // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
-    type t, eps = (type)(1e-4 * modify_sample_rate_), b = op.dot(r.d),
-            det = b * b - op.dot(op) + rad * rad;
+    type t, eps = static_cast<type>(1e-4 * modify_sample_rate_),
+            b = op.dot(r.d), det = b * b - op.dot(op) + rad * rad;
     if (det < 0) {
       return 0;
     } else {

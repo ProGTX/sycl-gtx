@@ -41,7 +41,7 @@ int main() {
     });
 
     auto v = V.get_access<access::mode::read, access::target::host_buffer>();
-    int sum = (static_cast<uint64_t>(N) * (uint64_t)(N - 1)) / 2;
+    int sum = (static_cast<uint64_t>(N) * (uint64_t)(N - 1)) / 2;  // NOLINT
 
     if (v[0] != sum) {
       debug() << "wrong sum, should be" << sum << "- is" << v[0];

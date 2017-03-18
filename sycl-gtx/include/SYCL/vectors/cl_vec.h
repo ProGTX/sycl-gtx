@@ -64,7 +64,7 @@ struct cl_base<dataT, parentElems, 0> {
   cl_base() {}
   cl_base(const cl_base&) = default;
   cl_base(genvector v) {
-    auto start = reinterpret_cast<dataT*>(&v);
+    auto start = reinterpret_cast<dataT*>(&v);  // NOLINT
     std::copy(start, start + size, this->elems);
   }
 #if MSVC_2013_OR_LOWER
@@ -83,9 +83,11 @@ struct cl_base<dataT, parentElems, 0> {
   cl_base& operator=(const cl_base&) = default;
   cl_base& operator=(genvector v) { std::copy(&v, &v + size, this->elems); }
 
-  operator genvector&() { return *reinterpret_cast<genvector*>(elems); }
+  operator genvector&() {
+    return *reinterpret_cast<genvector*>(elems);  // NOLINT
+  }
   operator const genvector&() const {
-    return *reinterpret_cast<genvector*>(elems);
+    return *reinterpret_cast<genvector*>(elems);  // NOLINT
   }
 };
 
@@ -116,7 +118,7 @@ struct cl_base<dataT, parentElems, 2> : cl_base<dataT, parentElems, 0> {
   SYCL_CL_REF(dataT, y, this->elems[1]);
   SYCL_CL_REF(dataT, lo, x());
   SYCL_CL_REF(dataT, hi, y());
-  SYCL_CL_REF(cl_base_2, xy, *reinterpret_cast<cl_base_2*>(this));
+  SYCL_CL_REF(cl_base_2, xy, *reinterpret_cast<cl_base_2*>(this));  // NOLINT
 };
 
 template <typename dataT, int parentElems>
@@ -136,7 +138,7 @@ struct cl_base<dataT, parentElems, 3> : cl_base<dataT, parentElems, 2> {
   SYCL_CL_REF(dataT, z, this->elems[2]);
   SYCL_CL_REF(cl_base_2, lo, this->xy());
   SYCL_CL_REF(dataT, hi, z());
-  SYCL_CL_REF(cl_base_3, xyz, *reinterpret_cast<cl_base_3*>(this));
+  SYCL_CL_REF(cl_base_3, xyz, *reinterpret_cast<cl_base_3*>(this));  // NOLINT
 };
 
 #define SYCL_CL_HI(cl_base_half, half)              \
@@ -164,10 +166,10 @@ struct cl_base<dataT, parentElems, 4> : cl_base<dataT, parentElems, 3> {
 #endif
 
   SYCL_CL_REF(dataT, w, this->elems[3]);
-  SYCL_CL_REF(cl_base_4, xyzw, *reinterpret_cast<cl_base_4*>(this));
-  SYCL_CL_REF(
-      cl_base_2, hi,
-      *reinterpret_cast<cl_base_2*>(reinterpret_cast<dataT*>(this->elems) + 2));
+  SYCL_CL_REF(cl_base_4, xyzw, *reinterpret_cast<cl_base_4*>(this));  // NOLINT
+  SYCL_CL_REF(cl_base_2, hi,
+              *reinterpret_cast<cl_base_2*>(                    // NOLINT
+                  reinterpret_cast<dataT*>(this->elems) + 2));  // NOLINT
 
   operator cl_base_3&() { return this->xyz(); }
   operator const cl_base_3&() const { return this->xyz(); }
@@ -186,10 +188,10 @@ struct cl_base<dataT, parentElems, 8> : cl_base<dataT, parentElems, 0> {
   using Base::Base;
 #endif
 
-  SYCL_CL_REF(cl_base_4, lo, *reinterpret_cast<cl_base_4*>(this));
-  SYCL_CL_REF(
-      cl_base_4, hi,
-      *reinterpret_cast<cl_base_4*>(reinterpret_cast<dataT*>(this->elems) + 4));
+  SYCL_CL_REF(cl_base_4, lo, *reinterpret_cast<cl_base_4*>(this));  // NOLINT
+  SYCL_CL_REF(cl_base_4, hi,
+              *reinterpret_cast<cl_base_4*>(                    // NOLINT
+                  reinterpret_cast<dataT*>(this->elems) + 4));  // NOLINT
 };
 
 template <typename dataT, int parentElems>
@@ -205,10 +207,10 @@ struct cl_base<dataT, parentElems, 16> : cl_base<dataT, parentElems, 0> {
   using Base::Base;
 #endif
 
-  SYCL_CL_REF(cl_base_8, lo, *reinterpret_cast<cl_base_8*>(this));
-  SYCL_CL_REF(
-      cl_base_8, hi,
-      *reinterpret_cast<cl_base_8*>(reinterpret_cast<dataT*>(this->elems) + 8));
+  SYCL_CL_REF(cl_base_8, lo, *reinterpret_cast<cl_base_8*>(this));  // NOLINT
+  SYCL_CL_REF(cl_base_8, hi,
+              *reinterpret_cast<cl_base_8*>(                    // NOLINT
+                  reinterpret_cast<dataT*>(this->elems) + 8));  // NOLINT
 };
 
 #undef SYCL_CL_REF
