@@ -18,3 +18,4 @@ ComputeCpp/sycl/sycl_export_link.h
 *.db
 build/
 .vscode/
+compile_commands.json
