@@ -36,11 +36,14 @@ static const async_handler default_async_handler =
 namespace error {
 
 struct thrower {
-  static exception get(::cl_int error_code, context* thrower) {
-    return cl_exception(error_code, thrower);
+  static unique_ptr_class<exception> get(::cl_int error_code,
+                                         context* thrower) {
+    return unique_ptr_class<exception>(new cl_exception(error_code, thrower));
   }
-  static exception get(code::value_t error_code, context* thrower) {
-    return exception((*error::codes.find(error_code)).second, thrower);
+  static unique_ptr_class<exception> get(code::value_t error_code,
+                                         context* thrower) {
+    return unique_ptr_class<exception>(
+        new exception((*error::codes.find(error_code)).second, thrower));
   }
   static void report(exception& error) {
     debug displayError("SYCL_ERROR::", error.what());
@@ -53,14 +56,14 @@ struct thrower {
 static void report(::cl_int error_code, context* thrower = nullptr) {
   if (error_code != CL_SUCCESS) {
     auto e = thrower::get(error_code, thrower);
-    thrower::report(e);
+    thrower::report(*e);
   }
 }
 
 // Synchronous error reporting
 static void report(code::value_t error_code, context* thrower = nullptr) {
   auto e = thrower::get(error_code, thrower);
-  thrower::report(e);
+  thrower::report(*e);
 }
 
 }  // namespace error
