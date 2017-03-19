@@ -83,6 +83,8 @@ struct cl_base<dataT, parentElems, 0> {
   cl_base& operator=(const cl_base&) = default;
   cl_base& operator=(genvector v) { std::copy(&v, &v + size, this->elems); }
 
+  ~cl_base() = default;
+
   operator genvector&() {
     return *reinterpret_cast<genvector*>(elems);  // NOLINT
   }

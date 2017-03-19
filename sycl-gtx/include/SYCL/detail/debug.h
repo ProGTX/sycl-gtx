@@ -63,6 +63,9 @@ class debug {
 #endif
   debug(const debug& copy) = delete;
 
+  debug& operator=(const debug& copy) = delete;
+  debug& operator=(debug&& move) = default;
+
   template <typename T>
   debug(T add) : debug() {
     before << "Debug: ";

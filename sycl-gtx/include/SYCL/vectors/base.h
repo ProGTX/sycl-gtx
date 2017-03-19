@@ -78,6 +78,12 @@ class base : protected counter<base<dataT, numElements>>, public data_ref {
     data_ref::operator=(n);
     return *this;
   }
+  base(base&& move) noexcept : data_ref(static_cast<data_ref&&>(*this)) {}
+  base& operator=(base&& move) noexcept {
+    data_ref::operator=(static_cast<data_ref&&>(*this));
+    return *this;
+  }
+  ~base() = default;
 
   template <int num = numElements>
   base(const data_ref& x, const data_ref& y, SYCL_ENABLE_IF_DIM(2))

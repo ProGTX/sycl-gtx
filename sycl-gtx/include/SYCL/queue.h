@@ -101,6 +101,10 @@ class queue {
     move.command_q = nullptr;
     command_group.q = this;
   }
+  queue& operator=(queue&& move) noexcept {
+    std::swap(*this, move);
+    return *this;
+  }
   friend void swap(queue& first, queue& second) {
     using std::swap;
     SYCL_SWAP(ctx);

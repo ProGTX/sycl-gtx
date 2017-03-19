@@ -86,6 +86,7 @@ class context {
   context(context&&) = default;             // NOLINT
   context& operator=(context&&) = default;  // NOLINT
 #endif
+  ~context() = default;
 
  public:
   // Returns the underlying cl context object, after retaining the cl_context.

@@ -62,6 +62,10 @@ struct testInfo {
   testInfo(testInfo&& move) noexcept
       : name(std::move(move.name)), test(move.test), dev(std::move(move.dev)) {}
 
+  testInfo& operator=(const testInfo&) = delete;
+  testInfo& operator=(testInfo&& move) noexcept = delete;
+  ~testInfo() = default;
+
   bool isOpenCL() { return dev != nullptr; }
 };
 

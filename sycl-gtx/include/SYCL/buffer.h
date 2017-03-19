@@ -164,6 +164,11 @@ class buffer_detail : public buffer_base {
   buffer_detail(cl_mem mem_object, queue& from_queue,
                 event available_event = {});
 
+  buffer_detail(const buffer_detail&) = default;
+  buffer_detail(buffer_detail&&) noexcept = default;
+  buffer_detail& operator=(const buffer_detail&) = default;
+  buffer_detail& operator=(buffer_detail&&) = default;  // NOLINT
+
   ~buffer_detail() { event::wait_and_throw(events); }
 
   // Return a range object representing the size of the buffer

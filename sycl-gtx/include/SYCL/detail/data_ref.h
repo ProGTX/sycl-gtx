@@ -70,9 +70,14 @@ class data_ref {
 #else
   data_ref(data_ref&&) = default;
 #endif
+  ~data_ref() = default;
 
-  // Without this one explicitly stated, default copy assignment is used
+  // We need to generate a new line, no matter whether moving or copying
   data_ref& operator=(const data_ref& dref) {
+    kernel_add(name + " = " + dref.name);
+    return *this;
+  }
+  data_ref& operator=(data_ref&& dref) noexcept {
     kernel_add(name + " = " + dref.name);
     return *this;
   }

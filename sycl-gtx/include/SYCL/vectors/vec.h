@@ -59,6 +59,7 @@ class vec : public detail::vectors::base<dataT, numElements>,
     this->type = move.type;
   }
   vec(data_ref&& move) : Base(std::move(move.name), true), Members(this) {}
+  ~vec() = default;
 
   vec& operator=(const vec& copy) {
     assign(static_cast<const Base&>(copy));
@@ -173,6 +174,8 @@ class vec<dataT, 1> : public detail::vectors::base<dataT, 1>,
     this->type = move.type;
   }
   vec(data_ref&& move) : Base(std::move(move.name), true), Members(this) {}
+  ~vec() = default;
+
   vec(const dataT& n)
       : Base(detail::get_string<dataT>::get(n), true), Members(this) {}
 

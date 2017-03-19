@@ -53,6 +53,8 @@ class device {
   device& operator=(device&&) noexcept = default;  // NOLINT
 #endif
 
+  ~device() = default;
+
   cl_device_id get() const;
 
  private:

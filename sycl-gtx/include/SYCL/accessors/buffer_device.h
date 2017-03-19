@@ -47,6 +47,18 @@ SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
       : base_acc_buffer(std::move(static_cast<base_acc_buffer&&>(move))),
         base_acc_device_ref(
             this, std::move(static_cast<base_acc_device_ref&&>(move))) {}
+  accessor_detail& operator=(const accessor_detail& copy) {
+    base_acc_buffer::operator=(copy);
+    base_acc_device_ref tmp(copy);
+    std::swap(static_cast<base_acc_device_ref&>(*this), tmp);
+    return *this;
+  }
+  accessor_detail& operator=(accessor_detail&& move) noexcept {
+    base_acc_buffer::operator=(std::move(move));
+    std::swap(static_cast<base_acc_device_ref&>(*this), move);
+    return *this;
+  }
+  virtual ~accessor_detail() = default;
 
   virtual cl_mem get_cl_mem_object() const override {
     return base_acc_buffer::get_buffer_object();

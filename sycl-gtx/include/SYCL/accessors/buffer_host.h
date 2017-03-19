@@ -99,6 +99,18 @@ SYCL_ACCESSOR_CLASS(target == access::target::host_buffer)
     synchronizer::add(this, base_acc_buffer::buf);
   }
 
+  accessor_detail& operator=(const accessor_detail& copy) {
+    base_acc_buffer::operator=(copy);
+    base_acc_host_ref tmp(copy);
+    std::swap(static_cast<base_acc_host_ref&>(*this), tmp);
+    return *this;
+  }
+  accessor_detail& operator=(accessor_detail&& move) noexcept {
+    base_acc_buffer::operator=(std::move(move));
+    std::swap(static_cast<base_acc_host_ref&>(*this), move);
+    return *this;
+  }
+
   ~accessor_detail() { synchronizer::remove(this, base_acc_buffer::buf); }
 };
 

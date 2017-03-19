@@ -54,6 +54,7 @@ class refc : public refc_ptr<CL_Type> {
     Base::operator=(std::move(move));
     return *this;
   }
+  ~refc() = default;
 
   void reset(CL_Type data) {
     Base::reset(data, release);

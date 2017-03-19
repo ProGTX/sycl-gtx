@@ -24,6 +24,7 @@ class counter {
     return *this;
   }
   counter& operator=(counter&& move) noexcept { return *this; }
+  ~counter() = default;
 
   static counter_t get_total_count() { return internal_count; }
 
