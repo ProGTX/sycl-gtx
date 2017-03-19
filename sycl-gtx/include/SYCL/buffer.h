@@ -95,8 +95,8 @@ class buffer_detail : public buffer_base {
   // The default value of the allocator is going to be the buffer_allocator
   // which will be of type DataType.
   buffer_detail(const DataType* hostData, range<dimensions> range)
-      : buffer_detail(const_cast<DataType*>(hostData), range, true) {
-  }  // NOLINT
+      : buffer_detail(const_cast<DataType*>(hostData),  // NOLINT
+                      range, true) {}
 
   // Create a new buffer of the given size with storage managed by the SYCL
   // runtime.
@@ -165,7 +165,7 @@ class buffer_detail : public buffer_base {
                 event available_event = {});
 
   buffer_detail(const buffer_detail&) = default;
-  buffer_detail(buffer_detail&&) noexcept = default;
+  buffer_detail(buffer_detail&&) noexcept = default;  // NOLINT
   buffer_detail& operator=(const buffer_detail&) = default;
   buffer_detail& operator=(buffer_detail&&) = default;  // NOLINT
 

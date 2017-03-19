@@ -23,16 +23,16 @@ using Vec = Vec_detail<float_type>;
 using Ray = Ray_detail<float_type>;
 using Sphere = Sphere_detail<float_type, modify_sample_rate>;
 
-using std::string;
-
 inline float_type clamp(float_type x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
 inline int toInt(float_type x);
 
-static void to_file(int w, int h, Vec* c, string filename) {
+static void to_file(int w, int h, Vec* c, std::string filename) {
   FILE* f = fopen(filename.c_str(), "w");  // Write image to PPM file.
-  fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
+  fprintf(                                 // NOLINT
+      f, "P3\n%d %d\n%d\n", w, h, 255);
   for (int i = 0; i < w * h; i++) {
-    fprintf(f, "%d %d %d\n", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
+    fprintf(  // NOLINT
+        f, "%d %d %d\n", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
   }
   fclose(f);
 }
@@ -49,12 +49,12 @@ static auto duration = [](time_point before) {
 
 struct testInfo {
   using function_ptr = void (*)(void*, int, int, int, Ray, Vec, Vec, Vec, Vec*);
-  string name;
+  std::string name;
   function_ptr test;
   std::shared_ptr<cl::sycl::device> dev;
   float lastTime = 0;
 
-  testInfo(string name, function_ptr test,
+  testInfo(std::string name, function_ptr test,
            std::shared_ptr<cl::sycl::device> dev = nullptr)
       : name(name), test(test), dev(dev) {}
 
@@ -80,8 +80,8 @@ static Ray& cam() {
   return c;
 }
 
-static string& imagePrefix() {
-  static string ip;
+static std::string& imagePrefix() {
+  static std::string ip;
   return ip;
 }
 
@@ -168,12 +168,12 @@ struct version {
   int minor = 0;
 
   version(int major, int minor) : major{major}, minor{minor} {}
-  version(const string& v) {
+  version(const std::string& v) {
     // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetPlatformInfo.html
     using namespace std;
-    string search("OpenCL");
+    std::string search("OpenCL");
     auto pos = v.find(search);
-    if (pos != string::npos) {
+    if (pos != std::string::npos) {
       pos += search.length() + 1;  // Plus one for space
       try {
         major = static_cast<int>(v.at(pos)) - '0';
@@ -186,16 +186,17 @@ struct version {
 };
 
 template <class T>
-void printInfo(string description, const T& data, int offset = 0) {
-  string indent;
+void printInfo(std::string description, const T& data, int offset = 0) {
+  std::string indent;
   for (int i = 0; i < offset; ++i) {
     indent += '\t';
   }
   std::cout << indent << description << ": " << data << std::endl;
 }
 
-static void displayDevice(const cl::sycl::device& d, int dNum, string& name,
-                          version& deviceVersion, int tabOffset = 2) {
+static void displayDevice(const cl::sycl::device& d, int dNum,
+                          std::string& name, version& deviceVersion,
+                          int tabOffset = 2) {
   using namespace std;
   using namespace cl::sycl;
   cout << "\t-- OpenCL device " << dNum << ':' << endl;
@@ -283,7 +284,7 @@ static void getDevices(std::vector<testInfo>& tests,
       int dNum = 0;
 
       for (auto& d : devices) {
-        string name;
+        std::string name;
         version deviceVersion("");
         displayDevice(d, dNum, name, deviceVersion);
 
@@ -297,7 +298,7 @@ static void getDevices(std::vector<testInfo>& tests,
 #ifndef SYCL_GTX
 #ifndef NDEBUG
           // There seem to be some problems with ComputeCpp and HD 4600
-          if (name.find("HD Graphics 4600") == string::npos)
+          if (name.find("HD Graphics 4600") == std::string::npos)
 #endif
 #endif
             testVector.emplace_back(
@@ -313,8 +314,8 @@ static void getDevices(std::vector<testInfo>& tests,
     for (auto ptr : compute_sycl_ptrs) {
       ++i;
       for (auto& t : testVector) {
-        tests.emplace_back(string("T") + std::to_string(i) + ' ' + t.name, ptr,
-                           t.dev);
+        tests.emplace_back(std::string("T") + std::to_string(i) + ' ' + t.name,
+                           ptr, t.dev);
       }
     }
   } catch (cl::sycl::exception& e) {
@@ -324,7 +325,7 @@ static void getDevices(std::vector<testInfo>& tests,
 }
 
 static int mainTester(int argc, char* argv[], std::vector<testInfo>& tests,
-                      string image_prefix) {
+                      std::string image_prefix) {
   using namespace std;
 
   cout << "smallpt SYCL tester" << endl;
