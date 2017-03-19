@@ -19,7 +19,7 @@ struct nd_item;
 namespace detail {
 
 // Forward declarations
-namespace kernel_ {
+namespace kernel_ns {
 class source;
 template <class Input>
 struct constructor;
@@ -33,7 +33,7 @@ struct id;
 template <>
 struct id<1> : detail::point<1> {
   template <class Input>
-  friend struct detail::kernel_::constructor;
+  friend struct detail::kernel_ns::constructor;
   friend class detail::data_ref;
 
   id(::size_t x = 0) : point<1>(x, 0, 0) {}
@@ -44,7 +44,7 @@ struct id<1> : detail::point<1> {
 template <>
 struct id<2> : detail::point<2> {
   template <class Input>
-  friend struct detail::kernel_::constructor;
+  friend struct detail::kernel_ns::constructor;
   friend class detail::data_ref;
 
   id(::size_t x = 0, ::size_t y = 0) : point<2>(x, y, 0) {}
@@ -55,7 +55,7 @@ struct id<2> : detail::point<2> {
 template <>
 struct id<3> : detail::point<3> {
   template <class Input>
-  friend struct detail::kernel_::constructor;
+  friend struct detail::kernel_ns::constructor;
   friend class detail::data_ref;
 
   id(::size_t x = 0, ::size_t y = 0, ::size_t z = 0) : point<3>(x, y, z) {}

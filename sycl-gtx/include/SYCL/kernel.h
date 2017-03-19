@@ -26,12 +26,12 @@ class kernel {
  private:
   friend class program;
   friend class detail::issue_command;
-  friend class detail::kernel_::source;
+  friend class detail::kernel_ns::source;
 
   detail::refc<cl_kernel, clRetainKernel, clReleaseKernel> kern;
   context ctx;
   shared_ptr_class<program> prog;
-  detail::kernel_::source src;
+  detail::kernel_ns::source src;
 
   // These are meant only for program class
   kernel(bool);

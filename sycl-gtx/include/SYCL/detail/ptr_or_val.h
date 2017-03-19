@@ -20,16 +20,19 @@ struct ptr_or_val<T, false> {
   ptr_or_val(const ptr_or_val<T, true>& ptr) : data(*(ptr.data)) {}
 
   ptr_or_val& operator=(T n) {
-    data = n;
+    this->data = n;
     return *this;
   }
 
-  operator T() const { return data; }
-  operator T&() { return data; }
+  operator T() const { return this->data; }
+  operator T&() { return this->data; }
 
-  ptr_or_val<T, true> operator&() { return ptr_or_val<T, true>(&data); }
+  ptr_or_val<T, true> operator&() {  // NOLINT
+    return ptr_or_val<T, true>(&this->data);
+  }
   ptr_or_val<typename std::remove_pointer<T>::type, false> operator*() {
-    return ptr_or_val<typename std::remove_pointer<T>::type, false>(*data);
+    return ptr_or_val<typename std::remove_pointer<T>::type, false>(
+        *this->data);
   }
 };
 
@@ -44,16 +47,19 @@ struct ptr_or_val<T, true> {
   ptr_or_val(ptr_or_val<T, false>& value) : data(&(value.data)) {}
 
   ptr_or_val& operator=(T n) {
-    *data = n;
+    *this->data = n;
     return *this;
   }
 
-  operator T() const { return *data; }
-  operator T&() { return *data; }
+  operator T() const { return *this->data; }
+  operator T&() { return *this->data; }
 
-  ptr_or_val<T*, true> operator&() { return ptr_or_val<T*, true>(&data); }
+  ptr_or_val<T*, true> operator&() {  // NOLINT
+    return ptr_or_val<T*, true>(&this->data);
+  }
   ptr_or_val<typename std::remove_pointer<T>::type, false> operator*() {
-    return ptr_or_val<typename std::remove_pointer<T>::type, false>(*data);
+    return ptr_or_val<typename std::remove_pointer<T>::type, false>(
+        *this->data);
   }
 };
 

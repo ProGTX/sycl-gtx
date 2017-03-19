@@ -27,7 +27,7 @@ class program {
  protected:
   friend class handler;
   friend class kernel;
-  friend class detail::kernel_::source;
+  friend class detail::kernel_ns::source;
 
   detail::refc<cl_program, clRetainProgram, clReleaseProgram> prog;
   bool linked = false;
@@ -48,7 +48,7 @@ class program {
 
   template <class KernelType>
   void compile(KernelType kernFunctor, string_class compile_options = "") {
-    auto src = detail::kernel_::constructor<
+    auto src = detail::kernel_ns::constructor<
         typename detail::first_arg<KernelType>::type>::get(kernFunctor);
     auto kern = shared_ptr_class<kernel>(new kernel(true));
     kern->src = std::move(src);
@@ -115,10 +115,10 @@ class program {
     return_t get_info(const program* p) { return this->get(p->prog.get()); }
   };
 
-  template <typename Contained_, info::program param>
-  struct traits<vector_class<Contained_>, param>
-      : detail::array_traits<Contained_, info::program, param> {
-    using Container = typename detail::array_traits<Contained_, info::program,
+  template <typename Contained_t, info::program param>
+  struct traits<vector_class<Contained_t>, param>
+      : detail::array_traits<Contained_t, info::program, param> {
+    using Container = typename detail::array_traits<Contained_t, info::program,
                                                     param>::Container;
     Container get_info(const program* p) {
       this->get(p->prog.get());
@@ -127,17 +127,18 @@ class program {
     }
   };
 
-  template <class Contained_>
-  struct traits<vector_class<vector_class<Contained_>>, info::program::binaries>
-      : detail::array_traits<Contained_*, info::program,
+  template <class Contained_t>
+  struct traits<vector_class<vector_class<Contained_t>>,
+                info::program::binaries>
+      : detail::array_traits<Contained_t*, info::program,
                              info::program::binaries> {
-    using DoubleContainer = vector_class<vector_class<Contained_>>;
+    using DoubleContainer = vector_class<vector_class<Contained_t>>;
     DoubleContainer get_info(const program* p) {
       auto binary_sizes = p->get_info<info::program::binary_sizes>();
       this->get(p->prog.get());
 
       DoubleContainer ret;
-      static const auto inner_type_size = sizeof(Contained_);
+      static const auto inner_type_size = sizeof(Contained_t);
       ::size_t i = 0;
       for (auto bin_size : binary_sizes) {
         ret.emplace_back(this->param_value[i],

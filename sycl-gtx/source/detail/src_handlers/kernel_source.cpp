@@ -7,7 +7,7 @@
 #include "SYCL/program.h"
 
 using namespace cl::sycl;
-using namespace detail::kernel_;
+using namespace detail::kernel_ns;
 
 const string_class source::resource_name_root = "_sycl_buf";
 SYCL_THREAD_LOCAL int source::num_resources = 0;

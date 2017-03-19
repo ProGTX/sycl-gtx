@@ -12,31 +12,32 @@ namespace sycl {
 namespace detail {
 namespace control {
 
-static void if_(data_ref condition) {
-  kernel_::source::add<false>(string_class("if(") + condition.name + ")");
+static void if_detail(data_ref condition) {
+  kernel_ns::source::add<false>(string_class("if(") + condition.name + ")");
 }
 
 static void else_if(data_ref condition) {
-  kernel_::source::add<false>(string_class("else if(") + condition.name + ")");
+  kernel_ns::source::add<false>(string_class("else if(") + condition.name +
+                                ")");
 }
 
-static void else_() { kernel_::source::add<false>("else"); }
+static void else_detail() { kernel_ns::source::add<false>("else"); }
 
-static void while_(data_ref condition) {
-  kernel_::source::add<false>(string_class("while( ") + condition.name + ")");
+static void while_detail(data_ref condition) {
+  kernel_ns::source::add<false>(string_class("while( ") + condition.name + ")");
 }
 
 // Note: Increment can only be ++ or --, other assignment doesn't work
-static void for_(data_ref condition, data_ref increment) {
-  kernel_::source::add<false>(string_class("for(; ") + condition.name + "; " +
-                              increment.name + ")");
+static void for_detail(data_ref condition, data_ref increment) {
+  kernel_ns::source::add<false>(string_class("for(; ") + condition.name + "; " +
+                                increment.name + ")");
 }
 
-static void break_() { kernel_::source::add<true>("break"); }
+static void break_detail() { kernel_ns::source::add<true>("break"); }
 
-static void continue_() { kernel_::source::add<true>("continue"); }
+static void continue_detail() { kernel_ns::source::add<true>("continue"); }
 
-static void return_() { kernel_::source::add<true>("return"); }
+static void return_detail() { kernel_ns::source::add<true>("return"); }
 
 }  // namespace control
 }  // namespace detail
@@ -44,17 +45,18 @@ static void return_() { kernel_::source::add<true>("return"); }
 }  // namespace sycl
 }  // namespace cl
 
-#define SYCL_BEGIN ::cl::sycl::detail::kernel_::source::add_curlies();
+#define SYCL_BEGIN ::cl::sycl::detail::kernel_ns::source::add_curlies();
 
-#define SYCL_END ::cl::sycl::detail::kernel_::source::remove_curlies();
+#define SYCL_END ::cl::sycl::detail::kernel_ns::source::remove_curlies();
 
-#define SYCL_IF(condition)                                                     \
-  ::cl::sycl::detail::control::if_(::cl::sycl::detail::data_ref((condition))); \
+#define SYCL_IF(condition)                        \
+  ::cl::sycl::detail::control::if_detail(         \
+      ::cl::sycl::detail::data_ref((condition))); \
   SYCL_BEGIN
 
-#define SYCL_ELSE                       \
-  SYCL_END                              \
-  ::cl::sycl::detail::control::else_(); \
+#define SYCL_ELSE                             \
+  SYCL_END                                    \
+  ::cl::sycl::detail::control::else_detail(); \
   SYCL_BEGIN
 
 #define SYCL_ELSE_IF(condition)                   \
@@ -65,21 +67,21 @@ static void return_() { kernel_::source::add<true>("return"); }
 
 // TODO(progtx): do-while not supported
 #define SYCL_WHILE(condition)                     \
-  ::cl::sycl::detail::control::while_(            \
+  ::cl::sycl::detail::control::while_detail(      \
       ::cl::sycl::detail::data_ref((condition))); \
   SYCL_BEGIN
 
 #define SYCL_FOR(init, condition, increment)      \
   init;                                           \
-  ::cl::sycl::detail::control::for_(              \
+  ::cl::sycl::detail::control::for_detail(        \
       ::cl::sycl::detail::data_ref((condition)),  \
       ::cl::sycl::detail::data_ref((increment))); \
   SYCL_BEGIN
 
-#define SYCL_BREAK ::cl::sycl::detail::control::break_();
+#define SYCL_BREAK ::cl::sycl::detail::control::break_detail();
 
-#define SYCL_CONTINUE ::cl::sycl::detail::control::continue_();
+#define SYCL_CONTINUE ::cl::sycl::detail::control::continue_detail();
 
-#define SYCL_RETURN ::cl::sycl::detail::control::return_();
+#define SYCL_RETURN ::cl::sycl::detail::control::return_detail();
 
 #endif  // SYCL_GTX

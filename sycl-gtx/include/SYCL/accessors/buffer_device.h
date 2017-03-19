@@ -30,19 +30,20 @@ SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
       accessor_device_ref<dimensions, DataType, dimensions, mode, target>;
 
  public:
-  accessor_(cl::sycl::buffer<DataType, dimensions> & bufferRef,
-            handler & commandGroupHandler, range<dimensions> offset,
-            range<dimensions> range)
+  accessor_detail(cl::sycl::buffer<DataType, dimensions> & bufferRef,
+                  handler & commandGroupHandler, range<dimensions> offset,
+                  range<dimensions> range)
       : base_acc_buffer(bufferRef, &commandGroupHandler, offset, range),
         base_acc_device_ref(this, {}) {}
-  accessor_(cl::sycl::buffer<DataType, dimensions> & bufferRef,
-            handler & commandGroupHandler)
-      : accessor_(bufferRef, commandGroupHandler,
-                  detail::empty_range<dimensions>(), bufferRef.get_range()) {}
-  accessor_(const accessor_& copy)
+  accessor_detail(cl::sycl::buffer<DataType, dimensions> & bufferRef,
+                  handler & commandGroupHandler)
+      : accessor_detail(bufferRef, commandGroupHandler,
+                        detail::empty_range<dimensions>(),
+                        bufferRef.get_range()) {}
+  accessor_detail(const accessor_detail& copy)
       : base_acc_buffer(static_cast<const base_acc_buffer&>(copy)),
         base_acc_device_ref(this, copy) {}
-  accessor_(accessor_ && move) noexcept
+  accessor_detail(accessor_detail && move) noexcept
       : base_acc_buffer(std::move(static_cast<base_acc_buffer&&>(move))),
         base_acc_device_ref(
             this, std::move(static_cast<base_acc_device_ref&&>(move))) {}
@@ -52,7 +53,7 @@ SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
   }
 
   return_t operator[](id<dimensions> index) const {
-    auto resource_name = kernel_::register_resource(*this);
+    auto resource_name = kernel_ns::register_resource(*this);
     return return_t(resource_name + "[" + data_ref::get_name(index) + "]");
   }
 

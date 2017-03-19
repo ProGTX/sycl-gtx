@@ -31,17 +31,17 @@ namespace detail {
 
 // Forward declarations
 template <typename, int, access::mode, access::target, typename>
-class accessor_;
+class accessor_detail;
 template <typename, int>
 class accessor_buffer;
 class command_group;
 
 #undef SYCL_ADD_ACCESS_MODE_HELPER
 
-template <typename DataType_, int dimensions>
-class buffer_ : public buffer_base {
+template <typename DataType_t, int dimensions>
+class buffer_detail : public buffer_base {
  public:
-  using value_type = typename base_host_data<DataType_>::type;
+  using value_type = typename base_host_data<DataType_t>::type;
   using reference = value_type&;
   using const_reference = const value_type&;
 
@@ -57,19 +57,19 @@ class buffer_ : public buffer_base {
   bool is_initialized = false;
 
   friend class accessor_base;
-  friend class accessor_buffer<DataType_, dimensions>;
-  friend class kernel_::source;
+  friend class accessor_buffer<DataType_t, dimensions>;
+  friend class kernel_ns::source;
 
   // Associated host memory.
-  buffer_(value_type* host_data, range<dimensions> range, bool is_read_only,
-          bool is_blocking = true)
+  buffer_detail(value_type* host_data, range<dimensions> range,
+                bool is_read_only, bool is_blocking = true)
       : host_data(ptr_t(host_data, [](value_type* ptr) {})),
         rang(range),
         is_read_only(is_read_only),
         is_blocking(is_blocking) {}
 
-  buffer_(std::nullptr_t host_data, range<dimensions> range)
-      : buffer_(nullptr, range, false) {}
+  buffer_detail(std::nullptr_t host_data, range<dimensions> range)
+      : buffer_detail(nullptr, range, false) {}
 
  public:
   // Creates a new buffer with associated host memory.
@@ -78,8 +78,8 @@ class buffer_ : public buffer_base {
   // using the set_final_data method.
   // hostData points to the storage and values used by the buffer
   // and range<dimensions> defines the size.
-  buffer_(DataType* hostData, range<dimensions> range)
-      : buffer_(hostData, range, false) {}
+  buffer_detail(DataType* hostData, range<dimensions> range)
+      : buffer_detail(hostData, range, false) {}
 
   // Creates a new buffer with associated host memory.
   // hostData points to the storage and values used by the buffer
@@ -94,8 +94,9 @@ class buffer_ : public buffer_base {
   // after construction of the buffer.
   // The default value of the allocator is going to be the buffer_allocator
   // which will be of type DataType.
-  buffer_(const DataType* hostData, range<dimensions> range)
-      : buffer_(const_cast<DataType*>(hostData), range, true) {}  // NOLINT
+  buffer_detail(const DataType* hostData, range<dimensions> range)
+      : buffer_detail(const_cast<DataType*>(hostData), range, true) {
+  }  // NOLINT
 
   // Create a new buffer of the given size with storage managed by the SYCL
   // runtime.
@@ -104,7 +105,7 @@ class buffer_ : public buffer_base {
   // If the type of the buffer has the const qualifier,
   // then the default allocator will remove the qualifier
   // to allow host access to the data.
-  buffer_(const range<dimensions>& range)
+  buffer_detail(const range<dimensions>& range)
       : host_data(ptr_t(new DataType[range.size()])),
         rang(range),
         is_read_only(false),
@@ -118,15 +119,15 @@ class buffer_ : public buffer_base {
   // and unlocked otherwise.
   // Data is synchronized with hostData, when the mutex is unlocked by the
   // runtime.
-  buffer_(shared_ptr_class<DataType>& hostData,
-          const range<dimensions>& bufferRange, mutex_class* m);
+  buffer_detail(shared_ptr_class<DataType>& hostData,
+                const range<dimensions>& bufferRange, mutex_class* m);
 
   // Create a new buffer which is initialized by hostData.
   // The SYCL runtime receives full ownership of the hostData unique_ptr
   // and in effect there is no synchronization with the application code
   // using hostData.
-  buffer_(unique_ptr_class<void>&& hostData,
-          const range<dimensions>& bufferRange);
+  buffer_detail(unique_ptr_class<void>&& hostData,
+                const range<dimensions>& bufferRange);
 
   // TODO(progtx):
   // Create a new sub-buffer without allocation to have separate accessors
@@ -134,8 +135,8 @@ class buffer_ : public buffer_base {
   // b is the buffer with the real data.
   // baseIndex specifies the origin of the sub-buffer inside the buffer b.
   // subRange specifies the size of the sub-buffer.
-  buffer_(buffer_& b, const id<dimensions>& baseIndex,
-          const range<dimensions>& subRange)
+  buffer_detail(buffer_detail& b, const id<dimensions>& baseIndex,
+                const range<dimensions>& subRange)
       : rang(subRange),
         is_read_only(b.is_read_only),
         is_blocking(b.is_blocking) {
@@ -160,9 +161,10 @@ class buffer_ : public buffer_base {
   // mem_object is the OpenCL memory object to use.
   // from_queue is the queue associated to the memory object.
   // available_event specifies the event to wait for if non null
-  buffer_(cl_mem mem_object, queue& from_queue, event available_event = {});
+  buffer_detail(cl_mem mem_object, queue& from_queue,
+                event available_event = {});
 
-  ~buffer_() { event::wait_and_throw(events); }
+  ~buffer_detail() { event::wait_and_throw(events); }
 
   // Return a range object representing the size of the buffer
   // in terms of number of elements in each dimension as passed to the
@@ -180,12 +182,12 @@ class buffer_ : public buffer_base {
 
   // Total number of bytes in the buffer
   ::size_t get_size() const {
-    return get_count() * data_size<DataType_>::get();
+    return get_count() * data_size<DataType_t>::get();
   }
 
  private:
   static void create(queue* q, const vector_class<cl_event>& wait_events,
-                     buffer_* buffer) {
+                     buffer_detail* buffer) {
     ::cl_int error_code;
     const cl_mem_flags all_flags =
         ((buffer->host_data == nullptr) ? 0 : CL_MEM_USE_HOST_PTR) |
@@ -198,7 +200,7 @@ class buffer_ : public buffer_base {
 
   void init() {
     if (!is_initialized) {
-      command::group_::add_buffer_init(create, __func__, this);
+      command::group_detail::add_buffer_init(create, __func__, this);
       is_initialized = true;
     }
   }
@@ -210,19 +212,19 @@ class buffer_ : public buffer_base {
   }
 
   template <access::mode mode, access::target target>
-  using acc_return_t = accessor<DataType_, dimensions, mode, target>;
+  using acc_return_t = accessor<DataType_t, dimensions, mode, target>;
 
   template <access::mode mode, access::target target>
   acc_return_t<mode, target> get_access_device(handler& cgh) {
-    command::group_::check_scope();
+    command::group_detail::check_scope();
     if (mode != access::mode::read) {
       check_read_only();
     }
     init();
-    command::group_::add_buffer_access(buffer_access{this, mode, target},
-                                       __func__);
+    command::group_detail::add_buffer_access(buffer_access{this, mode, target},
+                                             __func__);
     return acc_return_t<mode, target>(
-        *(static_cast<cl::sycl::buffer<DataType_, dimensions>*>(this)), cgh);
+        *(static_cast<cl::sycl::buffer<DataType_t, dimensions>*>(this)), cgh);
   }
 
   template <access::mode mode, access::target target>
@@ -231,18 +233,18 @@ class buffer_ : public buffer_base {
       check_read_only();
     }
     return acc_return_t<mode, target>(
-        *(static_cast<cl::sycl::buffer<DataType_, dimensions>*>(this)));
+        *(static_cast<cl::sycl::buffer<DataType_t, dimensions>*>(this)));
   }
 
  public:
   template <access::mode mode,
             access::target target = access::target::global_buffer>
-  accessor<DataType_, dimensions, mode, target> get_access(handler& cgh) {
+  accessor<DataType_t, dimensions, mode, target> get_access(handler& cgh) {
     return get_access_device<mode, target>(cgh);
   }
 
   template <access::mode mode, access::target target>
-  accessor<DataType_, dimensions, mode, target> get_access() {
+  accessor<DataType_t, dimensions, mode, target> get_access() {
     return get_access_host<mode, target>();
   }
 
@@ -265,7 +267,7 @@ class buffer_ : public buffer_base {
   }
 
  public:
-  void set_final_data(weak_ptr_class<DataType_>& finalData);
+  void set_final_data(weak_ptr_class<DataType_t>& finalData);
 
   // TODO(progtx): nullptr indicates not to copy back
   void set_final_data(std::nullptr_t) {}
@@ -293,10 +295,10 @@ class buffer_ : public buffer_base {
       : Base(mem_object, from_queue, available_event) {}
 #endif
 
-template <typename DataType_>
-struct buffer<DataType_, 1> : public detail::buffer_<DataType_, 1> {
+template <typename DataType_t>
+struct buffer<DataType_t, 1> : public detail::buffer_detail<DataType_t, 1> {
  private:
-  using Base = detail::buffer_<DataType_, 1>;
+  using Base = detail::buffer_detail<DataType_t, 1>;
   using DataType = typename Base::value_type;
 
  public:
@@ -321,10 +323,10 @@ struct buffer<DataType_, 1> : public detail::buffer_<DataType_, 1> {
       : Base(host_data.data(), host_data.size()) {}
 };
 
-template <typename DataType_>
-struct buffer<DataType_, 2> : public detail::buffer_<DataType_, 2> {
+template <typename DataType_t>
+struct buffer<DataType_t, 2> : public detail::buffer_detail<DataType_t, 2> {
  private:
-  using Base = detail::buffer_<DataType_, 2>;
+  using Base = detail::buffer_detail<DataType_t, 2>;
   using DataType = typename Base::value_type;
 
  public:
@@ -340,10 +342,10 @@ struct buffer<DataType_, 2> : public detail::buffer_<DataType_, 2> {
       : buffer(host_data, {sizeX, sizeY}) {}
 };
 
-template <typename DataType_>
-struct buffer<DataType_, 3> : public detail::buffer_<DataType_, 3> {
+template <typename DataType_t>
+struct buffer<DataType_t, 3> : public detail::buffer_detail<DataType_t, 3> {
  private:
-  using Base = detail::buffer_<DataType_, 3>;
+  using Base = detail::buffer_detail<DataType_t, 3>;
   using DataType = typename Base::value_type;
 
  public:

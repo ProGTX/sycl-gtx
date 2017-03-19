@@ -19,7 +19,7 @@ template <int dimensions>
 struct nd_range;
 
 namespace detail {
-namespace kernel_ {
+namespace kernel_ns {
 template <class Input>
 struct constructor;
 }
@@ -28,7 +28,7 @@ struct constructor;
 template <int dimensions = 1>
 struct nd_item {
  protected:
-  friend struct detail::kernel_::constructor<nd_item<dimensions>>;
+  friend struct detail::kernel_ns::constructor<nd_item<dimensions>>;
 
   item<dimensions> global_item;
   item<dimensions> local_item;

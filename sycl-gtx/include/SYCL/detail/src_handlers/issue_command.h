@@ -17,7 +17,7 @@ class issue_command {
  private:
   static void compile_command(queue* q,
                               const vector_class<cl_event>& wait_events,
-                              kernel_::source src,
+                              kernel_ns::source src,
                               shared_ptr_class<kernel> kern);
   static void prepare_kernel(shared_ptr_class<kernel> kern);
 
@@ -54,14 +54,14 @@ class issue_command {
   static void enqueue_range(shared_ptr_class<kernel> kern, event* evnt,
                             range<dimensions> num_work_items,
                             id<dimensions> offset) {
-    command::group_::add_kernel_enqueue_range(
+    command::group_detail::add_kernel_enqueue_range(
         enqueue_range_command, __func__, kern, evnt, num_work_items, offset);
   }
 
   template <int dimensions>
   static void enqueue_nd_range(shared_ptr_class<kernel> kern, event* evnt,
                                nd_range<dimensions> execution_range) {
-    command::group_::add_kernel_enqueue_nd_range(
+    command::group_detail::add_kernel_enqueue_nd_range(
         enqueue_nd_range_command, __func__, kern, evnt, execution_range);
   }
 };

@@ -20,7 +20,7 @@ namespace detail {
 // Forward declaration
 class issue_command;
 
-namespace kernel_ {
+namespace kernel_ns {
 
 // Forward declaration
 template <class Input>
@@ -120,7 +120,7 @@ static string_class register_resource(
   return source::register_resource(acc);
 }
 
-}  // namespace kernel_
+}  // namespace kernel_ns
 }  // namespace detail
 
 }  // namespace sycl

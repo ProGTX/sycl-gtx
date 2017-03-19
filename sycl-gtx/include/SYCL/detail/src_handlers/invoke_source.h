@@ -10,7 +10,7 @@ namespace sycl {
 
 namespace detail {
 
-using kernel_::source;
+using kernel_ns::source;
 
 template <int dimensions, bool is_id>
 struct identifier_code {
@@ -86,7 +86,7 @@ struct generate_range_refs {
   }
 };
 
-namespace kernel_ {
+namespace kernel_ns {
 
 template <class Input>
 struct constructor;
@@ -170,7 +170,7 @@ struct constructor<nd_item<dimensions>> {
   }
 };
 
-}  // namespace kernel_
+}  // namespace kernel_ns
 }  // namespace detail
 
 }  // namespace sycl

@@ -23,12 +23,12 @@ namespace detail {
 // Forward declarations
 static inline unique_ptr_class<handler> get_handler(queue* q);
 template <typename, int>
-class buffer_;
+class buffer_detail;
 
 namespace command {
 
 // Forward declaration
-class group_;
+class group_detail;
 
 enum class type_t { unspecified, get_accessor, copy_data, kernel };
 
@@ -88,7 +88,7 @@ struct info {
 class command_group {
  private:
   friend class kernel;
-  friend class command::group_;
+  friend class command::group_detail;
   friend class ::cl::sycl::queue;
   using command_t = command::info;
   using command_f = command_t::command_f;
@@ -141,7 +141,7 @@ class command_group {
 
 namespace command {
 
-class group_ {
+class group_detail {
  private:
   friend class ::cl::sycl::detail::command_group;
 
@@ -185,9 +185,9 @@ class group_ {
   }
 
   template <typename DataType, int dimensions>
-  static void add_buffer_init(fn<buffer_<DataType, dimensions>*> function,
+  static void add_buffer_init(fn<buffer_detail<DataType, dimensions>*> function,
                               string_class name,
-                              buffer_<DataType, dimensions>* buff) {
+                              buffer_detail<DataType, dimensions>* buff) {
     add_command(function, name, buff);
   }
 

@@ -19,9 +19,9 @@
 #define modify_sample_rate 1
 #endif
 
-using Vec = Vec_<float_type>;
-using Ray = Ray_<float_type>;
-using Sphere = Sphere_<float_type, modify_sample_rate>;
+using Vec = Vec_detail<float_type>;
+using Ray = Ray_detail<float_type>;
+using Sphere = Sphere_detail<float_type, modify_sample_rate>;
 
 using std::string;
 
@@ -257,7 +257,7 @@ static void getDevices(std::vector<testInfo>& tests,
     using namespace cl::sycl;
 
     auto platforms = platform::get_platforms();
-    std::vector<testInfo> tests_;
+    std::vector<testInfo> testVector;
 
     version required(1, 2);
 
@@ -296,7 +296,7 @@ static void getDevices(std::vector<testInfo>& tests,
           if (name.find("HD Graphics 4600") == string::npos)
 #endif
 #endif
-            tests_.emplace_back(
+            testVector.emplace_back(
                 name + ' ' + openclVersion, nullptr,
                 std::shared_ptr<device>(new device(std::move(d))));
         }
@@ -308,7 +308,7 @@ static void getDevices(std::vector<testInfo>& tests,
     int i = 0;
     for (auto ptr : compute_sycl_ptrs) {
       ++i;
-      for (auto& t : tests_) {
+      for (auto& t : testVector) {
         tests.emplace_back(string("T") + std::to_string(i) + ' ' + t.name, ptr,
                            t.dev);
       }

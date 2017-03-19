@@ -16,11 +16,11 @@ struct point_ref;
 template <bool is_const, typename data_basic_t>
 struct get_value_point_t {
   using type = point_ref<is_const, data_basic_t, false>;
-  static type constructor(data_basic_t&& value, data_ref::type_t type_) {
-    return type(std::move(value), type_, true);
+  static type constructor(data_basic_t&& value, data_ref::type_t type_param) {
+    return type(std::move(value), type_param, true);
   }
-  static type constructor(string_class&& value, data_ref::type_t type_) {
-    return type(std::move(value), type_, true);
+  static type constructor(string_class&& value, data_ref::type_t type_param) {
+    return type(std::move(value), type_param, true);
   }
 };
 
@@ -52,36 +52,37 @@ struct point_ref : data_ref {
   // TODO(progtx): Need to also carry references to type and name
   ptr_or_val<data_t, holds_pointer> data;
 
-  point_ref(data_basic_t value, type_t type_, bool)
+  point_ref(data_basic_t value, type_t type, bool)
       : data_ref(get_string<data_basic_t>::get(value)), data(value) {
-    type = type_;
+    this->type = type;
   }
-  point_ref(string_class name, type_t type_, bool) : data_ref(name), data(0) {
-    type = type_;
+  point_ref(string_class name, type_t type, bool) : data_ref(name), data(0) {
+    this->type = type;
   }
 
  public:
-  point_ref(data_basic_t& data, string_class name, type_t type_)
+  point_ref(data_basic_t& data, string_class name, type_t type)
       : data_ref(name), data(&data) {
-    type = type_;
+    this->type = type;
   }
 
-  operator data_basic_t() const { return data; }
+  operator data_basic_t() const { return this->data; }
   // TODO(progtx): Only allow on is_const
-  operator data_basic_t&() { return data; }
+  operator data_basic_t&() { return this->data; }
 
   // TODO(progtx): enable_if causes here an internal MSVC error C1001
   // TODO(progtx): data_ref::operator&
   // template <class = typename std::enable_if<!is_const>::type>
-  point_ref<is_const, data_basic_t*> operator&() {
-    string_class name_;
-    if (type == type_t::numeric) {
-      name_ = name;
+  point_ref<is_const, data_basic_t*> operator&() {  // NOLINT
+    string_class name_tmp;
+    if (this->type == type_t::numeric) {
+      name_tmp = this->name;
     } else {
-      name_ = string_class("&(") + name + ")";
+      name_tmp = string_class("&(") + this->name + ")";
     }
 
-    return point_ref<is_const, data_basic_t*>(&data, name_, type);
+    return point_ref<is_const, data_basic_t*>(&this->data, name_tmp,
+                                              this->type);
   }
 
   // TODO(progtx): enable_if causes here an internal MSVC error C1001
@@ -91,23 +92,23 @@ struct point_ref : data_ref {
   //  std::enable_if<std::is_pointer<data_basic_t>::value>::type>
   point_ref<is_const, typename std::remove_pointer<data_basic_t>::type>
   operator*() {
-    string_class name_;
-    if (type == type_t::numeric) {
-      name_ = name;
+    string_class name_tmp;
+    if (this->type == type_t::numeric) {
+      name_tmp = this->name;
     } else {
-      name_ = string_class("*(") + name + ")";
+      name_tmp = string_class("*(") + this->name + ")";
     }
 
     return point_ref<is_const,
                      typename std::remove_pointer<data_basic_t>::type>(
-        *data, name_, type);
+        *this->data, name_tmp, this->type);
   }
 
   template <typename T, class = if_is_num_assignable<T>>
   point_ref& operator=(T n) {
-    if (type == type_t::numeric) {
-      data = n;
-      name = get_string<T>::get(data);
+    if (this->type == type_t::numeric) {
+      this->data = n;
+      this->name = get_string<T>::get(this->data);
     } else {
       data_ref::operator=(n);
     }
@@ -117,48 +118,49 @@ struct point_ref : data_ref {
 #define SYCL_POINT_REF_ARITH_ASSIGN(OP)                  \
   template <typename T, class = if_is_num_assignable<T>> \
   point_ref& operator OP(T n) {                          \
-    if (type == type_t::numeric) {                       \
-      data OP n;                                         \
-      name = get_string<T>::get(data);                   \
+    if (this->type == type_t::numeric) {                 \
+      this->data OP n;                                   \
+      this->name = get_string<T>::get(this->data);       \
     } else {                                             \
       data_ref::operator OP(n);                          \
     }                                                    \
     return *this;                                        \
   }
 
-#define SYCL_POINT_REF_ARITH_OP(OP)                                      \
-  template <typename T, class = if_is_numeric<T>>                        \
-  value_point_t operator OP(T n) const {                                 \
-    if (type == type_t::numeric) {                                       \
-      return value_point_t(data OP n, type, true);                       \
-    } else {                                                             \
-      auto ret = data_ref::operator OP(n);                               \
-      return value_point_t(std::move(ret.name), ret.type, true);         \
-    }                                                                    \
-  }                                                                      \
-  template <bool is_const_, typename data_basic_t_, bool holds_pointer_> \
-  value_point_t operator OP(                                             \
-      point_ref<is_const_, data_basic_t_, holds_pointer_> pref) const {  \
-    if (type == type_t::numeric && pref.type == type_t::numeric) {       \
-      return value_point_t(data OP pref.data, type, true);               \
-    } else {                                                             \
-      auto ret = data_ref::operator OP(pref);                            \
-      return value_point_t(std::move(ret.name), ret.type, true);         \
-    }                                                                    \
-  }                                                                      \
-  data_ref operator OP(data_ref dref) const {                            \
-    return data_ref::operator OP(dref);                                  \
-  }                                                                      \
-  template <typename T, class = if_is_numeric<T>>                        \
-  friend value_point_t operator OP(T n, const point_ref& rhs) {          \
-    if (rhs.type == type_t::numeric) {                                   \
-      return get_value_point_t<is_const, data_basic_t>::constructor(     \
-          n OP rhs.data, rhs.type);                                      \
-    } else {                                                             \
-      auto ret = n OP(data_ref) rhs;                                     \
-      return get_value_point_t<is_const, data_basic_t>::constructor(     \
-          std::move(ret.name), ret.type);                                \
-    }                                                                    \
+#define SYCL_POINT_REF_ARITH_OP(OP)                                            \
+  template <typename T, class = if_is_numeric<T>>                              \
+  value_point_t operator OP(T n) const {                                       \
+    if (this->type == type_t::numeric) {                                       \
+      return value_point_t(this->data OP n, this->type, true);                 \
+    } else {                                                                   \
+      auto ret = data_ref::operator OP(n);                                     \
+      return value_point_t(std::move(ret.name), ret.type, true);               \
+    }                                                                          \
+  }                                                                            \
+  template <bool is_const_v, typename data_basic_t_param,                      \
+            bool holds_pointer_v>                                              \
+  value_point_t operator OP(                                                   \
+      point_ref<is_const_v, data_basic_t_param, holds_pointer_v> pref) const { \
+    if (this->type == type_t::numeric && pref.type == type_t::numeric) {       \
+      return value_point_t(this->data OP pref.data, this->type, true);         \
+    } else {                                                                   \
+      auto ret = data_ref::operator OP(pref);                                  \
+      return value_point_t(std::move(ret.name), ret.type, true);               \
+    }                                                                          \
+  }                                                                            \
+  data_ref operator OP(data_ref dref) const {                                  \
+    return data_ref::operator OP(dref);                                        \
+  }                                                                            \
+  template <typename T, class = if_is_numeric<T>>                              \
+  friend value_point_t operator OP(T n, const point_ref& rhs) {                \
+    if (rhs.type == type_t::numeric) {                                         \
+      return get_value_point_t<is_const, data_basic_t>::constructor(           \
+          n OP rhs.data, rhs.type);                                            \
+    } else {                                                                   \
+      auto ret = n OP(data_ref) rhs;                                           \
+      return get_value_point_t<is_const, data_basic_t>::constructor(           \
+          std::move(ret.name), ret.type);                                      \
+    }                                                                          \
   }
 
   SYCL_POINT_REF_ARITH_OP(+)

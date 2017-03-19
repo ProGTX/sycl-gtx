@@ -3,7 +3,7 @@
 namespace cl {
 namespace sycl {
 namespace detail {
-namespace kernel_ {
+namespace kernel_ns {
 
 // Forward declaration
 template <typename DataType, int dimensions, access::mode mode,

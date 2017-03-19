@@ -38,7 +38,7 @@ class handler {
 
   template <class KernelType>
   shared_ptr_class<kernel> build(KernelType kernFunctor) {
-    detail::command::group_::check_scope();
+    detail::command::group_detail::check_scope();
     program prog(get_context(q));
     prog.build(kernFunctor, "");
 
@@ -54,7 +54,7 @@ class handler {
                                              Args...),
                      Args... params) {
     issue::write_buffers_to_device(kern);
-    issue_enqueue_f(kern, &events.kernel_, params...);
+    issue_enqueue_f(kern, &events.kernelEvent, params...);
     issue::read_buffers_from_device(kern);
   }
 

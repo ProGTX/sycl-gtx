@@ -17,7 +17,7 @@ struct nd_item;
 
 namespace detail {
 
-namespace kernel_ {
+namespace kernel_ns {
 // Forward declaration
 template <class Input>
 struct constructor;
@@ -32,8 +32,8 @@ struct item {
   id<dimensions> offset;
 
  protected:
-  friend struct detail::kernel_::constructor<item<dimensions>>;
-  friend struct detail::kernel_::constructor<nd_item<dimensions>>;
+  friend struct detail::kernel_ns::constructor<item<dimensions>>;
+  friend struct detail::kernel_ns::constructor<nd_item<dimensions>>;
 
   item(id<dimensions> global_id, range<dimensions> global_range,
        id<dimensions> offset = id<dimensions>())

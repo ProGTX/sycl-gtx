@@ -9,8 +9,8 @@
 using namespace cl::sycl;
 using namespace detail;
 
-void command_group::enter() { detail::command::group_::last = this; }
-void command_group::exit() { detail::command::group_::last = nullptr; }
+void command_group::enter() { detail::command::group_detail::last = this; }
+void command_group::exit() { detail::command::group_detail::last = nullptr; }
 
 // TODO(progtx): Reschedules commands to achieve better performance
 void command_group::optimize() {
@@ -112,18 +112,18 @@ void command_group::flush(vector_class<cl_event> wait_events) {
 
 using namespace detail;
 
-SYCL_THREAD_LOCAL command_group* command::group_::last = nullptr;
+SYCL_THREAD_LOCAL command_group* command::group_detail::last = nullptr;
 
-bool command::group_::in_scope() { return last != nullptr; }
+bool command::group_detail::in_scope() { return last != nullptr; }
 
-void command::group_::check_scope() {
+void command::group_detail::check_scope() {
   if (!in_scope()) {
     detail::error::report(error::code::NOT_IN_COMMAND_GROUP_SCOPE);
   }
 }
 
-void command::group_::add_buffer_access(buffer_access buf_acc,
-                                        string_class name) {
+void command::group_detail::add_buffer_access(buffer_access buf_acc,
+                                              string_class name) {
   last->commands.push_back({name,
                             std::bind(info::do_nothing, std::placeholders::_1,
                                       std::placeholders::_2),
@@ -141,7 +141,7 @@ void command::group_::add_buffer_access(buffer_access buf_acc,
   }
 }
 
-void command::group_::add_buffer_copy(
+void command::group_detail::add_buffer_copy(
     buffer_access buf_acc, access::mode copy_mode,
     fn<buffer_base*, buffer_base::clEnqueueBuffer_f> function,
     string_class name, buffer_base* buffer,

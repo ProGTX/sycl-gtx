@@ -20,7 +20,7 @@ class vec : public detail::vectors::base<dataT, numElements>,
             public detail::vectors::members<dataT, numElements> {
  private:
   template <typename, int, access::mode, access::target, typename>
-  friend class detail::accessor_;
+  friend class detail::accessor_detail;
   template <int, typename, int, access::mode, access::target>
   friend class detail::accessor_device_ref;
   template <typename, int>
@@ -46,8 +46,8 @@ class vec : public detail::vectors::base<dataT, numElements>,
     Base::operator=(copy);
   }
 
-  vec(string_class name_, type_t type = type_t::general)
-      : Base(name_), Members(this) {
+  vec(string_class name, type_t type = type_t::general)
+      : Base(name), Members(this) {
     this->type = type;
   }
 
@@ -133,7 +133,7 @@ class vec<dataT, 1> : public detail::vectors::base<dataT, 1>,
                       public detail::vectors::members<dataT, 1> {
  private:
   template <typename, int, access::mode, access::target, typename>
-  friend class detail::accessor_;
+  friend class detail::accessor_detail;
   template <int, typename, int, access::mode, access::target>
   friend class detail::accessor_device_ref;
   template <typename, int>
@@ -160,8 +160,8 @@ class vec<dataT, 1> : public detail::vectors::base<dataT, 1>,
     return *this;
   }
 
-  vec(string_class name_, type_t type = type_t::general)
-      : Base(name_), Members(this) {
+  vec(string_class name, type_t type = type_t::general)
+      : Base(name), Members(this) {
     this->type = type;
   }
 

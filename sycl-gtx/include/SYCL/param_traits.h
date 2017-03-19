@@ -36,23 +36,23 @@ struct traits_buffer_default<string_class> {
   static const ::size_t size = 8192;
 };
 
-template <typename Contained_, ::size_t BufferSize,
-          class Container_ = vector_class<Contained_>>
+template <typename Contained_t, ::size_t BufferSize_v,
+          class Container_t = vector_class<Contained_t>>
 struct traits_helper {
-  using Container = Container_;
-  using Contained = Contained_;
-  static const int BUFFER_SIZE = BufferSize;
+  using Container = Container_t;
+  using Contained = Contained_t;
+  static const int BufferSizeConstant = BufferSize_v;
   static const ::size_t type_size = sizeof(Contained);
 };
 
-template <typename Contained_,
-          ::size_t BufferSize =
-              traits_buffer_default<vector_class<Contained_>>::size>
-struct traits : traits_helper<Contained_, BufferSize> {};
+template <typename Contained_t,
+          ::size_t BufferSize_v =
+              traits_buffer_default<vector_class<Contained_t>>::size>
+struct traits : traits_helper<Contained_t, BufferSize_v> {};
 
-template <::size_t BufferSize>
-struct traits<string_class, BufferSize>
-    : traits_helper<char, BufferSize, string_class> {};
+template <::size_t BufferSize_v>
+struct traits<string_class, BufferSize_v>
+    : traits_helper<char, BufferSize_v, string_class> {};
 
 template <typename cl_input_t>
 using opencl_info_f = ::cl_int(CL_API_CALL*)(cl_input_t, cl_uint, ::size_t,
@@ -349,15 +349,15 @@ SYCL_ADD_EVENT_PROFILING_TRAIT(info::event_profiling::command_end, cl_ulong)
 
 namespace detail {
 
-template <class Contained_, class EnumClass, EnumClass param,
-          ::size_t BufferSize = traits<Contained_>::BUFFER_SIZE>
-struct array_traits : traits<Contained_, BufferSize> {
-  using Base = array_traits<Contained_, EnumClass, param, BufferSize>;
-  using RealBase = traits<Contained_, BufferSize>;
+template <class Contained_t, class EnumClass, EnumClass param,
+          ::size_t BufferSize_v = traits<Contained_t>::BufferSizeConstant>
+struct array_traits : traits<Contained_t, BufferSize_v> {
+  using Base = array_traits<Contained_t, EnumClass, param, BufferSize_v>;
+  using RealBase = traits<Contained_t, BufferSize_v>;
   using Contained = typename RealBase::Contained;
   using return_t =
-      typename std::conditional<BufferSize == 1, Contained, Contained*>::type;
-  Contained param_value[RealBase::BUFFER_SIZE];
+      typename std::conditional<BufferSize_v == 1, Contained, Contained*>::type;
+  Contained param_value[RealBase::BufferSizeConstant];
   ::size_t actual_size = 0;
 
   template <typename cl_input_t>
@@ -366,18 +366,19 @@ struct array_traits : traits<Contained_, BufferSize> {
         data_ptr,
         static_cast<typename param_traits<EnumClass, param>::cl_flag_type>(
             param),
-        RealBase::BUFFER_SIZE * RealBase::type_size, param_value, &actual_size);
+        RealBase::BufferSizeConstant * RealBase::type_size, param_value,
+        &actual_size);
     error::report(error_code);
-    return trait_return<BufferSize == 1>::get(param_value);
+    return trait_return<BufferSize_v == 1>::get(param_value);
   }
 };
 
 // Meant for scalar and string cases
 template <class EnumClass, EnumClass param,
-          ::size_t BufferSize =
-              traits<param_traits_t<EnumClass, param>>::BUFFER_SIZE>
+          ::size_t BufferSize_v =
+              traits<param_traits_t<EnumClass, param>>::BufferSizeConstant>
 struct non_vector_traits : array_traits<param_traits_t<EnumClass, param>,
-                                        EnumClass, param, BufferSize> {};
+                                        EnumClass, param, BufferSize_v> {};
 
 }  // namespace detail
 

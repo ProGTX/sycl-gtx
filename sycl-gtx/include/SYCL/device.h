@@ -80,13 +80,14 @@ class device {
       info::device_affinity_domain affinityDomain) const;
 
  private:
-  template <class Contained_, info::device param,
-            ::size_t BufferSize = detail::traits<Contained_>::BUFFER_SIZE>
+  template <class Contained_t, info::device param,
+            ::size_t BufferSize_v =
+                detail::traits<Contained_t>::BufferSizeConstant>
   struct array_traits
-      : detail::array_traits<Contained_, info::device, param, BufferSize> {
+      : detail::array_traits<Contained_t, info::device, param, BufferSize_v> {
    private:
     using Base =
-        detail::array_traits<Contained_, info::device, param, BufferSize>;
+        detail::array_traits<Contained_t, info::device, param, BufferSize_v>;
 
    public:
     void get_info(const device* dev) { Base::Base::get(dev->device_id.get()); }
@@ -152,13 +153,13 @@ class device {
     }
   };
 
-  template <class Contained_>
-  struct traits<vector_class<Contained_>, info::device::partition_type,
+  template <class Contained_t>
+  struct traits<vector_class<Contained_t>, info::device::partition_type,
                 typename std::false_type::type>
-      : traits<vector_class<Contained_>, info::device::partition_type,
+      : traits<vector_class<Contained_t>, info::device::partition_type,
                typename std::true_type::type> {
     // TODO(progtx): Why isn't return_t inherited? May be a bug.
-    using return_t = vector_class<Contained_>;
+    using return_t = vector_class<Contained_t>;
     return_t get(const device* dev) {
       // TODO(progtx): I have no idea how to handle this case
       this->get_info(dev);

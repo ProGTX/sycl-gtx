@@ -13,10 +13,10 @@ int main() {
     queue myQueue;
 
     buffer<int> V(N);
-    buffer<int> stride_(1);
+    buffer<int> stride_tmp(1);
     {
-      auto s = stride_.get_access<access::mode::discard_write,
-                                  access::target::host_buffer>();
+      auto s = stride_tmp.get_access<access::mode::discard_write,
+                                     access::target::host_buffer>();
       s[0] = 1;
     }
 
@@ -27,7 +27,7 @@ int main() {
       cgh.parallel_for<class init>(range<1>(N),
                                    [=](id<1> index) { v[index] = index; });
 
-      auto s = stride_.get_access<access::mode::read_write>(cgh);
+      auto s = stride_tmp.get_access<access::mode::read_write>(cgh);
 
       // Calculate reduction sum
       for (size_t stride = 1; stride < N; stride *= 2) {

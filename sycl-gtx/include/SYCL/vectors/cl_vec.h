@@ -97,9 +97,9 @@ struct cl_base<dataT, parentElems, 0> {
   cl_base(genvector v) : Base(v) {}      \
   cl_base(cl_base&& move) { std::swap(this->elems, move.elems); }
 
-#define SYCL_CL_REF(return_, name, code) \
-  return_& name() { return code; }       \
-  const return_& name() const { return code; }
+#define SYCL_CL_REF(return_t, name, code) \
+  return_t& name() { return code; }       \
+  const return_t& name() const { return code; }
 
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 2> : cl_base<dataT, parentElems, 0> {

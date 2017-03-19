@@ -15,8 +15,8 @@ namespace sycl {
 namespace detail {
 
 #define SYCL_ACCESSOR_HOST_REF_CONSTRUCTOR()                                \
-  using acc_t =                                                             \
-      accessor_<DataType, dimensions, mode, access::target::host_buffer>;   \
+  using acc_t = accessor_detail<DataType, dimensions, mode,                 \
+                                access::target::host_buffer>;               \
   friend acc_t;                                                             \
   template <int, typename, int, access::mode>                               \
   friend class accessor_host_ref;                                           \
@@ -76,30 +76,30 @@ SYCL_ACCESSOR_CLASS(target == access::target::host_buffer)
       accessor_host_ref<dimensions, DataType, dimensions, mode>;
 
  public:
-  accessor_(buffer<DataType, dimensions> & bufferRef, range<dimensions> offset,
-            range<dimensions> range)
+  accessor_detail(buffer<DataType, dimensions> & bufferRef,
+                  range<dimensions> offset, range<dimensions> range)
       : base_acc_buffer(bufferRef, nullptr, offset, range),
         base_acc_host_ref(this, std::array<::size_t, 3>{0, 0, 0}) {
     synchronizer::add(this, base_acc_buffer::buf);
   }
-  accessor_(buffer<DataType, dimensions> & bufferRef)
-      : accessor_(bufferRef, detail::empty_range<dimensions>(),
-                  bufferRef.get_range()) {
+  accessor_detail(buffer<DataType, dimensions> & bufferRef)
+      : accessor_detail(bufferRef, detail::empty_range<dimensions>(),
+                        bufferRef.get_range()) {
     synchronizer::add(this, base_acc_buffer::buf);
   }
-  accessor_(const accessor_& copy)
+  accessor_detail(const accessor_detail& copy)
       : base_acc_buffer(static_cast<const base_acc_buffer&>(copy)),
         base_acc_host_ref(this, copy) {
     synchronizer::add(this, base_acc_buffer::buf);
   }
-  accessor_(accessor_ && move) noexcept
+  accessor_detail(accessor_detail && move) noexcept
       : base_acc_buffer(std::move(static_cast<base_acc_buffer&&>(move))),
         base_acc_host_ref(this,
                           std::move(static_cast<base_acc_host_ref&&>(move))) {
     synchronizer::add(this, base_acc_buffer::buf);
   }
 
-  ~accessor_() { synchronizer::remove(this, base_acc_buffer::buf); }
+  ~accessor_detail() { synchronizer::remove(this, base_acc_buffer::buf); }
 };
 
 }  // namespace detail

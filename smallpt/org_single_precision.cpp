@@ -14,17 +14,17 @@
 #include "win.h"
 #include <vector>
 
-using Vec = Vec_<double>;
-using Ray = Ray_<double>;
-using Sphere = Sphere_<double>;
+using Vec = Vec_detail<double>;
+using Ray = Ray_detail<double>;
+using Sphere = Sphere_detail<double>;
 
 namespace org_sp {
 struct Vec {
   float x, y, z;
-  Vec(float x_ = 0, float y_ = 0, float z_ = 0) {
-    x = x_;
-    y = y_;
-    z = z_;
+  Vec(float x = 0, float y = 0, float z = 0) {
+    this->x = x;
+    this->y = y;
+    this->z = z;
   }
   Vec(const ::Vec& v)
       : Vec(static_cast<float>(v.x), static_cast<float>(v.y),
@@ -35,15 +35,16 @@ struct Vec {
   Vec mult(const Vec& b) const { return Vec(x * b.x, y * b.y, z * b.z); }
   Vec& norm() { return *this = *this * (1 / sqrt(x * x + y * y + z * z)); }
   float dot(const Vec& b) const {
-    return x * b.x + y * b.y + z * b.z;
+    return this->x * b.x + this->y * b.y + this->z * b.z;
   }  // cross:
   Vec operator%(Vec& b) {
-    return Vec(y * b.z - z * b.y, z * b.x - x * b.z, x * b.y - y * b.x);
+    return Vec(this->y * b.z - this->z * b.y, this->z * b.x - this->x * b.z,
+               this->x * b.y - this->y * b.x);
   }
 };
 struct Ray {
   Vec o, d;
-  Ray(Vec o_, Vec d_) : o(o_), d(d_) {}
+  Ray(Vec o, Vec d) : o(o), d(d) {}
   Ray(const ::Ray& r) : o(r.o), d(r.d) {}
 };
 enum Refl_t { DIFF, SPEC, REFR };  // material types, used in radiance()
@@ -51,8 +52,8 @@ struct Sphere {
   float rad;    // radius
   Vec p, e, c;  // position, emission, color
   Refl_t refl;  // reflection type (DIFFuse, SPECular, REFRactive)
-  Sphere(float rad_, Vec p_, Vec e_, Vec c_, Refl_t refl_)
-      : rad(rad_), p(p_), e(e_), c(c_), refl(refl_) {}
+  Sphere(float rad, Vec p, Vec e, Vec c, Refl_t refl)
+      : rad(rad), p(p), e(e), c(c), refl(refl) {}
   float intersect(const Ray& r) const {  // returns distance, 0 if nohit
     Vec op = p - r.o;  // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
     float t, eps = 1e-2f, b = op.dot(r.d), det = b * b - op.dot(op) + rad * rad;
@@ -169,50 +170,50 @@ inline void compute_inner(int y, int w, int h, int samps, Ray& cam, Vec& cx,
     }
   }
 }
-std::vector<org_sp::Vec> get_c(int w, int h, ::Vec* c_) {
+std::vector<org_sp::Vec> get_c(int w, int h, ::Vec* cVecOut) {
   std::vector<org_sp::Vec> c;
   c.reserve(static_cast<size_t>(w) * static_cast<size_t>(h));
   for (int y = 0; y < h; ++y) {
     for (int x = 0; x < w; ++x) {
       int i = y * w + x;
-      c.emplace_back(c_[i]);
+      c.emplace_back(cVecOut[i]);
     }
   }
   return c;
 }
-void assign_c(int w, int h, std::vector<org_sp::Vec>& c, ::Vec* c_) {
+void assign_c(int w, int h, std::vector<org_sp::Vec>& c, ::Vec* cVecOut) {
   for (int y = 0; y < h; ++y) {
     for (int x = 0; x < w; ++x) {
       int i = y * w + x;
-      c_[i].x = c[i].x;
-      c_[i].y = c[i].y;
-      c_[i].z = c[i].z;
+      cVecOut[i].x = c[i].x;
+      cVecOut[i].y = c[i].y;
+      cVecOut[i].z = c[i].z;
     }
   }
 }
 }  // namespace org_sp
-void compute_org_sp(void*, int w, int h, int samps, Ray cam_, Vec cx_, Vec cy_,
-                    Vec r_, Vec* c_) {
-  org_sp::Ray cam(cam_);
-  org_sp::Vec cx(cx_);
-  org_sp::Vec cy(cy_);
-  org_sp::Vec r(r_);
-  auto c = org_sp::get_c(w, h, c_);
+void compute_org_sp(void*, int w, int h, int samps, Ray cameraRay, Vec cxIn,
+                    Vec cyIn, Vec rIn, Vec* cVecOut) {
+  org_sp::Ray cam(cameraRay);
+  org_sp::Vec cx(cxIn);
+  org_sp::Vec cy(cyIn);
+  org_sp::Vec r(rIn);
+  auto c = org_sp::get_c(w, h, cVecOut);
   for (int y = 0; y < h; y++) {  // Loop over image rows
     org_sp::compute_inner(y, w, h, samps, cam, cx, cy, r, c.data());
   }
-  org_sp::assign_c(w, h, c, c_);
+  org_sp::assign_c(w, h, c, cVecOut);
 }
-void compute_org_sp_openmp(void*, int w, int h, int samps, Ray cam_, Vec cx_,
-                           Vec cy_, Vec r_, Vec* c_) {
-  org_sp::Ray cam(cam_);
-  org_sp::Vec cx(cx_);
-  org_sp::Vec cy(cy_);
-  org_sp::Vec r(r_);
-  auto c = org_sp::get_c(w, h, c_);
+void compute_org_sp_openmp(void*, int w, int h, int samps, Ray cameraRay,
+                           Vec cxIn, Vec cyIn, Vec rIn, Vec* cVecOut) {
+  org_sp::Ray cam(cameraRay);
+  org_sp::Vec cx(cxIn);
+  org_sp::Vec cy(cyIn);
+  org_sp::Vec r(rIn);
+  auto c = org_sp::get_c(w, h, cVecOut);
 #pragma omp parallel for schedule(dynamic, 1) private(r)
   for (int y = 0; y < h; y++) {  // Loop over image rows
     org_sp::compute_inner(y, w, h, samps, cam, cx, cy, r, c.data());
   }
-  org_sp::assign_c(w, h, c, c_);
+  org_sp::assign_c(w, h, c, cVecOut);
 }

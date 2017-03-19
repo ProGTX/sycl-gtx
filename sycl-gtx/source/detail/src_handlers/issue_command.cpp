@@ -6,7 +6,7 @@
 
 using namespace cl::sycl;
 using detail::issue_command;
-using namespace detail::kernel_;
+using namespace detail::kernel_ns;
 
 // TODO(progtx):
 void issue_command::compile_command(queue* q,
@@ -40,7 +40,7 @@ void issue_command::write_buffers_to_device(shared_ptr_class<kernel> kern) {
       // Don't need to copy data that won't be used
       continue;
     }
-    command::group_::add_buffer_copy(
+    command::group_detail::add_buffer_copy(
         acc.second.acc, access::mode::write, buffer_base::enqueue_command,
         __func__, acc.second.acc.data, &clEnqueueWriteBuffer);
   }
@@ -54,8 +54,8 @@ void issue_command::enqueue_task_command(
 }
 
 void issue_command::enqueue_task(shared_ptr_class<kernel> kern, event* evnt) {
-  command::group_::add_kernel_enqueue_task(enqueue_task_command, __func__, kern,
-                                           evnt);
+  command::group_detail::add_kernel_enqueue_task(enqueue_task_command, __func__,
+                                                 kern, evnt);
 }
 
 void issue_command::read_buffers_from_device(shared_ptr_class<kernel> kern) {
@@ -65,7 +65,7 @@ void issue_command::read_buffers_from_device(shared_ptr_class<kernel> kern) {
       // Don't need to read back read-only buffers
       continue;
     }
-    command::group_::add_buffer_copy(
+    command::group_detail::add_buffer_copy(
         acc.second.acc, access::mode::read, buffer_base::enqueue_command,
         __func__, acc.second.acc.data,
         reinterpret_cast<buffer_base::clEnqueueBuffer_f>(  // NOLINT

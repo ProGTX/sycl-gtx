@@ -11,7 +11,7 @@ namespace sycl {
 namespace detail {
 
 // Forward declaration
-namespace kernel_ {
+namespace kernel_ns {
 class source;
 }
 
@@ -39,7 +39,7 @@ class accessor_core : public accessor_base {
   cl_event get_cl_event_object() const;
 
  protected:
-  friend class kernel_::source;
+  friend class kernel_ns::source;
 
   virtual void* resource() const { return nullptr; }
 
@@ -51,13 +51,13 @@ struct select_target;
 
 template <typename DataType, int dimensions, access::mode mode,
           access::target target, typename = select_target<true>>
-class accessor_;
+class accessor_detail;
 
 #define SYCL_ACCESSOR_CLASS(condition)                            \
   template <typename DataType, int dimensions, access::mode mode, \
             access::target target>                                \
-  class accessor_<DataType, dimensions, mode, target,             \
-                  select_target<(condition)>>                     \
+  class accessor_detail<DataType, dimensions, mode, target,       \
+                        select_target<(condition)>>               \
       : public accessor_core<DataType, dimensions, mode, target>
 
 }  // namespace detail
@@ -70,7 +70,7 @@ class accessor;
 #define SYCL_ADD_ACCESSOR(mode, target)              \
   template <typename DataType, int dimensions>       \
   class accessor<DataType, dimensions, mode, target> \
-      : public detail::accessor_<DataType, dimensions, mode, target>
+      : public detail::accessor_detail<DataType, dimensions, mode, target>
 
 }  // namespace sycl
 }  // namespace cl

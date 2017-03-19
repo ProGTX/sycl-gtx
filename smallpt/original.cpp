@@ -13,9 +13,9 @@
 #include "classes.h"
 #include "win.h"
 
-using Vec = Vec_<double>;
-using Ray = Ray_<double>;
-using Sphere = Sphere_<double>;
+using Vec = Vec_detail<double>;
+using Ray = Ray_detail<double>;
+using Sphere = Sphere_detail<double>;
 
 namespace org {
 Sphere spheres[] = {

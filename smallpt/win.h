@@ -9,13 +9,13 @@
 namespace ns_random {
 
 inline std::default_random_engine& generator() {
-  static std::default_random_engine generator_;
-  return generator_;
+  static std::default_random_engine generator_tmp;
+  return generator_tmp;
 }
 
-inline double distr(std::default_random_engine& generator_) {
-  static std::uniform_real_distribution<double> distr_(0.0, 1.0);
-  return distr_(generator_);
+inline double distr(std::default_random_engine& rng) {
+  static std::uniform_real_distribution<double> distr_detail(0.0, 1.0);
+  return distr_detail(rng);
 }
 
 static void reset() { generator().seed(0); }

@@ -24,9 +24,9 @@
 #define modify_sample_rate 1
 #endif
 
-using Vec = Vec_<float_type>;
-using Ray = Ray_<float_type>;
-using Sphere = Sphere_<float_type, modify_sample_rate>;
+using Vec = Vec_detail<float_type>;
+using Ray = Ray_detail<float_type>;
+using Sphere = Sphere_detail<float_type, modify_sample_rate>;
 
 #ifndef SYCL_GTX
 #include <CL/sycl_gtx_compatibility.h>
@@ -57,13 +57,13 @@ static Sphere spheres[numSpheres] = {
 using spheres_t =
     accessor<float16, 1, access::mode::read, access::target::global_buffer>;
 
-struct Vector : public ::Vec_<float1> {
+struct Vector : public ::Vec_detail<float1> {
  private:
-  using Base = ::Vec_<float1>;
+  using Base = ::Vec_detail<float1>;
 
  public:
-  Vector(float x_ = 0, float y_ = 0, float z_ = 0) : Base(x_, y_, z_) {}
-  Vector(const ::Vec_<float_type>& base)
+  Vector(float x = 0, float y = 0, float z = 0) : Base(x, y, z) {}
+  Vector(const ::Vec_detail<float_type>& base)
       : Base(static_cast<float>(base.x), static_cast<float>(base.y),
              static_cast<float>(base.z)) {}
   template <typename t = float1>
@@ -74,22 +74,22 @@ struct Vector : public ::Vec_<float1> {
   Vector(float3 data) : Base(data.x(), data.y(), data.z()) {}
 };
 
-using RaySycl = ::Ray_<float1>;
+using RaySycl = ::Ray_detail<float1>;
 
-struct SphereSycl : public ::Sphere_<float1> {
+struct SphereSycl : public ::Sphere_detail<float1> {
   float1 refl;
 
   SphereSycl(const float16& data)
-      : ::Sphere_<float1>(data.lo().lo().w(), Vector(data.lo().lo().xyz()),
-                          Vector(data.lo().hi().xyz()),
-                          Vector(data.hi().lo().xyz()),
-                          Refl_t::DIFF  // Not important
-                          ),
+      : ::Sphere_detail<float1>(
+            data.lo().lo().w(), Vector(data.lo().lo().xyz()),
+            Vector(data.lo().hi().xyz()), Vector(data.hi().lo().xyz()),
+            Refl_t::DIFF  // Not important
+            ),
         refl(data.hi().lo().w()) {}
 
   float1 intersect(
-      const Ray_<float1>& r) const {  // returns distance, 0 if no hit
-    float1 return_;
+      const Ray_detail<float1>& r) const {  // returns distance, 0 if no hit
+    float1 return_vec;
     Vector op = p - r.o;  // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0
     float1 t;
     float1 eps = 1e-2f;
@@ -97,25 +97,25 @@ struct SphereSycl : public ::Sphere_<float1> {
     float1 det = b * b - op.dot(op) + rad * rad;
 
     SYCL_IF(det < 0)
-    return_ = 0;
+    return_vec = 0;
     SYCL_ELSE {
       det = cl::sycl::sqrt(det);
       t = b - det;
       SYCL_IF(t > eps)
-      return_ = t;
+      return_vec = t;
       SYCL_ELSE {
         t = b + det;
         SYCL_IF(t > eps)
-        return_ = t;
+        return_vec = t;
         SYCL_ELSE
-        return_ = 0;
+        return_vec = 0;
         SYCL_END;
       }
       SYCL_END;
     }
     SYCL_END;
 
-    return return_;
+    return return_vec;
   }
 };
 
@@ -159,7 +159,7 @@ static float1 getRandom(uint2& seed) {
                              invMaxInt);
 }
 
-static void radiance(Vector& return_, spheres_t spheres, RaySycl r,
+static void radiance(Vector& return_vec, spheres_t spheres, RaySycl r,
                      uint2& randomSeed, Vector cl = {0, 0, 0},
                      Vector cf = {1, 1, 1}) {
   using namespace cl::sycl;
@@ -177,7 +177,7 @@ static void radiance(Vector& return_, spheres_t spheres, RaySycl r,
   SYCL_WHILE(true) {
     SYCL_IF(!intersect(spheres, r, t, id)) {
       // if miss, don't add anything
-      return_ = cl;
+      return_vec = cl;
       SYCL_BREAK
     }
     SYCL_END;
@@ -208,7 +208,7 @@ static void radiance(Vector& return_, spheres_t spheres, RaySycl r,
     SYCL_IF(depth > 5) {
       SYCL_IF(getRandom(randomSeed) < p) { f = f * (1 / p); }
       SYCL_ELSE {
-        return_ = cl;
+        return_vec = cl;
         SYCL_BREAK
       }
       SYCL_END;
@@ -310,15 +310,15 @@ static void radiance(Vector& return_, spheres_t spheres, RaySycl r,
 
 }  // namespace ns_sycl_gtx
 
-static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
-                             Vec cx_, Vec cy_, Vec r_, Vec* c_) {
+static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cameraRay,
+                             Vec cxIn, Vec cyIn, Vec rIn, Vec* cVecOut) {
   using namespace std;
   using namespace cl::sycl;
   using namespace ns_sycl_gtx;
 
   queue q(*reinterpret_cast<device*>(dev));  // NOLINT
 
-  auto spheres_ = buffer<float16>(range<1>(ns_sycl_gtx::numSpheres));
+  auto spheres_tmp = buffer<float16>(range<1>(ns_sycl_gtx::numSpheres));
   {
 // TODO(progtx): Conform to the SYCL spec
 #ifdef SYCL_GTX
@@ -332,8 +332,8 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
       target.z() = static_cast<type>(data.z);
     };
 
-    auto s = spheres_.get_access<access::mode::discard_write,
-                                 access::target::host_buffer>();
+    auto s = spheres_tmp.get_access<access::mode::discard_write,
+                                    access::target::host_buffer>();
     // See SphereSycl
     for (int i = 0; i < ns_sycl_gtx::numSpheres; ++i) {
       auto& si = s[i];
@@ -356,12 +356,12 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
 
   uint16_t Xi[3] = {0, 0, 0};
   vector<buffer<float3>> colors;
-  vector<buffer<cl::sycl::cl_uint2>> seeds_;
+  vector<buffer<cl::sycl::cl_uint2>> seeds_tmp;
   vector<pair<int, int>> lineOffset;
-  auto starts_ = buffer<int>(range<1>(numParts));
+  auto starts_tmp = buffer<int>(range<1>(numParts));
   {
-    auto starts = starts_.get_access<access::mode::discard_write,
-                                     access::target::host_buffer>();
+    auto starts = starts_tmp.get_access<access::mode::discard_write,
+                                        access::target::host_buffer>();
 
     for (int k = 0; k < numParts; ++k) {
       int start = h * k / numParts;
@@ -371,10 +371,10 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
 
       lineOffset.emplace_back(start, height);
       colors.emplace_back(length);
-      seeds_.emplace_back(length);
+      seeds_tmp.emplace_back(length);
       starts[k] = start;
 
-      auto seeds = seeds_.back()
+      auto seeds = seeds_tmp.back()
                        .get_access<access::mode::discard_write,
                                    access::target::host_buffer>();
 
@@ -397,22 +397,21 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
                                access::target::global_buffer>(cgh);
 
       // TODO(progtx): constant_buffer
-      auto spheres = spheres_.get_access<access::mode::read,
-                                         access::target::global_buffer>(cgh);
+      auto spheres = spheres_tmp.get_access<access::mode::read,
+                                            access::target::global_buffer>(cgh);
       auto seeds =
-          seeds_[k]
+          seeds_tmp[k]
               .get_access<access::mode::read, access::target::global_buffer>(
                   cgh);
-      auto starts =
-          starts_.get_access<access::mode::read, access::target::global_buffer>(
-              cgh);
+      auto starts = starts_tmp.get_access<access::mode::read,
+                                          access::target::global_buffer>(cgh);
 
       cgh.parallel_for<class smallpt>(
           range<2>(w, lineOffset[k].second), [=](id<2> i) {
-            Vector cx(cx_);
-            Vector cy(cy_);
-            Vector r(r_);
-            RaySycl cam(Vector(cam_.o), Vector(cam_.d));
+            Vector cx(cxIn);
+            Vector cy(cyIn);
+            Vector r(rIn);
+            RaySycl cam(Vector(cameraRay.o), Vector(cameraRay.d));
             uint2 randomSeed;
             randomSeed.x() = seeds[i].x() * i[0] + i[0] + 1;
             randomSeed.y() = seeds[i].y() * i[1] + i[1] + 1;
@@ -498,7 +497,7 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cam_,
       int ri = (h - y - 1) * w;  // Picture is upside down
       for (int x = 0; x < w; ++x) {
         auto& ci = c[i];
-        assign(c_[ri], ci);
+        assign(cVecOut[ri], ci);
 
         ++i;
         ++ri;

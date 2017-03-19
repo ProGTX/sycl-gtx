@@ -34,7 +34,7 @@ struct subscript_helper<1, DataType, dimensions, mode, target> {
 };
 
 #define SYCL_ACCESSOR_DEVICE_REF_CONSTRUCTOR()                                \
-  using acc_t = accessor_<DataType, dimensions, mode, target>;                \
+  using acc_t = accessor_detail<DataType, dimensions, mode, target>;          \
   friend acc_t;                                                               \
   template <int, typename, int, access::mode, access::target>                 \
   friend class accessor_device_ref;                                           \
@@ -101,7 +101,7 @@ class accessor_device_ref<1, DataType, dimensions, mode, target> {
              get_string<decltype(multiplier)>::get(multiplier);
       multiplier *= parent->access_buffer_range(i);
     }
-    auto resource_name = kernel_::register_resource(*parent);
+    auto resource_name = kernel_ns::register_resource(*parent);
     return subscript_return_t(resource_name + "[" + ind + "]");
   }
 

@@ -15,14 +15,14 @@ namespace detail {
 // Forward declarations
 class issue_command;
 namespace command {
-class group_;
+class group_detail;
 }
 
 class buffer_base {
  protected:
   friend class issue_command;
   friend class ::cl::sycl::queue;
-  friend class command::group_;
+  friend class command::group_detail;
 
   detail::refc<cl_mem, clRetainMemObject, clReleaseMemObject> device_data;
   vector_class<event> events;

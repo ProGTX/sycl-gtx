@@ -5,6 +5,6 @@
 using namespace cl::sycl;
 using namespace detail;
 
-void detail::kernel_add(string_class line) { kernel_::source::add(line); }
+void detail::kernel_add(string_class line) { kernel_ns::source::add(line); }
 
 const string_class data_ref::open_parenthesis = "(";
