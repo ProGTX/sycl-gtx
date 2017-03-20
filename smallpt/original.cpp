@@ -128,7 +128,8 @@ void compute_org(void*, int w, int h, int samps, Ray cam, Vec cx, Vec cy, Vec r,
 void compute_org_openmp(void*, int w, int h, int samps, Ray cam, Vec cx, Vec cy,
                         Vec r, Vec* c) {
 #pragma omp parallel for schedule(dynamic, 1) private(r)
-  for (int y = 0; y < h; y++) {  // Loop over image rows
+  for (int y = 0; y < h; y++) {  // NOLINT
+    // Loop over image rows
     org::compute_inner(y, w, h, samps, cam, cx, cy, r, c);
   }
 }

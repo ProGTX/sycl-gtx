@@ -212,11 +212,10 @@ int main() {
     const auto group_size =
         myQueue.get_device().get_info<info::device::max_work_group_size>();
     const auto size = group_size * 8;
-    size_t N = size;
     using type = float;
 
     // Calculate required number of buffer levels
-    N = size;
+    size_t N = size;
     size_t number_levels = 1;
     while (N > 1) {
       N /= 2 * group_size;

@@ -14,7 +14,8 @@ device::device(cl_device_id device_id, device_selector* dev_sel)
 
 device::device() : device(nullptr, detail::default_device_selector().get()) {}
 
-device::device(cl_device_id device_id) : device(device_id, nullptr) {}
+device::device(cl_device_id device_id)
+    : device(device_id, detail::default_device_selector().get()) {}
 
 device::device(device_selector& dev_sel) : device(nullptr, &dev_sel) {}
 
