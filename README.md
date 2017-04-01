@@ -101,7 +101,7 @@ along with [SyclParallelSTL](https://github.com/KhronosGroup/SyclParallelSTL)
 [VisionCpp](https://github.com/codeplaysoftware/visioncpp)
 (a library for computer vision and image processing).
 
-## Licence
+## License
 
-The project is licenced under MIT
-\- see the LICENCE file which applies to all code files.
+The project is licensed under MIT
+\- see the LICENSE file which applies to all code files.
