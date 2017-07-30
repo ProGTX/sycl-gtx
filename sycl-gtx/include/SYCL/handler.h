@@ -90,8 +90,7 @@ public:
   void set_arg(int arg_index, T scalar_value);
 
 
-  // 3.5.3.1 Single Task invoke
-
+  /** 3.5.3.1 Single Task invoke */
   template <typename KernelName, class KernelType>
   void single_task(KernelType kernFunctor) {
     auto kern = build(kernFunctor);
@@ -99,15 +98,16 @@ public:
   }
 
 
-  // 3.5.3.2 Parallel For invoke
-
+  /** 3.5.3.2 Parallel For invoke */
   template <typename KernelName, class KernelType, int dimensions>
   void parallel_for(range<dimensions> numWorkItems, KernelType kernFunctor) {
     parallel_for_range<KernelName>(numWorkItems, id<dimensions>(), kernFunctor);
   }
 
-  // This type of kernel can be invoked with a function
-  // accepting either an id or an item as parameter
+  /**
+   * This type of kernel can be invoked with a function
+   * accepting either an id or an item as parameter
+   */
   template <typename KernelName, class KernelType, int dimensions>
   void parallel_for(
     range<dimensions> numWorkItems,

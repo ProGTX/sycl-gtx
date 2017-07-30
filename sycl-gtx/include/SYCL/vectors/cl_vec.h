@@ -16,7 +16,7 @@ template <typename, int>
 class base;
 
 
-// In OpenCL, 3 and 4 element vectors have the same size
+/** In OpenCL, 3 and 4 element vectors have the same size */
 template <int parentElems>
 struct num_elems {
   static const int value = parentElems;

@@ -92,7 +92,9 @@ namespace kernel_ {
 template <class Input>
 struct constructor;
 
-// Single task invoke
+/**
+ * Single task invoke
+ */
 template <>
 struct constructor<void> {
   static source get(function_class<void(void)> kern) {
@@ -105,7 +107,9 @@ struct constructor<void> {
   }
 };
 
-// Parallel For with range and kernel parameter id
+/**
+ * Parallel For with range and kernel parameter id
+ */
 template <int dimensions>
 struct constructor<id<dimensions>> {
   static source get(function_class<void(id<dimensions>)> kern) {
@@ -120,7 +124,9 @@ struct constructor<id<dimensions>> {
   }
 };
 
-// Parallel For with range and kernel parameter item
+/**
+ * Parallel For with range and kernel parameter item
+ */
 template <int dimensions>
 struct constructor<item<dimensions>> {
   static source get(function_class<void(item<dimensions>)> kern) {
@@ -138,7 +144,9 @@ struct constructor<item<dimensions>> {
   }
 };
 
-// Parallel For with nd_range
+/**
+ * Parallel For with nd_range
+ */
 template <int dimensions>
 struct constructor<nd_item<dimensions>> {
   static source get(function_class<void(nd_item<dimensions>)> kern) {

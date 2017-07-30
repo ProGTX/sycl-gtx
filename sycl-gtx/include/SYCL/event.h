@@ -22,21 +22,21 @@ private:
   detail::refc<cl_event, clRetainEvent, clReleaseEvent> evnt;
 
 public:
-  // Default construct a null event object.
+  /** Default construct a null event object. */
   event() = default;
 
   explicit event(cl_event clEvent);
 
-  // Return the underlying OpenCL event reference
+  /** Return the underlying OpenCL event reference */
   cl_event get();
 
-  // Return the list of events that this event waits for in the dependence graph.
+  /** Return the list of events that this event waits for in the dependence graph. */
   vector_class<event> get_wait_list();
 
-  // Wait for the event and the command associated with it to complete.
+  /** Wait for the event and the command associated with it to complete. */
   void wait();
 
-  // Synchronously wait on a list of events.
+  /** Synchronously wait on a list of events. */
   static void wait(const vector_class<event>& event_list);
 
   void wait_and_throw();

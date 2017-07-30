@@ -1,8 +1,5 @@
 #pragma once
 
-// 3.7.2 Vector types
-// B.5 vec class base
-
 #include "SYCL/vectors/helpers.h"
 #include "SYCL/vectors/cl_vec.h"
 #include "SYCL/detail/common.h"
@@ -30,7 +27,11 @@ struct swizzled;
 #define SYCL_ENABLE_IF_DIM(dim)  \
 typename std::enable_if<num == dim>::type* = nullptr
 
-
+/**
+ * 3.7.2 Vector types
+ *
+ * B.5 vec class base
+ */
 template <typename dataT, int numElements>
 class base : protected counter<base<dataT, numElements>>, public data_ref {
 private:
@@ -63,7 +64,7 @@ protected:
 
 public:
   using element_type = dataT;
-  // Underlying OpenCL type
+  /** Underlying OpenCL type */
   using vector_t = detail::cl_type<dataT, numElements>;
 
   base()

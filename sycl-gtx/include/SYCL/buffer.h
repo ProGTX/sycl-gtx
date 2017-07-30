@@ -62,7 +62,7 @@ protected:
   friend class accessor_buffer<DataType_, dimensions>;
   friend class kernel_::source;
 
-  // Associated host memory.
+  /** Associated host memory. */
   buffer_(
     value_type* host_data,
     range<dimensions> range,
@@ -77,66 +77,80 @@ protected:
     : buffer_(nullptr, range, false) {}
 
 public:
-  // Creates a new buffer with associated host memory.
-  // The memory is owned by the runtime during the lifetime of the object.
-  // Data is copied back to the host unless the user overrides the behavior
-  // using the set_final_data method.
-  // hostData points to the storage and values used by the buffer
-  // and range<dimensions> defines the size.
+  /**
+   * Creates a new buffer with associated host memory.
+   * The memory is owned by the runtime during the lifetime of the object.
+   * Data is copied back to the host unless the user overrides the behavior
+   * using the set_final_data method.
+   * @param hostData points to the storage and values used by the buffer
+   * @param range<dimensions> defines the size.
+   */
   buffer_(DataType* hostData, range<dimensions> range)
     : buffer_(hostData, range, false) {}
 
-  // Creates a new buffer with associated host memory.
-  // hostData points to the storage and values used by the buffer
-  // and range<dimensions> defines the size.
-  // The host accesses can be read-only.
-  // However, the typename DataType is not const,
-  // so the device accesses can be both read and write accesses.
-  // Since the hostData is const,
-  // this buffer is only initialized with this memory
-  // and there is no write after its destruction,
-  // unless there is another final data address given
-  // after construction of the buffer.
-  // The default value of the allocator is going to be the buffer_allocator
-  // which will be of type DataType.
+  /**
+   * Creates a new buffer with associated host memory.
+   *
+   * The host accesses can be read-only.
+   * However, the typename DataType is not const,
+   * so the device accesses can be both read and write accesses.
+   * Since the hostData is const,
+   * this buffer is only initialized with this memory
+   * and there is no write after its destruction,
+   * unless there is another final data address given
+   * after construction of the buffer.
+   * The default value of the allocator is going to be the buffer_allocator
+   * which will be of type DataType.
+   * @param hostData points to the storage and values used by the buffer
+   * @param range<dimensions> defines the size.
+   */
   buffer_(const DataType* hostData, range<dimensions> range)
     : buffer_(const_cast<DataType*>(hostData), range, true) {}
 
-  // Create a new buffer of the given size with storage managed by the SYCL runtime.
-  // The default behavior is to use the default host buffer allocator,
-  // in order to allow for host accesses.
-  // If the type of the buffer has the const qualifier,
-  // then the default allocator will remove the qualifier
-  // to allow host access to the data.
+  /**
+   * Create a new buffer of the given size with storage managed by the SYCL runtime.
+   * The default behavior is to use the default host buffer allocator,
+   * in order to allow for host accesses.
+   * If the type of the buffer has the const qualifier,
+   * then the default allocator will remove the qualifier
+   * to allow host access to the data.
+   * @param range<dimensions> defines the size.
+   */
   buffer_(const range<dimensions>& range)
     : host_data(ptr_t(new DataType[range.size()])),
       rang(range),
       is_read_only(false),
       is_blocking(false) {}
 
-  // Create a new buffer with associated memory, using the data in hostData.
-  // The ownership of the hostData is shared between the runtime and the user.
-  // In order to enable both the user application and the SYCL runtime
-  // to use the same pointer, a mutex_class is used.
-  // The mutex m is locked by the runtime whenever the data is in use
-  // and unlocked otherwise.
-  // Data is synchronized with hostData, when the mutex is unlocked by the runtime.
+  /**
+   * Create a new buffer with associated memory, using the data in hostData.
+   * The ownership of the hostData is shared between the runtime and the user.
+   * In order to enable both the user application and the SYCL runtime
+   * to use the same pointer, a mutex_class is used.
+   * The mutex m is locked by the runtime whenever the data is in use
+   * and unlocked otherwise.
+   * Data is synchronized with hostData, when the mutex is unlocked by the runtime.
+   */
   buffer_(
     shared_ptr_class<DataType>& hostData,
     const range<dimensions>& bufferRange, mutex_class * m
   );
 
-  // Create a new buffer which is initialized by hostData.
-  // The SYCL runtime receives full ownership of the hostData unique_ptr
-  // and in effect there is no synchronization with the application code
-  // using hostData.
+  /**
+   * Create a new buffer which is initialized by hostData.
+   * The SYCL runtime receives full ownership of the hostData unique_ptr
+   * and in effect there is no synchronization with the application code
+   * using hostData.
+  */
   buffer_(unique_ptr_class<void>&& hostData, const range<dimensions>& bufferRange);
 
   // TODO
-  // Create a new sub-buffer without allocation to have separate accessors later.
-  // b is the buffer with the real data.
-  // baseIndex specifies the origin of the sub-buffer inside the buffer b.
-  // subRange specifies the size of the sub-buffer.
+  /**
+   * Create a new sub-buffer without allocation to have separate accessors later.
+   * @param b is the buffer with the real data.
+   * @param baseIndex specifies the origin of the sub-buffer inside the buffer b.
+   * @param subRange specifies the size of the sub-buffer.
+   */
   buffer_(
     buffer_& b, const id<dimensions>& baseIndex, const range<dimensions>& subRange)
     : rang(subRange), is_read_only(b.is_read_only), is_blocking(b.is_blocking) {
@@ -157,24 +171,28 @@ public:
     host_data = ptr_t(start, [](DataType* ptr) {});
   }
 
-  // Creates a buffer from an existing OpenCL memory object associated to a context
-  // after waiting for an event signaling the availability of the OpenCL data.
-  // mem_object is the OpenCL memory object to use.
-  // from_queue is the queue associated to the memory object.
-  // available_event specifies the event to wait for if non null
+  /**
+   * Creates a buffer from an existing OpenCL memory object associated to a context
+   * after waiting for an event signaling the availability of the OpenCL data.
+   * @param mem_object is the OpenCL memory object to use.
+   * @param from_queue is the queue associated to the memory object.
+   * @param available_event specifies the event to wait for if non null
+   */
   buffer_(cl_mem mem_object, queue& from_queue, event available_event = {});
 
   ~buffer_() {
     event::wait_and_throw(events);
   }
 
-  // Return a range object representing the size of the buffer
-  // in terms of number of elements in each dimension as passed to the constructor.
+  /**
+   * Return a range object representing the size of the buffer
+   * in terms of number of elements in each dimension as passed to the constructor.
+   */
   range<dimensions> get_range() {
     return rang;
   }
 
-  // Total number of elements in the buffer
+  /** Total number of elements in the buffer */
   ::size_t get_count() const {
     ::size_t count = rang.get(0);
     for(int i = 1; i < dimensions; ++i) {
@@ -183,7 +201,7 @@ public:
     return count;
   }
 
-  // Total number of bytes in the buffer
+  /** Total number of bytes in the buffer */
   ::size_t get_size() const {
     return get_count() * data_size<DataType_>::get();
   }
@@ -327,8 +345,10 @@ public:
   using Base::Base;
 #endif
 
-  // Create a new allocated 1D buffer initialized from the given elements
-  // ranging from first up to one before last
+  /**
+   * Create a new allocated 1D buffer initialized from the given elements
+   * ranging from first up to one before last
+   */
   template <class InputIterator>
   buffer(InputIterator first, InputIterator last)
     : Base(nullptr, last - first) {

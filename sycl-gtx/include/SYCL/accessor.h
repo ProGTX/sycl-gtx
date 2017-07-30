@@ -25,18 +25,17 @@ public:
   using reference = value_type&;
   using const_reference = const value_type&;
 
-  // Returns the size of the underlying buffer in number of elements.
+  /** Returns the size of the underlying buffer in number of elements. */
   ::size_t get_size() const;
 
-  // Returns the cl_mem object corresponding to the access.
   // TODO: Only available when target is cl_image or cl_buffer
+  /** @return the cl_mem object corresponding to the access. */
   virtual cl_mem get_cl_mem_object() const {
     return nullptr;
   }
 
-  // Returns the cl_event object corresponding to the last command
-  // to access the memory object.
   // TODO: Only available when target is cl_image or cl_buffer.
+  /** @return the cl_event object corresponding to the last command to access the memory object. */
   cl_event get_cl_event_object() const;
 
 protected:

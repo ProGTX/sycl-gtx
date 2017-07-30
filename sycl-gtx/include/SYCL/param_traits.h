@@ -127,10 +127,11 @@ struct param_traits<EnumClass, Value>                         \
     EnumClass, Value, ReturnType, CLType                      \
   > {};
 
-
-  // 3.3.3.2 Context information descriptors
-  // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetContextInfo.html
-
+/**
+ * 3.3.3.2 Context information descriptors
+ *
+ * https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetContextInfo.html
+ */
 #define SYCL_ADD_CONTEXT_TRAIT(Value, ReturnType) \
   SYCL_ADD_TRAIT(info::context, Value, ReturnType, cl_context_info)
 
@@ -141,10 +142,11 @@ SYCL_ADD_CONTEXT_TRAIT(info::context::gl_interop, info::gl_context_interop)
 
 #undef SYCL_ADD_CONTEXT_TRAIT
 
-
-// 3.3.2.1 Platform information descriptors
-// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetPlatformInfo.html
-
+/**
+ * 3.3.2.1 Platform information descriptors
+ *
+ * https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetPlatformInfo.html
+ */
 #define SYCL_ADD_PLATFORM_TRAIT(Value)  \
   SYCL_ADD_TRAIT(info::platform, Value, string_class, cl_platform_info)
 
@@ -157,9 +159,11 @@ SYCL_ADD_PLATFORM_TRAIT(info::platform::extensions)
 #undef SYCL_ADD_PLATFORM_TRAIT
 
 
-// 3.3.4.2 Device information descriptors
-// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetDeviceInfo.html
-
+/**
+ * 3.3.4.2 Device information descriptors
+ *
+ * https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetDeviceInfo.html
+ */
 #define SYCL_ADD_DEVICE_TRAIT(Value, ReturnType)  \
   SYCL_ADD_TRAIT(info::device, Value, ReturnType, cl_device_info)
 
@@ -259,9 +263,11 @@ SYCL_ADD_DEVICE_TRAIT(info::device::reference_count, cl_uint)
 #undef SYCL_ADD_DEVICE_TRAIT
 
 
-// 3.3.5.2 Queue information descriptors
-// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetCommandQueueInfo.html
-
+/**
+ * 3.3.5.2 Queue information descriptors
+ *
+ * https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetCommandQueueInfo.html
+ */
 #define SYCL_ADD_QUEUE_TRAIT(Value, ReturnType)  \
   SYCL_ADD_TRAIT(info::queue, Value, ReturnType, cl_command_queue_info)
 
@@ -273,8 +279,7 @@ SYCL_ADD_QUEUE_TRAIT(info::queue::properties, info::queue_profiling)
 #undef SYCL_ADD_QUEUE_TRAIT
 
 
-// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetMemObjectInfo.html
-
+/** https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetMemObjectInfo.html */
 #define SYCL_ADD_BUFFER_TRAIT(Value, ReturnType)  \
   SYCL_ADD_TRAIT(info::detail::buffer, Value, ReturnType, cl_mem_info)
 
@@ -290,10 +295,11 @@ SYCL_ADD_BUFFER_TRAIT(info::detail::buffer::offset, ::size_t)
 
 #undef SYCL_ADD_BUFFER_TRAIT
 
-
-// Table 3.62: Kernel class information descriptors.
-// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetKernelInfo.html
-
+/**
+ * Table 3.62: Kernel class information descriptors.
+ *
+ * https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetKernelInfo.html
+ */
 #define SYCL_ADD_KERNEL_TRAIT(Value, ReturnType)  \
   SYCL_ADD_TRAIT(info::kernel, Value, ReturnType, cl_kernel_info)
 
@@ -308,10 +314,11 @@ SYCL_ADD_KERNEL_TRAIT(info::kernel::program, cl_program)
 
 #undef SYCL_ADD_KERNEL_TRAIT
 
-
-// Table 3.65: Program class information descriptors
-// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetProgramInfo.html
-
+/**
+ * Table 3.65: Program class information descriptors
+ *
+ * https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetProgramInfo.html
+ */
 #define SYCL_ADD_PROGRAM_TRAIT(Value, ReturnType)  \
   SYCL_ADD_TRAIT(info::program, Value, ReturnType, cl_program_info)
 
@@ -330,10 +337,11 @@ SYCL_ADD_PROGRAM_TRAIT(info::program::kernel_names, string_class)
 
 #undef SYCL_ADD_PROGRAM_TRAIT
 
-
-// 3.3.6.1 Event information and profiling descriptors
-
-// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetEventInfo.html
+/**
+ * 3.3.6.1 Event information and profiling descriptors
+ *
+ * https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetEventInfo.html
+ */
 #define SYCL_ADD_EVENT_TRAIT(Value, ReturnType)  \
   SYCL_ADD_TRAIT(info::event, Value, ReturnType, cl_event_info)
 
@@ -347,7 +355,7 @@ SYCL_ADD_EVENT_TRAIT(info::event::context, cl_context)
 
 #undef SYCL_ADD_EVENT_TRAIT
 
-// https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetEventProfilingInfo.html
+/** https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetEventProfilingInfo.html */
 #define SYCL_ADD_EVENT_PROFILING_TRAIT(Value, ReturnType)  \
   SYCL_ADD_TRAIT(info::event_profiling, Value, ReturnType, cl_profiling_info)
 
@@ -393,7 +401,7 @@ struct array_traits : traits<Contained_, BufferSize> {
   }
 };
 
-// Meant for scalar and string cases
+/** Meant for scalar and string cases */
 template <
   class EnumClass,
   EnumClass param,

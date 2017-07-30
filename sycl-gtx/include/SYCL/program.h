@@ -66,21 +66,25 @@ protected:
     link();
   }
 public:
-  // Creates an empty program object for all devices associated with context
+  /** Creates an empty program object for all devices associated with context */
   explicit program(const context& context);
 
-  // Creates an empty program object
-  // for all devices in list associated with the context
+  /**
+   * Creates an empty program object
+   * for all devices in list associated with the context
+   */
   program(const context& context, vector_class<device> deviceList);
 
-  // Creates a program object from a cl_program object
+  /** Creates a program object from a cl_program object */
   program(const context& context, cl_program clProgram);
 
-  // Creates a program by linking a list of other programs
+  /** Creates a program by linking a list of other programs */
   program(vector_class<program> programList, string_class linkOptions = "");
 
-  // Obtains a SYCL program object from a SYCL kernel name
-  // and compiles it ready-to-link
+  /**
+   * Obtains a SYCL program object from a SYCL kernel name
+   * and compiles it ready-to-link
+   */
   // TODO: Can only compile well-defined functors with a public default constructor
   template <typename kernelT>
   void compile_from_kernel_name(string_class compile_options = "") {
@@ -88,17 +92,17 @@ public:
     compile(functor, compile_options);
   }
 
-  // Obtains a SYCL program object from a SYCL kernel name and builds it ready-to-run
+  /** Obtains a SYCL program object from a SYCL kernel name and builds it ready-to-run */
   template <typename kernelT>
   void build_from_kernel_name(string_class compile_options = "") {
     compile_from_kernel_name<kernelT>(compile_options);
     link();
   }
 
-  // Link all compiled programs that are added in the program class
+  /** Link all compiled programs that are added in the program class */
   void link(string_class linking_options = "");
 
-  // Gets a kernel from a given name (Functor)
+  /** Gets a kernel from a given name (Functor) */
   template <typename kernelT>
   kernel get_kernel() const {
     return *(kernels.at(detail::kernel_name::get<kernelT>()));

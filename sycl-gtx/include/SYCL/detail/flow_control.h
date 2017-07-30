@@ -32,7 +32,7 @@ static void while_(data_ref condition) {
   kernel_::source::add<false>(string_class("while( ") + condition.name + ")");
 }
 
-// Note: Increment can only be ++ or --, other assignment doesn't work
+/** Note: Increment can only be ++ or --, other assignments don't work */
 static void for_(data_ref condition, data_ref increment) {
   kernel_::source::add<false>(string_class("for(; ") + condition.name + "; " + increment.name + ")");
 }

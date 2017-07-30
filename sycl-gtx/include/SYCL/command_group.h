@@ -90,9 +90,11 @@ struct info {
 } // namespace command
 
 
-// A command group in SYCL as it is defined in 2.3.1
-// includes a kernel to be enqueued along with all the commands
-// for queued data transfers that it needs in order for its execution to be successful
+/**
+ * A command group in SYCL as it is defined in 2.3.1
+ * includes a kernel to be enqueued along with all the commands
+ * for queued data transfers that it needs in order for its execution to be successful
+ */
 class command_group {
 private:
   friend class kernel;
@@ -122,9 +124,11 @@ public:
     exit();
   }
 
-  // Constructs a command group with the queue the group will enqueue its commands to
-  // and a lambda function or function object
-  // containing the body of commands to enqueue.
+  /**
+   * Constructs a command group with the queue the group will enqueue its commands to
+   * and a lambda function or function object
+   * containing the body of commands to enqueue.
+   */
   template <typename functorT>
   command_group(queue& primaryQueue, functorT lambda)
     : q(&primaryQueue) {
@@ -135,13 +139,15 @@ public:
   }
 
   // TODO
-  // Constructs a command group from a primary queue
-  // to be used in order to enqueue its commands to
-  // and a lambda function or function object
-  // containing the body of commands to enqueue.
-  // If the command group execution fails in the primary queue,
-  // the SYCL runtime will try to re-schedule the whole command group
-  // to the secondary queue.
+  /**
+   * Constructs a command group from a primary queue
+   * to be used in order to enqueue its commands to
+   * and a lambda function or function object
+   * containing the body of commands to enqueue.
+   * If the command group execution fails in the primary queue,
+   * the SYCL runtime will try to re-schedule the whole command group
+   * to the secondary queue.
+   */
   template <typename functorT>
   command_group(queue& primaryQueue, queue& secondaryQueue, functorT lambda);
 

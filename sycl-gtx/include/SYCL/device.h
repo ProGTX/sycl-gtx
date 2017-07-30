@@ -15,7 +15,7 @@
 namespace cl {
 namespace sycl {
 
-// Encapsulates a particular SYCL device against on which kernels may be executed
+/** Encapsulates a particular SYCL device against on which kernels may be executed */
 class device {
 private:
   detail::refc<cl_device_id, clRetainDevice, clReleaseDevice> device_id;
@@ -23,17 +23,19 @@ private:
 
   device(cl_device_id device_id, device_selector* selector);
 public:
-  // Default constructor for the device.
-  // It choses a device using default selector.
+  /**
+   * Default constructor for the device.
+   * It chooses a device using default selector.
+   */
   device();
 
-  // Constructs a device class instance using cl device_id of the OpenCL device.
+  /** Constructs a device class instance using cl device_id of the OpenCL device. */
   explicit device(cl_device_id device_id);
 
-  // Constructs a device class instance using the device selector provided.
+  /** Constructs a device class instance using the device selector provided. */
   explicit device(device_selector& selector);
 
-  // Copy and move semantics
+  /** Copy and move semantics */
   device(const device&) = default;
   device& operator=(const device&) = default;
 #if MSVC_LOW
@@ -63,13 +65,13 @@ public:
 
   platform get_platform() const;
 
-  // Returns all the available OpenCL devices and the SYCL host device
+  /** @return all the available OpenCL devices and the SYCL host device */
   static vector_class<device> get_devices(
     info::device_type deviceType = info::device_type::all);
 
   bool has_extension(const string_class& extension_name) const;
 
-  // Partition device
+  /** Partition device */
   vector_class<device> create_sub_devices(
     info::device_partition_type partitionType,
     info::device_partition_property partitionProperty,

@@ -4,8 +4,6 @@
 #include "SYCL/detail/debug.h"
 #include <type_traits>
 
-// Data reference wrappers
-
 namespace cl {
 namespace sycl {
 
@@ -18,6 +16,9 @@ namespace detail {
 // Forward declaration
 void kernel_add(string_class line);
 
+/**
+ * Data reference wrappers
+ */
 class data_ref {
 public:
   enum class type_t {
@@ -79,7 +80,7 @@ public:
   data_ref(data_ref&&) = default;
 #endif
 
-  // Without this one explicitly stated, default copy assignment is used
+  /** Without this one explicitly stated, default copy assignment is used */
   data_ref& operator=(const data_ref& dref) {
     kernel_add(name + " = " + dref.name);
     return *this;

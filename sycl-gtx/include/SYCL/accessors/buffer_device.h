@@ -1,8 +1,5 @@
 #pragma once
 
-// Device buffer accessors
-// 3.4.6 Accessors and 3.4.6.4 Buffer accessors
-
 #include "SYCL/accessors/buffer_base.h"
 #include "SYCL/accessors/device_reference.h"
 #include "SYCL/access.h"
@@ -16,6 +13,11 @@ namespace cl {
 namespace sycl {
 namespace detail {
 
+/**
+ * Device buffer accessors
+ *
+ * 3.4.6 Accessors and 3.4.6.4 Buffer accessors
+ */
 SYCL_ACCESSOR_CLASS(
   target == access::target::constant_buffer ||
   target == access::target::global_buffer
