@@ -59,7 +59,7 @@ class debug {
 #elif MSVC_2017_OR_LOWER
   debug(debug&& move) = default;
 #else
-  debug(debug&& move) noexcept = default;
+  debug(debug&& move) /*noexcept*/ = default;
 #endif
   debug(const debug& copy) = delete;
 
