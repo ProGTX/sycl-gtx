@@ -1,13 +1,14 @@
 #pragma once
 
-// 3.5.1.2 nd_range class
-
 #include "SYCL/ranges/id.h"
 #include "SYCL/ranges/range.h"
 
 namespace cl {
 namespace sycl {
 
+/**
+ * 3.5.1.2 nd_range class
+ */
 template <int dims = 1>
 struct nd_range {
  private:

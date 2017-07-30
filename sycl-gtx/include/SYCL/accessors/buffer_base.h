@@ -1,8 +1,5 @@
 #pragma once
 
-// Core buffer accessor class
-// 3.4.6 Accessors and 3.4.6.4 Buffer accessors
-
 #include "SYCL/detail/common.h"
 #include "SYCL/ranges.h"
 
@@ -16,6 +13,11 @@ class handler;
 
 namespace detail {
 
+/**
+ * Core buffer accessor class
+ *
+ * 3.4.6 Accessors and 3.4.6.4 Buffer accessors
+ */
 template <typename DataType, int dimensions>
 class accessor_buffer {
  protected:

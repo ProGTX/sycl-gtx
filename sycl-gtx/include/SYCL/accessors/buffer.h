@@ -60,8 +60,9 @@ class handler;
   };
 #endif
 
-// 3.4.6.8 Accessor capabilities and restrictions
-
+/**
+ * 3.4.6.8 Accessor capabilities and restrictions
+ */
 #define SYCL_ADD_ACC_BUFFERS(mode)                              \
   SYCL_ADD_ACCESSOR_BUFFER(mode, access::target::global_buffer) \
   SYCL_ADD_ACCESSOR_HOST_BUFFER(mode)
@@ -72,7 +73,7 @@ SYCL_ADD_ACC_BUFFERS(access::mode::read_write)
 SYCL_ADD_ACC_BUFFERS(access::mode::discard_write)
 SYCL_ADD_ACC_BUFFERS(access::mode::discard_read_write)
 
-// Can only be read
+/** Can only be read */
 SYCL_ADD_ACCESSOR_BUFFER(access::mode::read, access::target::constant_buffer)
 
 }  // namespace sycl

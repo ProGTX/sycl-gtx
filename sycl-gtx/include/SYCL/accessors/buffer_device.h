@@ -1,8 +1,5 @@
 #pragma once
 
-// Device buffer accessors
-// 3.4.6 Accessors and 3.4.6.4 Buffer accessors
-
 #include "SYCL/access.h"
 #include "SYCL/accessor.h"
 #include "SYCL/accessors/buffer_base.h"
@@ -16,9 +13,14 @@ namespace cl {
 namespace sycl {
 namespace detail {
 
+/**
+ * Device buffer accessors
+ *
+ * 3.4.6 Accessors and 3.4.6.4 Buffer accessors
+ */
 SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
-                    target == access::target::global_buffer)
-, public accessor_buffer<DataType, dimensions>,
+                    target == access::target::global_buffer),
+    public accessor_buffer<DataType, dimensions>,
     public accessor_device_ref<dimensions, DataType, dimensions, mode, target> {
  private:
   template <int, typename, int, access::mode, access::target>
@@ -35,18 +37,22 @@ SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
                   range<dimensions> range)
       : base_acc_buffer(bufferRef, &commandGroupHandler, offset, range),
         base_acc_device_ref(this, {}) {}
+
   accessor_detail(cl::sycl::buffer<DataType, dimensions> & bufferRef,
                   handler & commandGroupHandler)
       : accessor_detail(bufferRef, commandGroupHandler,
                         detail::empty_range<dimensions>(),
                         bufferRef.get_range()) {}
+
   accessor_detail(const accessor_detail& copy)
       : base_acc_buffer(static_cast<const base_acc_buffer&>(copy)),
         base_acc_device_ref(this, copy) {}
+
   accessor_detail(accessor_detail && move) noexcept
       : base_acc_buffer(std::move(static_cast<base_acc_buffer&&>(move))),
         base_acc_device_ref(
             this, std::move(static_cast<base_acc_device_ref&&>(move))) {}
+
   accessor_detail& operator=(const accessor_detail& copy) {
     base_acc_buffer::operator=(copy);
     base_acc_device_ref tmp(copy);
@@ -77,10 +83,14 @@ SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
  public:
   SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(base_acc_device_ref::);
 
- protected:
-  virtual void* resource() const override { return base_acc_buffer::buf; }
+protected:
+  virtual void* resource() const override {
+    return base_acc_buffer::buf;
+  }
 
-  virtual ::size_t argument_size() const override { return sizeof(cl_mem); }
+  virtual ::size_t argument_size() const override {
+    return sizeof(cl_mem);
+  }
 };
 
 }  // namespace detail

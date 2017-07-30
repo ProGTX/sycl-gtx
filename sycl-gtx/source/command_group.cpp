@@ -83,7 +83,7 @@ void command_group::optimize() {
   commands = std::move(saveResults);
 }
 
-// Executes all commands in queue and removes them
+/** Executes all commands in queue and removes them */
 void command_group::flush(vector_class<cl_event> wait_events) {
   DSELF() << q << q->get();
 

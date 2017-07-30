@@ -29,6 +29,11 @@ struct swizzled;
 #define SYCL_ENABLE_IF_DIM(dim) \
   typename std::enable_if<num == dim>::type* = nullptr
 
+/**
+ * 3.7.2 Vector types
+ *
+ * B.5 vec class base
+ */
 template <typename dataT, int numElements>
 class base : protected counter<base<dataT, numElements>>, public data_ref {
  private:
@@ -48,7 +53,9 @@ class base : protected counter<base<dataT, numElements>>, public data_ref {
            get_string<counter_t>::get(this->get_count_id());
   }
 
-  string_class this_name() const { return type_name() + ' ' + this->name; }
+  string_class this_name() const {
+    return type_name() + ' ' + this->name;
+  }
 
  protected:
   base(string_class assign, bool generate_new = false)
@@ -60,12 +67,16 @@ class base : protected counter<base<dataT, numElements>>, public data_ref {
 
  public:
   using element_type = dataT;
-  // Underlying OpenCL type
+  /** Underlying OpenCL type */
   using vector_t = detail::cl_type<dataT, numElements>;
 
-  base() : data_ref(generate_name()) { kernel_add(this_name()); }
+  base()
+    : data_ref(generate_name()) {
+    kernel_add(this_name());
+  }
 
-  base(const base& copy) : data_ref(copy.name) {}
+  base(const base& copy)
+    : data_ref(copy.name) {}
   base& operator=(const base& copy) {
     data_ref::operator=(copy.name);
     return *this;
@@ -130,7 +141,9 @@ class base : protected counter<base<dataT, numElements>>, public data_ref {
     return *reinterpret_cast<vec<dataT, numElements>*>(this);  // NOLINT
   }
 
-  ::size_t get_count() const { return numElements; }
+  ::size_t get_count() const {
+    return numElements;
+  }
   ::size_t get_size() const {
     return numElements * sizeof(typename cl_type<dataT, numElements>::type);
   }

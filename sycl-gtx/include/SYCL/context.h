@@ -18,14 +18,16 @@ namespace sycl {
 class platform;
 class program;
 
-// 2.3.1, point 2
-// Any OpenCL resource that is acquired by the user is attached to a context.
-// A context contains a collection of devices that the host can use
-// and manages memory objects that can be shared between the devices.
-// Data movement between devices within a context may be efficient
-// and hidden by the underlying runtime
-// while data movement between contexts must involve the host.
-// A given context can only wrap devices owned by a single platform.
+/**
+ * 2.3.1, point 2
+ * Any OpenCL resource that is acquired by the user is attached to a context.
+ * A context contains a collection of devices that the host can use
+ * and manages memory objects that can be shared between the devices.
+ * Data movement between devices within a context may be efficient
+ * and hidden by the underlying runtime
+ * while data movement between contexts must involve the host.
+ * A given context can only wrap devices owned by a single platform.
+ */
 class context {
  private:
   detail::refc<cl_context, clRetainContext, clReleaseContext> ctx;
@@ -33,7 +35,7 @@ class context {
   async_handler asyncHandler;
   friend struct detail::error::thrower;
 
-  // Master constructor
+  /** Master constructor */
   context(cl_context c, const async_handler& asyncHandler,
           info::gl_context_interop interopFlag,
           vector_class<device> deviceList = {}, const platform* plt = nullptr,
@@ -41,16 +43,20 @@ class context {
               *(detail::default_device_selector()));
 
  public:
-  // Default constructor that chooses the context
-  // according the heuristics of the default selector.
-  // Returns synchronous errors via the SYCL exception class.
+  /**
+   * Default constructor that chooses the context
+   * according the heuristics of the default selector.
+   * Returns synchronous errors via the SYCL exception class.
+   */
   context();
 
-  // Constructs a context object for SYCL host
-  // using an async_handler for handling asynchronous errors.
+  /**
+   * Constructs a context object for SYCL host
+   * using an async_handler for handling asynchronous errors.
+   */
   explicit context(const async_handler& asyncHandler);
 
-  // Executes a retain on the cl_context
+  /** Executes a retain on the cl_context */
   context(cl_context clContext,
           const async_handler& asyncHandler = detail::default_async_handler);
 
@@ -89,16 +95,17 @@ class context {
   ~context() = default;
 
  public:
-  // Returns the underlying cl context object, after retaining the cl_context.
+  /** @return the underlying cl context object, after retaining the cl_context. */
   cl_context get() const;
 
   // TODO(progtx): Specifies whether the context is in SYCL Host Execution Mode
+  /** Specifies whether the context is in SYCL Host Execution Mode */
   bool is_host() const;
 
-  // Returns the SYCL platform that the context is initialized for.
+  /** @return the SYCL platform that the context is initialized for. */
   platform get_platform();
 
-  // Returns the set of devices that are part of this context.
+  /** @return the set of devices that are part of this context. */
   vector_class<device> get_devices() const;
 
  private:
@@ -134,7 +141,7 @@ class context {
   };
 
  public:
-  // Queries OpenCL information for the underlying cl_context
+  /** Queries OpenCL information for the underlying cl_context */
   template <info::context param>
   typename param_traits<info::context, param>::type get_info() const {
     return traits<typename param_traits<info::context, param>::type, param>()

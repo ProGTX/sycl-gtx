@@ -11,23 +11,36 @@ enum class fence_space : char { local_space, global_space, global_and_local };
 
 // 3.4.6.1 Access modes
 enum class mode {
-  read,                // read-only access
-  write,               // write-only access, previous contents NOT discarded
-  read_write,          // read and write access
-  discard_write,       // write-only access, previous contents discarded
-  discard_read_write,  // read and write access, previous contents discarded
-  atomic,              // atomic access
+  /** read-only access */
+  read,
+  /** write-only access, previous contents NOT discarded */
+  write,
+  /** read and write access */
+  read_write,
+  /** write-only access, previous contents discarded */
+  discard_write,
+  /** read and write access, previous contents discarded */
+  discard_read_write,
+  /** atomic access */
+  atomic
 };
 
 // 3.4.6.2 Access targets
 enum class target {
-  global_buffer,    // access buffer via __global memory
-  constant_buffer,  // access buffer via __constant memory
-  local,            // access work-group-local memory
-  image,            // access an image
-  host_buffer,      // access buffer immediately on the host
-  host_image,       // access image immediately on the host
-  image_array,      // access an array of images on device
+  /** access buffer via __global memory */
+  global_buffer,
+  /** access buffer via __constant memory */
+  constant_buffer,
+  /** access work-group-local memory */
+  local,
+  /** access an image */
+  image,
+  /** access buffer immediately on the host */
+  host_buffer,
+  /** access image immediately on the host */
+  host_image,
+  /** access an array of images on device */
+  image_array
 };
 
 static debug& operator<<(debug& d, mode m) {

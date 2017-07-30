@@ -51,7 +51,7 @@ struct item {
   size_t_ref operator[](int dimension) { return index[dimension]; }
 
   // TODO(progtx): Return the linearized ID in the item's range.
-  // Computed as the flatted ID after the offset is subtracted.
+  /** Computed as the flatted ID after the offset is subtracted. */
   ::size_t get_linear_id() const { return 0; }
 
   operator id<dimensions>() { return index; }

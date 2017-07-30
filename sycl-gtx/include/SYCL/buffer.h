@@ -60,7 +60,7 @@ class buffer_detail : public buffer_base {
   friend class accessor_buffer<DataType_t, dimensions>;
   friend class kernel_ns::source;
 
-  // Associated host memory.
+  /** Associated host memory. */
   buffer_detail(value_type* host_data, range<dimensions> range,
                 bool is_read_only, bool is_blocking = true)
       : host_data(ptr_t(host_data, [](value_type* ptr) {})),
@@ -72,69 +72,83 @@ class buffer_detail : public buffer_base {
       : buffer_detail(nullptr, range, false) {}
 
  public:
-  // Creates a new buffer with associated host memory.
-  // The memory is owned by the runtime during the lifetime of the object.
-  // Data is copied back to the host unless the user overrides the behavior
-  // using the set_final_data method.
-  // hostData points to the storage and values used by the buffer
-  // and range<dimensions> defines the size.
+  /**
+   * Creates a new buffer with associated host memory.
+   * The memory is owned by the runtime during the lifetime of the object.
+   * Data is copied back to the host unless the user overrides the behavior
+   * using the set_final_data method.
+   * @param hostData points to the storage and values used by the buffer
+   * @param range<dimensions> defines the size.
+   */
   buffer_detail(DataType* hostData, range<dimensions> range)
       : buffer_detail(hostData, range, false) {}
 
-  // Creates a new buffer with associated host memory.
-  // hostData points to the storage and values used by the buffer
-  // and range<dimensions> defines the size.
-  // The host accesses can be read-only.
-  // However, the typename DataType is not const,
-  // so the device accesses can be both read and write accesses.
-  // Since the hostData is const,
-  // this buffer is only initialized with this memory
-  // and there is no write after its destruction,
-  // unless there is another final data address given
-  // after construction of the buffer.
-  // The default value of the allocator is going to be the buffer_allocator
-  // which will be of type DataType.
+  /**
+   * Creates a new buffer with associated host memory.
+   *
+   * The host accesses can be read-only.
+   * However, the typename DataType is not const,
+   * so the device accesses can be both read and write accesses.
+   * Since the hostData is const,
+   * this buffer is only initialized with this memory
+   * and there is no write after its destruction,
+   * unless there is another final data address given
+   * after construction of the buffer.
+   * The default value of the allocator is going to be the buffer_allocator
+   * which will be of type DataType.
+   * @param hostData points to the storage and values used by the buffer
+   * @param range<dimensions> defines the size.
+   */
   buffer_detail(const DataType* hostData, range<dimensions> range)
       : buffer_detail(const_cast<DataType*>(hostData),  // NOLINT
                       range, true) {}
 
-  // Create a new buffer of the given size with storage managed by the SYCL
+  /**
+   * Create a new buffer of the given size with storage managed by the SYCL
   // runtime.
-  // The default behavior is to use the default host buffer allocator,
-  // in order to allow for host accesses.
-  // If the type of the buffer has the const qualifier,
-  // then the default allocator will remove the qualifier
-  // to allow host access to the data.
+   * The default behavior is to use the default host buffer allocator,
+   * in order to allow for host accesses.
+   * If the type of the buffer has the const qualifier,
+   * then the default allocator will remove the qualifier
+   * to allow host access to the data.
+   * @param range<dimensions> defines the size.
+   */
   buffer_detail(const range<dimensions>& range)
       : host_data(ptr_t(new DataType[range.size()])),
         rang(range),
         is_read_only(false),
         is_blocking(false) {}
 
-  // Create a new buffer with associated memory, using the data in hostData.
-  // The ownership of the hostData is shared between the runtime and the user.
-  // In order to enable both the user application and the SYCL runtime
-  // to use the same pointer, a mutex_class is used.
-  // The mutex m is locked by the runtime whenever the data is in use
-  // and unlocked otherwise.
-  // Data is synchronized with hostData, when the mutex is unlocked by the
+  /**
+   * Create a new buffer with associated memory, using the data in hostData.
+   * The ownership of the hostData is shared between the runtime and the user.
+   * In order to enable both the user application and the SYCL runtime
+   * to use the same pointer, a mutex_class is used.
+   * The mutex m is locked by the runtime whenever the data is in use
+   * and unlocked otherwise.
+   * Data is synchronized with hostData, when the mutex is unlocked by the
   // runtime.
+   */
   buffer_detail(shared_ptr_class<DataType>& hostData,
                 const range<dimensions>& bufferRange, mutex_class* m);
 
-  // Create a new buffer which is initialized by hostData.
-  // The SYCL runtime receives full ownership of the hostData unique_ptr
-  // and in effect there is no synchronization with the application code
-  // using hostData.
+  /**
+   * Create a new buffer which is initialized by hostData.
+   * The SYCL runtime receives full ownership of the hostData unique_ptr
+   * and in effect there is no synchronization with the application code
+   * using hostData.
+  */
   buffer_detail(unique_ptr_class<void>&& hostData,
                 const range<dimensions>& bufferRange);
 
   // TODO(progtx):
-  // Create a new sub-buffer without allocation to have separate accessors
+  /**
+   * Create a new sub-buffer without allocation to have separate accessors
   // later.
-  // b is the buffer with the real data.
-  // baseIndex specifies the origin of the sub-buffer inside the buffer b.
-  // subRange specifies the size of the sub-buffer.
+   * @param b is the buffer with the real data.
+   * @param baseIndex specifies the origin of the sub-buffer inside the buffer b.
+   * @param subRange specifies the size of the sub-buffer.
+   */
   buffer_detail(buffer_detail& b, const id<dimensions>& baseIndex,
                 const range<dimensions>& subRange)
       : rang(subRange),
@@ -155,12 +169,14 @@ class buffer_detail : public buffer_base {
     host_data = ptr_t(start, [](DataType* ptr) {});
   }
 
-  // Creates a buffer from an existing OpenCL memory object associated to a
+  /**
+   * Creates a buffer from an existing OpenCL memory object associated to a
   // context
-  // after waiting for an event signaling the availability of the OpenCL data.
-  // mem_object is the OpenCL memory object to use.
-  // from_queue is the queue associated to the memory object.
-  // available_event specifies the event to wait for if non null
+   * after waiting for an event signaling the availability of the OpenCL data.
+   * @param mem_object is the OpenCL memory object to use.
+   * @param from_queue is the queue associated to the memory object.
+   * @param available_event specifies the event to wait for if non null
+   */
   buffer_detail(cl_mem mem_object, queue& from_queue,
                 event available_event = {});
 
@@ -171,12 +187,14 @@ class buffer_detail : public buffer_base {
 
   ~buffer_detail() { event::wait_and_throw(events); }
 
-  // Return a range object representing the size of the buffer
-  // in terms of number of elements in each dimension as passed to the
-  // constructor.
+  /**
+   * Return a range object representing the size of the buffer
+   * in terms of number of elements in each dimension as passed to the
+   * constructor.
+   */
   range<dimensions> get_range() { return rang; }
 
-  // Total number of elements in the buffer
+  /** Total number of elements in the buffer */
   ::size_t get_count() const {
     ::size_t count = rang.get(0);
     for (int i = 1; i < dimensions; ++i) {
@@ -185,7 +203,7 @@ class buffer_detail : public buffer_base {
     return count;
   }
 
-  // Total number of bytes in the buffer
+  /** Total number of bytes in the buffer */
   ::size_t get_size() const {
     return get_count() * data_size<DataType_t>::get();
   }
@@ -313,8 +331,10 @@ struct buffer<DataType_t, 1> : public detail::buffer_detail<DataType_t, 1> {
   using Base::Base;
 #endif
 
-  // Create a new allocated 1D buffer initialized from the given elements
-  // ranging from first up to one before last
+  /**
+   * Create a new allocated 1D buffer initialized from the given elements
+   * ranging from first up to one before last
+   */
   template <class InputIterator>
   buffer(InputIterator first, InputIterator last)
       : Base(nullptr, last - first) {

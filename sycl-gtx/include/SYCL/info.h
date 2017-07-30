@@ -10,7 +10,7 @@ namespace cl {
 namespace sycl {
 namespace info {
 
-// C.1 Platform Information Descriptors
+/** C.1 Platform Information Descriptors */
 enum class platform : cl_platform_info {
   profile = CL_PLATFORM_PROFILE,
   version = CL_PLATFORM_VERSION,
@@ -19,8 +19,8 @@ enum class platform : cl_platform_info {
   extensions = CL_PLATFORM_EXTENSIONS
 };
 
-// C.2 Context Information Descriptors
 using gl_context_interop = cl_bool;
+/** C.2 Context Information Descriptors */
 enum class context : cl_context_info {
   reference_count = CL_CONTEXT_REFERENCE_COUNT,
   num_devices = CL_CONTEXT_NUM_DEVICES,
@@ -181,8 +181,8 @@ enum class device_execution_capabilities : cl_device_exec_capabilities {
   exec_native_kernel = CL_EXEC_NATIVE_KERNEL
 };
 
-// C.4 Queue Information Descriptors
 using queue_profiling = bool;
+/** C.4 Queue Information Descriptors */
 enum class queue : cl_command_queue_info {
   context = CL_QUEUE_CONTEXT,
   device = CL_QUEUE_DEVICE,
@@ -190,7 +190,7 @@ enum class queue : cl_command_queue_info {
   properties = CL_QUEUE_PROPERTIES
 };
 
-// C.5 Kernel Information Descriptors
+/** C.5 Kernel Information Descriptors */
 enum class kernel : cl_kernel_info {
   function_name = CL_KERNEL_FUNCTION_NAME,
   num_args = CL_KERNEL_NUM_ARGS,
@@ -202,7 +202,7 @@ enum class kernel : cl_kernel_info {
   program = CL_KERNEL_PROGRAM
 };
 
-// C.6 Program Information Descriptors
+/** C.6 Program Information Descriptors */
 enum class program : cl_program_info {
   reference_count = CL_PROGRAM_REFERENCE_COUNT,
   context = CL_PROGRAM_CONTEXT,
@@ -217,8 +217,7 @@ enum class program : cl_program_info {
   kernel_names = CL_PROGRAM_KERNEL_NAMES
 };
 
-// C.7 Event Information Descriptors
-
+/** C.7 Event Information Descriptors */
 enum class event : cl_event_info {
   command_type = CL_EVENT_COMMAND_TYPE,
   command_execution_status = CL_EVENT_COMMAND_EXECUTION_STATUS,

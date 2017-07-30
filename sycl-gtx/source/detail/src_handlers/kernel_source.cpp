@@ -25,7 +25,7 @@ source source::exit(source& src) {
   return src;
 }
 
-// Creates kernel source
+/** Creates kernel source */
 string_class source::get_code() const {
   // TODO(progtx): Caching?
 
