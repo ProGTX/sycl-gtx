@@ -14,6 +14,34 @@ and was presented as a paper at the
 [1st SYCL Programming Workshop](http://ppopp16.sigplan.org/event/sycl-2016-papers-an-overview-of-sycl-gtx)
 at PPoPP 2016.
 
+## Installation
+
+### Requirements
+
+* CMake 3.2
+* Compiler with full C++11 support
+  * Known to successfully build on Ubuntu 16.04
+    using GCC 4.8 and 5.4 or Clang versions 3.5, 3.6, and 3.8
+  * Visual Studio 2013 has been used for development,
+    but is not supported anymore
+  * Visual Studio 2017, although 2015 should still work
+* OpenCL
+
+### Steps
+
+```
+git clone https://github.com/ProGTX/sycl-gtx.git
+cd sycl-gtx
+mkdir build
+cd build
+cmake ..
+```
+
+Ideally, that's all that's needed to generate a
+Visual Studio solution or a makefile.
+
+### OpenCL setup
+
 ## Kernel compilation
 
 A very important part of sycl-gtx is the way it compiles kernels.
@@ -67,18 +95,6 @@ but implementing that in sycl-gtx would require a lot of work,
 so it's not planned anytime soon.
 A good start would be to carry values inside the `data_ref` class
 and to make them type safe.
-
-### Compiler supports
-
-Most of the implementation was developed using Visual Studio 2013.
-The project can now by used by other compiler thanks to CMake,
-though it's difficult to test all
-\- any compilation bugs should be reported.
-The project is known to successfully build on Ubuntu 16.04
-using GCC 4.8 and 5.4 or Clang versions 3.5, 3.6, and 3.8.
-On Windows, main development has now switched to Visual Studio 2015
-and backwards compatibility with VS2013 will be slowly phased out
-in order to be able to use modern C++ features.
 
 ## The SYCL ecosystem
 
