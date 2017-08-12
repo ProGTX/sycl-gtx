@@ -169,12 +169,16 @@ class buffer_detail : public buffer_base {
   buffer_detail& operator=(const buffer_detail&) = default;
   buffer_detail& operator=(buffer_detail&&) = default;  // NOLINT
 
-  ~buffer_detail() { event::wait_and_throw(events); }
+  ~buffer_detail() {
+    event::wait_and_throw(events);
+  }
 
   // Return a range object representing the size of the buffer
   // in terms of number of elements in each dimension as passed to the
   // constructor.
-  range<dimensions> get_range() { return rang; }
+  range<dimensions> get_range() {
+    return rang;
+  }
 
   // Total number of elements in the buffer
   ::size_t get_count() const {

@@ -18,7 +18,9 @@ platform::platform(cl_platform_id platform_id)
 platform::platform(device_selector& dev_selector)
     : platform(nullptr, dev_selector) {}
 
-cl_platform_id platform::get() const { return platform_id.get(); }
+cl_platform_id platform::get() const {
+  return platform_id.get();
+}
 
 vector_class<platform> platform::get_platforms() {
   if (platforms.empty()) {

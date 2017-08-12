@@ -111,7 +111,9 @@ SYCL_ACCESSOR_CLASS(target == access::target::host_buffer)
     return *this;
   }
 
-  ~accessor_detail() { synchronizer::remove(this, base_acc_buffer::buf); }
+  ~accessor_detail() {
+    synchronizer::remove(this, base_acc_buffer::buf);
+  }
 };
 
 }  // namespace detail

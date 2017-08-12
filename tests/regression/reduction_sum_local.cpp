@@ -62,14 +62,18 @@ int main() {
 
               uint1 stride = N / 2;
               SYCL_WHILE(stride > 0) {
-                SYCL_IF(lid < stride) { local[lid] += local[lid + stride]; }
+                SYCL_IF(lid < stride) {
+                  local[lid] += local[lid + stride];
+                }
                 SYCL_END;
                 index.barrier(access::fence_space::local_space);
                 stride /= 2;
               }
               SYCL_END;
 
-              SYCL_IF(lid == 0) { output[gid / N] = local[0]; }
+              SYCL_IF(lid == 0) {
+                output[gid / N] = local[0];
+              }
               SYCL_END;
             });
       });

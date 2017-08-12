@@ -109,7 +109,9 @@ class vec : public detail::vectors::base<dataT, numElements>,
         Members(this) {}
 
   // TODO(progtx):
-  operator genvector() const { return genvector(); }
+  operator genvector() const {
+    return genvector();
+  }
 
 // TODO(progtx): Operators
 #define SYCL_VEC_OP(op)                                \
@@ -201,7 +203,9 @@ class vec<dataT, 1> : public detail::vectors::base<dataT, 1>,
   }
 
   // TODO(progtx):
-  operator genvector() const { return genvector(); }
+  operator genvector() const {
+    return genvector();
+  }
 
 // TODO(progtx): Operators
 #define SYCL_VEC_OP(op)                                \

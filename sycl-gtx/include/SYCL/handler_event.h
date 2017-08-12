@@ -18,9 +18,15 @@ class handler_event {
   event endEvent;
 
  public:
-  event get_kernel() const { return kernelEvent; }
-  event get_complete() const { return completeEvent; }
-  event get_end() const { return endEvent; }
+  event get_kernel() const {
+    return kernelEvent;
+  }
+  event get_complete() const {
+    return completeEvent;
+  }
+  event get_end() const {
+    return endEvent;
+  }
 };
 
 }  // namespace sycl

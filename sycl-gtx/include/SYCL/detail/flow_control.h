@@ -21,7 +21,9 @@ static void else_if(data_ref condition) {
                                 ")");
 }
 
-static void else_detail() { kernel_ns::source::add<false>("else"); }
+static void else_detail() {
+  kernel_ns::source::add<false>("else");
+}
 
 static void while_detail(data_ref condition) {
   kernel_ns::source::add<false>(string_class("while( ") + condition.name + ")");
@@ -33,11 +35,17 @@ static void for_detail(data_ref condition, data_ref increment) {
                                 increment.name + ")");
 }
 
-static void break_detail() { kernel_ns::source::add<true>("break"); }
+static void break_detail() {
+  kernel_ns::source::add<true>("break");
+}
 
-static void continue_detail() { kernel_ns::source::add<true>("continue"); }
+static void continue_detail() {
+  kernel_ns::source::add<true>("continue");
+}
 
-static void return_detail() { kernel_ns::source::add<true>("return"); }
+static void return_detail() {
+  kernel_ns::source::add<true>("return");
+}
 
 }  // namespace control
 }  // namespace detail

@@ -31,7 +31,9 @@ class accessor_core : public accessor_base {
 
   // Returns the cl_mem object corresponding to the access.
   // TODO(progtx): Only available when target is cl_image or cl_buffer
-  virtual cl_mem get_cl_mem_object() const { return nullptr; }
+  virtual cl_mem get_cl_mem_object() const {
+    return nullptr;
+  }
 
   // Returns the cl_event object corresponding to the last command
   // to access the memory object.
@@ -41,9 +43,13 @@ class accessor_core : public accessor_base {
  protected:
   friend class kernel_ns::source;
 
-  virtual void* resource() const { return nullptr; }
+  virtual void* resource() const {
+    return nullptr;
+  }
 
-  virtual ::size_t argument_size() const { return 0; }
+  virtual ::size_t argument_size() const {
+    return 0;
+  }
 };
 
 template <bool>

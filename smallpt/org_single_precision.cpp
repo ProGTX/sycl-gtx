@@ -29,11 +29,21 @@ struct Vec {
   Vec(const ::Vec& v)
       : Vec(static_cast<float>(v.x), static_cast<float>(v.y),
             static_cast<float>(v.z)) {}
-  Vec operator+(const Vec& b) const { return Vec(x + b.x, y + b.y, z + b.z); }
-  Vec operator-(const Vec& b) const { return Vec(x - b.x, y - b.y, z - b.z); }
-  Vec operator*(float b) const { return Vec(x * b, y * b, z * b); }
-  Vec mult(const Vec& b) const { return Vec(x * b.x, y * b.y, z * b.z); }
-  Vec& norm() { return *this = *this * (1 / sqrt(x * x + y * y + z * z)); }
+  Vec operator+(const Vec& b) const {
+    return Vec(x + b.x, y + b.y, z + b.z);
+  }
+  Vec operator-(const Vec& b) const {
+    return Vec(x - b.x, y - b.y, z - b.z);
+  }
+  Vec operator*(float b) const {
+    return Vec(x * b, y * b, z * b);
+  }
+  Vec mult(const Vec& b) const {
+    return Vec(x * b.x, y * b.y, z * b.z);
+  }
+  Vec& norm() {
+    return *this = *this * (1 / sqrt(x * x + y * y + z * z));
+  }
   float dot(const Vec& b) const {
     return this->x * b.x + this->y * b.y + this->z * b.z;
   }  // cross:
@@ -85,7 +95,9 @@ Sphere spheres[] = {
     Sphere(600, Vec(50, 681.6f - .27f, 81.6f), Vec(12, 12, 12), Vec(),
            DIFF)  // Lite
 };
-inline float clamp(float x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+inline float clamp(float x) {
+  return x < 0 ? 0 : x > 1 ? 1 : x;
+}
 inline bool intersect(const Ray& r, float& t, int& id) {
   float n = sizeof(spheres) / sizeof(Sphere), d, inf = t = 1e20f;
   for (int i = int(n); i--;) {
@@ -97,14 +109,16 @@ inline bool intersect(const Ray& r, float& t, int& id) {
   return t < inf;
 }
 Vec radiance(const Ray& r, int depth, uint16_t* Xi) {
-  float t;                                 // distance to intersection
-  int id = 0;                              // id of intersected object
-  if (!intersect(r, t, id)) return Vec();  // if miss, return black
-  const Sphere& obj = spheres[id];         // the hit object
+  float t;     // distance to intersection
+  int id = 0;  // id of intersected object
+  if (!intersect(r, t, id))
+    return Vec();                   // if miss, return black
+  const Sphere& obj = spheres[id];  // the hit object
   Vec x = r.o + r.d * t;
   Vec n = (x - obj.p).norm(), nl = n.dot(r.d) < 0 ? n : n * -1, f = obj.c;
   float p = f.x > f.y && f.x > f.z ? f.x : f.y > f.z ? f.y : f.z;  // max refl
-  if (depth > 255) return obj.e;
+  if (depth > 255)
+    return obj.e;
   if (++depth > 5) {
     if (get_random(Xi) < p) {
       f = f * (1 / p);

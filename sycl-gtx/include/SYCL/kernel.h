@@ -48,10 +48,14 @@ class kernel {
   kernel(cl_kernel openclKernelObject);
 
   // Return the OpenCL kernel object for this kernel.
-  cl_kernel get() const { return kern.get(); }
+  cl_kernel get() const {
+    return kern.get();
+  }
 
   // Return the context that this kernel is defined for.
-  context get_context() const { return ctx; }
+  context get_context() const {
+    return ctx;
+  }
 
   // Return the program that this kernel is part of.
   program get_program() const;

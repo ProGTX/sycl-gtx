@@ -34,7 +34,9 @@ Sphere spheres[] = {
     Sphere(600, Vec(50, 681.6 - .27, 81.6), Vec(12, 12, 12), Vec(),
            DIFF)  // Lite
 };
-inline double clamp(double x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+inline double clamp(double x) {
+  return x < 0 ? 0 : x > 1 ? 1 : x;
+}
 inline bool intersect(const Ray& r, double& t, int& id) {
   double n = sizeof(spheres) / sizeof(Sphere), d, inf = t = 1e20;
   for (int i = int(n); i--;) {
@@ -46,14 +48,16 @@ inline bool intersect(const Ray& r, double& t, int& id) {
   return t < inf;
 }
 Vec radiance(const Ray& r, int depth, uint16_t* Xi) {
-  double t;                                // distance to intersection
-  int id = 0;                              // id of intersected object
-  if (!intersect(r, t, id)) return Vec();  // if miss, return black
-  const Sphere& obj = spheres[id];         // the hit object
+  double t;    // distance to intersection
+  int id = 0;  // id of intersected object
+  if (!intersect(r, t, id))
+    return Vec();                   // if miss, return black
+  const Sphere& obj = spheres[id];  // the hit object
   Vec x = r.o + r.d * t;
   Vec n = (x - obj.p).norm(), nl = n.dot(r.d) < 0 ? n : n * -1, f = obj.c;
   double p = f.x > f.y && f.x > f.z ? f.x : f.y > f.z ? f.y : f.z;  // max refl
-  if (depth > 255) return obj.e;
+  if (depth > 255)
+    return obj.e;
   if (++depth > 5) {
     if (get_random(Xi) < p) {
       f = f * (1 / p);

@@ -23,12 +23,18 @@ class counter {
     counter_id = copy.counter_id;
     return *this;
   }
-  counter& operator=(counter&& move) noexcept { return *this; }
+  counter& operator=(counter&& move) noexcept {
+    return *this;
+  }
   ~counter() = default;
 
-  static counter_t get_total_count() { return internal_count; }
+  static counter_t get_total_count() {
+    return internal_count;
+  }
 
-  counter_t get_count_id() const { return counter_id; }
+  counter_t get_count_id() const {
+    return counter_id;
+  }
 };
 
 template <class T, counter_t start>

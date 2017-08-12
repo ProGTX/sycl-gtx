@@ -78,9 +78,13 @@ SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
   SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(base_acc_device_ref::);
 
  protected:
-  virtual void* resource() const override { return base_acc_buffer::buf; }
+  virtual void* resource() const override {
+    return base_acc_buffer::buf;
+  }
 
-  virtual ::size_t argument_size() const override { return sizeof(cl_mem); }
+  virtual ::size_t argument_size() const override {
+    return sizeof(cl_mem);
+  }
 };
 
 }  // namespace detail

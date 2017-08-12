@@ -19,7 +19,9 @@ device::device(cl_device_id device_id)
 
 device::device(device_selector& dev_sel) : device(nullptr, &dev_sel) {}
 
-cl_device_id device::get() const { return device_id.get(); }
+cl_device_id device::get() const {
+  return device_id.get();
+}
 
 bool device::is_host() const {
   // TODO(progtx):
@@ -31,13 +33,19 @@ bool device::is_type() const {
   return get_info<info::device::device_type>() == type;
 }
 
-bool device::is_cpu() const { return is_type<info::device_type::cpu>(); }
-bool device::is_gpu() const { return is_type<info::device_type::gpu>(); }
+bool device::is_cpu() const {
+  return is_type<info::device_type::cpu>();
+}
+bool device::is_gpu() const {
+  return is_type<info::device_type::gpu>();
+}
 bool device::is_accelerator() const {
   return is_type<info::device_type::accelerator>();
 }
 
-platform device::get_platform() const { return platfrm; }
+platform device::get_platform() const {
+  return platfrm;
+}
 
 vector_class<device> device::get_devices(info::device_type deviceType) {
   return detail::get_devices(static_cast<cl_device_type>(deviceType), nullptr);

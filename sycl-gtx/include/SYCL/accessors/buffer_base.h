@@ -34,8 +34,12 @@ class accessor_buffer {
         rang(range) {}
 
  protected:
-  cl_mem get_buffer_object() const { return buf->device_data.get(); }
-  ::size_t access_buffer_range(int n) const { return buf->rang.get(n); }
+  cl_mem get_buffer_object() const {
+    return buf->device_data.get();
+  }
+  ::size_t access_buffer_range(int n) const {
+    return buf->rang.get(n);
+  }
   typename base_host_data<DataType>::type* access_host_data() const {
     return buf->host_data.get();
   }

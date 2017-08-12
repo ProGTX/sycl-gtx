@@ -112,7 +112,9 @@ class context {
         detail::array_traits<Contained_t, info::context, param, BufferSize_v>;
 
    public:
-    void get_info(const context* ctx) { Base::Base::get(ctx->ctx.get()); }
+    void get_info(const context* ctx) {
+      Base::Base::get(ctx->ctx.get());
+    }
   };
 
   template <class return_t, info::context param>

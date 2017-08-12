@@ -4,7 +4,9 @@ using namespace cl::sycl;
 
 event::event(cl_event clEvent) : evnt(clEvent) {}
 
-cl_event event::get() { return evnt.get(); }
+cl_event event::get() {
+  return evnt.get();
+}
 
 vector_class<event> event::get_wait_list() {
   // TODO(progtx):

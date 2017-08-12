@@ -30,11 +30,15 @@ struct exception : std::exception_ptr {
   exception() : exception("Undefined SYCL Error") {}
 
   // Returns a descriptive string for the error, if available.
-  string_class what() const { return description; }
+  string_class what() const {
+    return description;
+  }
 
   // Returns the context that caused the error.
   // Returns null if not a buffer error.
-  context* get_context() { return thrower; }
+  context* get_context() {
+    return thrower;
+  }
 };
 
 struct cl_exception : exception {
@@ -50,7 +54,9 @@ struct cl_exception : exception {
   cl_exception() : cl_exception(CL_SUCCESS, nullptr) {}
 
   // Thrown as a result of an OpenCL API error code
-  ::cl_int get_cl_code() const { return error_code; }
+  ::cl_int get_cl_code() const {
+    return error_code;
+  }
 };
 
 struct async_exception : exception {
@@ -73,12 +79,18 @@ class exception_list {
   using iterator = list_t::const_iterator;  // TODO(progtx): non const
   using const_iterator = list_t::const_iterator;
 
-  ::size_t size() const { return list.size(); }
+  ::size_t size() const {
+    return list.size();
+  }
 
   // // first asynchronous exception
-  iterator begin() const { return list.begin(); }
+  iterator begin() const {
+    return list.begin();
+  }
   // refer to past-the-end last asynchronous exception
-  iterator end() const { return list.end(); }
+  iterator end() const {
+    return list.end();
+  }
 };
 
 using async_handler = function_class<void(cl::sycl::exception_list)>;

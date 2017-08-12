@@ -65,7 +65,9 @@ context::context(vector_class<device> deviceList,
     : context(nullptr, asyncHandler, interopFlag, deviceList) {}
 
 // TODO(progtx): Retain
-cl_context context::get() const { return ctx.get(); }
+cl_context context::get() const {
+  return ctx.get();
+}
 
 vector_class<device> context::get_devices() const {
   return detail::transform_vector<device>(get_info<info::context::devices>());

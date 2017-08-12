@@ -92,7 +92,9 @@ class device {
         detail::array_traits<Contained_t, info::device, param, BufferSize_v>;
 
    public:
-    void get_info(const device* dev) { Base::Base::get(dev->device_id.get()); }
+    void get_info(const device* dev) {
+      Base::Base::get(dev->device_id.get());
+    }
   };
 
   template <class return_t, info::device param,

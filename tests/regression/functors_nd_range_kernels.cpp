@@ -21,9 +21,13 @@ class example_functor {
     random_num = std::rand() % (100 - 1) + 1;
   }
 
-  void operator()(nd_item<1> item) { ptr[item.get_global()] = random_num; }
+  void operator()(nd_item<1> item) {
+    ptr[item.get_global()] = random_num;
+  }
 
-  int get_random() { return random_num; }
+  int get_random() {
+    return random_num;
+  }
 };
 
 int main() {
