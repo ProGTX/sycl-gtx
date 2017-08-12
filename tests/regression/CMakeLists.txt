@@ -1,4 +1,4 @@
-set(_source_list
+set(sourceList
   "access_sycl_cl_types.cpp"
   "anatomy_sycl_app_parallel_for.cpp"
   "anatomy_sycl_app_single_task.cpp"
@@ -13,4 +13,4 @@ set(_source_list
   "work_efficient_prefix_sum.cpp"
 )
 
-ADD_TEST_GROUP("regression" "${_source_list}")
+add_test_group("regression" "${sourceList}")

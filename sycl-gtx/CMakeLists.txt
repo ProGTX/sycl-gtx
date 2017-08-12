@@ -1,20 +1,20 @@
-set(_source_root_path "${CMAKE_CURRENT_SOURCE_DIR}/source")
-set(_include_root_path "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(sourceRootPath "${CMAKE_CURRENT_SOURCE_DIR}/source")
+set(includeRootPath "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-GET_ALL_FILES(_source_list "${_source_root_path}" "*.cpp")
-GET_ALL_FILES(_header_list "${_include_root_path}" "*.h")
+get_all_files(sourceList "${sourceRootPath}" "*.cpp")
+get_all_files(headerList "${includeRootPath}" "*.h")
 
 add_library(sycl-gtx
-  "${_source_list}"
-  "${_header_list}"
+  "${sourceList}"
+  "${headerList}"
   "${CMAKE_CURRENT_SOURCE_DIR}/include/CL/sycl.hpp"
   "${CMAKE_CURRENT_SOURCE_DIR}/include/CL/sycl_gtx_compatibility.h"
 )
 
-include_directories(sycl-gtx "${_include_root_path}")
+include_directories(sycl-gtx "${includeRootPath}")
 include_directories(sycl-gtx ${OpenCL_INCLUDE_DIRS})
 
 target_link_libraries(sycl-gtx ${OpenCL_LIBRARIES})
 
-MSVC_SET_SOURCE_FILTERS("${_source_root_path}" "${_source_list}")
-MSVC_SET_HEADER_FILTERS("${_include_root_path}" "${_header_list}")
+msvc_set_source_filters("${sourceRootPath}" "${sourceList}")
+msvc_set_header_filters("${includeRootPath}" "${headerList}")

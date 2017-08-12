@@ -1,69 +1,69 @@
-function(GET_ALL_FILES
-  _source_list_out
-  _root_path
-  _regex
-  # ARGV3 _recursion = TRUE
+function(get_all_files
+  sourceListOut
+  rootPath
+  regex
+  # ARGV3 recursion = TRUE
 )
-  set(_glob GLOB_RECURSE)
+  set(globList GLOB_RECURSE)
   if((${ARGC} GREATER 3) AND ("${ARGV3}" STREQUAL "FALSE"))
-    set(_glob GLOB)
+    set(globList GLOB)
   endif()
   file(
-    ${_glob} _source_list_local
+    ${globList} sourceListLocal
     LIST_DIRECTORIES false
-    "${_root_path}/${_regex}"
+    "${rootPath}/${regex}"
   )
-  set(${_source_list_out} ${_source_list_local} PARENT_SCOPE)
+  set(${sourceListOut} ${sourceListLocal} PARENT_SCOPE)
 endfunction()
 
-function(MSVC_SET_FILTERS _source_root_path _source_list _prefix)
+function(msvc_set_filters sourceRootPath sourceList prefix)
   # http://stackoverflow.com/a/33813154
-  foreach(_source IN ITEMS ${_source_list})
-    get_filename_component(_source_path "${_source}" PATH)
+  foreach(sourceFile IN ITEMS ${sourceList})
+    get_filename_component(sourcePath "${sourceFile}" PATH)
     file(
-      RELATIVE_PATH _source_path_rel
-      "${_source_root_path}" "${_source_path}"
+      RELATIVE_PATH sourcePathRel
+      "${sourceRootPath}" "${sourcePath}"
     )
-    string(REPLACE "/" "\\" _group_path "${_source_path_rel}")
-    source_group("${_prefix}${_group_path}" FILES "${_source}")
+    string(REPLACE "/" "\\" groupPath "${sourcePathRel}")
+    source_group("${prefix}${groupPath}" FILES "${sourceFile}")
   endforeach()
 endfunction()
   
-function(MSVC_SET_SOURCE_FILTERS _source_root_path _source_list)
-  MSVC_SET_FILTERS("${_source_root_path}" "${_source_list}" "Source Files\\")
+function(msvc_set_source_filters sourceRootPath sourceList)
+  msvc_set_filters("${sourceRootPath}" "${sourceList}" "Source Files\\")
 endfunction()
   
-function(MSVC_SET_HEADER_FILTERS _include_root_path _header_list)
-  MSVC_SET_FILTERS("${_include_root_path}" "${_header_list}" "Header Files\\")
+function(msvc_set_header_filters includeRootPath headerList)
+  msvc_set_filters("${includeRootPath}" "${headerList}" "Header Files\\")
 endfunction()
 
-function(ADD_TEST_GROUP _group _source_list)
-  set(group_set "")
-  foreach(_test ${_source_list})
-    get_filename_component(_test "${_test}" NAME)
-    get_filename_component(_project_name "${_test}" NAME_WE)
+function(add_test_group groupName sourceList)
+  set(groupSet "")
+  foreach(testName ${sourceList})
+    get_filename_component(testName "${testName}" NAME)
+    get_filename_component(projectName "${testName}" NAME_WE)
     
-    add_executable(${_project_name} ${_test})
-    set(group_set ${group_set} ${_project_name})
+    add_executable(${projectName} ${testName})
+    set(groupSet ${groupSet} ${projectName})
     
-    include_directories(${_project_name} ${SYCL_GTX_INCLUDE_PATH})
-    include_directories(${_project_name} ${OpenCL_INCLUDE_DIRS})
+    include_directories(${projectName} ${SYCL_GTX_INCLUDE_PATH})
+    include_directories(${projectName} ${OpenCL_INCLUDE_DIRS})
     
-    target_link_libraries(${_project_name} sycl-gtx)
-    target_link_libraries(${_project_name} ${OpenCL_LIBRARIES})
+    target_link_libraries(${projectName} sycl-gtx)
+    target_link_libraries(${projectName} ${OpenCL_LIBRARIES})
     
     if(MSVC)
       set_target_properties(
-        ${_project_name} PROPERTIES FOLDER "tests/${_group}"
+        ${projectName} PROPERTIES FOLDER "tests/${groupName}"
       )
     endif(MSVC)
     
-    add_test(NAME ${_project_name} COMMAND ${_project_name})
+    add_test(NAME ${projectName} COMMAND ${projectName})
   endforeach()
 
-  add_custom_target(${_group}_tests DEPENDS ${group_set})
+  add_custom_target(${groupName}_tests DEPENDS ${groupSet})
   if(MSVC)
-    set_target_properties(${_group}_tests
+    set_target_properties(${groupName}_tests
                           PROPERTIES FOLDER "tests")
   endif(MSVC)
 endfunction()
