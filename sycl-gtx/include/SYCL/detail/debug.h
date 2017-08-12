@@ -56,10 +56,8 @@ class debug {
     stream << move.stream.str();
     before << move.before.str();
   }
-#elif MSVC_2017_OR_LOWER
-  debug(debug&& move) = default;
 #else
-  debug(debug&& move) noexcept = default;
+  debug(debug&& move) = default;
 #endif
   debug(const debug& copy) = delete;
 
