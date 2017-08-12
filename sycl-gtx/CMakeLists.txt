@@ -18,3 +18,10 @@ target_link_libraries(sycl-gtx ${OpenCL_LIBRARIES})
 
 msvc_set_source_filters("${sourceRootPath}" "${sourceList}")
 msvc_set_header_filters("${includeRootPath}" "${headerList}")
+
+# Install
+set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
+set(CMAKE_SKIP_PACKAGE_ALL_DEPENDENCY TRUE)
+install(TARGETS sycl-gtx DESTINATION lib)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include
+        DESTINATION .)
