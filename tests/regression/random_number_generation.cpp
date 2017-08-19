@@ -44,7 +44,9 @@ int main() {
 
     cgh.single_task<class generate>([=]() {
       uint2 seed(startSeed.s[0], startSeed.s[1]);
-      SYCL_FOR(int1 i = 0, i < size, ++i) { n[i] = deviceRandom(seed); }
+      SYCL_FOR(int1 i = 0, i < size, ++i) {
+        n[i] = deviceRandom(seed);
+      }
       SYCL_END;
     });
   });

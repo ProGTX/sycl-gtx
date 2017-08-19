@@ -18,7 +18,9 @@ inline double distr(std::default_random_engine& rng) {
   return distr_detail(rng);
 }
 
-static void reset() { generator().seed(0); }
+static void reset() {
+  generator().seed(0);
+}
 
 }  // namespace ns_random
 

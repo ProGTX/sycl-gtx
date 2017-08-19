@@ -23,7 +23,9 @@ using Vec = Vec_detail<float_type>;
 using Ray = Ray_detail<float_type>;
 using Sphere = Sphere_detail<float_type, modify_sample_rate>;
 
-inline float_type clamp(float_type x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+inline float_type clamp(float_type x) {
+  return x < 0 ? 0 : x > 1 ? 1 : x;
+}
 inline int toInt(float_type x);
 
 static void to_file(int w, int h, Vec* c, std::string filename) {
@@ -66,7 +68,9 @@ struct testInfo {
   testInfo& operator=(testInfo&& move) noexcept = delete;
   ~testInfo() = default;
 
-  bool isOpenCL() { return dev != nullptr; }
+  bool isOpenCL() {
+    return dev != nullptr;
+  }
 };
 
 static decltype(now()) & startTime() {

@@ -24,8 +24,12 @@ struct ptr_or_val<T, false> {
     return *this;
   }
 
-  operator T() const { return this->data; }
-  operator T&() { return this->data; }
+  operator T() const {
+    return this->data;
+  }
+  operator T&() {
+    return this->data;
+  }
 
   ptr_or_val<T, true> operator&() {  // NOLINT
     return ptr_or_val<T, true>(&this->data);
@@ -51,8 +55,12 @@ struct ptr_or_val<T, true> {
     return *this;
   }
 
-  operator T() const { return *this->data; }
-  operator T&() { return *this->data; }
+  operator T() const {
+    return *this->data;
+  }
+  operator T&() {
+    return *this->data;
+  }
 
   ptr_or_val<T*, true> operator&() {  // NOLINT
     return ptr_or_val<T*, true>(&this->data);

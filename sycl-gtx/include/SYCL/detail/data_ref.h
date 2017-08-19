@@ -35,7 +35,9 @@ class data_ref {
   string_class name;
   type_t type;
 
-  static string_class get_name(const data_ref& dref) { return dref.name; }
+  static string_class get_name(const data_ref& dref) {
+    return dref.name;
+  }
 
   template <
       typename T,

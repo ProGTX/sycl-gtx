@@ -9,8 +9,12 @@
 using namespace cl::sycl;
 using namespace detail;
 
-void command_group::enter() { detail::command::group_detail::last = this; }
-void command_group::exit() { detail::command::group_detail::last = nullptr; }
+void command_group::enter() {
+  detail::command::group_detail::last = this;
+}
+void command_group::exit() {
+  detail::command::group_detail::last = nullptr;
+}
 
 // TODO(progtx): Reschedules commands to achieve better performance
 void command_group::optimize() {
@@ -114,7 +118,9 @@ using namespace detail;
 
 SYCL_THREAD_LOCAL command_group* command::group_detail::last = nullptr;
 
-bool command::group_detail::in_scope() { return last != nullptr; }
+bool command::group_detail::in_scope() {
+  return last != nullptr;
+}
 
 void command::group_detail::check_scope() {
   if (!in_scope()) {

@@ -127,7 +127,7 @@ class buffer_detail : public buffer_base {
    * The mutex m is locked by the runtime whenever the data is in use
    * and unlocked otherwise.
    * Data is synchronized with hostData, when the mutex is unlocked by the
-  // runtime.
+   * runtime.
    */
   buffer_detail(shared_ptr_class<DataType>& hostData,
                 const range<dimensions>& bufferRange, mutex_class* m);
@@ -144,7 +144,7 @@ class buffer_detail : public buffer_base {
   // TODO(progtx):
   /**
    * Create a new sub-buffer without allocation to have separate accessors
-  // later.
+   * later.
    * @param b is the buffer with the real data.
    * @param baseIndex specifies the origin of the sub-buffer inside the buffer b.
    * @param subRange specifies the size of the sub-buffer.
@@ -171,7 +171,7 @@ class buffer_detail : public buffer_base {
 
   /**
    * Creates a buffer from an existing OpenCL memory object associated to a
-  // context
+   * context
    * after waiting for an event signaling the availability of the OpenCL data.
    * @param mem_object is the OpenCL memory object to use.
    * @param from_queue is the queue associated to the memory object.
@@ -185,14 +185,18 @@ class buffer_detail : public buffer_base {
   buffer_detail& operator=(const buffer_detail&) = default;
   buffer_detail& operator=(buffer_detail&&) = default;  // NOLINT
 
-  ~buffer_detail() { event::wait_and_throw(events); }
+  ~buffer_detail() {
+    event::wait_and_throw(events);
+  }
 
   /**
    * Return a range object representing the size of the buffer
    * in terms of number of elements in each dimension as passed to the
    * constructor.
    */
-  range<dimensions> get_range() { return rang; }
+  range<dimensions> get_range() {
+    return rang;
+  }
 
   /** Total number of elements in the buffer */
   ::size_t get_count() const {

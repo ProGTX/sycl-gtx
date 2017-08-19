@@ -26,9 +26,13 @@ void synchronizer::flush_queues(buffer_base* buf) {
   }
 }
 
-void synchronizer::add(queue* q) { queues.insert(q); }
+void synchronizer::add(queue* q) {
+  queues.insert(q);
+}
 
-void synchronizer::remove(queue* q) { queues.erase(q); }
+void synchronizer::remove(queue* q) {
+  queues.erase(q);
+}
 
 void synchronizer::add(accessor_base* acc, buffer_base* buf) {
   DSELF() << acc << buf;

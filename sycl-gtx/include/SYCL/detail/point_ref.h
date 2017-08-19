@@ -66,9 +66,13 @@ struct point_ref : data_ref {
     this->type = type;
   }
 
-  operator data_basic_t() const { return this->data; }
+  operator data_basic_t() const {
+    return this->data;
+  }
   // TODO(progtx): Only allow on is_const
-  operator data_basic_t&() { return this->data; }
+  operator data_basic_t&() {
+    return this->data;
+  }
 
   // TODO(progtx): enable_if causes here an internal MSVC error C1001
   // TODO(progtx): data_ref::operator&

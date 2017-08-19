@@ -13,7 +13,9 @@ const string_class source::resource_name_root = "_sycl_buf";
 SYCL_THREAD_LOCAL int source::num_resources = 0;
 SYCL_THREAD_LOCAL source* source::scope = nullptr;
 
-bool source::in_scope() { return scope != nullptr; }
+bool source::in_scope() {
+  return scope != nullptr;
+}
 
 void source::enter(source& src) {
   scope = &src;
@@ -43,7 +45,9 @@ string_class source::get_code() const {
   return final_code;
 }
 
-string_class source::get_kernel_name() const { return kernel_name; }
+string_class source::get_kernel_name() const {
+  return kernel_name;
+}
 
 string_class source::generate_accessor_list() const {
   string_class list;

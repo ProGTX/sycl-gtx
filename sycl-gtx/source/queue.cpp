@@ -107,13 +107,21 @@ queue::~queue() {
   wait_and_throw();
 }
 
-bool queue::is_host() { return dev.is_host(); }
+bool queue::is_host() {
+  return dev.is_host();
+}
 
-cl_command_queue queue::get() { return command_q.get(); }
+cl_command_queue queue::get() {
+  return command_q.get();
+}
 
-context queue::get_context() const { return ctx; }
+context queue::get_context() const {
+  return ctx;
+}
 
-device queue::get_device() const { return dev; }
+device queue::get_device() const {
+  return dev;
+}
 
 /**
  * Checks to see if any asynchronous errors have been produced by the queue

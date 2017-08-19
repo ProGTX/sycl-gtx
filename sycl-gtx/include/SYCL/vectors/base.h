@@ -70,13 +70,11 @@ class base : protected counter<base<dataT, numElements>>, public data_ref {
   /** Underlying OpenCL type */
   using vector_t = detail::cl_type<dataT, numElements>;
 
-  base()
-    : data_ref(generate_name()) {
+  base() : data_ref(generate_name()) {
     kernel_add(this_name());
   }
 
-  base(const base& copy)
-    : data_ref(copy.name) {}
+  base(const base& copy) : data_ref(copy.name) {}
   base& operator=(const base& copy) {
     data_ref::operator=(copy.name);
     return *this;

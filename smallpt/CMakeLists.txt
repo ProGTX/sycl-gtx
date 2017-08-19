@@ -1,22 +1,22 @@
-GET_ALL_FILES(_source_list "${CMAKE_CURRENT_SOURCE_DIR}" "*.cpp")
-GET_ALL_FILES(_header_list "${CMAKE_CURRENT_SOURCE_DIR}" "*.h")
+get_all_files(sourceList "${CMAKE_CURRENT_SOURCE_DIR}" "*.cpp")
+get_all_files(headerList "${CMAKE_CURRENT_SOURCE_DIR}" "*.h")
 
-set(_project_name "smallpt")
+set(projectName "smallpt")
 
-add_executable(${_project_name} "${_source_list}" "${_header_list}")
+add_executable(${projectName} "${sourceList}" "${headerList}")
 
 find_package(OpenMP)
 if(OPENMP_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-include_directories(${_project_name} ${SYCL_GTX_INCLUDE_PATH})
-include_directories(${_project_name} ${OpenCL_INCLUDE_DIRS})
+include_directories(${projectName} ${SYCL_GTX_INCLUDE_PATH})
+include_directories(${projectName} ${OpenCL_INCLUDE_DIRS})
 
-target_link_libraries(${_project_name} sycl-gtx)
-target_link_libraries(${_project_name} ${OpenCL_LIBRARIES})
+target_link_libraries(${projectName} sycl-gtx)
+target_link_libraries(${projectName} ${OpenCL_LIBRARIES})
 
 if(MSVC)
-  MSVC_SET_SOURCE_FILTERS("${CMAKE_CURRENT_SOURCE_DIR}" "${_source_list}")
-  MSVC_SET_HEADER_FILTERS("${CMAKE_CURRENT_SOURCE_DIR}" "${_header_list}")
+  msvc_set_source_filters("${CMAKE_CURRENT_SOURCE_DIR}" "${sourceList}")
+  msvc_set_header_filters("${CMAKE_CURRENT_SOURCE_DIR}" "${headerList}")
 endif()

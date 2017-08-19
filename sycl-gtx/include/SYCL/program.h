@@ -106,7 +106,9 @@ class program {
     return *(kernels.at(detail::kernel_name::get<kernelT>()));
   }
 
-  bool is_linked() const { return linked; }
+  bool is_linked() const {
+    return linked;
+  }
 
  private:
   template <typename ReturnType, info::program param>
@@ -116,7 +118,9 @@ class program {
     using return_t = typename detail::array_traits<
         ReturnType, info::program, param,
         detail::traits_buffer_default<ReturnType>::size>::return_t;
-    return_t get_info(const program* p) { return this->get(p->prog.get()); }
+    return_t get_info(const program* p) {
+      return this->get(p->prog.get());
+    }
   };
 
   template <typename Contained_t, info::program param>
@@ -165,7 +169,9 @@ class program {
   vector_class<device> get_devices() const;
   string_class get_build_options() const;
 
-  cl_program get() const { return prog.get(); }
+  cl_program get() const {
+    return prog.get();
+  }
 };
 
 }  // namespace sycl

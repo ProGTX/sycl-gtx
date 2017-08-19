@@ -83,7 +83,7 @@ SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
  public:
   SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(base_acc_device_ref::);
 
-protected:
+ protected:
   virtual void* resource() const override {
     return base_acc_buffer::buf;
   }

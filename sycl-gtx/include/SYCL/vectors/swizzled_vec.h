@@ -19,7 +19,9 @@ struct swizzled;
 
 template <int index, int current>
 struct swizzled<index, current> {
-  static void get(char* name) { to_char<index, current>(name); }
+  static void get(char* name) {
+    to_char<index, current>(name);
+  }
 };
 
 template <int index, int current, int... others>

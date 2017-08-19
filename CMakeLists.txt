@@ -1,9 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2)
 
 project(sycl-gtx-solution)
-
-# CMake variable to string resolution policy
-cmake_policy(SET CMP0054 NEW)
 
 # Requirements
 set(CMAKE_CXX_STANDARD 11)
@@ -11,13 +8,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(OpenCL REQUIRED)
 
 # Common functions
-set(_cmake_files
+set(SYCL_GTX_CMAKE_FILES
   "cmake/common.cmake"
   "cmake/color_diagnostics.cmake"
 )
-foreach(_file ${_cmake_files})
-  include(${_file})
-endforeach()
+foreach (fileName ${SYCL_GTX_CMAKE_FILES})
+  include(${fileName})
+endforeach ()
 
 if(MSVC)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)

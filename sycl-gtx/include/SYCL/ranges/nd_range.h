@@ -23,14 +23,22 @@ struct nd_range {
            id<dims> offset = id<dims>())
       : global_size(global_size), local_size(local_size), offset(offset) {}
 
-  range<dims> get_global() const { return global_size; }
+  range<dims> get_global() const {
+    return global_size;
+  }
 
-  range<dims> get_local() const { return local_size; }
+  range<dims> get_local() const {
+    return local_size;
+  }
 
   // Return a range representing the number of groups in each dimension.
-  range<dims> get_group() const { return global_size / local_size; }
+  range<dims> get_group() const {
+    return global_size / local_size;
+  }
 
-  id<dims> get_offset() const { return offset; }
+  id<dims> get_offset() const {
+    return offset;
+  }
 };
 
 }  // namespace sycl

@@ -96,19 +96,23 @@ struct SphereSycl : public ::Sphere_detail<float1> {
     float1 b = op.dot(r.d);
     float1 det = b * b - op.dot(op) + rad * rad;
 
-    SYCL_IF(det < 0)
-    return_vec = 0;
+    SYCL_IF(det < 0) {
+      return_vec = 0;
+    }
     SYCL_ELSE {
       det = cl::sycl::sqrt(det);
       t = b - det;
-      SYCL_IF(t > eps)
-      return_vec = t;
+      SYCL_IF(t > eps) {
+        return_vec = t;
+      }
       SYCL_ELSE {
         t = b + det;
-        SYCL_IF(t > eps)
-        return_vec = t;
-        SYCL_ELSE
-        return_vec = 0;
+        SYCL_IF(t > eps) {
+          return_vec = t;
+        }
+        SYCL_ELSE {
+          return_vec = 0;
+        }
         SYCL_END;
       }
       SYCL_END;
@@ -120,10 +124,12 @@ struct SphereSycl : public ::Sphere_detail<float1> {
 };
 
 inline void clamp(float1& x) {
-  SYCL_IF(x < 0)
-  x = 0;
-  SYCL_ELSE_IF(x > 1)
-  x = 1;
+  SYCL_IF(x < 0) {
+    x = 0;
+  }
+  SYCL_ELSE_IF(x > 1) {
+    x = 1;
+  }
   SYCL_END;
 }
 
@@ -178,7 +184,7 @@ static void radiance(Vector& return_vec, spheres_t spheres, RaySycl r,
     SYCL_IF(!intersect(spheres, r, t, id)) {
       // if miss, don't add anything
       return_vec = cl;
-      SYCL_BREAK
+      SYCL_BREAK;
     }
     SYCL_END;
 
@@ -187,29 +193,35 @@ static void radiance(Vector& return_vec, spheres_t spheres, RaySycl r,
 
     Vector n = Vector(x - obj.p).norm();
     Vector nl = n;
-    SYCL_IF(n.dot(r.d) > 0)
-    nl = nl * -1;
+    SYCL_IF(n.dot(r.d) > 0) {
+      nl = nl * -1;
+    }
     SYCL_END;
 
     Vector f = obj.c;
 
     float1 p;  // max refl
-    SYCL_IF(f.x > f.y && f.x > f.z)
-    p = f.x;
-    SYCL_ELSE_IF(f.y > f.z)
-    p = f.y;
-    SYCL_ELSE
-    p = f.z;
+    SYCL_IF(f.x > f.y && f.x > f.z) {
+      p = f.x;
+    }
+    SYCL_ELSE_IF(f.y > f.z) {
+      p = f.y;
+    }
+    SYCL_ELSE {
+      p = f.z;
+    }
     SYCL_END;
 
     cl = cl + cf.mult(obj.e);
 
     depth += 1;
     SYCL_IF(depth > 5) {
-      SYCL_IF(getRandom(randomSeed) < p) { f = f * (1 / p); }
+      SYCL_IF(getRandom(randomSeed) < p) {
+        f = f * (1 / p);
+      }
       SYCL_ELSE {
         return_vec = cl;
-        SYCL_BREAK
+        SYCL_BREAK;
       }
       SYCL_END;
     }
@@ -224,10 +236,12 @@ static void radiance(Vector& return_vec, spheres_t spheres, RaySycl r,
       Vector w = nl;
 
       Vector u(0, 0, 0);
-      SYCL_IF(cl::sycl::fabs(w.x) > .1f)
-      u.y = 1;
-      SYCL_ELSE
-      u.x = 1;
+      SYCL_IF(cl::sycl::fabs(w.x) > .1f) {
+        u.y = 1;
+      }
+      SYCL_ELSE {
+        u.x = 1;
+      }
       SYCL_END;
       u = (u % w).norm();
 
@@ -239,12 +253,12 @@ static void radiance(Vector& return_vec, spheres_t spheres, RaySycl r,
 
       // Recursion
       r = RaySycl(x, d);
-      SYCL_CONTINUE
+      SYCL_CONTINUE;
     }
     SYCL_ELSE_IF(obj.refl == (::cl_float)SPEC) {  // Ideal SPECULAR reflection
       // Recursion
       r = RaySycl(x, r.d - n * 2 * n.dot(r.d));
-      SYCL_CONTINUE
+      SYCL_CONTINUE;
     }
     SYCL_END;
 
@@ -255,10 +269,12 @@ static void radiance(Vector& return_vec, spheres_t spheres, RaySycl r,
     float1 nt = 1.5f;
 
     float1 nnt;
-    SYCL_IF(into)
-    nnt = nc / nt;
-    SYCL_ELSE
-    nnt = nt / nc;
+    SYCL_IF(into) {
+      nnt = nc / nt;
+    }
+    SYCL_ELSE {
+      nnt = nt / nc;
+    }
     SYCL_END;
 
     float1 ddn = r.d.dot(nl);
@@ -266,13 +282,14 @@ static void radiance(Vector& return_vec, spheres_t spheres, RaySycl r,
     SYCL_IF(cos2t < 0) {  // Total internal reflection
       // Recursion
       r = reflRay;
-      SYCL_CONTINUE
+      SYCL_CONTINUE;
     }
     SYCL_END;
 
     float1 tmp = 1;
-    SYCL_IF(!into)
-    tmp = -1;
+    SYCL_IF(!into) {
+      tmp = -1;
+    }
     SYCL_END;
 
     tdir = Vector(r.d * nnt - n * (tmp * (ddn * nnt + cl::sycl::sqrt(cos2t))))
@@ -282,10 +299,12 @@ static void radiance(Vector& return_vec, spheres_t spheres, RaySycl r,
     float1 R0 = a * a / (b * b);
 
     float1 c = 1;
-    SYCL_IF(into)
-    c += ddn;
-    SYCL_ELSE
-    c -= tdir.dot(n);
+    SYCL_IF(into) {
+      c += ddn;
+    }
+    SYCL_ELSE {
+      c -= tdir.dot(n);
+    }
     SYCL_END;
 
     float1 Re = R0 + (1 - R0) * c * c * c * c * c;
@@ -429,22 +448,26 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cameraRay,
 
                   float2 dd;
 
-                  SYCL_IF(rnew.x() < 1)
-                  dd.x() = cl::sycl::sqrt(rnew.x()) - 1;
-                  SYCL_ELSE
-                  dd.x() = 1 - cl::sycl::sqrt(2 - rnew.x());
+                  SYCL_IF(rnew.x() < 1) {
+                    dd.x() = cl::sycl::sqrt(rnew.x()) - 1;
+                  }
+                  SYCL_ELSE {
+                    dd.x() = 1 - cl::sycl::sqrt(2 - rnew.x());
+                  }
                   SYCL_END;
 
-                  SYCL_IF(rnew.y() < 1)
-                  dd.y() = cl::sycl::sqrt(rnew.y()) - 1;
-                  SYCL_ELSE
-                  dd.y() = 1 - cl::sycl::sqrt(2 - rnew.y());
+                  SYCL_IF(rnew.y() < 1) {
+                    dd.y() = cl::sycl::sqrt(rnew.y()) - 1;
+                  }
+                  SYCL_ELSE {
+                    dd.y() = 1 - cl::sycl::sqrt(2 - rnew.y());
+                  }
                   SYCL_END;
 
                   Vector d =
-                      cx * (((sx + .5f + dd.x()) / 2 + i[0]) / w - .5f) +
-                      cy * (((sy + .5f + dd.y()) / 2 + i[1] + starts[k]) / h -
-                            .5f) +
+                      (cx * (((sx + .5f + dd.x()) / 2 + i[0]) / w - .5f)) +
+                      (cy * (((sy + .5f + dd.y()) / 2 + i[1] + starts[k]) / h -
+                             .5f)) +
                       cam.d;
 
                   // TODO(progtx):

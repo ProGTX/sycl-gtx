@@ -36,8 +36,12 @@ struct cl_base<dataT, 1, 1> {
   cl_base() {}
   cl_base(dataT value) : elem(value) {}
 
-  operator dataT&() { return elem; }
-  operator const dataT&() const { return elem; }
+  operator dataT&() {
+    return elem;
+  }
+  operator const dataT&() const {
+    return elem;
+  }
 };
 
 template <typename dataT, int parentElems>
@@ -68,7 +72,9 @@ struct cl_base<dataT, parentElems, 0> {
     std::copy(start, start + size, this->elems);
   }
 #if MSVC_2013_OR_LOWER
-  cl_base(cl_base&& move) { std::swap(this->elems, move.elems); }
+  cl_base(cl_base&& move) {
+    std::swap(this->elems, move.elems);
+  }
   cl_base& operator=(cl_base&& move) {
     std::swap(this->elems, move.elems);
     return *this;
@@ -81,7 +87,9 @@ struct cl_base<dataT, parentElems, 0> {
   cl_base& operator=(cl_base&&) noexcept = default;  // NOLINT
 #endif
   cl_base& operator=(const cl_base&) = default;
-  cl_base& operator=(genvector v) { std::copy(&v, &v + size, this->elems); }
+  cl_base& operator=(genvector v) {
+    std::copy(&v, &v + size, this->elems);
+  }
 
   ~cl_base() = default;
 
@@ -97,11 +105,17 @@ struct cl_base<dataT, parentElems, 0> {
   cl_base() {}                           \
   cl_base(const cl_base&) = default;     \
   cl_base(genvector v) : Base(v) {}      \
-  cl_base(cl_base&& move) { std::swap(this->elems, move.elems); }
+  cl_base(cl_base&& move) {              \
+    std::swap(this->elems, move.elems);  \
+  }
 
 #define SYCL_CL_REF(return_t, name, code) \
-  return_t& name() { return code; }       \
-  const return_t& name() const { return code; }
+  return_t& name() {                      \
+    return code;                          \
+  }                                       \
+  const return_t& name() const {          \
+    return code;                          \
+  }
 
 template <typename dataT, int parentElems>
 struct cl_base<dataT, parentElems, 2> : cl_base<dataT, parentElems, 0> {
@@ -173,8 +187,12 @@ struct cl_base<dataT, parentElems, 4> : cl_base<dataT, parentElems, 3> {
               *reinterpret_cast<cl_base_2*>(                    // NOLINT
                   reinterpret_cast<dataT*>(this->elems) + 2));  // NOLINT
 
-  operator cl_base_3&() { return this->xyz(); }
-  operator const cl_base_3&() const { return this->xyz(); }
+  operator cl_base_3&() {
+    return this->xyz();
+  }
+  operator const cl_base_3&() const {
+    return this->xyz();
+  }
 };
 
 template <typename dataT, int parentElems>

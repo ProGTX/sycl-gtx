@@ -18,9 +18,7 @@ class source;
 class accessor_base {};
 
 // 3.6.4.3 Core accessors class
-template <typename DataType,
-          int dimensions,
-          access::mode mode,
+template <typename DataType, int dimensions, access::mode mode,
           access::target target>
 class accessor_core : public accessor_base {
  public:
@@ -33,11 +31,12 @@ class accessor_core : public accessor_base {
 
   // TODO(progtx): Only available when target is cl_image or cl_buffer
   /** @return the cl_mem object corresponding to the access. */
-  virtual cl_mem get_cl_mem_object() const { return nullptr; }
+  virtual cl_mem get_cl_mem_object() const {
+    return nullptr;
+  }
 
   // TODO(progtx): Only available when target is cl_image or cl_buffer.
-  /** * @return the cl_event object corresponding to the last command to access the memory object.
-   */
+  /** @return the cl_event object corresponding to the last command to access the memory object. */
   cl_event get_cl_event_object() const;
 
  protected:

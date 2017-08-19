@@ -186,7 +186,9 @@ struct point : data_ref {
     return const_cast<point<dimensions>*>(this)  // NOLINT
         ->get_ref<true>(dim);
   }
-  point_ref<false> operator[](int dim) { return get_ref<false>(dim); }
+  point_ref<false> operator[](int dim) {
+    return get_ref<false>(dim);
+  }
 };
 
 #undef SYCL_POINT_OP_EQ

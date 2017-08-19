@@ -104,7 +104,9 @@ struct prefix_sum_kernel {
     }
     SYCL_END;
 
-    SYCL_IF(LID == 0) { localBlock[local_size - 1] = 0; }
+    SYCL_IF(LID == 0) {
+      localBlock[local_size - 1] = 0;
+    }
     SYCL_END;
     index.barrier(access::fence_space::local_space);
 
