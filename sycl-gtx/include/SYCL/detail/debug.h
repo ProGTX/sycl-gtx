@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 #if MSVC_2013_OR_LOWER
 #define __func__ __FUNCTION__
