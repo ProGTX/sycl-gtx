@@ -19,7 +19,8 @@ namespace detail {
  * 3.4.6 Accessors and 3.4.6.4 Buffer accessors
  */
 SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
-                    target == access::target::global_buffer),
+                    target == access::target::global_buffer)
+,
     public accessor_buffer<DataType, dimensions>,
     public accessor_device_ref<dimensions, DataType, dimensions, mode, target> {
  private:

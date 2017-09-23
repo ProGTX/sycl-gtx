@@ -81,7 +81,6 @@ struct info {
 
 }  // namespace command
 
-
 /**
  * A command group in SYCL as it is defined in 2.3.1
  * includes a kernel to be enqueued along with all the commands

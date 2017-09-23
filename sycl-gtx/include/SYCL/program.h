@@ -77,8 +77,8 @@ class program {
   /** Creates a program by linking a list of other programs */
   program(vector_class<program> programList, string_class linkOptions = "");
 
-    // TODO(progtx): Can only compile well-defined functors with a public default
-    // constructor
+  // TODO(progtx): Can only compile well-defined functors with a public default
+  // constructor
   /**
    * Obtains a SYCL program object from a SYCL kernel name
    * and compiles it ready-to-link

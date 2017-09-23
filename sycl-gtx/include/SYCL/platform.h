@@ -67,7 +67,8 @@ class platform {
   /** True if the platform is host */
   bool is_host() const;
 
-  /** Returns the available extensions for all SYCL platforms (OpenCL and host) */
+  /** Returns the available extensions for all SYCL platforms (OpenCL and host)
+   */
   bool has_extension(string_class extension_name) const;
 };
 

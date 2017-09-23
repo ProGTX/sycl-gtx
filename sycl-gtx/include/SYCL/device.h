@@ -33,7 +33,8 @@ class device {
    */
   device();
 
-  /** Constructs a device class instance using cl device_id of the OpenCL device. */
+  /** Constructs a device class instance using cl device_id of the OpenCL
+   * device. */
   explicit device(cl_device_id device_id);
 
   /** Constructs a device class instance using the device selector provided. */

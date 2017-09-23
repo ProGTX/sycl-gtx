@@ -68,7 +68,8 @@ queue::queue(const context& syclContext, const device& syclDevice,
              const async_handler& asyncHandler)
     : queue(syclContext, syclDevice, false, asyncHandler) {}
 
-/** Chooses a device based on the provided device selector in the given context. */
+/** Chooses a device based on the provided device selector in the given context.
+ */
 queue::queue(const context& syclContext, const device& syclDevice,
              info::queue_profiling profilingFlag,
              const async_handler& asyncHandler)

@@ -146,7 +146,8 @@ class buffer_detail : public buffer_base {
    * Create a new sub-buffer without allocation to have separate accessors
    * later.
    * @param b is the buffer with the real data.
-   * @param baseIndex specifies the origin of the sub-buffer inside the buffer b.
+   * @param baseIndex specifies the origin of the sub-buffer inside the buffer
+   * b.
    * @param subRange specifies the size of the sub-buffer.
    */
   buffer_detail(buffer_detail& b, const id<dimensions>& baseIndex,

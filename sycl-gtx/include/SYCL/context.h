@@ -95,7 +95,8 @@ class context {
   ~context() = default;
 
  public:
-  /** @return the underlying cl context object, after retaining the cl_context. */
+  /** @return the underlying cl context object, after retaining the cl_context.
+   */
   cl_context get() const;
 
   // TODO(progtx): Specifies whether the context is in SYCL Host Execution Mode
