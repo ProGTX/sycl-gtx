@@ -29,6 +29,11 @@ struct swizzled;
 #define SYCL_ENABLE_IF_DIM(dim) \
   typename std::enable_if<num == dim>::type* = nullptr
 
+/**
+ * 3.7.2 Vector types
+ *
+ * B.5 vec class base
+ */
 template <typename dataT, int numElements>
 class base : protected counter<base<dataT, numElements>>, public data_ref {
  private:
@@ -62,7 +67,7 @@ class base : protected counter<base<dataT, numElements>>, public data_ref {
 
  public:
   using element_type = dataT;
-  // Underlying OpenCL type
+  /** Underlying OpenCL type */
   using vector_t = detail::cl_type<dataT, numElements>;
 
   base() : data_ref(generate_name()) {

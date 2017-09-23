@@ -29,13 +29,15 @@ struct exception : std::exception_ptr {
  public:
   exception() : exception("Undefined SYCL Error") {}
 
-  // Returns a descriptive string for the error, if available.
+  /** Returns a descriptive string for the error, if available. */
   string_class what() const {
     return description;
   }
 
-  // Returns the context that caused the error.
-  // Returns null if not a buffer error.
+  /**
+   * Returns the context that caused the error.
+   * Returns null if not a buffer error.
+   */
   context* get_context() {
     return thrower;
   }
@@ -83,11 +85,11 @@ class exception_list {
     return list.size();
   }
 
-  // // first asynchronous exception
+  /** first asynchronous exception */
   iterator begin() const {
     return list.begin();
   }
-  // refer to past-the-end last asynchronous exception
+  /** refer to past-the-end last asynchronous exception */
   iterator end() const {
     return list.end();
   }

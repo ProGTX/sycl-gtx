@@ -5,6 +5,7 @@ project(sycl-gtx-solution)
 # Requirements
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(OpenCL REQUIRED)
 
 # Common functions

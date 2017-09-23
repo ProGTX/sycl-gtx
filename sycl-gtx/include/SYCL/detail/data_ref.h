@@ -4,8 +4,6 @@
 #include "SYCL/detail/debug.h"
 #include <type_traits>
 
-// Data reference wrappers
-
 namespace cl {
 namespace sycl {
 
@@ -18,6 +16,9 @@ namespace detail {
 // Forward declaration
 void kernel_add(string_class line);
 
+/**
+ * Data reference wrappers
+ */
 class data_ref {
  public:
   enum class type_t {

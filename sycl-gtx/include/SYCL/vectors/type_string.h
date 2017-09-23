@@ -9,8 +9,10 @@ namespace sycl {
 
 namespace detail {
 
-// Cannot be joined with vector declarations
-// because a vector of 3 is a typedef of a vector of 4
+/**
+ * Cannot be joined with vector declarations
+ * because a vector of 3 is a typedef of a vector of 4
+ */
 #define SYCL_CL_TYPE_STRING(nummedType)             \
   template <>                                       \
   struct type_string<::cl_##nummedType> {           \

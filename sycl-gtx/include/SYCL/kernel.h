@@ -39,25 +39,27 @@ class kernel {
   void set(const context& context, cl_program validProgram);
 
  public:
-  // The default object is not valid
-  // because there is no program or cl_kernel associated with it
+  /**
+   * The default object is not valid
+   * because there is no program or cl_kernel associated with it
+   */
   kernel() = delete;
   kernel(std::nullptr_t) = delete;
 
-  // Constructs from a valid, initialized OpenCL kernel
+  /** Constructs from a valid, initialized OpenCL kernel */
   kernel(cl_kernel openclKernelObject);
 
-  // Return the OpenCL kernel object for this kernel.
+  /** @return the OpenCL kernel object for this kernel. */
   cl_kernel get() const {
     return kern.get();
   }
 
-  // Return the context that this kernel is defined for.
+  /** @return the context that this kernel is defined for. */
   context get_context() const {
     return ctx;
   }
 
-  // Return the program that this kernel is part of.
+  /** @return the program that this kernel is part of. */
   program get_program() const;
 
   template <info::kernel param>
@@ -69,12 +71,12 @@ class kernel {
         .get(kern.get());
   }
 
-  // Return the name of the kernel function
+  /** @return the name of the kernel function */
   string_class get_kernel_attributes() const {
     return get_info<info::kernel::attributes>();
   }
 
-  // Return the name of the kernel function
+  /** @return the name of the kernel function */
   string_class get_function_name() {
     return get_info<info::kernel::function_name>();
   }

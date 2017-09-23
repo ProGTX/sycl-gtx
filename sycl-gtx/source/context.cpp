@@ -36,12 +36,14 @@ context::context(cl_context c, const async_handler& asyncHandler,
 
 context::context() : context(nullptr, detail::default_async_handler, false) {}
 
-// Constructs a context object for SYCL host using an async_handler
-// for handling asynchronous errors.
+/**
+ * Constructs a context object for SYCL host using an async_handler
+ * for handling asynchronous errors.
+ */
 context::context(const async_handler& asyncHandler)
     : context(nullptr, asyncHandler, false) {}
 
-// Executes a retain on the cl_context
+/** Executes a retain on the cl_context */
 context::context(cl_context clContext, const async_handler& asyncHandler)
     : context(clContext, asyncHandler, false) {}
 

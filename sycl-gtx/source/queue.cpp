@@ -68,7 +68,7 @@ queue::queue(const context& syclContext, const device& syclDevice,
              const async_handler& asyncHandler)
     : queue(syclContext, syclDevice, false, asyncHandler) {}
 
-// Chooses a device based on the provided device selector in the given context.
+/** Chooses a device based on the provided device selector in the given context. */
 queue::queue(const context& syclContext, const device& syclDevice,
              info::queue_profiling profilingFlag,
              const async_handler& asyncHandler)
@@ -79,7 +79,7 @@ queue::queue(const context& syclContext, const device& syclDevice,
   command_q.release_one();
 }
 
-// Creates a queue for the provided device.
+/** Creates a queue for the provided device. */
 queue::queue(const device& syclDevice, const async_handler& asyncHandler)
     : ctx(syclDevice, false, asyncHandler),
       dev(syclDevice),
@@ -88,8 +88,10 @@ queue::queue(const device& syclDevice, const async_handler& asyncHandler)
   command_q.release_one();
 }
 
-// Creates a SYCL queue from an OpenCL queue.
-// At construction it does a retain on the queue memory object.
+/**
+ * Creates a SYCL queue from an OpenCL queue.
+ * At construction it does a retain on the queue memory object.
+ */
 queue::queue(cl_command_queue clQueue, const async_handler& asyncHandler)
     : command_q(clQueue), command_group(this) {
   display_device_info();
@@ -121,10 +123,12 @@ device queue::get_device() const {
   return dev;
 }
 
-// Checks to see if any asynchronous errors have been produced by the queue
-// and if so reports them by passing them to the async_handler
-// passed to the queue on construction.
-// If no async_handler was provided then asynchronous exceptions will be lost.
+/**
+ * Checks to see if any asynchronous errors have been produced by the queue
+ * and if so reports them by passing them to the async_handler
+ * passed to the queue on construction.
+ * If no async_handler was provided then asynchronous exceptions will be lost.
+ */
 void queue::throw_asynchronous() {
   if (ex_list.size() > 0) {
     detail::error::thrower::report_async(&ctx, ex_list);

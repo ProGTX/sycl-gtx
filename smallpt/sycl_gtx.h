@@ -335,7 +335,7 @@ static void compute_sycl_gtx(void* dev, int w, int h, int samps, Ray cameraRay,
   using namespace cl::sycl;
   using namespace ns_sycl_gtx;
 
-  queue q(*reinterpret_cast<device*>(dev));  // NOLINT
+  queue q(*static_cast<device*>(dev));  // NOLINT
 
   auto spheres_tmp = buffer<float16>(range<1>(ns_sycl_gtx::numSpheres));
   {

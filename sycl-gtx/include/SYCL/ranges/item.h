@@ -61,7 +61,7 @@ struct item {
   }
 
   // TODO(progtx): Return the linearized ID in the item's range.
-  // Computed as the flatted ID after the offset is subtracted.
+  /** Computed as the flatted ID after the offset is subtracted. */
   ::size_t get_linear_id() const {
     return 0;
   }
