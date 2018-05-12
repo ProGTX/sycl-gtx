@@ -111,14 +111,16 @@ inline bool intersect(const Ray& r, float& t, int& id) {
 Vec radiance(const Ray& r, int depth, uint16_t* Xi) {
   float t;     // distance to intersection
   int id = 0;  // id of intersected object
-  if (!intersect(r, t, id))
-    return Vec();                   // if miss, return black
+  if (!intersect(r, t, id)) {
+    return Vec();  // if miss, return black
+  }
   const Sphere& obj = spheres[id];  // the hit object
   Vec x = r.o + r.d * t;
   Vec n = (x - obj.p).norm(), nl = n.dot(r.d) < 0 ? n : n * -1, f = obj.c;
   float p = f.x > f.y && f.x > f.z ? f.x : f.y > f.z ? f.y : f.z;  // max refl
-  if (depth > 255)
+  if (depth > 255) {
     return obj.e;
+  }
   if (++depth > 5) {
     if (get_random(Xi) < p) {
       f = f * (1 / p);
