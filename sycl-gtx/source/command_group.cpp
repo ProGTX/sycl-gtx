@@ -153,7 +153,8 @@ void command::group_detail::add_buffer_copy(
     string_class name, buffer_base* buffer,
     buffer_base::clEnqueueBuffer_f enqueue_function) {
   last->commands.push_back(
-      {name, std::bind(function, std::placeholders::_1, std::placeholders::_2,
-                       buffer, enqueue_function),
+      {name,
+       std::bind(function, std::placeholders::_1, std::placeholders::_2, buffer,
+                 enqueue_function),
        type_t::copy_data, metadata(buffer_copy{buf_acc, copy_mode})});
 }

@@ -81,7 +81,7 @@ default_device_selector() {
   static const ptr_t selector(ptr_t(new default_selector()));
   return selector;
 }
-}
+}  // namespace detail
 
 }  // namespace sycl
 }  // namespace cl

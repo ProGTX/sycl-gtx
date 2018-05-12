@@ -214,7 +214,7 @@ namespace detail {
 static unique_ptr_class<handler> get_handler(queue* q) {
   return unique_ptr_class<handler>(new handler(q));
 }
-}
+}  // namespace detail
 
 }  // namespace sycl
 }  // namespace cl

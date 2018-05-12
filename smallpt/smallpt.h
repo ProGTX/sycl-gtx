@@ -210,9 +210,10 @@ static void displayDevice(const cl::sycl::device& d, int dNum,
   deviceVersion = deviceVersionString;
 
   printInfo("name", name, tabOffset);
-  printInfo("device_type", static_cast<cl_device_type>(
-                               d.get_info<info::device::device_type>()),
-            tabOffset);
+  printInfo(
+      "device_type",
+      static_cast<cl_device_type>(d.get_info<info::device::device_type>()),
+      tabOffset);
   printInfo("vendor", d.get_info<info::device::vendor>(), tabOffset);
   printInfo("device_version", deviceVersionString, tabOffset);
   printInfo("driver_version", d.get_info<info::device::driver_version>(),

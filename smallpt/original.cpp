@@ -89,13 +89,13 @@ Vec radiance(const Ray& r, int depth, uint16_t* Xi) {
   double b = nt + nc, R0 = a * a / (b * b), c = 1 - (into ? -ddn : tdir.dot(n));
   double Re = R0 + (1 - R0) * c * c * c * c * c;
   double Tr = 1 - Re, P = .25 + .5 * Re, RP = Re / P, TP = Tr / (1 - P);
-  return obj.e +
-         f.mult(depth > 2 ? (get_random(Xi) < P
-                                 ?  // Russian roulette
-                                 radiance(reflRay, depth, Xi) * RP
-                                 : radiance(Ray(x, tdir), depth, Xi) * TP)
-                          : radiance(reflRay, depth, Xi) * Re +
-                                radiance(Ray(x, tdir), depth, Xi) * Tr);
+  return obj.e + f.mult(depth > 2
+                            ? (get_random(Xi) < P
+                                   ?  // Russian roulette
+                                   radiance(reflRay, depth, Xi) * RP
+                                   : radiance(Ray(x, tdir), depth, Xi) * TP)
+                            : radiance(reflRay, depth, Xi) * Re +
+                                  radiance(Ray(x, tdir), depth, Xi) * Tr);
 }
 inline void compute_inner(int y, int w, int h, int samps, Ray& cam, Vec& cx,
                           Vec& cy, Vec& r, Vec* c) {

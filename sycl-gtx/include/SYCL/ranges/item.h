@@ -21,8 +21,8 @@ namespace kernel_ns {
 // Forward declaration
 template <class Input>
 struct constructor;
-}
-}
+}  // namespace kernel_ns
+}  // namespace detail
 
 template <int dimensions = 1>
 struct item {

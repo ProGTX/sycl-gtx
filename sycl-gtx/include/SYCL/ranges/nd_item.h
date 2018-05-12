@@ -23,7 +23,7 @@ namespace kernel_ns {
 template <class Input>
 struct constructor;
 }
-}
+}  // namespace detail
 
 template <int dimensions = 1>
 struct nd_item {

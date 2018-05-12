@@ -161,8 +161,9 @@ class group_detail {
 
   template <type_t type = type_t::unspecified, class F, class... Args>
   static void add_command(F function, string_class name, Args... params) {
-    last->commands.push_back({name, std::bind(function, std::placeholders::_1,
-                                              std::placeholders::_2, params...),
+    last->commands.push_back({name,
+                              std::bind(function, std::placeholders::_1,
+                                        std::placeholders::_2, params...),
                               type});
   }
 

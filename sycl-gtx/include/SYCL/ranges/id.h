@@ -23,7 +23,7 @@ namespace kernel_ns {
 class source;
 template <class Input>
 struct constructor;
-}
+}  // namespace kernel_ns
 
 }  // namespace detail
 

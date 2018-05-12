@@ -137,7 +137,7 @@ class buffer_detail : public buffer_base {
    * The SYCL runtime receives full ownership of the hostData unique_ptr
    * and in effect there is no synchronization with the application code
    * using hostData.
-  */
+   */
   buffer_detail(unique_ptr_class<void>&& hostData,
                 const range<dimensions>& bufferRange);
 

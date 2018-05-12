@@ -20,8 +20,7 @@ namespace detail {
  */
 SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
                     target == access::target::global_buffer)
-,
-    public accessor_buffer<DataType, dimensions>,
+, public accessor_buffer<DataType, dimensions>,
     public accessor_device_ref<dimensions, DataType, dimensions, mode, target> {
  private:
   template <int, typename, int, access::mode, access::target>

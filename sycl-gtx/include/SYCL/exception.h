@@ -15,7 +15,7 @@ namespace detail {
 namespace error {
 struct thrower;
 }
-}
+}  // namespace detail
 
 struct exception : std::exception_ptr {
  protected:
