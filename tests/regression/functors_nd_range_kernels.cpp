@@ -53,7 +53,6 @@ int main() {
       random_num = functor.get_random();
 
       debug() << "-> Random number" << random_num;
-
     });
 
     auto hostPtr =

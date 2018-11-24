@@ -73,7 +73,7 @@ struct testInfo {
   }
 };
 
-static decltype(now()) & startTime() {
+static decltype(now())& startTime() {
   static decltype(now()) s(now());
   return s;
 }

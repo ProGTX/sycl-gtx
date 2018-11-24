@@ -84,8 +84,8 @@ class data_ref {
     return *this;
   }
 
-    // TODO(progtx):
-    // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/operators.html
+  // TODO(progtx):
+  // https://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/operators.html
 
 #define SYCL_ASSIGNMENT_OPERATOR(op)              \
   template <class T>                              \
@@ -158,13 +158,13 @@ class data_ref {
   data_ref operator++() const {
     return data_ref(open_parenthesis + "++" + name + ')');
   }
-  data_ref operator++(int)const {
+  data_ref operator++(int) const {
     return data_ref(open_parenthesis + name + "++" + ')');
   }
   data_ref operator--() const {
     return data_ref(open_parenthesis + "--" + name + ')');
   }
-  data_ref operator--(int)const {
+  data_ref operator--(int) const {
     return data_ref(open_parenthesis + name + "--" + ')');
   }
 
