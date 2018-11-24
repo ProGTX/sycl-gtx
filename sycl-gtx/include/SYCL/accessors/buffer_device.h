@@ -64,9 +64,8 @@ SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
     std::swap(static_cast<base_acc_device_ref&>(*this), move);
     return *this;
   }
-  virtual ~accessor_detail() = default;
 
-  virtual cl_mem get_cl_mem_object() const override {
+  cl_mem get_cl_mem_object() const final {
     return base_acc_buffer::get_buffer_object();
   }
 
@@ -84,11 +83,11 @@ SYCL_ACCESSOR_CLASS(target == access::target::constant_buffer ||
   SYCL_DEVICE_REF_SUBSCRIPT_OPERATORS(base_acc_device_ref::);
 
  protected:
-  virtual void* resource() const override {
+  void* resource() const final {
     return base_acc_buffer::buf;
   }
 
-  virtual ::size_t argument_size() const override {
+  ::size_t argument_size() const final {
     return sizeof(cl_mem);
   }
 };

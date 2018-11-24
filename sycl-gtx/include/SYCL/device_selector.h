@@ -34,6 +34,7 @@ class device_selector {
   device_selector() : device_selector(info::device_type::all) {}
   device select_device() const;
   virtual int operator()(const device& dev) const = 0;
+  virtual ~device_selector() = default;
 };
 
 // TODO(progtx): Built-in device selectors
@@ -45,7 +46,7 @@ class device_selector {
  */
 struct default_selector : device_selector {
   default_selector() : device_selector(info::device_type::defaults) {}
-  virtual int operator()(const device& dev) const override;
+  int operator()(const device& dev) const final;
 };
 
 /**
@@ -55,7 +56,7 @@ struct default_selector : device_selector {
  */
 struct gpu_selector : device_selector {
   gpu_selector() : device_selector(info::device_type::gpu) {}
-  virtual int operator()(const device& dev) const override;
+  int operator()(const device& dev) const final;
 };
 
 /**
@@ -65,13 +66,13 @@ struct gpu_selector : device_selector {
  */
 struct cpu_selector : device_selector {
   cpu_selector() : device_selector(info::device_type::cpu) {}
-  virtual int operator()(const device& dev) const override;
+  int operator()(const device& dev) const final;
 };
 
 /** Selects the SYCL host CPU device that does not require an OpenCL runtime. */
 struct host_selector : device_selector {
   host_selector() : device_selector(info::device_type::defaults) {}
-  virtual int operator()(const device& dev) const override;
+  int operator()(const device& dev) const final;
 };
 
 namespace detail {

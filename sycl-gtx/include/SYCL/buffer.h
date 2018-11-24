@@ -278,8 +278,8 @@ class buffer_detail : public buffer_base {
 
  private:
   // TODO(progtx):
-  virtual void enqueue(queue* q, const vector_class<cl_event>& wait_events,
-                       clEnqueueBuffer_f clEnqueueBuffer) override {
+  void enqueue(queue* q, const vector_class<cl_event>& wait_events,
+               clEnqueueBuffer_f clEnqueueBuffer) final {
     cl_event evnt;
     auto error_code = this->cl_enqueue_buffer(
         q, get_size(), host_data.get(), wait_events, evnt, clEnqueueBuffer);

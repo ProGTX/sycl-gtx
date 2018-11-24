@@ -34,11 +34,11 @@ SYCL_ACCESSOR_CLASS(target == access::target::local)
     return allocationSize.get(n);
   }
 
-  virtual void* resource() const override {
+  void* resource() const final {
     return reinterpret_cast<void*>(this->get_count_id());  // NOLINT
   }
 
-  virtual ::size_t argument_size() const override {
+  ::size_t argument_size() const final {
     return data_size<DataType>::get() * allocationSize.size();
   }
 

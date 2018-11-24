@@ -19,6 +19,9 @@ class group_detail;
 }
 
 class buffer_base {
+ public:
+  virtual ~buffer_base() = default;
+
  protected:
   friend class issue_command;
   friend class ::cl::sycl::queue;

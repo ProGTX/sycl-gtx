@@ -40,6 +40,8 @@ class accessor_core : public accessor_base {
    * the memory object. */
   cl_event get_cl_event_object() const;
 
+  virtual ~accessor_core() = default;
+
  protected:
   friend class kernel_ns::source;
 
