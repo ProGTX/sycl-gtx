@@ -98,9 +98,8 @@ and to make them type safe.
 
 ## The SYCL ecosystem
 
-There are two other known implementations of SYCL,
-[triSYCL](https://github.com/keryell/triSYCL)
-and [ComputeCpp](https://www.codeplay.com/products/computesuite/computecpp).
+There are other known implementations of SYCL,
+like [triSYCL](https://github.com/keryell/triSYCL), [ComputeCpp](https://www.codeplay.com/products/computesuite/computecpp) and [hipSYCL](https://github.com/illuhad/hipSYCL)
 
 In addition to implementations,
 there is an effort to build the SYCL ecosystem
