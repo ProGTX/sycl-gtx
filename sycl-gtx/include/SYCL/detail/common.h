@@ -1,12 +1,7 @@
 #pragma once
 
-#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
-#ifdef __APPLE__
-#include <OpenCL/cl.h>
-#else
-#include <CL/cl.h>
-#endif
 #include "SYCL/detail/msvc_version.h"
+#include "SYCL/detail/opencl.h"
 
 #include <cstdio>
 #include <sstream>
