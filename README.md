@@ -99,7 +99,10 @@ and to make them type safe.
 ## The SYCL ecosystem
 
 There are other known implementations of SYCL,
-like [triSYCL](https://github.com/keryell/triSYCL), [ComputeCpp](https://www.codeplay.com/products/computesuite/computecpp) and [hipSYCL](https://github.com/illuhad/hipSYCL)
+like [ComputeCpp](https://www.codeplay.com/products/computesuite/computecpp),
+[triSYCL](https://github.com/keryell/triSYCL),
+[hipSYCL](https://github.com/illuhad/hipSYCL),
+and [Intel LLVM SYCL](https://github.com/intel/llvm/tree/sycl).
 
 In addition to implementations,
 there is an effort to build the SYCL ecosystem
