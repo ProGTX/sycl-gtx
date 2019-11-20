@@ -108,7 +108,7 @@ so that developers can then use tools they already know,
 just with SYCL running underneath.
 sycl-gtx will try to cover at least some of those efforts.
 
-A good ecosystem starting point is [sycl.tech](sycl.tech),
+A good ecosystem starting point is [sycl.tech](https://sycl.tech/),
 along with [SyclParallelSTL](https://github.com/KhronosGroup/SyclParallelSTL)
 (an implementation of the C++17 Parallel STL in SYCL),
 [ComputeCpp SDK](https://github.com/codeplaysoftware/computecpp-sdk)
