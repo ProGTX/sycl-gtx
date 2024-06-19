@@ -56,8 +56,12 @@ struct identifier_code {
         source::add(string_class("const int ") + name + " = " + name + "1 * " +
                     function_name + "(0) + " + name + "0");
       }
+      if (dimensions == 3) {
+        source::add(string_class("const int ") + name + " = " + name + "2 * " +
+                    function_name + "(1) * " + function_name + "(0) + " + name +
+                    "1 * " + function_name + "(0) + " + name + "0");
+      }
 
-      // TODO(progtx): 3d
     }
   }
 };
